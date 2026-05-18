@@ -991,7 +991,7 @@ function rulePCIT() {
 function rulePsychotherapy() {
   const ageOk=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
   const langOk=isVerbalEnough();
-  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.emotionalReg;
+  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.emotionalReg;
   return {include:ageOk&&langOk&&ind};
 }
 function ruleSocialSkills() {
@@ -1004,7 +1004,7 @@ function ruleSLP() {
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
-function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('coordination')}; }
+function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() { return {include:S.diagStatus==='confirmed'}; }
 function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings}; }
 function rulePsychiatry() {
@@ -1012,7 +1012,7 @@ function rulePsychiatry() {
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
   return {include:med||sev};
 }
-function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding}; }
+function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
   const delay=['nonverbal','singleWord','phrase','morphosyntactic','unclearSLP'].includes(S.langLevel)||hasMorphoErrors()||hasAnyArticulation();
@@ -2680,6 +2680,8 @@ function _iepLetterContent(){
       goals.push('social-pragmatic language: conversational turn-taking, perspective-taking in academic discussion, and understanding classroom social discourse');
     if(S.langModifiers&&(S.langModifiers.has('speechSound')||S.langModifiers.has('reducedIntell')))
       goals.push('speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness');
+    if(S.comorbid.has('language_disorder'))
+      goals.push('language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting academic comprehension and classroom participation, addressed as a diagnosis distinct from ASD-related social communication impairment');
     if(goals.length) s+=' Recommended goals include: '+goals.join('; ')+'.';
     svContent.slp_school=s;
   }
@@ -3426,6 +3428,8 @@ function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── SYNC HELPERS ────────────────────────────────────────────────────────────
 // Needs checkboxes → pre-populate ABA targets (add-only; manual unchecks are preserved)
 function syncABATargetsFromNeeds(){
+  // rigidity is derived from B2 (not directly checkable); reset before re-evaluating
+  if(!S.criteriaB.has('b2')) S.needsBehavior.delete('rigidity');
   const add=(t)=>{
     if(S.abaTargets.has(t)) return;
     S.abaTargets.add(t);
@@ -3445,8 +3449,12 @@ function syncABATargetsFromNeeds(){
   if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
   // Stereotypy — fire when b1 (repetitive movements/speech) checked or any interfering behavior present
   if(S.criteriaB.has('b1')||S.needsBehavior.size>0) add('reduce_stereotypy');
-  // Transitions — fire when b2 (insistence on sameness) checked
-  if(S.criteriaB.has('b2')) add('transitions');
+  // Transitions + rigidity — fire when b2 (insistence on sameness) checked
+  // B2 IS rigidity; also populate needsBehavior so IEP letter, accommodation, and counseling triggers activate
+  if(S.criteriaB.has('b2')){
+    add('transitions');
+    S.needsBehavior.add('rigidity');
+  }
   // Self-regulation — fire when emotional regulation is flagged
   if(S.emotionalReg) add('self_reg');
 }
@@ -3467,13 +3475,13 @@ function syncSchoolSvcFromNeeds(){
       lbl.appendChild(badge);
     }
   };
-  if(S.needsComm.size>0||S.langLevel) add('slp_school');
+  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
-  if(S.needsMotor.has('gross')) add('pt_school');
+  if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')){add('aide');add('fba');}
-  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')) add('counseling');
+  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')) add('counseling');
   if(S.comorbid.has('ld_suspected')) add('psychoed');
 }
 
