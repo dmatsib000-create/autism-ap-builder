@@ -293,10 +293,11 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">GDD<br>(testing deferred)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="borderline">Borderline</label>
+          <label class="r-opt" id="gddCogOption"><input type="radio" name="cogProfile" value="gdd">GDD</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">Above average</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">Above-average<br>range</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown /<br>under evaluation</label>
         </div>
       </div>
@@ -308,6 +309,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="r-opt"><input type="radio" name="adaptProfile" value="moderatelyImpaired">Moderately impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="mildlyImpaired">Mildly impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Commensurate<br>w/ cognitive level</label>
+          <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Age-appropriate<br>/ WNL</label>
         </div>
       </div>
 
@@ -423,6 +425,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGDD"> With Global Developmental Delay (GDD) — confirmed</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
             </div>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — approx. IQ 70–79, does not meet ID criteria</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -1042,8 +1045,8 @@ function validateCriteria() {
 
 // ─── LABEL MAPS ──────────────────────────────────────────────────────────────
 const AGE_LABELS={toddler:'toddler (12–35 months)',preschool:'preschool-aged child (3–5 years)',schoolAge:'school-aged child (6–11 years)',adolescent:'adolescent (12–17 years)',youngAdult:'young adult (18+ years)'};
-const COG_LABELS={id_severe:'Severe intellectual disability is present.',id_moderate:'Moderate intellectual disability is present.',id_mild:'Mild intellectual disability is present.',borderline:'Cognitive functioning falls in the borderline range.',average:'Cognitive functioning is in the average range.',aboveAverage:'Cognitive functioning is above average.',gdd:'Global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of psychoeducational evaluation.',unknown:'Cognitive/intellectual functioning has not been formally evaluated or results are pending; estimates are based on clinical observation and developmental history.'};
-const ADAPT_LABELS={severelyImpaired:'Adaptive behavior is severely impaired relative to chronological age.',moderatelyImpaired:'Adaptive behavior is moderately impaired relative to chronological age.',mildlyImpaired:'Adaptive behavior is mildly impaired relative to chronological age.',commensurate:'Adaptive behavior is commensurate with cognitive level.'};
+const COG_LABELS={id_severe:'Severe intellectual disability is present.',id_moderate:'Moderate intellectual disability is present.',id_mild:'Mild intellectual disability is present.',borderline:'Cognitive functioning falls in the borderline intellectual functioning (BIF) range.',lowAverage:'Cognitive functioning is in the low-average range.',average:'Cognitive functioning is in the average range.',aboveAverage:'Cognitive functioning is above average.',gdd:'Global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of psychoeducational evaluation.',unknown:'Cognitive/intellectual functioning has not been formally evaluated or results are pending; estimates are based on clinical observation and developmental history.'};
+const ADAPT_LABELS={severelyImpaired:'Adaptive behavior is severely impaired relative to chronological age.',moderatelyImpaired:'Adaptive behavior is moderately impaired relative to chronological age.',mildlyImpaired:'Adaptive behavior is mildly impaired relative to chronological age.',commensurate:'Adaptive behavior is commensurate with cognitive level.',ageAppropriate:'Adaptive behavior is age-appropriate and within normal limits.'};
 const LEVEL_LABELS={'1':'Level 1, requiring support','2':'Level 2, requiring substantial support','3':'Level 3, requiring very substantial support'};
 const LEVEL_DESC={
   sc:{
@@ -1070,6 +1073,7 @@ const SPEC_LABELS={
   withSuspectedID:'with suspected intellectual disability — formal evaluation pending',
   withGDD:'with Global Developmental Delay (GDD)',
   withSuspectedGDD:'with Global Developmental Delay (GDD) — provisional, formal evaluation underway',
+  withBIF:'with borderline intellectual functioning (BIF)',
   withoutID:'without intellectual impairment',
   withLangImpairment:'with co-occurring language impairment (confirmed)',
   withSuspectedLang:'with suspected/uncharacterized language impairment (SLP evaluation pending)',
@@ -1104,7 +1108,8 @@ function generateClinicalSummary(){
   const langDesc=getLangDescription();
   const cogShort={
     id_severe:'with severe intellectual disability',id_moderate:'with moderate intellectual disability',
-    id_mild:'with mild intellectual disability',borderline:'with cognitive functioning in the borderline range',
+    id_mild:'with mild intellectual disability',borderline:'with cognitive functioning in the borderline intellectual functioning (BIF) range',
+    lowAverage:'with cognitive functioning in the low-average range',
     average:'with cognitive functioning in the average range',aboveAverage:'with above-average cognitive functioning',
     gdd:'with global developmental delays',unknown:'with cognitive functioning not yet formally assessed'
   }[S.cogProfile]||'';
@@ -1112,7 +1117,8 @@ function generateClinicalSummary(){
     severelyImpaired:'severely impaired adaptive behavior relative to chronological age',
     moderatelyImpaired:'moderately impaired adaptive behavior relative to chronological age',
     mildlyImpaired:'mildly impaired adaptive behavior relative to chronological age',
-    commensurate:'adaptive behavior commensurate with cognitive level'
+    commensurate:'adaptive behavior commensurate with cognitive level',
+    ageAppropriate:'adaptive behavior age-appropriate and within normal limits'
   }[S.adaptProfile]||'';
 
   // Opening sentence — "The patient is a [preschool-aged boy/girl/child] who is [conversational], [with avg cognition], with [adaptive]."
@@ -1281,6 +1287,7 @@ function generateNote() {
     const idCode={id_mild:'F70',id_moderate:'F71',id_severe:'F72'}[S.cogProfile]||'F79';
     const idSev={id_mild:'mild',id_moderate:'moderate',id_severe:'severe'}[S.cogProfile]||'unspecified severity';
     comorbs.push(`Intellectual disability, ${idSev} (${idCode})`);
+    if(!hasID()) comorbs.push('[DOCUMENTATION NOTE: "With intellectual disability" specifier is checked but no ID severity is selected in Cognitive Profile. ICD-10 code defaults to F79 (unspecified severity). Select a severity in Cognitive Profile for precise coding.]');
   }
   if(S.specifiers.has('withSuspectedID')) comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)');
   if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)');
@@ -2658,6 +2665,7 @@ function _iepLetterContent(){
     withSuspectedID:'with suspected intellectual disability, formal evaluation pending',
     withGDD:'with Global Developmental Delay',
     withSuspectedGDD:'with Global Developmental Delay, formal evaluation underway',
+    withBIF:'with borderline intellectual functioning (BIF)',
     withoutID:'without intellectual impairment',
     withLangImpairment:'with co-occurring language impairment',
     withCatatonia:'with associated catatonia'
@@ -2771,7 +2779,11 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('sped')){
-    svContent.sped='Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student\'s present levels of performance and updated at each annual IEP review.';
+    let spedText='Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student\'s present levels of performance and updated at each annual IEP review.';
+    if(hasID()){
+      spedText+=' Given the confirmed intellectual disability, the IEP team should consider: (1) a modified curriculum aligned to the student\'s functional level rather than standard grade-level expectations; (2) eligibility for the Florida Alternate Assessment (FAA) in place of standard statewide assessments, per Florida Rule 6A-1.0943; and (3) transition planning goals beginning no later than age 16, with functional skills and supported employment pathways as appropriate to the level of intellectual disability.';
+    }
+    svContent.sped=spedText;
   }
 
   const accomASD=[];
@@ -2779,6 +2791,11 @@ function _iepLetterContent(){
   accomASD.push('Visual supports: written or pictorial schedule, visual cues for task steps and transitions');
   if(S.needsSensory.size) accomASD.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools); alternative seating options');
   if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomASD.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  if(hasID()){
+    accomASD.push('Modified curriculum: alternate grade-level content standards aligned with functional level; IEP goals written to functional benchmarks rather than standard grade-level expectations');
+    accomASD.push('Alternate assessment: FAA (Florida Alternate Assessment) in place of standard statewide assessments where applicable, per Florida Rule 6A-1.0943 and IDEA');
+    accomASD.push('Specialized academic instruction: direct instruction in an appropriately supportive setting consistent with the degree of intellectual disability and IDEA Least Restrictive Environment (LRE) requirements');
+  }
   const accomBeh=[];
   if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
   if(S.comorbid.has('anxiety')) accomBeh.push('Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes');
@@ -3359,7 +3376,7 @@ function updateSectionHeaders(){
 function bridgeCogProfileToSpecifier(cogVal){
   // Clear the mutually-exclusive ID/GDD specifier group, then pre-check the
   // matching specifier. Clinician can still manually override after.
-  const excl=['withID','withSuspectedID','withGDD','withSuspectedGDD','withoutID'];
+  const excl=['withID','withSuspectedID','withGDD','withSuspectedGDD','withBIF','withoutID'];
   excl.forEach(k=>{
     S.specifiers.delete(k);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
@@ -3368,7 +3385,8 @@ function bridgeCogProfileToSpecifier(cogVal){
   let toCheck=null;
   if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck='withID';
   else if(cogVal==='gdd') toCheck='withGDD';
-  else if(['average','aboveAverage','borderline'].includes(cogVal)) toCheck='withoutID';
+  else if(cogVal==='borderline') toCheck='withBIF';
+  else if(['average','aboveAverage','lowAverage'].includes(cogVal)) toCheck='withoutID';
   // cogVal==='unknown' → leave all unchecked; clinician decides
   if(toCheck){
     S.specifiers.add(toCheck);
@@ -3420,6 +3438,18 @@ function updateAgeBasedVisibility(){
       gddRows.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
     }
   }
+  // GDD cogProfile option — only valid for toddler/preschool (GDD is not diagnosable after ~age 5-6)
+  const gddCogOpt=document.getElementById('gddCogOption');
+  if(gddCogOpt){
+    const hideGddCog=older&&S.ageGroup!=='';
+    gddCogOpt.style.display=hideGddCog?'none':'';
+    if(hideGddCog&&S.cogProfile==='gdd'){
+      S.cogProfile='';
+      const r=gddCogOpt.querySelector('input[type=radio]');
+      if(r) r.checked=false;
+      bridgeCogProfileToSpecifier('');
+    }
+  }
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
@@ -3457,6 +3487,8 @@ function syncABATargetsFromNeeds(){
   }
   // Self-regulation — fire when emotional regulation is flagged
   if(S.emotionalReg) add('self_reg');
+  // Confirmed severe/moderate ID — self-help skills are a core ABA target
+  if(S.cogProfile==='id_severe'||S.cogProfile==='id_moderate') add('self_help');
 }
 
 // Needs/comorbid checkboxes -> pre-populate school services (add-only; manual unchecks preserved via schoolSvcManualOff)
@@ -3483,6 +3515,7 @@ function syncSchoolSvcFromNeeds(){
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')){add('aide');add('fba');}
   if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')) add('counseling');
   if(S.comorbid.has('ld_suspected')) add('psychoed');
+  if(hasID()) add('sped');
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
