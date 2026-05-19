@@ -101,6 +101,17 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-yes{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--green-light);color:#166534;font-weight:500}
 .ov-no{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
 .divider{border:none;border-top:1px solid var(--gray-200);margin:8px 0}
+/* ── 2-column checkbox grid for dense sub-domains ── */
+.cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:8px;row-gap:3px;align-items:start}
+.cb-list.col2>div{grid-column:1/-1}
+/* ── Comorbid group separators ── */
+.comorbid-grp{font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
+/* ── Section completion left-border ── */
+.section.has-content{border-left:3px solid var(--green)}
+/* ── Prior-testing expander ── */
+.expander-btn{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:4px;font-family:var(--font)}
+.expander-btn:hover{color:var(--blue)}
+.expander-count{font-size:10px;font-weight:500;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue);border-radius:999px;padding:1px 7px;margin-left:2px}
 .pronoun-hint{font-size:10.5px;color:var(--gray-400);margin-top:3px;font-style:italic}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
@@ -378,21 +389,23 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
         <label class="cb-row"><input type="checkbox" data-key="single" value="cars2Done"> CARS-2 completed at this visit (results incorporated — note tense will update)</label>
       </div>
       <div class="field-group" style="margin-top:8px">
-        <span class="field-label">Prior autism-specific testing reviewed</span>
-        <div class="field-hint">Results documented separately — select outcome per instrument</div>
-        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+        <button id="priorTestToggleBtn" class="expander-btn" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
+        <div id="priorTestList" style="display:none">
+        <div class="field-hint" style="margin:3px 0 5px">Results documented separately — select outcome per instrument</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2st"> CARS-2 ST</label><select class="outcome-sel" data-outcome-key="cars2st"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2st" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2hf"> CARS-2 HF</label><select class="outcome-sel" data-outcome-key="cars2hf"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2hf" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="ados2"> ADOS-2</label><select class="outcome-sel" data-outcome-key="ados2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><select class="prior-mod-sel" id="ados2ModuleSel"><option value="">— module —</option><option value="Module T">Module T (toddler)</option><option value="Module 1">Module 1 (preverbal/min. verbal)</option><option value="Module 2">Module 2 (phrase speech)</option><option value="Module 3">Module 3 (fluent speech)</option><option value="Module 4">Module 4 (fluent, older)</option></select><input class="prior-date-input" data-date-key="ados2" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="adir"> ADI-R</label><select class="outcome-sel" data-outcome-key="adir"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="adir" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="asdpeds" type="text" placeholder="date admin."></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="midgas" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="srs2"> SRS-2 (Social Responsiveness Scale, 2nd ed.)</label><select class="outcome-sel" data-outcome-key="srs2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (T ≥ 60, clinically significant)</option><option value="equivocal">Equivocal (T 55–59, mild-moderate range)</option><option value="notConsistent">Not consistent with ASD (T &lt; 55, average range)</option></select><input class="prior-date-input" data-date-key="srs2" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label><select class="outcome-sel" data-outcome-key="gars3"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (AQ ≥ 70, very likely)</option><option value="equivocal">Equivocal (AQ 55–69, possibly)</option><option value="notConsistent">Not consistent with ASD (AQ &lt; 55, unlikely)</option></select><input class="prior-date-input" data-date-key="gars3" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="vineland3"> Vineland-3</label><select class="outcome-sel" data-outcome-key="vineland3"><option value="">— outcome —</option><option value="consistent">Significantly impaired (consistent with ASD adaptive profile)</option><option value="equivocal">Mildly impaired</option><option value="notConsistent">Age-appropriate / within normal limits</option></select><input class="prior-date-input" data-date-key="vineland3" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="basc3"> BASC-3</label><select class="outcome-sel" data-outcome-key="basc3"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ASD/ADHD/anxiety profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="basc3" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="conners4"> Conners 4</label><select class="outcome-sel" data-outcome-key="conners4"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ADHD/behavioral profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="conners4" type="text" placeholder="date admin."></div>
         </div>
+        </div><!-- /priorTestList -->
       </div>
     </div>
   </div>
@@ -500,7 +513,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Communication</span>
-        <div class="cb-list">
+        <div class="cb-list col2">
           <label class="cb-row"><input type="checkbox" data-key="needsComm" value="expressive"> Expressive language delays</label>
           <label class="cb-row"><input type="checkbox" data-key="needsComm" value="receptive"> Receptive language delays</label>
           <label class="cb-row"><input type="checkbox" data-key="needsComm" value="functional_aac"> Functional communication / AAC needs</label>
@@ -510,11 +523,14 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Adaptive / Self-Care</span>
-        <div class="cb-list">
+        <div class="cb-list col2">
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="toileting"> Toileting / toilet training</label>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="dressing"> Dressing / undressing</label>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="feeding_adl"> Mealtime / self-feeding</label>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="hygiene"> Hygiene / grooming</label>
+          <div id="menstrualCareRow" style="display:none;grid-column:1/-1;margin-left:16px">
+            <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="menstrualCare"> Menstrual hygiene management</label>
+          </div>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="commSafety"> Community safety (supervision in public, hazard awareness)</label>
           <div id="strangerDangerRow" style="display:none;margin-left:16px">
             <label class="cb-row"><input type="checkbox" data-key="single" value="strangerDanger"> Reduced protective stranger response (approaches unfamiliar adults without appropriate caution)</label>
@@ -544,7 +560,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Social / Play</span>
-        <div class="cb-list">
+        <div class="cb-list col2">
           <label class="cb-row"><input type="checkbox" data-key="needsSocial" value="peer"> Peer interaction / friendships</label>
           <label class="cb-row"><input type="checkbox" data-key="needsSocial" value="play"> Play skills</label>
           <label class="cb-row"><input type="checkbox" data-key="needsSocial" value="reciprocity"> Social reciprocity</label>
@@ -556,7 +572,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Sensory Processing</span>
-        <div class="cb-list">
+        <div class="cb-list col2">
           <label class="cb-row"><input type="checkbox" data-key="needsSensory" value="hypersensitivity"> Sensory hypersensitivity (over-responsive)</label>
           <label class="cb-row"><input type="checkbox" data-key="needsSensory" value="hyposensitivity"> Sensory hyposensitivity (under-responsive)</label>
           <label class="cb-row"><input type="checkbox" data-key="needsSensory" value="seeking"> Sensory-seeking behaviors</label>
@@ -566,7 +582,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Motor</span>
-        <div class="cb-list">
+        <div class="cb-list col2">
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="gross"> Gross motor delays / hypotonia</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="fine"> Fine motor delays</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="coordination"> Motor coordination / DCD</label>
@@ -577,17 +593,20 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <div class="field-group">
         <span class="field-label">Additional Domains</span>
         <div class="cb-list">
+          <div class="comorbid-grp" style="margin-top:2px">Regulatory / Behavioral</div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="emotionalReg"> Emotional regulation difficulties</label>
           <div class="beh-freq-row" data-for="emotionalReg" style="display:none"><input class="beh-freq-inp" data-freqkey="emotionalReg" type="text" placeholder="Frequency/description (optional) — e.g., 2–3 episodes/day, triggered by transitions or demands"></div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="academic"> Academic / learning difficulties</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
+          <div class="comorbid-grp">Medical</div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
+          <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="hearingScreenFail"> Behavioral hearing screen non-compliant or inconclusive</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="under34Months"> Under 34 months — Early Steps (FL Part C) eligible</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="seizureConcern"> History concerning for seizures (staring spells, atypical regression, non-emergent) → EEG</label>
           <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
+          <div class="comorbid-grp">Support Services</div>
+          <label class="cb-row"><input type="checkbox" data-key="single" value="under34Months"> Under 34 months — Early Steps (FL Part C) eligible</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
           <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
             <span class="sub-label">Reason(s) for referral</span>
@@ -609,6 +628,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
     <div class="sec-body">
       <p style="font-size:11px;color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
+        <div class="comorbid-grp" style="margin-top:2px">Psychiatric / Behavioral Health</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_combined"> ADHD, Combined presentation</label><span class="plan-pill" data-cv="adhd_combined">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_inattentive"> ADHD, Predominantly inattentive</label><span class="plan-pill" data-cv="adhd_inattentive">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_hyperactive"> ADHD, Predominantly hyperactive-impulsive</label><span class="plan-pill" data-cv="adhd_hyperactive">Include plan</span></div>
@@ -623,6 +643,18 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           </div>
         </div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><span class="plan-pill" data-cv="trauma">Include plan</span></div>
+
+        <div class="comorbid-grp">Neurodevelopmental</div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><span class="plan-pill" data-cv="language_disorder">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_reading"> Specific learning disorder — reading / dyslexia (F81.0)</label><span class="plan-pill" data-cv="ld_reading">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_math"> Specific learning disorder — mathematics / dyscalculia (F81.2)</label><span class="plan-pill" data-cv="ld_math">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_written"> Specific learning disorder — written expression / dysgraphia (F81.81)</label><span class="plan-pill" data-cv="ld_written">Include plan</span></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><span class="plan-pill" data-cv="ld_suspected">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><span class="plan-pill" data-cv="dcd">Include plan</span></div>
+
+        <div class="comorbid-grp">Medical</div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><span class="plan-pill" data-cv="epilepsy">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="sleep_disorder"> Sleep disorder (insomnia / circadian)</label><span class="plan-pill" data-cv="sleep_disorder">Include plan</span></div>
         <div id="sleepFactorsRow" class="sub-options" style="display:none">
           <span class="sub-label">Contributing factors (check all that apply)</span>
@@ -631,7 +663,6 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="sleepFactors" value="anxiety"> Anxiety / bedtime resistance</label>
           <label class="cb-row"><input type="checkbox" data-key="sleepFactors" value="stimulant"> Stimulant timing effects</label>
         </div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><span class="plan-pill" data-cv="epilepsy">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="gi"> GI issues (constipation / GERD / abdominal pain)</label><span class="plan-pill" data-cv="gi">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_chronic"> Pediatric Feeding Disorder (PFD) — Chronic, ≥3 months (R63.32)</label><span class="plan-pill" data-cv="pfd_chronic">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_acute"> Pediatric Feeding Disorder (PFD) — Acute, &lt;3 months (R63.31)</label><span class="plan-pill" data-cv="pfd_acute">Include plan</span></div>
@@ -656,13 +687,6 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="arfidImpact" value="psychosocial"> Marked interference with psychosocial functioning</label>
         </div>
         <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="arfid_suspected"> ARFID — Suspected, evaluation pending (F50.82 provisional)</label><span class="plan-pill" data-cv="arfid_suspected">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><span class="plan-pill" data-cv="dcd">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><span class="plan-pill" data-cv="language_disorder">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_reading"> Specific learning disorder — reading / dyslexia (F81.0)</label><span class="plan-pill" data-cv="ld_reading">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_math"> Specific learning disorder — mathematics / dyscalculia (F81.2)</label><span class="plan-pill" data-cv="ld_math">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_written"> Specific learning disorder — written expression / dysgraphia (F81.81)</label><span class="plan-pill" data-cv="ld_written">Include plan</span></div>
-        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><span class="plan-pill" data-cv="ld_suspected">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><span class="plan-pill" data-cv="trauma">Include plan</span></div>
       </div>
     </div>
   </div>
@@ -804,6 +828,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="joint_attention"> Joint attention and social referencing</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="imitation"> Imitation and observational learning</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="self_help"> Self-help / daily living skills (feeding, dressing, toileting)</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="menstrual_care"> Menstrual hygiene management</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="safety_skills"> Safety skills and community awareness</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="play"> Play skills and peer interaction</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_sib"> Reduction of self-injurious behavior (SIB)</label>
@@ -1260,7 +1285,7 @@ function needsSummaryLines() {
   const L=[];
   if(S.needsComm.size){const x=[];if(S.needsComm.has('expressive'))x.push('expressive language');if(S.needsComm.has('receptive'))x.push('receptive language');if(S.needsComm.has('functional_aac'))x.push('functional communication/AAC');if(S.needsComm.has('oral_motor'))x.push('oral motor/feeding speech');L.push('  • Communication: '+x.join(', '));}
   if(S.langModifiers.size){const x=[];if(S.langModifiers.has('echolalic'))x.push('scripted/echolalic speech');if(hasMorphoErrors())x.push('morphosyntactic errors');if(hasPragmaticDeficit())x.push('pragmatic/social language deficits');if(hasSemanticDeficit())x.push('semantic deficits/literal thinking');if(hasSpeechSoundErrors())x.push('speech-sound errors');if(hasReducedIntell())x.push('reduced intelligibility');if(x.length)L.push('  • Language modifiers: '+x.join(', '));}
-  if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('commSafety'))x.push('community safety');if(S.needsAdaptive.has('commIndependence'))x.push('community independence/life skills');L.push('  • Adaptive/self-care: '+x.join(', '));}
+  if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(S.needsAdaptive.has('commSafety'))x.push('community safety');if(S.needsAdaptive.has('commIndependence'))x.push('community independence/life skills');L.push('  • Adaptive/self-care: '+x.join(', '));}
   if(S.needsBehavior.size){const x=[];if(S.needsBehavior.has('aggression'))x.push('aggression');if(S.needsBehavior.has('sib'))x.push('self-injurious behavior (SIB)');if(S.needsBehavior.has('property'))x.push('property destruction');if(S.needsBehavior.has('tantrums'))x.push('tantrums/meltdowns');if(S.needsBehavior.has('elopement'))x.push('elopement');if(S.needsBehavior.has('noncompliance'))x.push('noncompliance/defiance');if(S.needsBehavior.has('rigidity'))x.push('rigidity/inflexibility');if(S.needsBehavior.has('vocalDisruption'))x.push('disruptive vocalizations');if(S.needsBehavior.has('pica'))x.push('pica');L.push('  • Behavior/interfering: '+x.join(', '));}
   if(S.safety.size){const x=[];if(S.safety.has('elopement_counsel'))x.push('elopement/wandering');if(S.safety.has('sib_safety_counsel'))x.push('self-injury safety');if(S.safety.has('water_counsel'))x.push('water/drowning');if(S.safety.has('road_counsel'))x.push('road/traffic safety');if(S.safety.has('fire_counsel'))x.push('environmental hazard');if(S.safety.has('bullying'))x.push('bullying/victimization');if(S.safety.has('internet'))x.push('internet/social media safety');if(x.length)L.push('  • Safety: '+x.join(', '));}
   if(S.needsSocial.size){const x=[];if(S.needsSocial.has('peer'))x.push('peer interaction');if(S.needsSocial.has('play'))x.push('play skills');if(S.needsSocial.has('reciprocity'))x.push('social reciprocity');if(S.needsSocial.has('emotion'))x.push('emotion recognition');if(S.needsSocial.has('perspective'))x.push('perspective-taking/Theory of Mind');if(S.needsSocial.has('conversation'))x.push('conversation skills');L.push('  • Social/play: '+x.join(', '));}
@@ -1298,7 +1323,7 @@ function generateNote() {
     dx+='\nICD-10-CM: F84.0';
     L.push(dx);
   } else if(S.diagStatus==='suspected'){
-    L.push('Autism Spectrum Disorder (ASD) - under evaluation');
+    L.push('Autism Spectrum Disorder (ASD) — under evaluation');
     L.push('ICD-10-CM: Z03.89');
   } else if(S.diagStatus==='ruleOut'){
     L.push('Rule out Autism Spectrum Disorder');
@@ -1481,10 +1506,8 @@ function generateNote() {
         if(S.cars2Done){
           L.push('  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the confirmed diagnosis.');
         } else {
-          L.push('  • CARS-2 scheduled with MD: 1-hour assessment appointment. Standardized direct');
-          L.push('    observation instrument providing severity rating and diagnostic support.');
-          L.push('  Given clinical picture is consistent with ASD, CARS-2 will provide an objective');
-          L.push('  severity rating to support diagnosis and guide level designation.');
+          L.push('  • CARS-2 scheduled with MD: 1-hour assessment appointment. This standardized direct observation instrument provides a severity rating and diagnostic support.');
+          L.push('  Given the clinical picture is consistent with ASD, the CARS-2 will provide objective data to support the diagnosis and guide severity level designation.');
         }
       } else if(S.dxEvalPath==='certainOlder'){
         L.push('Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):');
@@ -1492,11 +1515,9 @@ function generateNote() {
         if(S.cars2Done){
           L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. Results incorporated; support confirmed diagnosis.');
         } else if(cars2HF){
-          L.push('  Step 2: CARS-2-HF (High Functioning) to follow; indicated given age ≥ 6,');
-          L.push('    conversational language, and estimated cognitive functioning in average range or above.');
+          L.push('  Step 2: CARS-2-HF (High Functioning) to follow; indicated given age 6 or older, conversational language, and estimated cognitive functioning in average range or above.');
         } else {
-          L.push('  Step 2: CARS-2 ST (Standard) to follow; standardized direct observation providing');
-          L.push('    severity rating and diagnostic support.');
+          L.push('  Step 2: CARS-2 ST (Standard) to follow; standardized direct observation providing severity rating and diagnostic support.');
         }
       } else if(S.dxEvalPath==='uncertainComp'){
         L.push('Autism Evaluation: Uncertain (Comprehensive):');
@@ -1614,6 +1635,7 @@ function generateNote() {
       joint_attention:'Joint attention and social referencing: foundational prerequisite for language acquisition and social development; a primary early intervention target with a strong evidence base.',
       imitation:'Imitation and observational learning: prerequisite for social modeling and generalized skill acquisition; a core early intervention target.',
       self_help:'Self-help / daily living skills: significant adaptive skill impairment documented; ADL training is a core ABA domain and reduces caregiver burden and care dependency.',
+      menstrual_care:'Menstrual hygiene management: documented difficulty managing menstrual care independently; task analysis and video/visual supports are used to teach the multi-step sequence (checking, changing products, disposal, hand hygiene) with systematic fading of prompts across home and community settings.',
       safety_skills:'Safety skills and community awareness: documented safety risks require systematic behavioral safety training; targets include emergency stop response, proximity maintenance, and boundary recognition in community settings.',
       play:'Play skills and peer interaction: social skill deficits documented; play-based ABA programming supports language development, social cognition, and the foundation for peer relationships.',
       reduce_sib:'Reduction of self-injurious behavior (SIB): SIB is a Behavior of Danger — even infrequent events carry risk of permanent injury. A function-based behavior intervention plan (BIP) is required; FBA must precede intervention. Medical and behavioral co-management indicated.',
@@ -1767,7 +1789,7 @@ function generateNote() {
     L.push(n+++'. OCCUPATIONAL THERAPY (OT)');
     {const sl=therapyStatusLine('ot','OT');if(sl){L.push(sl);L.push('');}}
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
-    if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
+    if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
     if(S.needsAdaptive.has('commSafety')){
       L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training). Additional OT-scope supports:');
       if(S.safety.has('elopement_counsel')){
@@ -1857,6 +1879,7 @@ function generateNote() {
       if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized BSP addressing function; reduced group size during high-disruption periods; staff trained in non-punitive response; alternative communication supports as indicated');
       if(S.emotionalReg) accomBeh.push('Emotional regulation: designated calm-down space; break pass for self-initiated regulation breaks; de-escalation plan on file with all staff; advance notice of schedule changes');
       if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers); social skills instruction addressing personal space and appropriate touch integrated into daily schedule; all staff trained on consistent, calm redirection protocol; ABA BCBA consultation for school-based boundary skill generalization');
+      if(S.needsAdaptive.has('menstrualCare')) accomBeh.push('Menstrual hygiene management: private, consistent location for menstrual care during school day without requiring verbal request; proactive check-in prompts from designated same-gender staff; visual task sequence available in care location; spare period products supplied discreetly; school nurse health plan documenting protocol; staff trained to respond immediately and without drawing peer attention');
       // Group 3: Academic
       const accomAcad=[];
       if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -2589,6 +2612,9 @@ function _abaContent(){
     self_reg:'Self-regulation and coping strategies',
     transitions:'Transition tolerance and behavioral flexibility',
     academics:'Pre-academic and academic readiness skills',
+    menstrual_care:'Menstrual hygiene management (task analysis, multi-step self-care routine)',
+    boundary_skills:'Personal space and interpersonal boundary skills',
+    pica_reduction:'Reduction of pica (ingestion of non-food items)',
   };
   const targets=[...S.abaTargets].map(t=>TL[t]||t);
 
@@ -2970,6 +2996,7 @@ function _iepLetterContent(){
   if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized behavior support plan (BSP) addressing antecedents and function of vocalizations; preferential seating to minimize acoustic disruption to peers; access to communication tools or fidgets as possible alternatives to vocal stimming; staff trained in non-punitive response protocols; reduced group size or separate testing environment during high-disruption periods');
   if(S.emotionalReg) accomBeh.push('Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes');
   if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision during all unstructured and semi-structured periods; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers — no unsolicited hugging or touching); social skills instruction addressing personal space and appropriate touch integrated into weekly schedule; all staff trained on consistent, calm, non-shaming redirection protocol for boundary violations; BCBA consultation recommended for school-based generalization of boundary skill programming');
+  if(S.needsAdaptive.has('menstrualCare')) accomBeh.push('Menstrual hygiene management: access to a private, consistent location (nurse\'s office or single-occupancy restroom) for menstrual care during the school day without requiring verbal request; scheduled proactive check-in prompts from a designated same-gender staff member at intervals matched to the student\'s cycle pattern; visual task sequence (with pictures) available in the private care location; spare period products supplied discreetly and kept accessible; school nurse health plan documenting the support protocol; staff trained to respond to menstrual care requests immediately and without drawing peer attention');
   if(S.needsBehavior.has('rigidity')) accomBeh.push('Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)');
   const accomAcad=[];
   if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -3319,6 +3346,7 @@ function render(){
   if(dxSec) dxSec.classList.toggle('dx-active',S.diagStatus==='suspected');
   updateCriteriaBadge(v);
   renderOverrides();
+  updatePriorExpander();
   updateSectionHeaders();
 }
 
@@ -3355,11 +3383,30 @@ function renderOverrides(){
   p.innerHTML='<div class="ov-pill-grid">'+OV_DEFS.map(d=>{
     const r=d.rule(),ov=S.overrides[d.key],eff=resolveOv(d.key,r);
     let cls,lbl;
-    if(ov==='yes'){cls='ov-yes';lbl='Manual: Include';}
-    else if(ov==='no'){cls='ov-no';lbl='Manual: Exclude';}
-    else{cls=eff?'auto-yes':'auto-no';lbl=eff?'Auto ✓':'Auto —';}
-    return `<button class="ov-pill ${cls}" onclick="cycleOverride('${d.key}')" title="Click to cycle: Auto → Include → Exclude → Auto"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${lbl}</span></button>`;
+    if(ov==='yes'){cls='ov-yes';lbl='Override · Included';}
+    else if(ov==='no'){cls='ov-no';lbl='Override · Excluded';}
+    else{cls=eff?'auto-yes':'auto-no';lbl=eff?'Auto · Included':'Auto · Excluded';}
+    const autoOutcome=r.include?'included':'excluded';
+    const tip=`Click to cycle: Auto → Include → Exclude → Auto\nAuto rule currently: ${autoOutcome}`;
+    return `<button class="ov-pill ${cls}" onclick="cycleOverride('${d.key}')" title="${tip}"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${lbl}</span></button>`;
   }).join('')+'</div>';
+}
+let priorTestingExpanded=false;
+function togglePriorExpander(){
+  priorTestingExpanded=!priorTestingExpanded;
+  _applyPriorExpander();
+}
+function updatePriorExpander(){
+  if(S.priorTesting.size>0) priorTestingExpanded=true;
+  _applyPriorExpander();
+}
+function _applyPriorExpander(){
+  const list=document.getElementById('priorTestList');
+  const arrow=document.getElementById('priorTestArrow');
+  const countEl=document.getElementById('priorTestCount');
+  if(list) list.style.display=priorTestingExpanded?'':'none';
+  if(arrow) arrow.textContent=priorTestingExpanded?'▾':'▸';
+  if(countEl){const n=S.priorTesting.size;countEl.textContent=n+' selected';countEl.style.display=n>0?'':'none';}
 }
 function cycleOverride(k){
   const cur=S.overrides[k];
@@ -3478,7 +3525,7 @@ function clearAll(){
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
   S.strangerDanger=false;
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow'].forEach(id=>{
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
@@ -3495,6 +3542,7 @@ function updateSectionHeaders(){
     let sum=h.querySelector('.sec-sum');
     if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector('span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
     dot.className='sec-dot'+(hasData?' dot-has':'');
+    h.closest('.section')?.classList.toggle('has-content',!!hasData);
     sum.textContent=summary?' — '+summary:'';
   };
   const agShort={toddler:'Toddler',preschool:'Preschool',schoolAge:'School-age',adolescent:'Adolescent',youngAdult:'Young adult'};
@@ -3597,6 +3645,18 @@ function updateAgeBasedVisibility(){
       if(cb) cb.checked=false;
     }
   }
+  // Menstrual care — adolescent/young adult + hygiene checked
+  const menstrualCareRow=document.getElementById('menstrualCareRow');
+  if(menstrualCareRow){
+    const ageOk=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
+    const show=ageOk&&S.needsAdaptive.has('hygiene');
+    menstrualCareRow.style.display=show?'':'none';
+    if(!show&&S.needsAdaptive.has('menstrualCare')){
+      S.needsAdaptive.delete('menstrualCare');
+      const cb=menstrualCareRow.querySelector('input[type=checkbox]');
+      if(cb) cb.checked=false;
+    }
+  }
   // Boundary violations — school-age+ only
   const boundaryViolRow=document.getElementById('boundaryViolRow');
   if(boundaryViolRow){
@@ -3682,6 +3742,7 @@ function syncABATargetsFromNeeds(){
   if(S.needsComm.has('expressive')||S.needsComm.has('receptive')||S.needsComm.has('functional_aac')) add('functional_comm');
   if(S.needsAdaptive.has('toileting')||S.needsAdaptive.has('dressing')||S.needsAdaptive.has('feeding_adl')) add('self_help');
   if(S.needsAdaptive.has('commSafety')||S.needsAdaptive.has('commIndependence')) add('safety_skills');
+  if(S.needsAdaptive.has('menstrualCare')) add('menstrual_care');
   if(S.academic)                                                            add('academics');
   // Early intervention core targets — fire for toddler/preschool with social or communication needs
   if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
@@ -3837,6 +3898,9 @@ document.addEventListener('DOMContentLoaded',()=>{
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
           if(fr) fr.style.display=inp.checked?'':'none';
           if(!inp.checked) S.behavFreq[v]='';
+        }
+        if(k==='needsAdaptive'&&v==='hygiene'){
+          updateAgeBasedVisibility();
         }
         if(k==='needsAdaptive'&&v==='commSafety'){
           const sdr=document.getElementById('strangerDangerRow');
