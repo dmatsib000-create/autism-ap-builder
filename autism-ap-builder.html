@@ -66,11 +66,21 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .beh-freq-row{margin:2px 0 4px 24px}
 .beh-freq-inp{width:100%;max-width:400px;font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
-.modifier-strip{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding:6px 8px;background:var(--gray-50);border-radius:4px;border:1px solid var(--gray-200)}
+.modifier-strip{display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px;background:white;border-radius:7px;border:1px solid var(--gray-200);box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .mod-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1.5px solid var(--gray-300);cursor:pointer;font-size:11.5px;font-weight:500;background:white;transition:all .12s;user-select:none}
 .mod-chip:hover{border-color:var(--blue);background:var(--blue-light)}
 .mod-chip.active{border-color:var(--blue);background:var(--blue-light);color:var(--blue-dark)}
 .mod-chip.active::before{content:'✓ '}
+.lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
+.lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
+.lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
+.lang-qual-inner{display:flex;align-items:center;gap:10px}
+.lang-qual-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:12px;color:#16a34a;flex-shrink:0;transition:all .15s;background:white}
+.lang-qual-card:has(input:checked) .lang-qual-icon{background:#16a34a;border-color:#16a34a;color:white}
+.lang-qual-label{font-size:12px;font-weight:600;color:#15803d;line-height:1.3}
+.lang-qual-hint{font-size:10.5px;color:#4d7c0f;margin-top:2px;line-height:1.35;font-weight:400}
+.chip-grp-hd{font-size:9px;font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
+.chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
 .str-chip{padding:3px 9px;border-radius:999px;border:1.5px solid var(--gray-200);cursor:pointer;font-size:11px;background:white;transition:all .12s;user-select:none;color:var(--gray-700)}
 .str-chip:hover{border-color:var(--green);background:var(--green-light);color:#166534}
@@ -334,16 +344,29 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="r-opt"><input type="radio" name="langLevel" value="ageAppropriate">Fluent /<br>no concerns</label>
           <label class="r-opt"><input type="radio" name="langLevel" value="unclearSLP">Mixed / hard to<br>characterize — SLP eval</label>
         </div>
-        <span class="field-sublabel" style="margin-top:8px">Language Modifiers — select any that apply at any level</span>
+        <label class="lang-qual-card">
+          <input type="checkbox" id="mod_langAgeAppropriate" style="display:none" onchange="if(this.checked)S.langModifiers.add('langAgeAppropriate');else S.langModifiers.delete('langAgeAppropriate');syncCommNeedsFromLangLevel();syncSchoolSvcFromNeeds();render()">
+          <div class="lang-qual-inner">
+            <div class="lang-qual-icon">&#10003;</div>
+            <div>
+              <div class="lang-qual-label">Age-appropriate for developmental level</div>
+              <div class="lang-qual-hint">Output level is normal for where this child is developmentally &mdash; no SLP referral auto-triggered</div>
+            </div>
+          </div>
+        </label>
+        <span class="field-sublabel" style="margin-top:10px">Language Features / Concerns</span>
         <div class="modifier-strip">
-          <div class="mod-chip" id="mod_langAgeAppropriate" onclick="toggleMod('langAgeAppropriate')" style="border-color:var(--green);color:#166534">Age-appropriate for child's developmental age</div>
-          <div class="mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / sentence structure errors (morphosyntax)</div>
-          <div class="mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use of language)</div>
-          <div class="mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal or concrete thinking</div>
+          <span class="chip-grp-hd">Pragmatics</span>
+          <div class="mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use)</div>
+          <div class="mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
+          <span class="chip-grp-hd">Language Form</span>
+          <div class="mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / morphosyntax errors</div>
+          <div class="mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal thinking</div>
+          <span class="chip-grp-hd">Speech</span>
           <div class="mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')">Speech-sound errors</div>
           <div class="mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')">Reduced intelligibility</div>
-          <div class="mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
-          <div class="mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech style</div>
+          <span class="chip-grp-hd">Other</span>
+          <div class="mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech</div>
           <div class="mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary for age</div>
         </div>
       </div>
@@ -1007,6 +1030,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 
 <script>
 // ─── STATE ───────────────────────────────────────────────────────────────────
+// DSM-5 uses two separate severity domains; there is no single asdLevel field.
+// Derive a combined display level as Math.max(asdLevelSC, asdLevelRRB) where needed.
 const S = {
   ageGroup:'', pronouns:'', langLevel:'', langModifiers:new Set(),
   cogProfile:'', unevenCog:false, unevenCogDesc:'', adaptProfile:'', strengths:'',
@@ -1048,7 +1073,9 @@ const hasLDConfirmed = () => S.comorbid.has('ld_reading')||S.comorbid.has('ld_ma
 const hasLD = () => hasLDConfirmed()||S.comorbid.has('ld_suspected');
 const hasID = () => ['id_severe','id_moderate','id_mild'].includes(S.cogProfile);
 const isYoung = () => S.ageGroup==='toddler'||S.ageGroup==='preschool';
+// Single words = minimally verbal for clinical gating (ABA, social skills)
 const isMinVerbal = () => S.langLevel==='nonverbal'||S.langLevel==='singleWord';
+// phrase/simpleSentence excluded — psychotherapy requires meta-language (self-reflection, abstract reasoning)
 const isVerbalEnough = () => ['simpleSentence','conversational','ageAppropriate'].includes(S.langLevel);
 const hasSigAdaptive = () => S.adaptProfile==='severelyImpaired'||S.adaptProfile==='moderatelyImpaired'||S.adaptProfile==='mildlyImpaired'||S.adaptProfile==='belowPotential';
 const asdLevel23 = () => S.asdLevelSC>='2'||S.asdLevelRRB>='2';
@@ -1059,6 +1086,7 @@ const hasSpeechSoundErrors = () => S.langModifiers.has('speechSound');
 const hasReducedIntell = () => S.langModifiers.has('reducedIntell');
 const hasPedanticSpeech = () => S.langModifiers.has('pedanticSpeech');
 const isLangAgeAppropriate = () => S.langModifiers.has('langAgeAppropriate');
+// Hyperlexia lives in the free-text strengths field, not a checkbox — checked by text search
 const hasHyperlexia = () => S.strengths.toLowerCase().includes('hyperlexia');
 const hasAnyArticulation = () => hasSpeechSoundErrors() || hasReducedIntell();
 
@@ -1100,6 +1128,8 @@ function getLangDescription() {
 }
 
 // ─── RULES ENGINE ────────────────────────────────────────────────────────────
+// Each rule returns {include: boolean}. resolveOv() applies manual overrides on top.
+// ruleABA() also returns {reasons: string[]} — used to populate the ABA letter justification.
 function ruleABA() {
   const r=[];
   if(S.ageGroup==='toddler') r.push('toddler age group');
@@ -1114,6 +1144,7 @@ function ruleABA() {
   return {include:r.length>0, reasons:r};
 }
 function rulePCIT() {
+  // PCIT evidence base is toddler through school-age; not indicated for adolescents/adults
   const ageOk=['toddler','preschool','schoolAge'].includes(S.ageGroup);
   const notOlder=S.ageGroup!=='adolescent'&&S.ageGroup!=='youngAdult';
   const beh=S.needsBehavior.has('aggression')||S.needsBehavior.has('tantrums')||
@@ -1133,6 +1164,8 @@ function ruleSocialSkills() {
   return {include:ageOk&&langOk&&(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol'))};
 }
 function ruleSLP() {
+  // Any non-fluent langLevel triggers SLP — unless the age-appropriate modifier is active,
+  // which signals the output is normal for the child's developmental level
   const belowAge = S.langLevel && S.langLevel !== 'ageAppropriate' && !isLangAgeAppropriate();
   const langTrigger = belowAge||S.langModifiers.has('echolalic')||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
@@ -1149,6 +1182,8 @@ function rulePsychiatry() {
 function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')||S.needsBehavior.has('pica')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
+  // Speech-driven audiology referral is restricted to toddler/preschool —
+  // older children are assumed to have a prior screen; hearingScreenFail overrides at any age
   const youngAge=['toddler','preschool'].includes(S.ageGroup);
   const speechConcern=hasSpeechSoundErrors()||hasReducedIntell()||hasMorphoErrors();
   return {include:S.hearingScreenFail||(youngAge&&speechConcern)};
@@ -1158,12 +1193,14 @@ function ruleEarlySteps() {
   return {include:S.ageGroup==='toddler'&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
 }
 function ruleFDLRS() {
+  // FDLRS is a Florida-specific early intervention network for preschoolers not yet in public school
   const ageOk=S.ageGroup==='preschool';
   const notPublicSchool=!['genEd','genEdSupport','selfContained'].includes(S.schoolPlacement);
   return {include:ageOk&&notPublicSchool&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
 }
 function ruleEEG() { return {include:S.seizureConcern}; }
 function ruleCARD() { return {include:S.diagStatus==='confirmed'}; }
+// Override system: 'yes'/'no' force include/exclude; 'auto' (default) defers to the rule
 function resolveOv(key,rule) {
   const v=S.overrides[key];
   return v==='yes'?true:v==='no'?false:rule.include;
@@ -3536,6 +3573,7 @@ function toggleMod(key){
   if(S.langModifiers.has(key)) S.langModifiers.delete(key);
   else {
     S.langModifiers.add(key);
+    // Echolalic speech is always a DSM-5 B1 item — auto-check criterion and pre-fill evidence field
     if(key==='echolalic'){
       if(!S.criteriaB.has('b1')){
         S.criteriaB.add('b1');
@@ -3816,6 +3854,8 @@ function updateAgeBasedVisibility(){
     }
   }
   // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
+  // Must restore to 'contents' not '' — these wrapper divs use display:contents so their
+  // children flow as direct flex items inside .radio-grid; '' would break the grid layout
   const idCogGroup=document.getElementById('cogProfileIdGroup');
   if(idCogGroup){
     const hideIDCog=young&&S.ageGroup!=='';
@@ -3835,6 +3875,7 @@ function updateAgeBasedVisibility(){
     }
   }
   // GDD cogProfile options — only valid for toddler/preschool (GDD not diagnosable after ~age 5)
+  // Same display:contents constraint as idCogGroup above
   const gddCogGroup=document.getElementById('gddCogGroup');
   if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
@@ -3851,9 +3892,13 @@ function updateAgeBasedVisibility(){
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ─── SYNC HELPERS ────────────────────────────────────────────────────────────
+// All sync functions are add-only — they never uncheck boxes the clinician manually set.
+// schoolSvcManualOff tracks services the clinician explicitly unchecked so they are not re-added.
+
 // Needs checkboxes → pre-populate ABA targets (add-only; manual unchecks are preserved)
 function syncABATargetsFromNeeds(){
   // rigidity is derived from B2 (not directly checkable); reset before re-evaluating
+  // (intentional exception to add-only: rigidity has no standalone checkbox)
   if(!S.criteriaB.has('b2')) S.needsBehavior.delete('rigidity');
   const add=(t)=>{
     if(S.abaTargets.has(t)) return;
@@ -3890,7 +3935,8 @@ function syncABATargetsFromNeeds(){
   if(S.cogProfile==='id_severe'||S.cogProfile==='id_moderate') add('self_help');
 }
 
-// Needs/comorbid checkboxes -> pre-populate school services (add-only; manual unchecks preserved via schoolSvcManualOff)
+// langLevel selection → pre-populate Communication functional needs (add-only)
+// Skips if age-appropriate modifier is active — output is normal for developmental level
 function syncCommNeedsFromLangLevel(){
   if(!S.langLevel||S.langLevel==='ageAppropriate'||isLangAgeAppropriate()) return;
   const addComm=(v)=>{
@@ -3932,12 +3978,11 @@ function syncSchoolSvcFromNeeds(){
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
-    // Track pre-click checked state so click handler can detect a re-click on already-selected radio
+    // Browsers don't fire 'change' when re-clicking an already-checked radio.
+    // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
     inp.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
-
-    // Deselect on re-click: if the radio was already selected when clicked, uncheck it and clear state
     inp.addEventListener('click',()=>{
-      if(!inp._wasChecked) return; // normal selection — let change handler do the work
+      if(!inp._wasChecked) return; // normal selection — change handler takes over
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;

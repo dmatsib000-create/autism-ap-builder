@@ -37,6 +37,17 @@ Everything lives in one file: CSS in `<style>`, JavaScript in `<script>`. There 
 
 **`{placeholder}` syntax:** Used in ABA and IEP letter output for fields the clinician fills in after copying. Rendered with yellow CSS highlighting (`.aba-ph`, `.iep-ph`). The Epic copy format replaces `{...}` with `***` cursor stops.
 
+### Code comments
+
+Leave concise inline comments when the reasoning is genuinely non-obvious — not to restate what the code does, but to explain *why* it is the way it is. Good candidates:
+
+- Intentional constraints that look like omissions (e.g., add-only sync functions)
+- Clinical rules whose rationale isn't derivable from code alone (e.g., DSM-5 age gates)
+- CSS-in-JS values that must not be changed to an intuitive alternative (`display:'contents'` not `''`)
+- Non-obvious cross-function interactions or side effects
+
+Skip comments for self-explanatory code, changelog-style notes ("added X to fix Y"), or anything already covered in this file. Those belong in commit messages, not source.
+
 ### Critical constraints
 
 - **Smart/curly quotes (U+2016 `'`, U+2017 `'`) must never appear in JS string literals.** They cause "Invalid or unexpected token" syntax errors and silently break the entire script with no console output. If editing triggers this (e.g., from auto-correct), run a PowerShell replace: `$content -replace [char]8216,"'" -replace [char]8217,"'"`.

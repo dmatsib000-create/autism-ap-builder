@@ -27,10 +27,14 @@ All output can be copied as rich text (for direct paste into Epic or Word), plai
   Age group gates several features: RITA-T and CARS-2 pathways, community independence checkbox, social skills group resources, transition planning language, and IEP tab visibility.
 - **Pronouns:** He / She / They / Not specified — used throughout note and IEP letter
 - **Visit type:** Initial evaluation / Re-evaluation / Follow-up — sets opening sentence of clinical summary
-- **Language level:** Nonverbal → Fluent with impairment  
-  Modifier chips add nuance: pragmatic deficits, reduced intelligibility, morphosyntactic errors, phonological errors, advanced vocabulary / hyperlexic, articulation errors
-- **Cognitive / adaptive profile:** radio options feeding clinical summary phrasing
-- **Strengths:** Free-text field with clickable chips (visual learner, strong memory, etc.)
+- **Language level:** Nonverbal / min. verbal → Single words → 2–3 word phrases → Simple sentences → Conversational → Fluent / no concerns → Mixed / hard to characterize (SLP eval)  
+  A green **"Age-appropriate for developmental level"** qualifier card sits below the radio — checking it signals the output level is normal for the child's developmental stage and suppresses SLP / communication auto-triggers without changing the selected level.  
+  **Language Features / Concerns** chip strip (domain-grouped): Pragmatics (pragmatic deficits, echolalic/scripted speech) · Language Form (morphosyntax errors, semantic deficits / literal thinking) · Speech (speech-sound errors, reduced intelligibility) · Other (formal/pedantic speech, advanced vocabulary).  
+  Selecting nonverbal or single words automatically checks expressive language needs (and functional AAC for nonverbal) in the Communication domain — add-only, manual unchecks respected.
+- **Cognitive profile:** Severe / Moderate / Mild ID → Global Developmental Delay (unspecified / mild / moderate / severe) → Borderline (BIF) → Low average → Average → High average (110–119) → Superior (120–129) → Very superior / gifted (130+) → Unknown / under evaluation.  
+  ID options are hidden and cleared for toddler/preschool (DSM-5: ID requires reliable standardized testing, typically ≥5 years). GDD options are hidden and cleared for school-age and older (GDD is a placeholder diagnosis for children under 5). Selecting a cognitive option automatically pre-checks the matching DSM-5 specifier.
+- **Adaptive behavior:** Severely / moderately / mildly impaired → Below cognitive potential → Commensurate with cognitive level → Age-appropriate / WNL
+- **Identified strengths:** Free-text field with clickable chips (visual learner, strong memory, hyperlexia, special interests, etc.). Hyperlexia is documented here — it auto-triggers SLP referral and psychoeducational evaluation via text-search on this field.
 
 ### 2 — Diagnostic Workup & Next Steps
 - **Diagnosis status:** Confirmed / Suspected / Rule-out — changes note language, ICD-10 codes, and IEP letter branch throughout
@@ -113,7 +117,7 @@ The tool uses rule functions and sync helpers to reduce repetitive data entry.
 | Therapy | Triggers |
 |---|---|
 | ABA | Confirmed or suspected ASD, language needs, behavioral needs, adaptive needs, social needs |
-| SLP | Any communication need, any language level selected, language disorder comorbid |
+| SLP | Any communication need checked; any language level other than "Fluent / no concerns" unless the age-appropriate qualifier is active; any language feature chip selected (pragmatic, echolalic, morphosyntax, semantic, speech-sound, intelligibility, pedantic, advanced vocab); language disorder comorbid; hyperlexia in strengths field |
 | OT | Sensory needs, fine motor / handwriting / coordination needs, adaptive needs, DCD |
 | PT | Gross motor needs, coordination needs, DCD |
 | Psychotherapy | Anxiety, depression, OCD, trauma, emotional regulation flag (school-age+, verbal enough) |
@@ -151,6 +155,18 @@ Checking needs checkboxes and DSM-5 criteria automatically checks the correspond
 - Emotional regulation → Self-regulation and coping strategies
 
 ABA target auto-population is **add-only** — manually unchecked targets are not re-checked on re-render.
+
+### Communication needs auto-population
+
+Selecting a language level automatically pre-checks communication functional needs:
+
+| Language level | Auto-checked |
+|---|---|
+| Nonverbal / min. verbal | Expressive language delays + Functional AAC needs |
+| Single words, 2–3 word phrases, Simple sentences | Expressive language delays |
+| Conversational, Fluent / no concerns | *(none)* |
+
+Suppressed entirely if the age-appropriate qualifier card is checked. Add-only — manual unchecks are respected.
 
 ### School service auto-population
 
@@ -231,6 +247,7 @@ Each school service generates a rationale paragraph (not just a label) connectin
 
 - **Single file** — no build system, no dependencies, no network requests. Open directly in any browser.
 - **No PHI is transmitted or stored** — everything runs locally in the browser.
+- **Mobile responsive** — a sticky Input / View Note toggle nav appears at ≤768px; touch targets enlarged throughout. Designed for desktop-first use but fully usable on a tablet or phone.
 - State resets completely with the **Clear All** button (with confirmation).
 - The file can be saved locally and used offline.
 - Smart/curly quotes in JS string literals will silently break the script — the CLAUDE.md has the PowerShell fix if this ever happens from copy-paste.
@@ -240,7 +257,7 @@ Each school service generates a rationale paragraph (not just a label) connectin
 ## File structure
 
 ```
-autism-ap-builder.html   — the entire application (CSS + HTML + JS, ~3900 lines)
+autism-ap-builder.html   — the entire application (CSS + HTML + JS, ~4400 lines)
 clinicalnotes.py         — separate CLI tool: pipes clinical text through UF AI API
 clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts for key)
 ```
@@ -255,11 +272,9 @@ A multi-session council review has produced an approved implementation plan. The
 - IEP letter pronoun substitution and specifier integration
 - Line spacing normalization (collapse triple blank lines)
 - Additional comorbidity blocks and accommodation logic
-- Boundary violations checkbox (age-gated, school-age+)
 - Social cognition → soft SLP referral trigger
 - B4 (sensory) → sensory need suggestion
 - Leisure / recreation skills ABA target
-- Menstrual care adaptive checkbox (adolescent female)
 - Interoception as sensory subtype
 - Low-priority diagnostic workup: ASD-PEDS/MIGDAS-2 date fields, CARS-2 sentence fragment fix, rule-out closing sentence, em dash in suspected header
 
