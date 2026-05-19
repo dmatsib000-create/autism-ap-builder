@@ -36,8 +36,9 @@ All output can be copied as rich text (for direct paste into Epic or Word), plai
 - **Diagnosis status:** Confirmed / Suspected / Rule-out — changes note language, ICD-10 codes, and IEP letter branch throughout
 - **ASD severity levels (SC and RRB):** Levels 1–3 per DSM-5's two-domain model; justification text boxes included
 - **Diagnostic eval path:** Selects which evaluation route is documented (CARS-2 scheduled, ADOS-2 uncertain, RITA-T, development-only, etc.)
-- **Prior testing reviewed:** CARS-2 ST/HF, ADOS-2 (with module), ADI-R, ASD-PEDS, MIGDAS-2 — each with outcome dropdown (Consistent / Equivocal / Not consistent). Results appear in both the clinical summary and the note's eval section.
+- **Prior testing reviewed:** CARS-2 ST/HF, ADOS-2 (with module), ADI-R, ASD-PEDS, MIGDAS-2, SRS-2, GARS-3 — each with outcome dropdown (Consistent / Equivocal / Not consistent). Vineland-3, BASC-3, and Conners 4 included as behavioral/adaptive instruments. Consistent results are cited automatically in the ABA Letter and IEP Letter.
 - **CARS-2 completed at this visit:** Flips CARS-2 note language from future to past tense
+- **Seizure concern:** Checkbox for non-emergent seizure history (triggers EEG referral); sub-checkbox to also refer to neurology now without waiting for EEG result
 
 ### 3 — DSM-5 Criteria Evidence
 - Checkboxes for A1, A2, A3 (all required) and B1–B4 (≥2 required), plus C/D/E specifying criteria
@@ -51,13 +52,15 @@ Six domain Sets, each with specific checkboxes:
 | Domain | Examples |
 |---|---|
 | **Communication** | Expressive, receptive, pragmatic, functional AAC |
-| **Behavior** | Aggression, SIB, elopement, tantrums, noncompliance, property destruction |
-| **Adaptive / Self-care** | Toileting, dressing, feeding ADL, community safety, community independence |
+| **Behavior** | Aggression, SIB, elopement, tantrums, noncompliance, property destruction, pica, disruptive vocalizations |
+| **Adaptive / Self-care** | Toileting, dressing, feeding ADL, hygiene, community safety, community independence |
 | **Sensory** | Auditory, tactile, visual, vestibular/proprioceptive, oral |
 | **Motor** | Fine motor, handwriting, gross motor, coordination/praxis |
-| **Social** | Peer interaction, play, perspective-taking, emotional recognition |
+| **Social** | Peer interaction, play, perspective-taking, emotional recognition, conversation, reciprocity |
 
 Checked items auto-populate ABA targets and school services (see Auto-logic below).
+
+**Behavior frequency inputs:** For Tier 2 interfering behaviors (tantrums, noncompliance, property destruction, disruptive vocalizations) and emotional regulation, an optional text field appears when the behavior is checked. If filled, the description is appended to that behavior in the ABA medical necessity paragraph (e.g., "tantrums/meltdowns (3–5x/day, 10–20 min each)"). If left blank, the behavior name alone appears — no placeholder, no post-copy editing required.
 
 ### 5 — Comorbid Conditions
 Checkboxes for co-occurring diagnoses with ICD-10 codes. Each generates its own Assessment and Plan block in the note when "Include plan" is toggled:
@@ -111,15 +114,15 @@ The tool uses rule functions and sync helpers to reduce repetitive data entry.
 |---|---|
 | ABA | Confirmed or suspected ASD, language needs, behavioral needs, adaptive needs, social needs |
 | SLP | Any communication need, any language level selected, language disorder comorbid |
-| OT | Sensory needs, fine motor / handwriting needs, adaptive needs, DCD |
+| OT | Sensory needs, fine motor / handwriting / coordination needs, adaptive needs, DCD |
 | PT | Gross motor needs, coordination needs, DCD |
 | Psychotherapy | Anxiety, depression, OCD, trauma, emotional regulation flag (school-age+, verbal enough) |
 | PCIT | Behavioral needs (toddler/preschool) |
 | Social skills group | Social needs (preschool+, verbal enough) |
 | Genetics | Confirmed ASD |
-| Neurology | Epilepsy, focal neurological findings |
+| Neurology | Epilepsy, focal neurological findings, neurology-now checkbox |
 | Psychiatry | Medication for comorbids, severe behavioral needs (school-age+) |
-| GI | GI comorbid, feeding concern, PFD, ARFID |
+| GI | GI comorbid, feeding concern, PFD, ARFID, pica |
 | Audiology | Language delay, articulation concerns, hearing screen fail |
 | QB Test | ADHD suspected (school-age+) |
 | Early Steps | Toddler/preschool with any need |
@@ -136,26 +139,28 @@ Checking needs checkboxes and DSM-5 criteria automatically checks the correspond
 - B2 (insistence on sameness) → Transitions; also sets `rigidity` for IEP/accommodation logic
 - Elopement → Reduce elopement
 - SIB → Reduce self-injurious behavior
-- Aggression / property → Reduce aggression
+- Aggression / property destruction → Reduce aggression
 - Tantrums / emotional regulation → Reduce tantrums / emotional dysregulation
+- Pica → Reduction of pica
 - Social needs → Play skills / peer interaction
 - Communication needs → Functional communication
 - Adaptive needs → Self-help / ADL
 - Community safety / independence → Safety skills
-- Academic flag → Academic readiness
+- Academic flag → Academic readiness / instruction-following skills (toddler/preschool only — excluded from ABA letter for school-age+ due to FAPE/IDEA insurance denial risk)
 - Toddler/preschool with social or communication needs → Joint attention, Imitation
+- Emotional regulation → Self-regulation and coping strategies
 
 ABA target auto-population is **add-only** — manually unchecked targets are not re-checked on re-render.
 
 ### School service auto-population
 
-- Communication needs or language level or language disorder → SLP school
-- Sensory, fine motor, adaptive, or DCD → OT school
+- Communication needs, language level, language disorder, or social communication needs (conversation/reciprocity) → SLP school
+- Sensory, fine motor, adaptive, coordination, or DCD → OT school
 - Gross motor or DCD → PT school
 - Social needs → Social skills school
 - Behavioral needs → FBA
-- Elopement, aggression, or SIB → Aide + FBA
-- Anxiety, depression, ADHD, OCD, trauma, or rigidity (B2) → Counseling
+- Elopement, aggression, SIB, pica, or disruptive vocalizations → Aide + FBA
+- Anxiety, depression, ADHD, OCD, trauma, rigidity (B2), or emotional regulation → Counseling
 - LD suspected → Psychoeducational evaluation
 
 School service auto-population is also add-only; manual overrides are respected.
@@ -178,6 +183,14 @@ PLAN
   Problem 1: Autism Spectrum Disorder
     1. Diagnostic evaluation pathway
     2. Therapy referrals (SLP, OT, PT, ABA, social skills, psychotherapy, PCIT)
+       ABA section includes:
+         - Tiered medical necessity paragraph (BOD behaviors with fixed impact
+           language; interfering behaviors with optional clinician-entered
+           frequency; skill deficits named without frequency framing)
+         - ABA Treatment Targets list with one-sentence clinical rationale per target
+         - Age-appropriate service model language (EIBI/NDBI for young children;
+           FBA-guided comprehensive services for school-age; self-determination
+           framing for adolescents/young adults)
     3. School/educational supports
     4. Safety counseling
     5. Anticipatory guidance topics
@@ -227,7 +240,7 @@ Each school service generates a rationale paragraph (not just a label) connectin
 ## File structure
 
 ```
-autism-ap-builder.html   — the entire application (CSS + HTML + JS, ~3700 lines)
+autism-ap-builder.html   — the entire application (CSS + HTML + JS, ~3900 lines)
 clinicalnotes.py         — separate CLI tool: pipes clinical text through UF AI API
 clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts for key)
 ```
@@ -236,18 +249,21 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 
 ## Roadmap / known plan backlog
 
-A multi-session council review has produced an approved implementation plan covering the items below. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
+A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
-- Community safety / independence checkbox split (commSafety vs. commIndependence)
-- Prior testing reviewed section with outcome dropdowns
 - RITA-T eval path
 - Clinical summary language improvements (DSM-5 terminology, Criterion E documentation)
-- ABA hours removal from auto-generated text (BCBA determination, not DBP)
-- Social skills resource age-gating (preschool vs. school-age)
 - Em dash reduction throughout note output
 - IEP letter pronoun substitution and specifier integration
 - Line spacing normalization (collapse triple blank lines)
 - Strength chip duplicate guard
 - Additional comorbidity blocks and accommodation logic
+- Boundary violations checkbox (age-gated, school-age+)
+- Social cognition → soft SLP referral trigger
+- B4 (sensory) → sensory need suggestion
+- Leisure / recreation skills ABA target
+- Menstrual care adaptive checkbox (adolescent female)
+- Interoception as sensory subtype
+- Low-priority diagnostic workup: ASD-PEDS/MIGDAS-2 date fields, CARS-2 sentence fragment fix, rule-out closing sentence, em dash in suspected header
 
 See `C:\Users\davem\.claude\plans\partitioned-seeking-octopus.md` for the full approved plan.
