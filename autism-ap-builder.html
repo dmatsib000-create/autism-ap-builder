@@ -6,7 +6,7 @@
 <title>DBP Autism A&P Builder</title>
 <style>
 :root {
-  --blue:#2563eb;--blue-light:#dbeafe;--blue-dark:#1d4ed8;
+  --blue:#1e50d2;--blue-light:#dbeafe;--blue-dark:#1438a8;
   --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
   --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-600:#4b5563;
   --gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
@@ -14,14 +14,20 @@
   --red:#dc2626;--red-light:#fee2e2;
   --green:#16a34a;--green-light:#dcfce7;
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --surface:#eef2f7;
+  --shadow-card:0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column}
-.app-header{background:var(--blue);color:white;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 4px rgba(0,0,0,.2)}
-.app-header h1{font-size:15px;font-weight:600}
-.app-header .sub{font-size:10.5px;opacity:.75;margin-top:1px}
+.app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
+.app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
+.app-header h1{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.header-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.88);white-space:nowrap}
+.header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
 .header-actions{display:flex;gap:6px;align-items:center}
-.btn{padding:5px 11px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;font-family:var(--font)}
+.btn{padding:5px 12px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;font-family:var(--font)}
 .btn-white{background:white;color:var(--blue-dark)}.btn-white:hover{background:var(--blue-light)}
 .btn-outline{background:transparent;color:white;border:1px solid rgba(255,255,255,.5)}.btn-outline:hover{background:rgba(255,255,255,.12)}
 .btn-danger{background:transparent;color:#fca5a5;border:1px solid rgba(252,165,165,.4)}.btn-danger:hover{background:rgba(255,0,0,.1)}
@@ -31,30 +37,31 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .btn-epic{background:#6d28d9;color:white;border-color:#6d28d9}.btn-epic:hover{background:#5b21b6}
 .btn-sm{padding:3px 8px;font-size:11px}
 .main{display:grid;grid-template-columns:445px 1fr;flex:1;overflow:hidden}
-.left-panel{background:white;border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
+.left-panel{background:var(--surface);border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
 .right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
-.rp-header{padding:9px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:6px}
+.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .rp-header h2{font-size:13px;font-weight:600;color:var(--gray-700)}
 .rp-actions{display:flex;gap:5px;flex-wrap:wrap}
 .note-preview{flex:1;overflow-y:auto;padding:16px 20px}
 .note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:13px;line-height:1.8}
-.section{margin-bottom:10px;border:1px solid var(--gray-200);border-radius:6px;overflow:hidden}
-.sec-head{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:6px 10px;font-weight:600;font-size:11px;color:var(--gray-600);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.sec-head:hover{background:var(--gray-100)}
+.section{margin-bottom:10px;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:white;box-shadow:var(--shadow-card)}
+.sec-head{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:8px 12px;font-weight:700;font-size:11px;color:var(--gray-700);letter-spacing:.03em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.sec-head:hover{background:var(--gray-200)}
 .sec-body{padding:10px}
 .sec-body.hidden{display:none}
 .field-group{margin-bottom:10px}
 .field-group:last-child{margin-bottom:0}
-.field-label{font-size:11px;font-weight:600;color:var(--gray-600);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.03em}
+.field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
 .field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
-.r-opt{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:3px;border:1px solid var(--gray-200);cursor:pointer;font-size:12px;transition:all .1s;background:white;line-height:1.3}
+#cogProfileIdGroup{display:contents}
+.r-opt{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;border:1px solid var(--gray-200);cursor:pointer;font-size:12px;transition:all .1s;background:white;line-height:1.3}
 .r-opt:hover{border-color:var(--blue);background:var(--blue-light)}
 .r-opt.sel{border-color:var(--blue);background:var(--blue-light);color:var(--blue-dark);font-weight:500}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
 .cb-row{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1.4}
-.cb-row:hover{background:var(--gray-50)}
+.cb-row:hover{background:var(--gray-100)}
 .cb-row input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--blue)}
 .beh-freq-row{margin:2px 0 4px 24px}
 .beh-freq-inp{width:100%;max-width:400px;font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
@@ -140,7 +147,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:#166534}
 .ov-pill.ov-no{border-color:var(--gray-300);background:var(--gray-100);color:var(--gray-400);text-decoration:line-through}
 /* ── Note preview — document style ─── */
-.note-doc{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:12px;line-height:1.8;color:var(--gray-800);background:white;border:1px solid var(--gray-200);border-radius:6px;padding:18px 22px;min-height:300px}
+.note-doc{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:12px;line-height:1.8;color:var(--gray-800);background:white;border:1px solid var(--gray-200);border-radius:8px;padding:20px 24px;min-height:300px}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
 /* ── DSM-5 ring indicators ─────────── */
 .dsm-rings{display:flex;gap:14px;align-items:center;margin:6px 0 4px;flex-wrap:wrap}
@@ -180,7 +187,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-active{border-color:var(--amber)!important;box-shadow:0 0 0 2px var(--amber-light)!important}
 .dx-active .sec-head{background:var(--amber-light)!important}
 /* ── Diagnosis status banner ─────────── */
-.dx-banner{background:white;border:2px solid var(--blue);border-radius:6px;padding:8px 12px;margin-bottom:10px;flex-shrink:0}
+.dx-banner{background:white;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;box-shadow:var(--shadow-card)}
 .dx-banner-label{font-size:10px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
 .dx-banner .radio-grid{gap:4px}
 .dx-banner .r-opt{font-size:12px;font-weight:500}
@@ -188,7 +195,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-none{font-size:11px;color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── ABA preview tabs ───────────────── */
 .preview-tabs{display:flex;gap:4px}
-.tab-btn{padding:4px 11px;border-radius:4px;border:1px solid var(--gray-300);background:white;color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:500;font-family:var(--font);transition:all .12s}
+.tab-btn{padding:4px 12px;border-radius:5px;border:1px solid var(--gray-300);background:white;color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:500;font-family:var(--font);transition:all .12s}
 .tab-btn:hover{background:var(--gray-100)}
 .tab-btn.tab-active{background:var(--blue);color:white;border-color:var(--blue)}
 /* ── ABA letter preview ─────────────── */
@@ -205,6 +212,33 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
 .iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
+/* ── Mobile nav bar (hidden on desktop) ─── */
+#mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
+.mnav-btn{flex:1;padding:10px 8px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--gray-500);border-bottom:3px solid transparent;font-family:var(--font);transition:color .15s,border-color .15s;letter-spacing:.01em}
+.mnav-btn.mnav-active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
+/* ── Mobile responsive ─────────────────── */
+@media(max-width:768px){
+  body{overflow:auto;height:auto}
+  .main{grid-template-columns:1fr;overflow:visible;height:auto}
+  .left-panel{overflow:visible;height:auto;border-right:none}
+  .right-panel{overflow:visible;height:auto;min-height:80vh}
+  body:not(.mob-output) .right-panel{display:none}
+  body.mob-output .left-panel{display:none}
+  .note-preview{overflow:visible;height:auto}
+  .note-content{min-height:50vh}
+  #mobile-nav{display:flex}
+  .app-header{flex-wrap:wrap;padding:8px 12px}
+  .app-header h1{font-size:13px}
+  .header-badge{font-size:7px;padding:1px 5px}
+  .header-actions{width:100%;justify-content:flex-end;gap:4px}
+  .cb-row{min-height:40px;padding:5px 2px}
+  .cb-row input[type=checkbox]{width:18px;height:18px}
+  .mod-chip{padding:9px 13px;font-size:13px;min-height:40px}
+  .r-opt{min-height:42px;padding:8px 4px}
+  .sec-head{padding:12px 14px;font-size:12px}
+  .rp-header{padding:8px 12px;gap:4px}
+  .tab-btn{padding:5px 10px;font-size:12px}
+}
 @media print{
   body{overflow:visible;height:auto;background:white}
   .app-header,.left-panel,.rp-header{display:none}
@@ -219,15 +253,26 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 <header class="app-header">
   <div>
     <h1>Autism A&amp;P Builder — Developmental-Behavioral Pediatrics</h1>
-    <div class="sub">Deterministic &bull; AI-free &bull; No PHI stored &bull; EHR-ready output</div>
+    <div class="sub">
+      <span class="header-badge">Deterministic</span>
+      <span class="header-badge">AI-free</span>
+      <span class="header-badge">No PHI stored</span>
+      <span class="header-badge">EHR-ready</span>
+    </div>
   </div>
   <div class="header-actions">
     <button class="btn btn-outline" onclick="window.print()">Print</button>
     <button class="btn btn-outline" onclick="copyNote('plain','all')">Copy Plain</button>
     <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
+    <div class="header-sep"></div>
     <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
   </div>
 </header>
+
+<div id="mobile-nav">
+  <button class="mnav-btn mnav-active" id="mnav-input" onclick="showMobilePanel('input')">&#9998; Input Form</button>
+  <button class="mnav-btn" id="mnav-output" onclick="showMobilePanel('output')">&#128203; View Note</button>
+</div>
 
 <div class="main">
 <div class="left-panel">
@@ -297,22 +342,36 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <div class="mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')">Speech-sound errors</div>
           <div class="mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')">Reduced intelligibility</div>
           <div class="mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
-          <div class="mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary / hyperlexic</div>
+          <div class="mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech style</div>
+          <div class="mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary for age</div>
         </div>
       </div>
 
       <div class="field-group">
         <span class="field-label">Cognitive Profile</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
-          <label class="r-opt" id="gddCogOption"><input type="radio" name="cogProfile" value="gdd">GDD</label>
+          <div id="cogProfileIdGroup" style="display:contents">
+            <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
+          </div>
+          <div id="gddCogGroup" style="display:contents">
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">GDD —<br>unspecified</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">GDD —<br>mild delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">GDD —<br>moderate delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">GDD —<br>severe delays</label>
+          </div>
           <label class="r-opt"><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">Above-average<br>range</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average<br>(110–119)</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior<br>(120–129)</label>
+          <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior /<br>gifted (130+)</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown /<br>under evaluation</label>
+        </div>
+        <label class="cb-row" style="margin-top:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
+        <div id="unevenCogWrap" style="display:none;margin:2px 0 0 26px">
+          <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
         </div>
       </div>
 
@@ -322,6 +381,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="r-opt"><input type="radio" name="adaptProfile" value="severelyImpaired">Severely impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="moderatelyImpaired">Moderately impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="mildlyImpaired">Mildly impaired</label>
+          <label class="r-opt" title="Adaptive score in normal or low-average range but meaningfully below cognitive potential — common Level 1/2 ASD pattern"><input type="radio" name="adaptProfile" value="belowPotential">Below cognitive<br>potential</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Commensurate<br>w/ cognitive level</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Age-appropriate<br>/ WNL</label>
         </div>
@@ -332,7 +392,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
         <div class="strength-chips" id="strengthChips">
           <span class="str-chip" onclick="addStrength('Strong visual memory')">Visual memory</span>
           <span class="str-chip" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
-          <span class="str-chip" onclick="addStrength('Driven by preferred interests')">Driven by interests</span>
+          <span class="str-chip" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
           <span class="str-chip" onclick="addStrength('Responsive to music')">Music</span>
           <span class="str-chip" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
           <span class="str-chip" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
@@ -341,11 +401,16 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <span class="str-chip" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
           <span class="str-chip" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
           <span class="str-chip" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
-          <span class="str-chip" onclick="addStrength('Advanced reading / hyperlexia')">Hyperlexia</span>
-          <span class="str-chip" onclick="addStrength('Kind and empathetic')">Empathetic</span>
+          <span class="str-chip" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
+          <span class="str-chip" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
           <span class="str-chip" onclick="addStrength('Persistent and determined')">Persistent</span>
           <span class="str-chip" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
           <span class="str-chip" onclick="addStrength('Motivated by social praise')">Social praise</span>
+          <span class="str-chip" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
+          <span class="str-chip" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
+          <span class="str-chip" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
+          <span class="str-chip" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
+          <span class="str-chip" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
         </div>
         <textarea class="strengths-area" id="strengthsField" placeholder="Click chips above or type freely..." rows="2"></textarea>
       </div>
@@ -458,6 +523,10 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
         <hr class="divider">
       </div>
 
+      <div style="display:flex;gap:5px;margin-bottom:10px">
+        <button class="btn btn-blue btn-sm" onclick="dsmCheckAll()">Check all criteria</button>
+        <button class="btn btn-gray btn-sm" onclick="dsmClearAll()">Clear all criteria</button>
+      </div>
       <div class="field-group">
         <span class="field-label">Criterion A — Social Communication (all 3 required)</span>
         <div class="cb-list">
@@ -606,7 +675,6 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
           <div class="comorbid-grp">Support Services</div>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="under34Months"> Under 34 months — Early Steps (FL Part C) eligible</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
           <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
             <span class="sub-label">Reason(s) for referral</span>
@@ -698,7 +766,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
       <div class="field-group">
         <span class="field-label">Current Placement</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="notYet">Not yet school-age / EI</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" value="notYet">Not yet<br>in school</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" value="daycare">Daycare /<br>childcare</label>
           <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEd">General ed</label>
           <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEdSupport">Gen ed with support</label>
           <label class="r-opt"><input type="radio" name="schoolPlacement" value="selfContained">Self-contained / special ed</label>
@@ -738,51 +807,49 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
     </div>
   </div>
 
-  <!-- 7. Overrides -->
+  <!-- 7. Safety -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" onclick="toggleSec(this)">7 &mdash; Therapy / Referral Overrides <span>&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" onclick="toggleSec(this)">7 &mdash; Safety Counseling <span>&#9660;</span></div>
     <div class="sec-body">
-      <div class="field-group">
-        <span class="field-label">Current Private / Clinic Therapy Status</span>
-        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Change only if patient is <em>already</em> receiving this therapy. Affects note language (refer vs. continue/revise).</p>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="increase">Increase intensity</label>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="increase">Increase intensity</label>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="increase">Increase intensity</label>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="increase">Increase intensity</label>
-          </div>
-        </div>
+      <div class="cb-list">
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="water_counsel"> Water / drowning safety</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="road_counsel"> Road / traffic safety</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="medID"> Medical ID / emergency alert</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="sib_safety_counsel"> Self-injurious behavior safety planning</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="bullying"> Bullying / victimization risk</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="internet"> Internet / social media safety</label>
+        <label class="cb-row"><input type="checkbox" data-key="safety" value="fire_counsel"> Fire / environmental hazard safety</label>
       </div>
-      <hr class="divider">
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects. Override individually if needed.</p>
-      <div id="overridePanel"></div>
     </div>
   </div>
 
-  <!-- 7b. ABA Parameters (shown when ABA is included in plan) -->
+  <!-- 8. Anticipatory Guidance -->
+  <div class="section">
+    <div id="sh-ag" class="sec-head" onclick="toggleSec(this)">8 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
+    <div class="sec-body">
+      <div class="cb-list">
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="sibling"> Sibling recurrence risk &amp; monitoring</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="sleep_hygiene"> Sleep hygiene counseling</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="nutrition"> Nutrition / feeding / diet variety</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="advocacy"> Educational rights &amp; advocacy (IDEA, Section 504)</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="transition"> Transition planning to adult services (age 14+)</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="puberty"> Puberty, sexuality &amp; body safety</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="driving"> Driving readiness (adolescent / young adult)</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="self_advocacy"> Self-advocacy &amp; self-determination</label>
+        <label class="cb-row"><input type="checkbox" data-key="ag" value="screen_time"> Screen time guidance</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="highlyMotivated"> Family is highly motivated for home learning resources</label>
+      </div>
+      <hr class="divider" style="margin-top:10px">
+      <div class="field-group" style="margin-top:8px">
+        <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
+        <input type="text" id="rtcIntervalField" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:12px;font-family:var(--font);border:1px solid var(--gray-200);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA Parameters (shown when ABA is included in plan) -->
   <div id="abaParamsSection" class="section" style="display:none;border-color:#2563eb">
     <div class="sec-head" style="background:#dbeafe;color:#1d4ed8" onclick="toggleSec(this)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
     <div class="sec-body">
@@ -846,45 +913,53 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
     </div>
   </div>
 
-  <!-- 8. Safety -->
-  <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this)">8 &mdash; Safety Counseling <span>&#9660;</span></div>
-    <div class="sec-body">
-      <div class="cb-list">
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="water_counsel"> Water / drowning safety</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="road_counsel"> Road / traffic safety</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="medID"> Medical ID / emergency alert</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="sib_safety_counsel"> Self-injurious behavior safety planning</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="bullying"> Bullying / victimization risk</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="internet"> Internet / social media safety</label>
-        <label class="cb-row"><input type="checkbox" data-key="safety" value="fire_counsel"> Fire / environmental hazard safety</label>
-      </div>
-    </div>
+  <!-- Review & Adjust divider -->
+  <div style="position:relative;margin:10px 0 6px">
+    <hr style="border:none;border-top:2px dashed var(--gray-300);margin:0">
+    <span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 10px;font-size:10px;color:var(--gray-400);font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">Review &amp; Adjust</span>
   </div>
 
-  <!-- 9. Anticipatory Guidance -->
+  <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this)">9 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
+    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
-      <div class="cb-list">
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="sibling"> Sibling recurrence risk &amp; monitoring</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="sleep_hygiene"> Sleep hygiene counseling</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="nutrition"> Nutrition / feeding / diet variety</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="advocacy"> Educational rights &amp; advocacy (IDEA, Section 504)</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="transition"> Transition planning to adult services (age 14+)</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="puberty"> Puberty, sexuality &amp; body safety</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="driving"> Driving readiness (adolescent / young adult)</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="self_advocacy"> Self-advocacy &amp; self-determination</label>
-        <label class="cb-row"><input type="checkbox" data-key="ag" value="screen_time"> Screen time guidance</label>
-        <label class="cb-row"><input type="checkbox" data-key="single" value="highlyMotivated"> Family is highly motivated for home learning resources</label>
+      <div class="field-group">
+        <span class="field-label">Current Private / Clinic Therapy Status</span>
+        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Change only if patient is <em>already</em> receiving this therapy. Affects note language (refer vs. continue/revise).</p>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="increase">Increase intensity</label>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="increase">Increase intensity</label>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="increase">Increase intensity</label>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="increase">Increase intensity</label>
+          </div>
+        </div>
       </div>
-      <hr class="divider" style="margin-top:10px">
-      <div class="field-group" style="margin-top:8px">
-        <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
-        <input type="text" id="rtcIntervalField" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:12px;font-family:var(--font);border:1px solid var(--gray-200);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
-      </div>
+      <hr class="divider">
+      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects. Override individually if needed.</p>
+      <div id="overridePanel"></div>
     </div>
   </div>
 
@@ -933,7 +1008,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const S = {
   ageGroup:'', pronouns:'', langLevel:'', langModifiers:new Set(),
-  cogProfile:'', adaptProfile:'', strengths:'',
+  cogProfile:'', unevenCog:false, unevenCogDesc:'', adaptProfile:'', strengths:'',
   diagStatus:'', asdLevelSC:'', asdLevelRRB:'', asdLevelJustificationSC:'', asdLevelJustificationRRB:'',
   visitType:'',
   rtcInterval:'',
@@ -945,7 +1020,7 @@ const S = {
   needsSocial:new Set(), needsSensory:new Set(), needsMotor:new Set(),
   emotionalReg:false, academic:false, sleep:false, feeding:false, hearingScreenFail:false,
   behavFreq:{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''},
-  under34Months:false, seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
+  seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
   teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
   priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'', cars2Done:false,
@@ -974,13 +1049,15 @@ const hasID = () => ['id_severe','id_moderate','id_mild'].includes(S.cogProfile)
 const isYoung = () => S.ageGroup==='toddler'||S.ageGroup==='preschool';
 const isMinVerbal = () => S.langLevel==='nonverbal'||S.langLevel==='singleWord';
 const isVerbalEnough = () => ['simpleSentence','conversational','ageAppropriate'].includes(S.langLevel);
-const hasSigAdaptive = () => S.adaptProfile==='severelyImpaired'||S.adaptProfile==='moderatelyImpaired';
+const hasSigAdaptive = () => S.adaptProfile==='severelyImpaired'||S.adaptProfile==='moderatelyImpaired'||S.adaptProfile==='mildlyImpaired'||S.adaptProfile==='belowPotential';
 const asdLevel23 = () => S.asdLevelSC>='2'||S.asdLevelRRB>='2';
 const hasPragmaticDeficit = () => S.langModifiers.has('pragmatic');
 const hasMorphoErrors = () => S.langModifiers.has('morphosyntactic');
 const hasSemanticDeficit = () => S.langModifiers.has('semantic');
 const hasSpeechSoundErrors = () => S.langModifiers.has('speechSound');
 const hasReducedIntell = () => S.langModifiers.has('reducedIntell');
+const hasPedanticSpeech = () => S.langModifiers.has('pedanticSpeech');
+const hasHyperlexia = () => S.strengths.toLowerCase().includes('hyperlexia');
 const hasAnyArticulation = () => hasSpeechSoundErrors() || hasReducedIntell();
 
 function getPron() {
@@ -1007,7 +1084,8 @@ function getLangDescription() {
   let desc = base[S.langLevel] || '';
   const mods = [];
   if (S.langModifiers.has('echolalic')) mods.push('scripted or echolalic speech patterns (phrase use is largely inflexible or rote rather than generative)');
-  if (S.langModifiers.has('advVocab')) mods.push('advanced vocabulary and complex sentence structure (language form may exceed functional communicative use)');
+  if (hasPedanticSpeech()) mods.push('formal or pedantic speech style (overly precise, adult-register language in casual contexts; language form exceeds pragmatic function)');
+  if (S.langModifiers.has('advVocab')) mods.push('advanced vocabulary exceeding age norms');
   if (hasMorphoErrors()) mods.push('notable morphosyntactic errors (grammatical/structural)');
   if (hasPragmaticDeficit()) mods.push('pragmatic/social language deficits');
   if (hasSemanticDeficit()) mods.push('semantic deficits and tendency toward literal or concrete interpretation');
@@ -1052,7 +1130,7 @@ function ruleSocialSkills() {
   return {include:ageOk&&langOk&&(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol'))};
 }
 function ruleSLP() {
-  const langTrigger = S.langLevel==='unclearSLP'||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation();
+  const langTrigger = S.langLevel==='unclearSLP'||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
@@ -1067,16 +1145,17 @@ function rulePsychiatry() {
 function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')||S.needsBehavior.has('pica')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
-  // A non-compliant hearing screen alone warrants formal audiologic evaluation regardless of language level
-  return {include:S.hearingScreenFail};
+  const youngAge=['toddler','preschool'].includes(S.ageGroup);
+  const speechConcern=hasSpeechSoundErrors()||hasReducedIntell()||hasMorphoErrors();
+  return {include:S.hearingScreenFail||(youngAge&&speechConcern)};
 }
 function ruleQBTest() { return {include:S.comorbid.has('adhd_suspected')&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)}; }
 function ruleEarlySteps() {
-  return {include:S.ageGroup==='toddler'&&S.under34Months&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
+  return {include:S.ageGroup==='toddler'&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
 }
 function ruleFDLRS() {
-  const ageOk=S.ageGroup==='preschool'||(S.ageGroup==='toddler'&&!S.under34Months);
-  const notPublicSchool=!['genEd','genEdSupport','selfContained','therapDay'].includes(S.schoolPlacement);
+  const ageOk=S.ageGroup==='preschool';
+  const notPublicSchool=!['genEd','genEdSupport','selfContained'].includes(S.schoolPlacement);
   return {include:ageOk&&notPublicSchool&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
 }
 function ruleEEG() { return {include:S.seizureConcern}; }
@@ -1094,8 +1173,8 @@ function validateCriteria() {
 
 // ─── LABEL MAPS ──────────────────────────────────────────────────────────────
 const AGE_LABELS={toddler:'toddler (12–35 months)',preschool:'preschool-aged child (3–5 years)',schoolAge:'school-aged child (6–11 years)',adolescent:'adolescent (12–17 years)',youngAdult:'young adult (18+ years)'};
-const COG_LABELS={id_severe:'Severe intellectual disability is present.',id_moderate:'Moderate intellectual disability is present.',id_mild:'Mild intellectual disability is present.',borderline:'Cognitive functioning falls in the borderline intellectual functioning (BIF) range.',lowAverage:'Cognitive functioning is in the low-average range.',average:'Cognitive functioning is in the average range.',aboveAverage:'Cognitive functioning is above average.',gdd:'Global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of psychoeducational evaluation.',unknown:'Cognitive/intellectual functioning has not been formally evaluated or results are pending; estimates are based on clinical observation and developmental history.'};
-const ADAPT_LABELS={severelyImpaired:'Adaptive behavior is severely impaired relative to chronological age.',moderatelyImpaired:'Adaptive behavior is moderately impaired relative to chronological age.',mildlyImpaired:'Adaptive behavior is mildly impaired relative to chronological age.',commensurate:'Adaptive behavior is commensurate with cognitive level.',ageAppropriate:'Adaptive behavior is age-appropriate and within normal limits.'};
+const COG_LABELS={id_severe:'Severe intellectual disability is present.',id_moderate:'Moderate intellectual disability is present.',id_mild:'Mild intellectual disability is present.',borderline:'Cognitive functioning falls in the borderline intellectual functioning (BIF) range.',lowAverage:'Cognitive functioning is in the low-average range.',average:'Cognitive functioning is in the average range.',aboveAverage:'Cognitive functioning is in the high-average range (approximately 110–119).',superior:'Cognitive functioning is in the superior range (approximately 120–129).',verySuperior:'Cognitive functioning is in the very superior / gifted range (130+).',gdd:'Global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of standardized cognitive assessment.',gdd_mild:'Mild global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of standardized cognitive assessment.',gdd_moderate:'Moderate global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of standardized cognitive assessment.',gdd_severe:'Severe global developmental delays are present. Formal intellectual disability diagnosis is deferred pending age ≥6 or completion of standardized cognitive assessment.',unknown:'Cognitive/intellectual functioning has not been formally evaluated or results are pending; estimates are based on clinical observation and developmental history.'};
+const ADAPT_LABELS={severelyImpaired:'Adaptive behavior is severely impaired relative to chronological age.',moderatelyImpaired:'Adaptive behavior is moderately impaired relative to chronological age.',mildlyImpaired:'Adaptive behavior is mildly impaired relative to chronological age.',belowPotential:'Adaptive behavior falls meaningfully below cognitive potential despite IQ in the normative range — a pattern common in ASD Level 1 and Level 2 presentations.',commensurate:'Adaptive behavior is commensurate with cognitive level.',ageAppropriate:'Adaptive behavior is age-appropriate and within normal limits.'};
 const LEVEL_LABELS={'1':'Level 1, requiring support','2':'Level 2, requiring substantial support','3':'Level 3, requiring very substantial support'};
 const LEVEL_DESC={
   sc:{
@@ -1159,15 +1238,21 @@ function generateClinicalSummary(){
     id_severe:'with severe intellectual disability',id_moderate:'with moderate intellectual disability',
     id_mild:'with mild intellectual disability',borderline:'with cognitive functioning in the borderline intellectual functioning (BIF) range',
     lowAverage:'with cognitive functioning in the low-average range',
-    average:'with cognitive functioning in the average range',aboveAverage:'with above-average cognitive functioning',
-    gdd:'with global developmental delays',unknown:'with cognitive functioning not yet formally assessed'
+    average:'with cognitive functioning in the average range',aboveAverage:'with cognitive functioning in the high-average range (110–119)',superior:'with superior cognitive functioning (120–129)',verySuperior:'with very superior / gifted cognitive functioning (130+)',
+    gdd:'with global developmental delays',
+    gdd_mild:'with mild global developmental delays',
+    gdd_moderate:'with moderate global developmental delays',
+    gdd_severe:'with severe global developmental delays',
+    unknown:'with cognitive functioning not yet formally assessed'
   }[S.cogProfile]||'';
+  const cogUneven=S.unevenCog?(S.unevenCogDesc?` (uneven profile: ${S.unevenCogDesc})`:', with an uneven cognitive profile'):'';
   const adaptShort={
     severelyImpaired:'severely impaired adaptive behavior relative to chronological age',
     moderatelyImpaired:'moderately impaired adaptive behavior relative to chronological age',
     mildlyImpaired:'mildly impaired adaptive behavior relative to chronological age',
+    belowPotential:'adaptive behavior below cognitive potential',
     commensurate:'adaptive behavior commensurate with cognitive level',
-    ageAppropriate:'adaptive behavior age-appropriate and within normal limits'
+    ageAppropriate:'age-appropriate adaptive behavior'
   }[S.adaptProfile]||'';
 
   // Opening sentence — "The patient is a [preschool-aged boy/girl/child] who is [conversational], [with avg cognition], with [adaptive]."
@@ -1187,9 +1272,9 @@ function generateClinicalSummary(){
     opening=`The patient is a ${genderDesc}`;
     if(langDesc) opening+=` who is ${langDesc}`;
     if(cogShort&&adaptShort){
-      opening+=`, ${cogShort} and ${adaptShort.replace(/^with /,'')}`;
+      opening+=`, ${cogShort}${cogUneven} and ${adaptShort}`;
     } else if(cogShort){
-      opening+=`, ${cogShort}`;
+      opening+=`, ${cogShort}${cogUneven}`;
     } else if(adaptShort){
       opening+=`, with ${adaptShort}`;
     }
@@ -1277,14 +1362,14 @@ function generateClinicalSummary(){
     ruleOut:'These findings were discussed with the family at today\'s visit.'
   }[S.diagStatus]||'';
 
-  return [opening,body,strengthsStr,close].filter(Boolean).join(' ');
+  return [opening,strengthsStr,body,close].filter(Boolean).join(' ');
 }
 
 // ─── NOTE GENERATOR ──────────────────────────────────────────────────────────
 function needsSummaryLines() {
   const L=[];
   if(S.needsComm.size){const x=[];if(S.needsComm.has('expressive'))x.push('expressive language');if(S.needsComm.has('receptive'))x.push('receptive language');if(S.needsComm.has('functional_aac'))x.push('functional communication/AAC');if(S.needsComm.has('oral_motor'))x.push('oral motor/feeding speech');L.push('  • Communication: '+x.join(', '));}
-  if(S.langModifiers.size){const x=[];if(S.langModifiers.has('echolalic'))x.push('scripted/echolalic speech');if(hasMorphoErrors())x.push('morphosyntactic errors');if(hasPragmaticDeficit())x.push('pragmatic/social language deficits');if(hasSemanticDeficit())x.push('semantic deficits/literal thinking');if(hasSpeechSoundErrors())x.push('speech-sound errors');if(hasReducedIntell())x.push('reduced intelligibility');if(x.length)L.push('  • Language modifiers: '+x.join(', '));}
+  if(S.langModifiers.size){const x=[];if(S.langModifiers.has('echolalic'))x.push('scripted/echolalic speech');if(hasMorphoErrors())x.push('morphosyntactic errors');if(hasPragmaticDeficit())x.push('pragmatic/social language deficits');if(hasSemanticDeficit())x.push('semantic deficits/literal thinking');if(hasSpeechSoundErrors())x.push('speech-sound errors');if(hasReducedIntell())x.push('reduced intelligibility');if(hasPedanticSpeech())x.push('formal/pedantic speech style');if(S.langModifiers.has('advVocab'))x.push('advanced vocabulary for age');if(x.length)L.push('  • Language modifiers: '+x.join(', '));}
   if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(S.needsAdaptive.has('commSafety'))x.push('community safety');if(S.needsAdaptive.has('commIndependence'))x.push('community independence/life skills');L.push('  • Adaptive/self-care: '+x.join(', '));}
   if(S.needsBehavior.size){const x=[];if(S.needsBehavior.has('aggression'))x.push('aggression');if(S.needsBehavior.has('sib'))x.push('self-injurious behavior (SIB)');if(S.needsBehavior.has('property'))x.push('property destruction');if(S.needsBehavior.has('tantrums'))x.push('tantrums/meltdowns');if(S.needsBehavior.has('elopement'))x.push('elopement');if(S.needsBehavior.has('noncompliance'))x.push('noncompliance/defiance');if(S.needsBehavior.has('rigidity'))x.push('rigidity/inflexibility');if(S.needsBehavior.has('vocalDisruption'))x.push('disruptive vocalizations');if(S.needsBehavior.has('pica'))x.push('pica');L.push('  • Behavior/interfering: '+x.join(', '));}
   if(S.safety.size){const x=[];if(S.safety.has('elopement_counsel'))x.push('elopement/wandering');if(S.safety.has('sib_safety_counsel'))x.push('self-injury safety');if(S.safety.has('water_counsel'))x.push('water/drowning');if(S.safety.has('road_counsel'))x.push('road/traffic safety');if(S.safety.has('fire_counsel'))x.push('environmental hazard');if(S.safety.has('bullying'))x.push('bullying/victimization');if(S.safety.has('internet'))x.push('internet/social media safety');if(x.length)L.push('  • Safety: '+x.join(', '));}
@@ -1498,7 +1583,7 @@ function generateNote() {
         L.push('In-Clinic Developmental Assessment:');
         L.push('  • DP-4 (Developmental Profile 4): Comprehensive developmental assessment to characterize');
         L.push('    functioning across physical, adaptive, social-emotional, cognitive, and communication domains.');
-        const kbitAge=['schoolAge','adolescent','youngAdult','preschool'].includes(S.ageGroup)||(S.ageGroup==='toddler'&&!S.under34Months);
+        const kbitAge=['schoolAge','adolescent','youngAdult','preschool'].includes(S.ageGroup);
         if(kbitAge||S.ageGroup==='preschool') L.push('  • KBIT-2R (Kaufman Brief Intelligence Test, 2nd ed.): Abbreviated cognitive screening [age 4+].');
         L.push('Results will inform treatment planning and need for further autism-specific evaluation.');
       } else if(S.dxEvalPath==='certainYoung'){
@@ -3415,7 +3500,34 @@ function cycleOverride(k){
 }
 function setOverride(k,v){S.overrides[k]=v;render();}
 
+// ─── UNEVEN COG TOGGLE ───────────────────────────────────────────────────────
+function toggleUnevenCog(){
+  const w=document.getElementById('unevenCogWrap');
+  if(w) w.style.display=S.unevenCog?'block':'none';
+}
+
+// ─── MOBILE PANEL TOGGLE ─────────────────────────────────────────────────────
+function showMobilePanel(which){
+  document.body.classList.toggle('mob-output',which==='output');
+  document.getElementById('mnav-input').classList.toggle('mnav-active',which==='input');
+  document.getElementById('mnav-output').classList.toggle('mnav-active',which==='output');
+  if(which==='input')window.scrollTo(0,0);
+}
+
 // ─── MODIFIER CHIPS ──────────────────────────────────────────────────────────
+function dsmCheckAll(){
+  ['a1','a2','a3'].forEach(v=>{S.criteriaA.add(v);const cb=document.querySelector(`input[data-key="criteriaA"][value="${v}"]`);if(cb)cb.checked=true;});
+  ['b1','b2','b3','b4'].forEach(v=>{S.criteriaB.add(v);const cb=document.querySelector(`input[data-key="criteriaB"][value="${v}"]`);if(cb)cb.checked=true;});
+  S.criteriaC=true;S.criteriaD=true;S.criteriaE=true;
+  ['C','D','E'].forEach(k=>{const cb=document.querySelector(`input[data-key="criteria${k}"]`);if(cb)cb.checked=true;});
+  render();
+}
+function dsmClearAll(){
+  S.criteriaA.clear();S.criteriaB.clear();
+  S.criteriaC=false;S.criteriaD=false;S.criteriaE=false;
+  document.querySelectorAll('input[data-key="criteriaA"],input[data-key="criteriaB"],input[data-key="criteriaC"],input[data-key="criteriaD"],input[data-key="criteriaE"]').forEach(cb=>cb.checked=false);
+  render();
+}
 function toggleMod(key){
   if(S.langModifiers.has(key)) S.langModifiers.delete(key);
   else {
@@ -3494,9 +3606,10 @@ function clearAll(){
   document.querySelectorAll('textarea').forEach(t=>{t.value='';});
   syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('active'));
-  Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',adaptProfile:'',strengths:'',
+  const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
+  Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',unevenCog:false,unevenCogDesc:'',adaptProfile:'',strengths:'',
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
-    visitType:'',under34Months:false,seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
+    visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',
     schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
@@ -3571,7 +3684,7 @@ function updateSectionHeaders(){
   const cc=S.comorbid.size;
   setSH('sh-comorbid',cc>0,cc>0?cc+' condition'+(cc>1?'s':''):'');
   // 6 School
-  const sc=[];const spShort={notYet:'Not in school',genEd:'Gen ed',genEdSupport:'Gen ed+support',selfContained:'Self-contained',therapDay:'Therapeutic day',privateNoIEP:'Private (no IEP)',privateWithIEP:'Private (IEP svcs)',home:'Homeschool'};
+  const sc=[];const spShort={notYet:'Not yet in school',daycare:'Daycare',genEd:'Gen ed',genEdSupport:'Gen ed+support',selfContained:'Self-contained',therapDay:'Therapeutic day',privateNoIEP:'Private (no IEP)',privateWithIEP:'Private (IEP svcs)',home:'Homeschool'};
   if(S.schoolPlacement)sc.push(spShort[S.schoolPlacement]||'');
   const sdShort={iep:'IEP',iep_needed:'IEP needed',504:'504 Plan',neither:'No doc'};
   if(S.schoolDoc)sc.push(sdShort[S.schoolDoc]||'');
@@ -3619,9 +3732,9 @@ function bridgeCogProfileToSpecifier(cogVal){
   });
   let toCheck=null;
   if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck='withID';
-  else if(cogVal==='gdd') toCheck='withGDD';
+  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck='withGDD';
   else if(cogVal==='borderline') toCheck='withBIF';
-  else if(['average','aboveAverage','lowAverage'].includes(cogVal)) toCheck='withoutID';
+  else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)) toCheck='withoutID';
   // cogVal==='unknown' → leave all unchecked; clinician decides
   if(toCheck){
     S.specifiers.add(toCheck);
@@ -3698,6 +3811,17 @@ function updateAgeBasedVisibility(){
       idRows.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
     }
   }
+  // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
+  const idCogGroup=document.getElementById('cogProfileIdGroup');
+  if(idCogGroup){
+    const hideIDCog=young&&S.ageGroup!=='';
+    idCogGroup.style.display=hideIDCog?'none':'contents';
+    if(hideIDCog&&hasID()){
+      S.cogProfile='';
+      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+      bridgeCogProfileToSpecifier('');
+    }
+  }
   if(gddRows){
     const hide=older&&S.ageGroup!=='';
     gddRows.style.display=hide?'none':'';
@@ -3706,15 +3830,14 @@ function updateAgeBasedVisibility(){
       gddRows.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
     }
   }
-  // GDD cogProfile option — only valid for toddler/preschool (GDD is not diagnosable after ~age 5-6)
-  const gddCogOpt=document.getElementById('gddCogOption');
-  if(gddCogOpt){
+  // GDD cogProfile options — only valid for toddler/preschool (GDD not diagnosable after ~age 5)
+  const gddCogGroup=document.getElementById('gddCogGroup');
+  if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
-    gddCogOpt.style.display=hideGddCog?'none':'';
-    if(hideGddCog&&S.cogProfile==='gdd'){
+    gddCogGroup.style.display=hideGddCog?'none':'contents';
+    if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
-      const r=gddCogOpt.querySelector('input[type=radio]');
-      if(r) r.checked=false;
+      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
     }
   }
@@ -3779,14 +3902,14 @@ function syncSchoolSvcFromNeeds(){
       lbl.appendChild(badge);
     }
   };
-  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')) add('slp_school');
+  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}
   if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')||S.emotionalReg||S.needsBehavior.has('boundaryViol')) add('counseling');
-  if(S.comorbid.has('ld_suspected')) add('psychoed');
+  if(S.comorbid.has('ld_suspected')||(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&hasHyperlexia())) add('psychoed');
   if(hasID()) add('sped');
 }
 
@@ -3869,7 +3992,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         else if(v==='sleep') S.sleep=inp.checked;
         else if(v==='feeding') S.feeding=inp.checked;
         else if(v==='hearingScreenFail') S.hearingScreenFail=inp.checked;
-        else if(v==='under34Months') S.under34Months=inp.checked;
         else if(v==='seizureConcern') S.seizureConcern=inp.checked;
         else if(v==='neurologyNowForSeizure') S.neurologyNowForSeizure=inp.checked;
         else if(v==='focalNeuroFindings') S.focalNeuroFindings=inp.checked;
