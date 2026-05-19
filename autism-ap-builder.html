@@ -331,11 +331,12 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="r-opt"><input type="radio" name="langLevel" value="phrase">2–3 word<br>phrases</label>
           <label class="r-opt"><input type="radio" name="langLevel" value="simpleSentence">Simple sentences /<br>multi-word utterances</label>
           <label class="r-opt"><input type="radio" name="langLevel" value="conversational">Conversational</label>
-          <label class="r-opt"><input type="radio" name="langLevel" value="ageAppropriate">Age-appropriate /<br>fluent</label>
+          <label class="r-opt"><input type="radio" name="langLevel" value="ageAppropriate">Fluent /<br>no concerns</label>
           <label class="r-opt"><input type="radio" name="langLevel" value="unclearSLP">Mixed / hard to<br>characterize — SLP eval</label>
         </div>
         <span class="field-sublabel" style="margin-top:8px">Language Modifiers — select any that apply at any level</span>
         <div class="modifier-strip">
+          <div class="mod-chip" id="mod_langAgeAppropriate" onclick="toggleMod('langAgeAppropriate')" style="border-color:var(--green);color:#166534">Age-appropriate for child's developmental age</div>
           <div class="mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / sentence structure errors (morphosyntax)</div>
           <div class="mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use of language)</div>
           <div class="mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal or concrete thinking</div>
@@ -1057,6 +1058,7 @@ const hasSemanticDeficit = () => S.langModifiers.has('semantic');
 const hasSpeechSoundErrors = () => S.langModifiers.has('speechSound');
 const hasReducedIntell = () => S.langModifiers.has('reducedIntell');
 const hasPedanticSpeech = () => S.langModifiers.has('pedanticSpeech');
+const isLangAgeAppropriate = () => S.langModifiers.has('langAgeAppropriate');
 const hasHyperlexia = () => S.strengths.toLowerCase().includes('hyperlexia');
 const hasAnyArticulation = () => hasSpeechSoundErrors() || hasReducedIntell();
 
@@ -1078,10 +1080,11 @@ function getLangDescription() {
     phrase:'using 2–3 word phrase-level communication',
     simpleSentence:'using simple sentences and multi-word utterances',
     conversational:'conversational',
-    ageAppropriate:'using age-appropriate, fluent language',
+    ageAppropriate:'using fluent, age-appropriate language',
     unclearSLP:'communicating in a manner that requires formal SLP evaluation to characterize'
   };
   let desc = base[S.langLevel] || '';
+  if(isLangAgeAppropriate() && desc && S.langLevel !== 'ageAppropriate') desc += ' (age-appropriate for developmental level)';
   const mods = [];
   if (S.langModifiers.has('echolalic')) mods.push('scripted or echolalic speech patterns (phrase use is largely inflexible or rote rather than generative)');
   if (hasPedanticSpeech()) mods.push('formal or pedantic speech style (overly precise, adult-register language in casual contexts; language form exceeds pragmatic function)');
@@ -1130,7 +1133,8 @@ function ruleSocialSkills() {
   return {include:ageOk&&langOk&&(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol'))};
 }
 function ruleSLP() {
-  const langTrigger = S.langLevel==='unclearSLP'||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
+  const belowAge = S.langLevel && S.langLevel !== 'ageAppropriate' && !isLangAgeAppropriate();
+  const langTrigger = belowAge||S.langModifiers.has('echolalic')||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
@@ -3887,6 +3891,18 @@ function syncABATargetsFromNeeds(){
 }
 
 // Needs/comorbid checkboxes -> pre-populate school services (add-only; manual unchecks preserved via schoolSvcManualOff)
+function syncCommNeedsFromLangLevel(){
+  if(!S.langLevel||S.langLevel==='ageAppropriate'||isLangAgeAppropriate()) return;
+  const addComm=(v)=>{
+    if(S.needsComm.has(v)) return;
+    S.needsComm.add(v);
+    const cb=document.querySelector(`input[data-key="needsComm"][value="${v}"]`);
+    if(cb) cb.checked=true;
+  };
+  if(S.langLevel==='nonverbal'){addComm('expressive');addComm('functional_aac');}
+  else if(['singleWord','phrase','simpleSentence'].includes(S.langLevel)) addComm('expressive');
+}
+
 function syncSchoolSvcFromNeeds(){
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
@@ -3902,7 +3918,7 @@ function syncSchoolSvcFromNeeds(){
       lbl.appendChild(badge);
     }
   };
-  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()) add('slp_school');
+  if(S.needsComm.size>0||(S.langLevel&&S.langLevel!=='ageAppropriate'&&!isLangAgeAppropriate())||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()||S.langModifiers.has('echolalic')) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
@@ -3951,7 +3967,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const nm=inp.name;
       document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
       if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();}
-      else if(nm==='langLevel') S.langLevel=inp.value;
+      else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
       else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);}
       else if(nm==='adaptProfile') S.adaptProfile=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;
