@@ -384,6 +384,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="adir"> ADI-R</label><select class="outcome-sel" data-outcome-key="adir"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="adir" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="vineland3"> Vineland-3</label><select class="outcome-sel" data-outcome-key="vineland3"><option value="">— outcome —</option><option value="consistent">Significantly impaired (consistent with ASD adaptive profile)</option><option value="equivocal">Mildly impaired</option><option value="notConsistent">Age-appropriate / within normal limits</option></select><input class="prior-date-input" data-date-key="vineland3" type="text" placeholder="date admin."></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="basc3"> BASC-3</label><select class="outcome-sel" data-outcome-key="basc3"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ASD/ADHD/anxiety profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="basc3" type="text" placeholder="date admin."></div>
         </div>
       </div>
     </div>
@@ -1018,8 +1020,8 @@ function rulePsychiatry() {
 function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
-  const delay=['nonverbal','singleWord','phrase','morphosyntactic','unclearSLP'].includes(S.langLevel)||hasMorphoErrors()||hasAnyArticulation();
-  return {include:delay&&S.hearingScreenFail};
+  // A non-compliant hearing screen alone warrants formal audiologic evaluation regardless of language level
+  return {include:S.hearingScreenFail};
 }
 function ruleQBTest() { return {include:S.comorbid.has('adhd_suspected')&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)}; }
 function ruleEarlySteps() {
@@ -1062,7 +1064,7 @@ const LEVEL_DESC={
 };
 function updateOverallLevelBadge(){
   const el=document.getElementById('overallLevelBadge');if(!el)return;
-  const lv=S.asdLevelSC||S.asdLevelRRB;
+  const lv=(S.asdLevelSC&&S.asdLevelRRB)?String(Math.max(parseInt(S.asdLevelSC),parseInt(S.asdLevelRRB))):S.asdLevelSC||S.asdLevelRRB;
   if(!lv){el.innerHTML='';return;}
   const bg={'1':'var(--amber)','2':'var(--red)','3':'#7c3aed'};
   const names={'1':'Requires Support','2':'Requires Substantial Support','3':'Requires Very Substantial Support'};
@@ -1275,7 +1277,7 @@ function generateNote() {
     L.push(dx);
   } else if(S.diagStatus==='suspected'){
     L.push('Autism Spectrum Disorder (ASD) - under evaluation');
-    L.push('ICD-10-CM: F84.0');
+    L.push('ICD-10-CM: Z03.89');
   } else if(S.diagStatus==='ruleOut'){
     L.push('Rule out Autism Spectrum Disorder');
     L.push('ICD-10-CM: Z03.89');
@@ -1494,7 +1496,8 @@ function generateNote() {
     }
     if(S.priorTesting.size){
       if(S.dxEvalPath||S.teacherMaterials.size) L.push('');
-      const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2'};
+      const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',vineland3:'Vineland-3',basc3:'BASC-3'};
+      const behavAdaptKeys=new Set(['vineland3','basc3']);
       const buildLbl=k=>{
         let lbl=baseLabels[k]; if(!lbl) return null;
         if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
@@ -1502,17 +1505,27 @@ function generateNote() {
         return lbl;
       };
       const consistent=[],equivocal=[],notConsistent=[];
+      const adaptConsist=[],adaptEquiv=[],adaptNormal=[];
       [...S.priorTesting].forEach(k=>{
         const lbl=buildLbl(k); if(!lbl) return;
         const out=S.priorTestingOutcome[k]||'';
         if(!out) return;
-        if(out==='consistent') consistent.push(lbl);
-        else if(out==='equivocal') equivocal.push(lbl);
-        else notConsistent.push(lbl);
+        if(behavAdaptKeys.has(k)){
+          if(out==='consistent') adaptConsist.push(lbl);
+          else if(out==='equivocal') adaptEquiv.push(lbl);
+          else adaptNormal.push(lbl);
+        } else {
+          if(out==='consistent') consistent.push(lbl);
+          else if(out==='equivocal') equivocal.push(lbl);
+          else notConsistent.push(lbl);
+        }
       });
       if(consistent.length) L.push('Prior autism-specific testing reviewed: '+consistent.join(', ')+'. Results are consistent with and support the diagnosis of Autism Spectrum Disorder; see evaluation documentation for details.');
       if(equivocal.length) L.push('Prior testing reviewed (equivocal results): '+equivocal.join(', ')+'. Results were inconclusive; findings were considered in the overall diagnostic formulation alongside clinical history and direct observation.');
       if(notConsistent.length) L.push('Prior testing reviewed (results not individually consistent with ASD): '+notConsistent.join(', ')+'. Results were not consistent with ASD in isolation; clinical presentation, developmental history, and direct observation were weighted in the overall diagnostic formulation.');
+      if(adaptConsist.length) L.push('Behavioral/adaptive assessments reviewed: '+adaptConsist.join(', ')+'. Results indicate significant impairment consistent with the neurodevelopmental profile documented at this evaluation; see prior evaluation documentation for details.');
+      if(adaptEquiv.length) L.push('Behavioral/adaptive assessments reviewed (mild/at-risk findings): '+adaptEquiv.join(', ')+'. Results indicate mild impairment or at-risk elevations; findings were considered in the overall clinical formulation.');
+      if(adaptNormal.length) L.push('Behavioral/adaptive assessments reviewed (within normal limits): '+adaptNormal.join(', ')+'. Results were within normal limits or age-appropriate at the time of prior evaluation.');
     }
     L.push('');
   }
@@ -2414,7 +2427,7 @@ function _abaContent(){
     '3':['Level 3 — Requiring Very Substantial Support',
       `Severe deficits in verbal and nonverbal social communication cause marked functional impairment across all settings. ${p.cap} demonstrates minimal initiation of social interactions and limited response to social overtures from others. Extreme difficulty coping with change and restricted/repetitive behaviors interfere with functioning in all spheres of daily life. Intensive ABA therapy is medically necessary given the very substantial support needs documented, the severity of communication and behavioral impairments, and the significant risk to ${p.poss} safety and development without structured behavioral intervention.`]
   };
-  const asdLevelKey=S.asdLevelSC||S.asdLevelRRB||'';
+  const asdLevelKey=(S.asdLevelSC&&S.asdLevelRRB)?String(Math.max(parseInt(S.asdLevelSC),parseInt(S.asdLevelRRB))):S.asdLevelSC||S.asdLevelRRB||'';
   const [levelLabel,levelText]=levelData[asdLevelKey]||['(level not specified)','ABA therapy is medically necessary given the documented functional impairments associated with this patient\'s Autism Spectrum Disorder diagnosis.'];
 
   const domainPairs=[
