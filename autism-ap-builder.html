@@ -2285,7 +2285,7 @@ function generateNote() {
       L.push('  Pharmacotherapy for depression in ASD: no RCTs of depression treatment specifically in ASD exist. SSRIs (while first-line in neurotypical pediatric depression) have not shown consistent efficacy in ASD and carry high risk of behavioral activation syndrome (agitation, hyperactivity, or impulsivity). ASD-specific preferred agents:');
       L.push('  • Duloxetine (SNRI; preferred first-line if comorbid anxiety or pain): start 20 mg daily; increase by 10 mg every 1-2 weeks; range 20-90 mg/day in 1-2 divided doses. Addresses co-occurring anxiety and depression simultaneously. Black box warning: suicidality; monitor closely.');
       L.push('  • Mirtazapine (preferred if sleep disruption, appetite loss, or anxiety co-occurring): start 3.75 mg at bedtime; increase by 3.75 mg weekly; maximum 45 mg/day. Common adverse effects: drowsiness, weight gain.');
-      L.push('  • Bupropion (if ADHD symptoms co-occurring or SSRI/SNRI not tolerated): start 150 mg ER daily; may increase to 300 mg/day after ≥7 days (FDA adult label; pediatric practice typically extends to 7-14 days). Does not cause weight gain or sexual dysfunction. Caution: lowers seizure threshold; avoid if epilepsy co-occurring; activating and may worsen anxiety.');
+      L.push('  • Bupropion (if ADHD symptoms co-occurring or SSRI/SNRI not tolerated): start 150 mg ER daily; may increase to 300 mg/day after ≥7 days (FDA adult label; pediatric practice typically extends to 7-14 days; typically reserved for school-age children and adolescents — off-label; exercise caution in children under 12). Does not cause weight gain or sexual dysfunction. Caution: lowers seizure threshold; avoid if epilepsy co-occurring; activating and may worsen anxiety.');
       L.push('  • SSRIs (second-line, after above agents fail): fluoxetine has strongest neurotypical pediatric RCT evidence but monitor closely for behavioral activation syndrome (agitation, hyperactivity, disinhibition) in ASD at each dose change; black box warning for suicidality counseled. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.');
     } else {
       L.push('  • Psychotherapy first-line: CBT or IPT for mild-to-moderate severity; parent involvement essential. Active support for 6 weeks if symptoms are mild before initiating medication.');
@@ -2423,6 +2423,7 @@ function generateNote() {
       L.push('  • Clonidine IR (if melatonin insufficient; more sedating): start 0.05 mg (half of 0.1 mg tablet) 30 minutes before bedtime; increase by 0.05 mg every 3–5 days; maximum 0.3 mg. ER: start 0.1 mg, titrate weekly to 0.3 mg/day.');
       L.push('  • Trazodone (if above insufficient): start 25 mg at bedtime; increase weekly by 25 mg to 100-150 mg based on weight. No RCTs in ASD children but clinically used; rare risk of priapism; counsel families.');
       L.push('  • Mirtazapine (if co-occurring anxiety or depression): start 3.75 mg at bedtime; titrate to maximum 45 mg/day. Benefits sleep onset and maintenance; weight gain common.');
+      L.push('  NOT recommended as sleep agents in ASD: benzodiazepines (paradoxical activation risk is elevated in ASD; chronic use contraindicated), zolpidem (no pediatric ASD evidence), amitriptyline/doxepin (anticholinergic burden, cardiac risk). Antipsychotics should not be initiated primarily for sleep without separate behavioral or psychiatric indications.');
     } else {
       L.push('  Pharmacotherapy for sleep (always adjunct to behavioral intervention; FL BHC 2022):');
       L.push('  • Melatonin (Level 2; first-line adjunct): children start 0.5-1 mg nightly, maximum 3 mg; adolescents start 1-3 mg nightly, maximum 10 mg. Administer 30-60 minutes before target bedtime. Use pharmaceutical-grade formulation (USP or NSF certified; FDA does not regulate supplements).');
@@ -2446,7 +2447,8 @@ function generateNote() {
     L.push('  • Seizure action plan to be developed in collaboration with neurology; all caregivers and school staff trained.');
     L.push('  • Safety precautions: no unsupervised bathing or swimming; fall precautions if atonic or absence seizures; Medical ID bracelet recommended.');
     L.push('  • AED adherence counseling; medication interactions reviewed.');
-    L.push('  • Driving: discuss seizure-free interval requirements per state law if adolescent.');
+    if(['adolescent','youngAdult'].includes(S.ageGroup))
+      L.push('  • Driving: discuss seizure-free interval requirements per state law before licensure.');
     L.push('');
   }
 
@@ -2588,7 +2590,7 @@ function generateNote() {
     L.push('');
   }
   L.push('RETURN TO CLINIC');
-  L.push(S.rtcInterval?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic: ___________');
+  L.push(S.rtcInterval?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic: {interval}');
   L.push('');
 
   L.push('────────────────────────────────────────────────────────');
@@ -2786,7 +2788,21 @@ function _abaContent(){
   if(youngChild) evidPara+=` For young children specifically, Early Intensive Behavioral Intervention (EIBI) — a form of ABA — is supported by a Cochrane systematic review demonstrating significant improvements in language, adaptive behavior, and intellectual functioning.³`;
   if(isMilitary) evidPara+=` The National Academies of Sciences, Engineering, and Medicine (NASEM, 2025)${youngChild?' (Ref. 4)':' (Ref. 3)'} evaluated the TRICARE Autism Care Demonstration and reaffirmed the medical necessity and effectiveness of ABA therapy for military-connected individuals with ASD.`;
 
-  return {today,p,asdLevelKey,levelLabel,levelText,domains,safetyFlags,targets,settings,hoursText,refs,openPara,impPara,evidPara,youngChild,isMilitary};
+  // Specifiers in ABA letter: those that support or contextualize medical necessity
+  // (withGenetic and withNDD strengthen case for TRICARE/ChampVA; withID/withBIF affect intensity rationale)
+  const abaSpecMap={
+    withID:'with accompanying intellectual disability',
+    withSuspectedID:'with suspected intellectual disability',
+    withGDD:'with Global Developmental Delay',
+    withSuspectedGDD:'with Global Developmental Delay (evaluation underway)',
+    withBIF:'with borderline intellectual functioning',
+    withLangImpairment:'with co-occurring language impairment',
+    withGenetic:'with associated known genetic/medical condition',
+    withNDD:'with associated neurodevelopmental/behavioral/mental disorder'
+  };
+  const abaSpecStr=[...S.specifiers].map(k=>abaSpecMap[k]).filter(Boolean).join('; ');
+
+  return {today,p,asdLevelKey,levelLabel,levelText,abaSpecStr,domains,safetyFlags,targets,settings,hoursText,refs,openPara,impPara,evidPara,youngChild,isMilitary};
 }
 
 function generateABALetter(isPreview=false){
@@ -2800,7 +2816,7 @@ function generateABALetter(isPreview=false){
     h+=`<h3>LETTER OF MEDICAL NECESSITY</h3>`;
     h+=`<div class="aba-subtitle">Applied Behavior Analysis (ABA) Therapy — Autism Spectrum Disorder</div>`;
     h+=`<p class="aba-meta"><strong>Date:</strong> ${c.today}</p>`;
-    h+=`<p class="aba-meta"><strong>Diagnosis:</strong> Autism Spectrum Disorder${c.asdLevelKey?', '+e(c.levelLabel):''} (DSM-5) &nbsp;|&nbsp; <strong>ICD-10-CM:</strong> F84.0</p>`;
+    h+=`<p class="aba-meta"><strong>Diagnosis:</strong> Autism Spectrum Disorder${c.asdLevelKey?', '+e(c.levelLabel):''}${c.abaSpecStr?', '+e(c.abaSpecStr):''} (DSM-5) &nbsp;|&nbsp; <strong>ICD-10-CM:</strong> F84.0</p>`;
     h+=`<p style="margin:16px 0 6px">To Whom It May Concern / Dear Medical Director:</p>`;
     h+=`<p>${e(c.openPara)}</p>`;
     h+=`<div class="aba-sec">I. Diagnosis &amp; Level of Support</div>`;
@@ -2829,7 +2845,7 @@ function generateABALetter(isPreview=false){
   h+=`<p style="font-size:14pt;font-weight:bold;text-align:center;margin-bottom:4px">LETTER OF MEDICAL NECESSITY</p>`;
   h+=`<p style="text-align:center;font-size:10pt;color:#6b7280;margin-bottom:22px;font-style:italic">Applied Behavior Analysis (ABA) Therapy — Autism Spectrum Disorder</p>`;
   h+=`<p style="margin-bottom:4px"><strong>Date:</strong> ${e(c.today)}</p>`;
-  h+=`<p style="margin-bottom:16px"><strong>Diagnosis:</strong> Autism Spectrum Disorder${c.asdLevelKey?', '+e(c.levelLabel):''} (DSM-5) &nbsp;|&nbsp; <strong>ICD-10-CM:</strong> F84.0</p>`;
+  h+=`<p style="margin-bottom:16px"><strong>Diagnosis:</strong> Autism Spectrum Disorder${c.asdLevelKey?', '+e(c.levelLabel):''}${c.abaSpecStr?', '+e(c.abaSpecStr):''} (DSM-5) &nbsp;|&nbsp; <strong>ICD-10-CM:</strong> F84.0</p>`;
   h+=`<p style="margin:14px 0 8px">To Whom It May Concern / Dear Medical Director:</p>`;
   h+=`<p style="margin-bottom:12px">${e(c.openPara)}</p>`;
   h+=`<p style="${secStyle}">I. Diagnosis &amp; Level of Support</p><p>${e(c.levelText)}</p>`;
@@ -2854,7 +2870,7 @@ function generateABALetterPlain(){
   let t='LETTER OF MEDICAL NECESSITY\n';
   t+='Applied Behavior Analysis (ABA) Therapy — Autism Spectrum Disorder\n\n';
   t+=`Date: ${c.today}\n`;
-  t+=`Diagnosis: Autism Spectrum Disorder${c.asdLevelKey?', '+c.levelLabel:''} (DSM-5)\n`;
+  t+=`Diagnosis: Autism Spectrum Disorder${c.asdLevelKey?', '+c.levelLabel:''}${c.abaSpecStr?', '+c.abaSpecStr:''} (DSM-5)\n`;
   t+=`ICD-10-CM: F84.0\n\n`;
   t+='To Whom It May Concern / Dear Medical Director:\n\n';
   t+=c.openPara+'\n\n';
@@ -2909,7 +2925,9 @@ function _iepLetterContent(){
   const levelNumMap={1:'Level 1 (requiring support)',2:'Level 2 (requiring substantial support)',3:'Level 3 (requiring very substantial support)'};
   const scLvl=parseInt(S.asdLevelSC)||0;
   const rrbLvl=parseInt(S.asdLevelRRB)||0;
-  const levelLabel=S.diagStatus==='confirmed'?(scLvl?levelNumMap[scLvl]:(rrbLvl?levelNumMap[rrbLvl]:'')):'';
+  // IEP should reflect the highest support needs across either domain, not SC alone
+  const iepLevelKey=scLvl&&rrbLvl?Math.max(scLvl,rrbLvl):scLvl||rrbLvl;
+  const levelLabel=S.diagStatus==='confirmed'?(iepLevelKey?levelNumMap[iepLevelKey]:''):'';
   const dxCode=S.diagStatus==='confirmed'?'F84.0':'Z03.89';
   const reLineLabel=S.diagStatus==='confirmed'
     ?('Autism Spectrum Disorder (ICD-10: F84.0)'+(levelLabel?' — '+levelLabel:''))
@@ -2963,7 +2981,7 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_math')) impacts.push('Mathematics: A specific learning disability in mathematics affecting computation, problem-solving, and access to grade-level math curriculum.');
   if(S.comorbid.has('ld_written')) impacts.push('Written expression: A specific learning disability in written expression affecting the ability to produce written work at grade level.');
 
-  // Specifiers
+  // Specifiers — withCatatonia deferred: add checkbox + SPEC_LABELS + comorbidity block before re-adding here
   const specMap={
     withID:'with accompanying intellectual disability',
     withSuspectedID:'with suspected intellectual disability, formal evaluation pending',
@@ -2972,7 +2990,8 @@ function _iepLetterContent(){
     withBIF:'with borderline intellectual functioning (BIF)',
     withoutID:'without intellectual impairment',
     withLangImpairment:'with co-occurring language impairment',
-    withCatatonia:'with associated catatonia'
+    withGenetic:'with associated known genetic or medical condition',
+    withNDD:'with associated neurodevelopmental, behavioral, or mental health condition'
   };
   const specStr=[...S.specifiers].map(k=>specMap[k]).filter(Boolean).join('; ');
 
@@ -2984,7 +3003,8 @@ function _iepLetterContent(){
     const goals=[];
     if(S.needsComm.has('functional_aac')||S.langLevel==='nonverbal'||S.langLevel==='singleWord')
       goals.push('AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners');
-    if(S.needsComm.has('expressive')||S.langLevel==='phrases'||S.langLevel==='sentences')
+    // 'phrase' and 'simpleSentence' are the actual S.langLevel values (not 'phrases'/'sentences')
+    if(S.needsComm.has('expressive')||S.langLevel==='phrase'||S.langLevel==='simpleSentence')
       goals.push('expressive language development: sentence formulation, topic maintenance, and narrative organization');
     if(S.needsComm.has('receptive'))
       goals.push('receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary');
