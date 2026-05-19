@@ -641,6 +641,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutLangImpairment"> Without language impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGenetic"> With associated known genetic/medical condition</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withNDD"> With associated neurodevelopmental/behavioral/mental disorder</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withCatatonia"> With catatonia (active features at this visit; auto-applies when Catatonia comorbid is checked)</label>
           </div>
         </div>
         <hr class="divider">
@@ -835,6 +836,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><span class="plan-pill" data-cv="trauma">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia"> Catatonia — features present at this visit (F06.1)</label><span class="plan-pill" data-cv="catatonia">Include plan</span></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia_history"> Catatonia — prior episode (recovered or partial; F06.1 by history)</label><span class="plan-pill" data-cv="catatonia_history">Include plan</span></div>
 
         <div class="comorbid-grp">Neurodevelopmental</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><span class="plan-pill" data-cv="language_disorder">Include plan</span></div>
@@ -1122,6 +1125,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
     <span id="abaLevelWarn" style="display:none;font-size:11px;font-weight:600;color:#92400e;background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
     <span id="abaThinWarn" style="display:none;font-size:11px;font-weight:600;color:#991b1b;background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
+    <span id="abaCatatoniaWarn" style="display:none;font-size:11px;font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
     <button class="btn btn-gray btn-sm" onclick="copyABALetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Copy with *** cursor stops for Epic SmartText paste">Copy for Epic (***)</button>
@@ -1354,7 +1358,8 @@ const SPEC_LABELS={
   withSuspectedLang:'with suspected/uncharacterized language impairment (SLP evaluation pending)',
   withoutLangImpairment:'without language impairment',
   withGenetic:'with associated known genetic/medical condition',
-  withNDD:'with associated neurodevelopmental/behavioral/mental disorder'
+  withNDD:'with associated neurodevelopmental/behavioral/mental disorder',
+  withCatatonia:'with catatonia'
 };
 const CRIT_A={a1:'Deficits in social-emotional reciprocity',a2:'Deficits in nonverbal communicative behaviors used for social interaction',a3:'Deficits in developing, maintaining, and understanding relationships'};
 const CRIT_B={b1:'Stereotyped or repetitive motor movements, use of objects, or speech',b2:'Insistence on sameness, inflexible adherence to routines, or ritualized patterns',b3:'Highly restricted, fixated interests abnormal in intensity or focus',b4:'Hyper- or hyporeactivity to sensory input or unusual sensory interests'};
@@ -1404,9 +1409,12 @@ function generateClinicalSummary(){
 
   // Opening sentence — "The patient is a [preschool-aged boy/girl/child] who is [conversational], [with avg cognition], with [adaptive]."
   // Gender-appropriate descriptor by age group and pronoun
+  // Age-range parentheticals added to toddler and preschool openers — the tool
+  // does not collect a birthdate, so the range is the most honest specificity
+  // available. Council review 2026-05-19 (English Professor).
   const genderDescMap={
-    toddler:    {he:'toddler boy',    she:'toddler girl',    they:'toddler',          '':'toddler'},
-    preschool:  {he:'preschool-aged boy', she:'preschool-aged girl', they:'preschool-aged child', '':'preschool-aged child'},
+    toddler:    {he:'toddler boy (12–35 months)',    she:'toddler girl (12–35 months)',    they:'toddler (12–35 months)',          '':'toddler (12–35 months)'},
+    preschool:  {he:'preschool-aged boy (3–5 years)', she:'preschool-aged girl (3–5 years)', they:'preschool-aged child (3–5 years)', '':'preschool-aged child (3–5 years)'},
     schoolAge:  {he:'school-aged boy',she:'school-aged girl',they:'school-aged child','':'school-aged child'},
     adolescent: {he:'adolescent male',she:'adolescent female',they:'adolescent',      '':'adolescent'},
     youngAdult: {he:'young adult male',she:'young adult female',they:'young adult',   '':'young adult'}
@@ -2434,6 +2442,41 @@ function generateNote() {
     L.push('');
   }
 
+  // ── Catatonia — current features (F06.1) ─────────────────────────────────
+  // Council review 2026-05-19: underrecognized in autistic adolescents and
+  // young adults. Block contains the urgent safety pathway. Written with
+  // psychiatry voice; lorazepam challenge and consult are the operational moves.
+  if(S.comorbid.has('catatonia')&&cp('catatonia')){
+    L.push('── Problem '+probN+++': Catatonia, Active Features (F06.1) ──');L.push('');
+    L.push('Assessment:');
+    L.push('  Catatonic features are present at this visit. Catatonia in autistic adolescents and young adults is increasingly recognized and is associated with significant morbidity when missed. Features may include motor slowing or freezing, mutism or marked reduction in speech relative to baseline, posturing, waxy flexibility, echolalia or echopraxia worsening from baseline, marked decrease in self-care, and (in severe cases) autonomic instability. Differential includes neuroleptic malignant syndrome, encephalitis (autoimmune or infectious), substance effects, and severe depression with psychomotor retardation. {Describe specific features observed, time course, and baseline comparison.}');
+    L.push('');L.push('Plan:');
+    L.push('  • Psychiatry consultation today, expedited; inpatient admission is frequently indicated when features are pronounced or there is autonomic compromise, dehydration, or inability to maintain oral intake.');
+    L.push('  • Lorazepam challenge per psychiatry (typical: 1–2 mg PO or IM; observe 30–60 minutes; a positive response of measurable motor improvement supports the diagnosis and guides ongoing dosing).');
+    L.push('  • Maintenance: scheduled lorazepam titrated to symptom control is the first-line pharmacologic approach; some patients require substantial doses without sedation due to atypical benzodiazepine response in catatonia.');
+    L.push('  • ECT consultation if benzodiazepine response is partial or absent within 48–72 hours, or if life-threatening features (malignant catatonia, hyperthermia, autonomic instability) develop.');
+    L.push('  • Discontinue or hold antipsychotics if recently introduced — they can precipitate or worsen catatonia and risk neuroleptic malignant syndrome.');
+    L.push('  • Medical workup: CBC, BMP, CK, TSH; consider antibody panel and neuroimaging per psychiatry/neurology to rule out autoimmune encephalitis (anti-NMDA receptor and related) and structural causes.');
+    L.push('  • Supportive care: monitor hydration, nutrition, DVT prophylaxis if immobile, skin integrity.');
+    L.push('  • Caregiver education: catatonia is treatable; the behavioral changes are not willful; behavioral pressure or contingency demands during the active episode can worsen symptoms.');
+    L.push('  • Behavioral programming (ABA): pause or substantially reduce intensity during the active episode; resume with psychiatry input once stabilized.');
+    L.push('');
+  }
+
+  // ── Catatonia — prior episode (history) ──────────────────────────────────
+  if(S.comorbid.has('catatonia_history')&&cp('catatonia_history')){
+    L.push('── Problem '+probN+++': Catatonia, History of Prior Episode (F06.1 by history) ──');L.push('');
+    L.push('Assessment:');
+    L.push('  History of a prior catatonic episode is documented. Currently {recovered fully / partially recovered / on maintenance therapy}. Recurrence risk is real and recognition by family and clinical team is the primary protective factor against delayed care. {Describe prior episode timing, triggers if known, treatment that produced response, and current functional baseline.}');
+    L.push('');L.push('Plan:');
+    L.push('  • Maintenance therapy reviewed: {current lorazepam dose, response, and monitoring plan / off treatment, no medication / other regimen}.');
+    L.push('  • Caregiver and team education on early warning signs: motor slowing or freezing, regression of self-care, sudden marked decrease in speech relative to baseline, posturing, refusal to eat or drink.');
+    L.push('  • Action plan if early features recur: contact prescribing psychiatrist same day; do not delay; expedited re-evaluation indicated.');
+    L.push('  • Caution with new psychotropics: review any proposed antipsychotic with psychiatry first given prior catatonia history; benzodiazepine taper, if planned, should be psychiatry-directed and gradual.');
+    L.push('  • Behavioral programming: contingency demands and behavioral pressure increase risk during high-stress periods; coordinate ABA intensity adjustments with psychiatry.');
+    L.push('');
+  }
+
   if(S.comorbid.has('dcd')&&cp('dcd')){
     L.push('── Problem '+probN+++': Developmental Coordination Disorder (F82) ──');L.push('');
     L.push('Assessment:');
@@ -2850,7 +2893,18 @@ function _abaContent(){
     boundary_skills:'Personal space and interpersonal boundary skills',
     pica_reduction:'Reduction of pica (ingestion of non-food items)',
   };
-  const targets=[...S.abaTargets].map(t=>TL[t]||t);
+  // Age-specific overrides: developmental phrasing reads patronizing on an
+  // adolescent or young-adult letter; replace with role-appropriate labels.
+  // Council review 2026-05-19 (Cases 4, 5, 14). Same Set keys, different display.
+  const TL_OLDER={
+    functional_comm:'Functional and self-advocacy communication',
+    self_help:'Independent living skills (community ADLs, money management, transportation)',
+    safety_skills:'Community safety and personal safety advocacy',
+    play:'Social-pragmatic skills for peer, school, and workplace contexts',
+    transitions:'Flexibility and adaptation to schedule and role changes',
+  };
+  const isOlderForABA=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
+  const targets=[...S.abaTargets].map(t=>(isOlderForABA&&TL_OLDER[t])||TL[t]||t);
 
   const SL={home:'home',clinic:'clinic/center-based',school:'school/educational setting',community:'community settings',telehealth:'Telehealth (parent coaching and caregiver training)'};
   const settings=[...S.abaSetting].map(s=>SL[s]||s);
@@ -2904,7 +2958,8 @@ function _abaContent(){
     withBIF:'with borderline intellectual functioning',
     withLangImpairment:'with co-occurring language impairment',
     withGenetic:'with associated known genetic/medical condition',
-    withNDD:'with associated neurodevelopmental/behavioral/mental disorder'
+    withNDD:'with associated neurodevelopmental/behavioral/mental disorder',
+    withCatatonia:'with catatonia'
   };
   const abaSpecStr=[...S.specifiers].map(k=>abaSpecMap[k]).filter(Boolean).join('; ');
 
@@ -3058,6 +3113,7 @@ function _iepLetterContent(){
     language_disorder:'a language disorder',dcd:'Developmental Coordination Disorder (motor dyspraxia)',
     sleep_disorder:'a sleep disorder',arfid:'Avoidant/Restrictive Food Intake Disorder (ARFID)',epilepsy:'a seizure disorder (epilepsy)',
     pfd_chronic:'Pediatric Feeding Disorder, chronic (R63.32)',pfd_acute:'Pediatric Feeding Disorder, acute (R63.31)',pfd_suspected:'Pediatric Feeding Disorder, suspected — interdisciplinary evaluation pending (R63.30)',
+    catatonia:'catatonia (active features, F06.1)',catatonia_history:'a history of catatonia (F06.1 by history)',
   };
   const coDxs=[];
   Object.keys(coLabels).forEach(k=>{if(S.comorbid.has(k))coDxs.push(coLabels[k]);});
@@ -3097,7 +3153,8 @@ function _iepLetterContent(){
     withoutID:'without intellectual impairment',
     withLangImpairment:'with co-occurring language impairment',
     withGenetic:'with associated known genetic or medical condition',
-    withNDD:'with associated neurodevelopmental, behavioral, or mental health condition'
+    withNDD:'with associated neurodevelopmental, behavioral, or mental health condition',
+    withCatatonia:'with catatonia'
   };
   const specStr=[...S.specifiers].map(k=>specMap[k]).filter(Boolean).join('; ');
 
@@ -3931,6 +3988,10 @@ function updateSectionHeaders(){
     const thin=S.diagStatus==='confirmed'&&S.abaTargets.size<2&&!hasSafetyFlag;
     abaThin.style.display=thin?'':'none';
   }
+  // Catatonia ABA warning — surfaces when active features documented. ABA pressure
+  // during active catatonia can worsen the condition; psychiatry must coordinate.
+  const abaCat=document.getElementById('abaCatatoniaWarn');
+  if(abaCat) abaCat.style.display=(S.diagStatus==='confirmed'&&S.comorbid.has('catatonia'))?'':'none';
   // Visit type highlight when unset
   const vtRow=document.getElementById('visitTypeRow');
   if(vtRow)vtRow.classList.toggle('vt-unset',!S.visitType&&!!S.diagStatus);
@@ -4331,6 +4392,14 @@ document.addEventListener('DOMContentLoaded',()=>{
             const show=S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected');
             const r=document.getElementById('arfidDetailsRow');if(r)r.style.display=show?'':'none';
             if(!show){S.arfidMechanism.clear();S.arfidImpact.clear();document.querySelectorAll('[data-key="arfidMechanism"],[data-key="arfidImpact"]').forEach(c=>{c.checked=false;});}
+          }
+          // Catatonia (active features) auto-applies the withCatatonia DSM-5 specifier.
+          // Council review 2026-05-19: 'with catatonia' is the standard DSM-5 specifier
+          // when motor symptoms are currently active. Prior episode does not auto-apply.
+          if(v==='catatonia'){
+            const specCb=document.querySelector('input[data-key="specifiers"][value="withCatatonia"]');
+            if(inp.checked){S.specifiers.add('withCatatonia');if(specCb)specCb.checked=true;}
+            else{S.specifiers.delete('withCatatonia');if(specCb)specCb.checked=false;}
           }
         }
       }
