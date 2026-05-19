@@ -516,6 +516,9 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="feeding_adl"> Mealtime / self-feeding</label>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="hygiene"> Hygiene / grooming</label>
           <label class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="commSafety"> Community safety (supervision in public, hazard awareness)</label>
+          <div id="strangerDangerRow" style="display:none;margin-left:16px">
+            <label class="cb-row"><input type="checkbox" data-key="single" value="strangerDanger"> Reduced protective stranger response (approaches unfamiliar adults without appropriate caution)</label>
+          </div>
           <label id="commIndepRow" class="cb-row"><input type="checkbox" data-key="needsAdaptive" value="commIndependence"> Community independence / life skills (navigation, errands, transit)</label>
         </div>
       </div>
@@ -535,6 +538,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="vocalDisruption"> Disruptive vocalizations (repetitive, loud, or scripted speech disrupting the learning environment)</label>
           <div class="beh-freq-row" data-for="vocalDisruption" style="display:none"><input class="beh-freq-inp" data-freqkey="vocalDisruption" type="text" placeholder="Description (optional) — e.g., scripted phrases throughout instructional periods"></div>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="pica"> Pica (ingestion of non-food items — safety risk)</label>
+          <label id="boundaryViolRow" class="cb-row"><input type="checkbox" data-key="needsBehavior" value="boundaryViol"> Boundary violations / impaired personal space (inappropriate touching, physical intrusiveness toward peers or adults)</label>
         </div>
       </div>
       <hr class="divider">
@@ -811,6 +815,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="self_reg"> Self-regulation and coping strategies</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="transitions"> Transition tolerance and behavioral flexibility</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="academics"> Academic readiness / instruction-following skills</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="boundary_skills"> Personal space and interpersonal boundary skills</label>
         </div>
       </div>
     </div>
@@ -925,6 +930,7 @@ const S = {
   arfidMechanism:new Set(), arfidImpact:new Set(),
   socialWorkReasons:new Set(),
   schoolPlacement:'', schoolDoc:'', schoolSvc:new Set(), schoolSvcAuto:new Set(), schoolSvcManualOff:new Set(),
+  strangerDanger:false,
   safety:new Set(), ag:new Set(), showDSMTable:true, showDSMLines:false,
   insuranceType:'', abaHours:'', abaSetting:new Set(), abaTargets:new Set(),
   previewMode:'note',
@@ -1012,13 +1018,13 @@ function rulePCIT() {
 function rulePsychotherapy() {
   const ageOk=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
   const langOk=isVerbalEnough();
-  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.emotionalReg;
+  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.emotionalReg||(['adolescent','youngAdult'].includes(S.ageGroup)&&S.needsBehavior.has('boundaryViol'));
   return {include:ageOk&&langOk&&ind};
 }
 function ruleSocialSkills() {
   const ageOk=['preschool','schoolAge','adolescent'].includes(S.ageGroup);
   const langOk=!isMinVerbal()&&S.langLevel!=='unclearSLP';
-  return {include:ageOk&&langOk&&S.needsSocial.size>0};
+  return {include:ageOk&&langOk&&(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol'))};
 }
 function ruleSLP() {
   const langTrigger = S.langLevel==='unclearSLP'||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation();
@@ -1563,6 +1569,7 @@ function generateNote() {
     if(S.needsBehavior.has('sib'))             specR.push('self-injurious behavior (SIB; even infrequent events carry risk of permanent tissue damage — no safe frequency threshold exists)');
     if(S.needsBehavior.has('pica'))            specR.push('pica/ingestion of non-food items (any ingestion event is a medical emergency risk — no safe frequency threshold exists)');
     if(S.needsBehavior.has('aggression'))      specR.push('aggression toward others (any physical aggression incident poses risk of injury to staff or peers, school disciplinary action, and potential legal consequences)');
+    if(S.needsBehavior.has('boundaryViol'))    specR.push('boundary violations and failure to recognize personal space boundaries (creates risk of peer harm, disciplinary consequences, and vulnerability to exploitation — no safe-frequency threshold given safety and legal implications)');
     // Tier 2 — Interfering behaviors: optional clinician-entered description, no placeholder if blank
     if(S.needsBehavior.has('tantrums'))        specR.push('tantrums/meltdowns'+(S.behavFreq.tantrums?' ('+S.behavFreq.tantrums+')':''));
     if(S.needsBehavior.has('noncompliance'))   specR.push('severe noncompliance'+(S.behavFreq.noncompliance?' ('+S.behavFreq.noncompliance+')':''));
@@ -1617,7 +1624,8 @@ function generateNote() {
       reduce_pica:'Reduction of pica (ingestion of non-food items): pica is a Behavior of Danger — any ingestion event carries risk of foreign body obstruction, internal injury, or toxic exposure. Environmental modification, direct supervision protocol, and function-based behavioral intervention are required; coordinate with GI evaluation.',
       self_reg:'Self-regulation and coping strategies: emotional regulation impairments documented; programming targets physiological arousal awareness, identification of regulatory states, and adaptive coping responses.',
       transitions:'Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.',
-      academics:'Academic readiness / instruction-following skills: targets prerequisite learning behaviors (attending to instruction, following multi-step directions, task initiation and completion) rather than academic content instruction; appropriate for this developmental profile.'
+      academics:'Academic readiness / instruction-following skills: targets prerequisite learning behaviors (attending to instruction, following multi-step directions, task initiation and completion) rather than academic content instruction; appropriate for this developmental profile.',
+      boundary_skills:'Personal space and interpersonal boundary skills: documented boundary violations create risk of peer harm, disciplinary action, and exploitation; ABA-based explicit teaching of personal space concepts, appropriate touch by relationship type, and permission-seeking behaviors is indicated. All skills must be systematically generalized across school, home, and community settings.'
     };
     if(confirmed){
       L.push(`ABA therapy is recommended as the primary evidence-based behavioral intervention for ${pr.obj} and is medically necessary given ${pr.poss} confirmed diagnosis of Autism Spectrum Disorder${lvClause}, with the following documented functional impairments establishing medical necessity: ${specRStr}. These impairments substantially limit ${pr.poss} ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.`);
@@ -1661,9 +1669,21 @@ function generateNote() {
       L.push('  • Community Safety Behavioral Training: Structured ABA programming to address community safety risk. Recommended targets:');
       L.push('    - Emergency stop response: "Stop" on command at curbs, parking lots, and street crossings. Trained via discrete trial teaching in controlled settings, then systematically generalized to real community environments using in-vivo training.');
       L.push('    - Proximity maintenance: "Stay with me" and recall-to-caregiver behaviors reinforced in public settings using graduated distance and distraction hierarchies.');
-      L.push('    - Boundary training: Identifying and honoring physical boundaries (parking lots, store exits, water bodies) using visual supports, rule rehearsal, and reinforcement of safe behavior.');
+      L.push('    - Environmental boundary training: Identifying and honoring physical/geographic boundaries (parking lots, store exits, water bodies) using visual supports, rule rehearsal, and reinforcement of safe behavior. Note: this target addresses navigation and environmental safety; interpersonal boundary training is addressed separately below if indicated.');
       L.push('    - Elopement prevention protocol: BCBA should conduct a functional behavior assessment of any elopement behavior before intervention; the function of the behavior (escape, sensory seeking, access to tangibles) determines treatment. Safety skills training is not a substitute for function-based elopement intervention.');
+      if(S.strangerDanger) L.push('    - Stranger discrimination and protective response: Identification of familiar vs. unfamiliar adults using visual category supports; appropriate responses to unsolicited touch or approach from unfamiliar individuals ("Stop, Go, Tell"); adult mediation strategies to reduce unsupervised exposure to unfamiliar individuals in community and school settings. Exploitation prevention framing adapted to the patient\'s cognitive and communication level.');
       L.push('    [Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.]');
+    }
+    if(S.needsBehavior.has('boundaryViol')){
+      L.push('  • Interpersonal Boundary and Personal Space Training: Structured ABA programming is indicated given documented boundary violations. This is a high-priority target given the risk of peer harm, disciplinary consequences, and exploitation. Recommended targets:');
+      L.push('    - Personal space concept: Explicit teaching of "personal space bubble" using visual supports (hula hoop, floor markers, social narratives), discrimination between appropriate proximity for strangers, acquaintances, and family members.');
+      L.push('    - Appropriate touch by relationship type: Discrete trial and video modeling to discriminate handshake (peer/acquaintance), side-hug or fist-bump (close friend/family), no-touch (stranger or non-consenting person). Discrimination must be probed across novel people and settings.');
+      L.push('    - Permission-seeking: Teaching "Can I hug you?" or equivalent social script before any physical contact; reinforcing the wait-for-response interval before acting.');
+      if(['adolescent','youngAdult'].includes(S.ageGroup)){
+        L.push('    - Consent education: ASD-adapted, age-appropriate instruction on consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, and self-advocacy when others violate one\'s own boundaries. Coordinate with school counseling and outpatient therapist.');
+        L.push('    - Legal and social consequence awareness: Psychoeducation (adapted to cognitive level) on the legal and disciplinary consequences of uninvited physical contact. Coordinate with outpatient therapist and family.');
+      }
+      L.push('    - Generalization: All boundary skills require systematic generalization probing across school, home, community, and (where applicable) vocational settings; do not assume transfer from clinic training alone.');
     }
     if(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)) L.push('  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.');
     L.push('');
@@ -1682,10 +1702,11 @@ function generateNote() {
   // Psychotherapy
   if(resolveOv('psychotherapy',rulePsychotherapy())){
     L.push(n+++'. AUTISM-INFORMED PSYCHOTHERAPY');
-    const i=[];if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression/mood');if(S.comorbid.has('ocd'))i.push('OCD');if(S.emotionalReg)i.push('emotional regulation');
+    const i=[];if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression/mood');if(S.comorbid.has('ocd'))i.push('OCD');if(S.emotionalReg)i.push('emotional regulation');if(S.needsBehavior.has('boundaryViol'))i.push('boundary safety and social skill development');
     L.push('CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: '+(i.join(', ')||'emotional/coping needs')+'.');
     L.push(`Therapist with ASD-specific training required. Approaches must account for ${pr.poss} communication profile, cognitive style, and sensory differences.`);
     if(['adolescent','youngAdult'].includes(S.ageGroup)) L.push('Self-advocacy and self-determination should be integrated into treatment.');
+    if(['adolescent','youngAdult'].includes(S.ageGroup)&&S.needsBehavior.has('boundaryViol')) L.push('Boundary safety priority: Given documented boundary violations at this developmental stage, psychotherapy should explicitly address consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, legal and social consequences of uninvited physical contact, and self-advocacy when one\'s own boundaries are violated. ASD-adapted sexuality and relationship education (e.g., FLASH curriculum, Safety Net program) should be coordinated with the school team and family.');
     L.push('');
   }
 
@@ -1835,6 +1856,7 @@ function generateNote() {
       if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all student areas; direct staff supervision during transitions and mealtimes; school nurse notification with emergency ingestion action plan');
       if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized BSP addressing function; reduced group size during high-disruption periods; staff trained in non-punitive response; alternative communication supports as indicated');
       if(S.emotionalReg) accomBeh.push('Emotional regulation: designated calm-down space; break pass for self-initiated regulation breaks; de-escalation plan on file with all staff; advance notice of schedule changes');
+      if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers); social skills instruction addressing personal space and appropriate touch integrated into daily schedule; all staff trained on consistent, calm redirection protocol; ABA BCBA consultation for school-based boundary skill generalization');
       // Group 3: Academic
       const accomAcad=[];
       if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -1916,6 +1938,7 @@ function generateNote() {
     if(S.safety.has('bullying')){L.push('  • Bullying/Victimization: Identify trusted school adults, open communication, review anti-bullying policy. Family informed of the Florida Hope Scholarship Program; students who have experienced bullying or violence at school may qualify for a scholarship to attend an alternative school better suited to their needs.');}
     if(S.safety.has('internet')) L.push('  • Internet/Social Media Safety: Privacy, appropriate online relationships, digital stranger safety discussed.');
     if(S.safety.has('fire_counsel')) L.push('  • Fire/Environmental Hazards: Home fire safety plan and smoke detector placement reviewed.');
+    if(S.strangerDanger) L.push('  • Stranger Safety / Reduced Protective Response: Absence of age-appropriate stranger wariness discussed with family. Patient approaches unfamiliar adults without appropriate caution, creating significant safety risk and vulnerability to exploitation. Counseling provided regarding: continued direct supervision in community and school settings; stranger discrimination training (addressed via ABA programming); and caregiver strategies to minimize unsupervised access to unfamiliar adults. Family instructed to notify school staff and ensure supervision requirements are documented in the IEP/504 plan.');
     L.push('');
   }
 
@@ -2850,6 +2873,7 @@ function _iepLetterContent(){
     if(S.comorbid.has('anxiety')) goals.push('anxiety management strategies (graduated exposure, relaxation techniques, cognitive coping) adapted for the school setting');
     if(S.comorbid.has('depression')) goals.push('behavioral activation and mood support, coordinated with outpatient treatment');
     if(S.needsBehavior.has('rigidity')||S.needsBehavior.has('tantrums')) goals.push('coping skills for flexibility and transition management');
+    if(S.needsBehavior.has('boundaryViol')) goals.push('personal space and boundary awareness, including appropriate physical interaction with peers and adults in school settings, coordinated with ABA and outpatient psychotherapy');
     goals.push('social skill generalization in the school environment, reinforcing goals targeted in specialized social skills instruction');
     s+=' Goals: '+goals.join('; ')+'.';
     svContent.counseling=s;
@@ -2945,6 +2969,7 @@ function _iepLetterContent(){
   if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all classrooms, hallways, and areas the student accesses; non-food items secured or removed from reach; direct staff supervision during all transitions, unstructured periods, and mealtimes; school nurse notified with emergency action plan for suspected ingestion; cafeteria staff briefed; mouthing or ingestion incidents documented and reported to family same-day');
   if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized behavior support plan (BSP) addressing antecedents and function of vocalizations; preferential seating to minimize acoustic disruption to peers; access to communication tools or fidgets as possible alternatives to vocal stimming; staff trained in non-punitive response protocols; reduced group size or separate testing environment during high-disruption periods');
   if(S.emotionalReg) accomBeh.push('Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes');
+  if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision during all unstructured and semi-structured periods; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers — no unsolicited hugging or touching); social skills instruction addressing personal space and appropriate touch integrated into weekly schedule; all staff trained on consistent, calm, non-shaming redirection protocol for boundary violations; BCBA consultation recommended for school-based generalization of boundary skill programming');
   if(S.needsBehavior.has('rigidity')) accomBeh.push('Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)');
   const accomAcad=[];
   if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -3452,7 +3477,8 @@ function clearAll(){
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow'].forEach(id=>{
+  S.strangerDanger=false;
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
@@ -3571,6 +3597,16 @@ function updateAgeBasedVisibility(){
       if(cb) cb.checked=false;
     }
   }
+  // Boundary violations — school-age+ only
+  const boundaryViolRow=document.getElementById('boundaryViolRow');
+  if(boundaryViolRow){
+    boundaryViolRow.style.display=(S.ageGroup===''||older)?'':'none';
+    if(S.ageGroup!==''&&!older&&S.needsBehavior.has('boundaryViol')){
+      S.needsBehavior.delete('boundaryViol');
+      const cb=boundaryViolRow.querySelector('input[type=checkbox]');
+      if(cb) cb.checked=false;
+    }
+  }
   // RITA-T only visible for toddler/preschool
   const ritaTRow=document.getElementById('ritaTRow');
   if(ritaTRow){
@@ -3653,6 +3689,7 @@ function syncABATargetsFromNeeds(){
   if(S.criteriaB.has('b1')||S.needsBehavior.size>0||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
   // Pica — specific high-risk behavior requiring dedicated ABA target
   if(S.needsBehavior.has('pica')) add('reduce_pica');
+  if(S.needsBehavior.has('boundaryViol')) add('boundary_skills');
   // Transitions + rigidity — fire when b2 (insistence on sameness) checked
   // B2 IS rigidity; also populate needsBehavior so IEP letter, accommodation, and counseling triggers activate
   if(S.criteriaB.has('b2')){
@@ -3684,10 +3721,10 @@ function syncSchoolSvcFromNeeds(){
   if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
-  if(S.needsSocial.size>0) add('social_skills_school');
+  if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}
-  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')||S.emotionalReg) add('counseling');
+  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')||S.emotionalReg||S.needsBehavior.has('boundaryViol')) add('counseling');
   if(S.comorbid.has('ld_suspected')) add('psychoed');
   if(hasID()) add('sped');
 }
@@ -3782,6 +3819,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(!inp.checked){S.socialWorkReasons.clear();document.querySelectorAll('[data-key="socialWorkReasons"]').forEach(c=>{c.checked=false;});}
         }
         else if(v==='highlyMotivated') S.highlyMotivated=inp.checked;
+        else if(v==='strangerDanger') S.strangerDanger=inp.checked;
         else if(v==='sleepStudy') S.sleepStudy=inp.checked;
         else if(v==='cars2Done') S.cars2Done=inp.checked;
       } else {
@@ -3799,6 +3837,15 @@ document.addEventListener('DOMContentLoaded',()=>{
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
           if(fr) fr.style.display=inp.checked?'':'none';
           if(!inp.checked) S.behavFreq[v]='';
+        }
+        if(k==='needsAdaptive'&&v==='commSafety'){
+          const sdr=document.getElementById('strangerDangerRow');
+          if(sdr) sdr.style.display=inp.checked?'':'none';
+          if(!inp.checked){
+            S.strangerDanger=false;
+            const sdCb=document.querySelector('input[data-key="single"][value="strangerDanger"]');
+            if(sdCb) sdCb.checked=false;
+          }
         }
         if(k==='specifiers'&&inp.checked){
           const langWith=['withLangImpairment','withSuspectedLang'];
