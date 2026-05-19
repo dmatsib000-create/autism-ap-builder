@@ -1121,6 +1121,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
     <span id="abaLevelWarn" style="display:none;font-size:11px;font-weight:600;color:#92400e;background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
+    <span id="abaThinWarn" style="display:none;font-size:11px;font-weight:600;color:#991b1b;background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
     <button class="btn btn-gray btn-sm" onclick="copyABALetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Copy with *** cursor stops for Epic SmartText paste">Copy for Epic (***)</button>
@@ -3921,6 +3922,15 @@ function updateSectionHeaders(){
   // ABA level warning
   const abaWarn=document.getElementById('abaLevelWarn');
   if(abaWarn) abaWarn.style.display=(S.diagStatus==='confirmed'&&!S.asdLevelSC&&!S.asdLevelRRB)?'':'none';
+  // Thin-ABA warning — Council review 2026-05-19 (Case 5): adolescent/young-adult Level 1
+  // with no behavioral or safety needs produces ABA letters with one stereotypy target.
+  // Insurance denial risk. Warn the clinician before they copy the letter.
+  const abaThin=document.getElementById('abaThinWarn');
+  if(abaThin){
+    const hasSafetyFlag=S.safety.size>0||S.needsBehavior.has('sib')||S.needsBehavior.has('elopement')||S.needsBehavior.has('pica')||S.needsBehavior.has('aggression');
+    const thin=S.diagStatus==='confirmed'&&S.abaTargets.size<2&&!hasSafetyFlag;
+    abaThin.style.display=thin?'':'none';
+  }
   // Visit type highlight when unset
   const vtRow=document.getElementById('visitTypeRow');
   if(vtRow)vtRow.classList.toggle('vt-unset',!S.visitType&&!!S.diagStatus);
@@ -4085,7 +4095,10 @@ function syncABATargetsFromNeeds(){
   if(S.needsAdaptive.has('toileting')||S.needsAdaptive.has('dressing')||S.needsAdaptive.has('feeding_adl')) add('self_help');
   if(S.needsAdaptive.has('commSafety')||S.needsAdaptive.has('commIndependence')) add('safety_skills');
   if(S.needsAdaptive.has('menstrualCare')) add('menstrual_care');
-  if(S.academic)                                                            add('academics');
+  // Academics gated to toddler/preschool only — for school-age+, academic instruction is the
+  // school district's FAPE obligation under IDEA and academic ABA targets are a frequent
+  // claims-examiner denial reason. Council review 2026-05-19 (Case 19).
+  if(S.academic&&isYoung())                                                 add('academics');
   // Early intervention core targets — fire for toddler/preschool with social or communication needs
   if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
   // Stereotypy — fire when b1 (repetitive movements/speech) checked, any interfering behavior present, or vocal disruption
@@ -4272,6 +4285,19 @@ document.addEventListener('DOMContentLoaded',()=>{
             if(cb) cb.checked=false;
           } else if(v==='withoutLangImpairment'){
             langWith.forEach(w=>{S.specifiers.delete(w);const cb=document.querySelector(`input[data-key="specifiers"][value="${w}"]`);if(cb)cb.checked=false;});
+          }
+          // ID/GDD/BIF/withoutID are mutually exclusive — selecting any one clears the others.
+          // Council review 2026-05-19 (Cases 11, 16): clinician toggling withSuspectedGDD after
+          // cogProfile bridge had already set withGDD produced stuttering "with GDD; with GDD..." text.
+          const cogExcl=['withID','withSuspectedID','withGDD','withSuspectedGDD','withBIF','withoutID'];
+          if(cogExcl.includes(v)){
+            cogExcl.filter(x=>x!==v).forEach(other=>{
+              if(S.specifiers.has(other)){
+                S.specifiers.delete(other);
+                const cb=document.querySelector(`input[data-key="specifiers"][value="${other}"]`);
+                if(cb) cb.checked=false;
+              }
+            });
           }
         }
         if(k==='schoolSvc'){
