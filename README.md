@@ -13,8 +13,8 @@ The clinician fills in one left-side panel. Three outputs update in real time on
 | Tab | Output |
 |---|---|
 | **A&P Note** | Full problem-based Assessment & Plan, DSM-5 criteria table, clinical summary, therapy referrals, safety counseling, anticipatory guidance, and return-to-clinic interval |
-| **ABA Letter** | Letter of Medical Necessity for ABA insurance authorization, pre-filled with diagnosis, functional needs, severity level, requested hours, and treatment setting |
-| **IEP Letter** | Physician recommendation letter to the school from the UF Behavior and Development Clinic, with service-specific rationale paragraphs, educational impact bullets, accommodation lists, and IDEA statutory citations |
+| **ABA Letter** | Letter of Medical Necessity for ABA insurance authorization, pre-filled with diagnosis, DSM-5 specifiers, functional needs, severity level, requested hours, and treatment setting. ABA severity uses max(SC, RRB) so the highest support need across either domain drives the authorization request. |
+| **IEP Letter** | Physician recommendation letter to the school from the UF Behavior and Development Clinic, with service-specific rationale paragraphs, educational impact bullets, accommodation lists, DSM-5 specifiers (including `withGenetic` and `withNDD`), and IDEA statutory citations. IEP severity also uses max(SC, RRB) so educational placement reflects the highest support need across either domain. |
 
 All output can be copied as rich text (for direct paste into Epic or Word), plain text, or **Epic format** (replaces `{placeholder}` fields with `***` cursor stops for Tab-navigation in the Epic note composer).
 
@@ -269,7 +269,7 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
 - Em dash reduction throughout note output
-- IEP letter pronoun substitution and specifier integration
+- IEP letter pronoun substitution
 - Line spacing normalization (collapse triple blank lines)
 - Additional comorbidity blocks and accommodation logic
 - Social cognition → soft SLP referral trigger
