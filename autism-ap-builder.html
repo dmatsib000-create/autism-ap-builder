@@ -3363,17 +3363,20 @@ function toggleMod(key){
 }
 
 // ─── STRENGTH CHIPS ──────────────────────────────────────────────────────────
+function syncStrengthChips(){
+  const val=(document.getElementById('strengthsField')||{}).value||'';
+  document.querySelectorAll('.str-chip').forEach(c=>{
+    const m=c.getAttribute('onclick').match(/addStrength\('([^']+)'\)/);
+    if(m) c.classList.toggle('used',val.includes(m[1]));
+  });
+}
 function addStrength(text){
   const ta=document.getElementById('strengthsField');
   if(ta.value.includes(text)) return;
   const cur=ta.value.trim();
   ta.value=cur?(cur.endsWith(',')||cur.endsWith(';')?cur+' '+text:cur+'; '+text):text;
   S.strengths=ta.value;
-  // Mark chip as used
-  document.querySelectorAll('.str-chip').forEach(c=>{
-    if(c.textContent===text.substring(0,c.textContent.length)||ta.value.includes(c.onclick.toString().match(/'([^']+)'/)?.[1]||'')) {}
-    // simpler: just mark the clicked chip
-  });
+  syncStrengthChips();
   render();
 }
 
@@ -3417,6 +3420,7 @@ function clearAll(){
   document.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
   document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
   document.querySelectorAll('textarea').forEach(t=>{t.value='';});
+  syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('active'));
   Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',adaptProfile:'',strengths:'',
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
@@ -3899,7 +3903,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.beh-freq-inp').forEach(inp=>{
     inp.addEventListener('input',()=>{S.behavFreq[inp.dataset.freqkey]=inp.value.trim();render();});
   });
-  document.getElementById('strengthsField').addEventListener('input',function(){S.strengths=this.value;render();});
+  document.getElementById('strengthsField').addEventListener('input',function(){S.strengths=this.value;syncStrengthChips();render();});
   document.getElementById('levelJustificationSCField').addEventListener('input',function(){S.asdLevelJustificationSC=this.value;render();});
   document.getElementById('levelJustificationRRBField').addEventListener('input',function(){S.asdLevelJustificationRRB=this.value;render();});
   document.getElementById('teacherMaterialOtherField').addEventListener('input',function(){S.teacherMaterialOther=this.value;render();});

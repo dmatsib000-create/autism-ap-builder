@@ -251,12 +251,9 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 
 A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
-- RITA-T eval path
-- Clinical summary language improvements (DSM-5 terminology, Criterion E documentation)
 - Em dash reduction throughout note output
 - IEP letter pronoun substitution and specifier integration
 - Line spacing normalization (collapse triple blank lines)
-- Strength chip duplicate guard
 - Additional comorbidity blocks and accommodation logic
 - Boundary violations checkbox (age-gated, school-age+)
 - Social cognition → soft SLP referral trigger
