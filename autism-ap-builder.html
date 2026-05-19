@@ -1383,6 +1383,11 @@ function generateClinicalSummary(){
   const ageLabelMap={toddler:'toddler',preschool:'preschool-aged child',schoolAge:'school-aged child',adolescent:'adolescent',youngAdult:'young adult'};
   const ageLabel=ageLabelMap[S.ageGroup]||'patient';
   const verb=S.pronouns==='they'?'are':'is';
+  // Singular-they verb agreement: when subject is "they", swap third-person-singular
+  // verbs to bare form. Covers the verbs used by the summary's prose generators.
+  const v3=(w)=>{if(S.pronouns!=='they')return w;const m={presents:'present',is:'are',has:'have',was:'were',does:'do',demonstrates:'demonstrate',shows:'show',exhibits:'exhibit',meets:'meet'};return m[w]||w;};
+  // Article elision before vowel-initial age descriptors ("adolescent","adult").
+  const aOr=(n)=>/^[aeiouAEIOU]/.test((n||'').trim())?'an '+n:'a '+n;
 
   // Profile clauses
   const langDesc=getLangDescription();
@@ -1424,7 +1429,7 @@ function generateClinicalSummary(){
 
   let opening='';
   if(ageLabel||langDesc||cogShort){
-    opening=`The patient is a ${genderDesc}`;
+    opening=`The patient is ${aOr(genderDesc)}`;
     if(langDesc) opening+=` who is ${langDesc}`;
     if(cogShort&&adaptShort){
       opening+=`, ${cogShort}${cogUneven} and ${adaptShort}`;
@@ -1436,7 +1441,7 @@ function generateClinicalSummary(){
     opening+='.';
     if(S.visitType){
       const vtMap={initial:'initial autism evaluation',reeval:'diagnostic re-evaluation',followup:'follow-up visit'};
-      if(vtMap[S.visitType]) opening+=` ${pr.cap} presents for ${vtMap[S.visitType]}.`;
+      if(vtMap[S.visitType]) opening+=` ${pr.cap} ${v3('presents')} for ${vtMap[S.visitType]}.`;
     }
   }
 
@@ -1459,7 +1464,7 @@ function generateClinicalSummary(){
     if(S.needsSensory.size) needsD.push('sensory processing');
     if(S.needsMotor.size) needsD.push('motor development');
 
-    body=`${subj} presents with a persistent pattern of deficits in social communication and social interaction across ${aStr}, and restricted and repetitive patterns of behavior and interests across ${bStr}, as documented in the DSM-5 criteria table.`;
+    body=`${subj} ${v3('demonstrates')} a persistent pattern of deficits in social communication and social interaction across ${aStr}, and restricted and repetitive patterns of behavior and interests across ${bStr}, as documented in the DSM-5 criteria table.`;
     body+=` These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment`;
     if(needsD.length){
       const nd=[...needsD];
@@ -1490,7 +1495,7 @@ function generateClinicalSummary(){
     if(S.criteriaA.size||S.needsComm.size||S.needsSocial.size) cD.push('social communication and interaction');
     if(S.criteriaB.size||S.needsBehavior.size||S.needsSensory.size) cD.push('behavioral flexibility and sensory processing');
     if(S.needsAdaptive.size) cD.push('adaptive functioning');
-    body=`${subj} presents with developmental concerns`;
+    body=`${subj} ${v3('shows')} developmental concerns`;
     if(cD.length) body+=` in ${cD.join(' and ')}`;
     body+=` that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation.`;
     if(S.priorTesting.size>0){
@@ -1505,7 +1510,7 @@ function generateClinicalSummary(){
     const cD=[];
     if(S.criteriaA.size||S.needsSocial.size) cD.push('social communication');
     if(S.criteriaB.size) cD.push('restricted and repetitive behaviors');
-    body=`${subj} was referred for evaluation`;
+    body=`${subj} ${v3('was')} referred for evaluation`;
     if(cD.length) body+=` with concerns in ${cD.join(' and ')}`;
     body+=` prompting consideration of Autism Spectrum Disorder. Current findings do not meet full DSM-5 criteria for ASD; the presenting features are better accounted for by alternative explanations that are under active consideration.`;
   }
