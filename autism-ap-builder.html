@@ -364,7 +364,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
         <span class="field-label">Evaluation Path</span>
         <div class="radio-grid" style="flex-direction:column;gap:4px">
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="devOnly">&nbsp;Developmental profile only — DP-4 (+ KBIT-2R if age ≥ 4)</label>
-          <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainYoung">&nbsp;Fairly certain, age &lt; 5 — CARS-2 with MD (1 hr)</label>
+          <label id="certainYoungRow" class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainYoung">&nbsp;Fairly certain, age &lt; 5 — CARS-2 with MD (1 hr)</label>
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainOlder">&nbsp;Fairly certain, age ≥ 5 — DP-4 + KBIT-2R → CARS-2</label>
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="uncertainComp">&nbsp;Uncertain — comprehensive CMS eval + ADOS-2 (insurance-dependent)</label>
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="uncertainADOS">&nbsp;Uncertain — DP-4 + KBIT-2R → ADOS-2 by trained physician</label>
@@ -384,8 +384,11 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="adir"> ADI-R</label><select class="outcome-sel" data-outcome-key="adir"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="adir" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="srs2"> SRS-2 (Social Responsiveness Scale, 2nd ed.)</label><select class="outcome-sel" data-outcome-key="srs2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (T ≥ 60, clinically significant)</option><option value="equivocal">Equivocal (T 55–59, mild-moderate range)</option><option value="notConsistent">Not consistent with ASD (T &lt; 55, average range)</option></select><input class="prior-date-input" data-date-key="srs2" type="text" placeholder="date admin."></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label><select class="outcome-sel" data-outcome-key="gars3"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (AQ ≥ 70, very likely)</option><option value="equivocal">Equivocal (AQ 55–69, possibly)</option><option value="notConsistent">Not consistent with ASD (AQ &lt; 55, unlikely)</option></select><input class="prior-date-input" data-date-key="gars3" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="vineland3"> Vineland-3</label><select class="outcome-sel" data-outcome-key="vineland3"><option value="">— outcome —</option><option value="consistent">Significantly impaired (consistent with ASD adaptive profile)</option><option value="equivocal">Mildly impaired</option><option value="notConsistent">Age-appropriate / within normal limits</option></select><input class="prior-date-input" data-date-key="vineland3" type="text" placeholder="date admin."></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="basc3"> BASC-3</label><select class="outcome-sel" data-outcome-key="basc3"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ASD/ADHD/anxiety profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="basc3" type="text" placeholder="date admin."></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="conners4"> Conners 4</label><select class="outcome-sel" data-outcome-key="conners4"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ADHD/behavioral profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="conners4" type="text" placeholder="date admin."></div>
         </div>
       </div>
     </div>
@@ -568,6 +571,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="single" value="hearingScreenFail"> Behavioral hearing screen non-compliant or inconclusive</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="under34Months"> Under 34 months — Early Steps (FL Part C) eligible</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="seizureConcern"> History concerning for seizures (staring spells, atypical regression, non-emergent) → EEG</label>
+          <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
@@ -899,7 +903,7 @@ const S = {
   needsComm:new Set(), needsAdaptive:new Set(), needsBehavior:new Set(),
   needsSocial:new Set(), needsSensory:new Set(), needsMotor:new Set(),
   emotionalReg:false, academic:false, sleep:false, feeding:false, hearingScreenFail:false,
-  under34Months:false, seizureConcern:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
+  under34Months:false, seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
   teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
   priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'', cars2Done:false,
@@ -1011,7 +1015,7 @@ function ruleSLP() {
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
 function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() { return {include:S.diagStatus==='confirmed'}; }
-function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings}; }
+function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure}; }
 function rulePsychiatry() {
   const med=hasConfirmedADHD()||S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd');
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
@@ -1187,7 +1191,7 @@ function generateClinicalSummary(){
     }
     // Prior testing citation
     if(S.priorTesting.size>0){
-      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2'};
+      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
       const supportive=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
         let lbl=allLbls[k]||k;
         if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
@@ -1207,7 +1211,7 @@ function generateClinicalSummary(){
     if(cD.length) body+=` in ${cD.join(' and ')}`;
     body+=` that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation.`;
     if(S.priorTesting.size>0){
-      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2'};
+      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
       const eqv=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='equivocal').map(k=>{let lbl=allLbls[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
       if(eqv.length) body+=` Prior testing (${eqv.join('; ')}) yielded equivocal results and has been incorporated into the diagnostic formulation.`;
       const nc=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='notConsistent').map(k=>{let lbl=allLbls[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
@@ -1442,7 +1446,7 @@ function generateNote() {
       S.teacherMaterials.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
       L.push('Family to provide teacher contact information. Materials to be returned at or before the next visit.');
     }
-    if(S.dxEvalPath){
+    if(S.dxEvalPath&&S.diagStatus!=='confirmed'){
       if(S.teacherMaterials.size) L.push('');
       const cars2HF=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&
         ['conversational','ageAppropriate'].includes(S.langLevel)&&
@@ -1478,9 +1482,9 @@ function generateNote() {
         }
       } else if(S.dxEvalPath==='uncertainComp'){
         L.push('Autism Evaluation: Uncertain (Comprehensive):');
-        L.push('  Referral for comprehensive diagnostic evaluation with CMS psychologists, including');
+        L.push('  Referral for comprehensive diagnostic evaluation with the UF CMS evaluation program psychologists, including');
         L.push('  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration.');
-        L.push('  Referral placed. Insurance authorization required; family counseled to verify coverage and contact CMS to initiate scheduling.');
+        L.push('  Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.');
         L.push('  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.');
       } else if(S.dxEvalPath==='uncertainADOS'){
         L.push('Autism Evaluation: Uncertain (ADOS-2 Pathway):');
@@ -1496,8 +1500,8 @@ function generateNote() {
     }
     if(S.priorTesting.size){
       if(S.dxEvalPath||S.teacherMaterials.size) L.push('');
-      const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',vineland3:'Vineland-3',basc3:'BASC-3'};
-      const behavAdaptKeys=new Set(['vineland3','basc3']);
+      const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
+      const behavAdaptKeys=new Set(['vineland3','basc3','conners4']);
       const buildLbl=k=>{
         let lbl=baseLabels[k]; if(!lbl) return null;
         if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
@@ -2479,7 +2483,11 @@ function _abaContent(){
   // Opening paragraph
   const levelClause=asdLevelKey?`, ${levelLabel},`:'';
   const insClause=S.insuranceType&&S.insuranceType!=='selfpay'?` enrolled under ${({commercial:'commercial/private insurance',medicaid:'Medicaid/CHIP',tricare:'TRICARE',champva:'ChampVA'}[S.insuranceType]||'')}`:'' ;
-  const openPara=`I write to request authorization for Applied Behavior Analysis (ABA) therapy for ${p.subj==='he'||p.subj==='she'||p.subj==='they'?'the patient':p.subj}, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD)${levelClause} as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013)${insClause}. ABA therapy is medically necessary, as documented below.`;
+  const abaAsdDxKeys=new Set(['cars2st','cars2hf','ados2','adir','asdpeds','midgas','srs2','gars3']);
+  const abaAsdDxLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
+  const abaConsistentPrior=[...S.priorTesting].filter(k=>abaAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=abaAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const abaPtCite=abaConsistentPrior.length?` Supporting prior diagnostic assessments consistent with ASD include: ${abaConsistentPrior.join('; ')}.`:'';
+  const openPara=`I write to request authorization for Applied Behavior Analysis (ABA) therapy for ${p.subj==='he'||p.subj==='she'||p.subj==='they'?'the patient':p.subj}, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD)${levelClause} as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013)${insClause}. ABA therapy is medically necessary, as documented below.${abaPtCite}`;
 
   // Functional impairment paragraph
   let impPara='';
@@ -2833,7 +2841,14 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_math')) accomAcad.push('Math: calculator access for fact-dependent tasks, extended time, manipulatives, graph paper for number alignment');
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
-  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel};
+
+  // Prior testing citation for diagnosis paragraph
+  const iepAsdDxKeys=new Set(['cars2st','cars2hf','ados2','adir','asdpeds','midgas','srs2','gars3']);
+  const iepAsdDxLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
+  const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
+
+  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite};
 }
 
 function generateIEPLetterHTML(){
@@ -2861,6 +2876,7 @@ function generateIEPLetterHTML(){
     if(c.specStr) dxPara+=` (${e(c.specStr)})`;
     dxPara+=S.diagStatus==='confirmed'?', confirmed at the evaluation referenced above.':', as documented at the evaluation referenced above.';
     if(c.coDxs.length) dxPara+=` In addition, ${ph('{Student Name}')} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${e(c.coDxs.join('; '))}.`;
+    if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
   }
   h+=`<p>${dxPara}</p>`;
 
@@ -2951,6 +2967,7 @@ function generateIEPLetterPlain(){
     if(c.specStr) dxPara+=` (${c.specStr})`;
     dxPara+=S.diagStatus==='confirmed'?', confirmed at the evaluation referenced above.':', as documented at the evaluation referenced above.';
     if(c.coDxs.length) dxPara+=` In addition, ${pSub} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${c.coDxs.join('; ')}.`;
+    if(c.priorTestingCite) dxPara+=c.priorTestingCite;
   }
   t+=dxPara+'\n\n';
   if(c.impacts.length){
@@ -3040,6 +3057,7 @@ async function copyIEPLetter(format){
         if(c.specStr) dxPara+=` (${e(c.specStr)})`;
         dxPara+=S.diagStatus==='confirmed'?', confirmed at the evaluation referenced above.':', as documented at the evaluation referenced above.';
         if(c.coDxs.length) dxPara+=` In addition, ${wph('{Student Name}')} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${e(c.coDxs.join('; '))}.`;
+        if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
       }
       h+=`<p style="margin-bottom:10px">${dxPara}</p>`;
       if(c.impacts.length){
@@ -3291,7 +3309,7 @@ function clearAll(){
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('active'));
   Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',adaptProfile:'',strengths:'',
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
-    visitType:'',under34Months:false,seizureConcern:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
+    visitType:'',under34Months:false,seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',
     schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
@@ -3442,6 +3460,17 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=ritaTRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+    }
+  }
+  // certainYoung only valid for toddler/preschool (age < 5)
+  const certainYoungRow=document.getElementById('certainYoungRow');
+  if(certainYoungRow){
+    certainYoungRow.style.display=older?'none':'';
+    if(older&&S.dxEvalPath==='certainYoung'){
+      S.dxEvalPath='';
+      const r=certainYoungRow.querySelector('input[type=radio]');
+      if(r) r.checked=false;
+      updateSectionHeaders();
     }
   }
   const idRows=document.getElementById('spec-id-rows');
@@ -3618,6 +3647,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         else if(v==='hearingScreenFail') S.hearingScreenFail=inp.checked;
         else if(v==='under34Months') S.under34Months=inp.checked;
         else if(v==='seizureConcern') S.seizureConcern=inp.checked;
+        else if(v==='neurologyNowForSeizure') S.neurologyNowForSeizure=inp.checked;
         else if(v==='focalNeuroFindings') S.focalNeuroFindings=inp.checked;
         else if(v==='socialWork'){
           S.socialWork=inp.checked;
