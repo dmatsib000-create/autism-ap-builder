@@ -2815,7 +2815,7 @@ function generateIEPLetterHTML(){
   h+=`<p class="aba-meta"><strong>Re:</strong> ${ph('{Student Name}')} &nbsp;|&nbsp; <strong>Diagnosis:</strong> ${e(c.reLineLabel)}</p>`;
   h+=`<p style="margin:14px 0 4px">${ph('{Principal / Special Education Coordinator Name}')}<br>${ph('{School Name}')}<br>${ph('{School Address}')}</p>`;
   h+=`<p style="margin:12px 0 8px">Dear ${ph('{Principal / Special Education Coordinator Name}')}:</p>`;
-  h+=`<p>I am a physician specializing in Developmental Behavioral Pediatrics. I evaluated ${ph('{Student Name}')} on ${ph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
+  h+=`<p>I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${ph('{Student Name}')} on ${ph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
 
   let dxPara;
   if(S.diagStatus==='ruleOut'){
@@ -2878,9 +2878,9 @@ function generateIEPLetterHTML(){
   }
 
   h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if the team believes my participation would be helpful. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
-  h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>Developmental Behavioral Pediatrics<br>${ph('{Practice Name}')}<br>${ph('{Phone Number}')}</div>`;
+  h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${ph('{Phone Number}')}</div>`;
   h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review and signature before submission. Complete all {placeholder} fields before sending.</p>`;
-  h+=`<p class="aba-caveat">Enclosure: Copy of Developmental Behavioral Pediatrics evaluation note dated ${ph('{Date of Evaluation}')}</p>`;
+  h+=`<p class="aba-caveat">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${ph('{Date of Evaluation}')}</p>`;
   h+=`</div>`;
   return h;
 }
@@ -2904,7 +2904,7 @@ function generateIEPLetterPlain(){
   t+=`{Principal / Special Education Coordinator Name}\n{School Name}\n{School Address}\n\n`;
   t+=`Re: {Student Name} | ${c.reLineLabel}\n\n`;
   t+=`Dear {Principal / Special Education Coordinator Name}:\n\n`;
-  t+=`I am a physician specializing in Developmental Behavioral Pediatrics. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
+  t+=`I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
   let dxPara;
   if(S.diagStatus==='ruleOut'){
     dxPara=`${pCap} is being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
@@ -2958,7 +2958,7 @@ function generateIEPLetterPlain(){
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
   }
   t+=sep+'\n';
-  t+=`Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nDevelopmental Behavioral Pediatrics\n{Practice Name}\n{Phone Number}\n\nEnclosure: Copy of Developmental Behavioral Pediatrics evaluation note dated {Date of Evaluation}\n`;
+  t+=`Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
   return t;
 }
 
@@ -2991,7 +2991,7 @@ async function copyIEPLetter(format){
       h+=`<p style="margin-bottom:16px"><strong>Re:</strong> ${wph('{Student Name}')} &nbsp;|&nbsp; ${e(c.reLineLabel)}</p>`;
       h+=`<p style="margin:0 0 4px">${wph('{Principal / Special Education Coordinator Name}')}<br>${wph('{School Name}')}<br>${wph('{School Address}')}</p>`;
       h+=`<p style="margin:14px 0 8px">Dear ${wph('{Principal / Special Education Coordinator Name}')}:</p>`;
-      h+=`<p style="margin-bottom:10px">I am a physician specializing in Developmental Behavioral Pediatrics. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
+      h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
       let dxPara;
       if(S.diagStatus==='ruleOut'){
         dxPara=`${wph('{Student Name}')} is being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
@@ -3048,8 +3048,8 @@ async function copyIEPLetter(format){
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
       h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
-      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>Developmental Behavioral Pediatrics<br>${wph('{Practice Name}')}<br>${wph('{Phone Number}')}</div>`;
-      h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of Developmental Behavioral Pediatrics evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
+      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${wph('{Phone Number}')}</div>`;
+      h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;
       await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
       flash('✓ Letter copied!');return;
@@ -3440,7 +3440,7 @@ function syncABATargetsFromNeeds(){
   if(S.needsBehavior.has('sib')||S.safety.has('sib_safety_counsel'))      add('reduce_sib');
   if(S.needsBehavior.has('aggression')||S.needsBehavior.has('property'))   add('reduce_aggression');
   if(S.needsBehavior.has('tantrums')||S.emotionalReg)                      add('reduce_tantrum');
-  if(S.needsSocial.has('play')||S.needsSocial.has('peer'))                 add('play');
+  if(S.needsSocial.has('play')||S.needsSocial.has('peer'))                  add('play');
   if(S.needsComm.has('expressive')||S.needsComm.has('receptive')||S.needsComm.has('functional_aac')) add('functional_comm');
   if(S.needsAdaptive.has('toileting')||S.needsAdaptive.has('dressing')||S.needsAdaptive.has('feeding_adl')) add('self_help');
   if(S.needsAdaptive.has('commSafety')||S.needsAdaptive.has('commIndependence')) add('safety_skills');
