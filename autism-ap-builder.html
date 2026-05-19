@@ -56,6 +56,9 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .cb-row{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1.4}
 .cb-row:hover{background:var(--gray-50)}
 .cb-row input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--blue)}
+.beh-freq-row{margin:2px 0 4px 24px}
+.beh-freq-inp{width:100%;max-width:400px;font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
+.beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
 .modifier-strip{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding:6px 8px;background:var(--gray-50);border-radius:4px;border:1px solid var(--gray-200)}
 .mod-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1.5px solid var(--gray-300);cursor:pointer;font-size:11.5px;font-weight:500;background:white;transition:all .12s;user-select:none}
 .mod-chip:hover{border-color:var(--blue);background:var(--blue-light)}
@@ -523,9 +526,15 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="aggression"> Aggression toward others</label>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="sib"> Self-injurious behavior (SIB)</label>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="property"> Property destruction</label>
+          <div class="beh-freq-row" data-for="property" style="display:none"><input class="beh-freq-inp" data-freqkey="property" type="text" placeholder="Frequency/description (optional) — e.g., 2–3x/week, throws or breaks objects"></div>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="tantrums"> Tantrums / meltdowns</label>
+          <div class="beh-freq-row" data-for="tantrums" style="display:none"><input class="beh-freq-inp" data-freqkey="tantrums" type="text" placeholder="Frequency/description (optional) — e.g., 3–5x/day, 10–20 min each, requires adult redirection"></div>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="elopement"> Elopement / wandering</label>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="noncompliance"> Severe noncompliance / defiance</label>
+          <div class="beh-freq-row" data-for="noncompliance" style="display:none"><input class="beh-freq-inp" data-freqkey="noncompliance" type="text" placeholder="Frequency/description (optional) — e.g., refuses ~70% of directives, requires repeated prompting"></div>
+          <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="vocalDisruption"> Disruptive vocalizations (repetitive, loud, or scripted speech disrupting the learning environment)</label>
+          <div class="beh-freq-row" data-for="vocalDisruption" style="display:none"><input class="beh-freq-inp" data-freqkey="vocalDisruption" type="text" placeholder="Description (optional) — e.g., scripted phrases throughout instructional periods"></div>
+          <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="pica"> Pica (ingestion of non-food items — safety risk)</label>
         </div>
       </div>
       <hr class="divider">
@@ -565,6 +574,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
         <span class="field-label">Additional Domains</span>
         <div class="cb-list">
           <label class="cb-row"><input type="checkbox" data-key="single" value="emotionalReg"> Emotional regulation difficulties</label>
+          <div class="beh-freq-row" data-for="emotionalReg" style="display:none"><input class="beh-freq-inp" data-freqkey="emotionalReg" type="text" placeholder="Frequency/description (optional) — e.g., 2–3 episodes/day, triggered by transitions or demands"></div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="academic"> Academic / learning difficulties</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
@@ -796,10 +806,11 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_aggression"> Reduction of aggression toward others</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_elopement"> Elopement reduction and safety awareness</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_tantrum"> Meltdown / tantrum reduction and emotional regulation</label>
-          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_stereotypy"> Reduction of interfering repetitive behaviors</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_stereotypy"> Reduction of interfering repetitive behaviors (including disruptive vocalizations)</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_pica"> Reduction of pica / ingestion of non-food items</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="self_reg"> Self-regulation and coping strategies</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="transitions"> Transition tolerance and behavioral flexibility</label>
-          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="academics"> Pre-academic and academic readiness skills</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="academics"> Academic readiness / instruction-following skills</label>
         </div>
       </div>
     </div>
@@ -903,6 +914,7 @@ const S = {
   needsComm:new Set(), needsAdaptive:new Set(), needsBehavior:new Set(),
   needsSocial:new Set(), needsSensory:new Set(), needsMotor:new Set(),
   emotionalReg:false, academic:false, sleep:false, feeding:false, hearingScreenFail:false,
+  behavFreq:{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''},
   under34Months:false, seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
   teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
@@ -1012,7 +1024,7 @@ function ruleSLP() {
   const langTrigger = S.langLevel==='unclearSLP'||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
-function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
+function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
 function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() { return {include:S.diagStatus==='confirmed'}; }
 function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure}; }
@@ -1021,7 +1033,7 @@ function rulePsychiatry() {
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
   return {include:med||sev};
 }
-function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')}; }
+function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')||S.needsBehavior.has('pica')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
   // A non-compliant hearing screen alone warrants formal audiologic evaluation regardless of language level
@@ -1243,7 +1255,7 @@ function needsSummaryLines() {
   if(S.needsComm.size){const x=[];if(S.needsComm.has('expressive'))x.push('expressive language');if(S.needsComm.has('receptive'))x.push('receptive language');if(S.needsComm.has('functional_aac'))x.push('functional communication/AAC');if(S.needsComm.has('oral_motor'))x.push('oral motor/feeding speech');L.push('  • Communication: '+x.join(', '));}
   if(S.langModifiers.size){const x=[];if(S.langModifiers.has('echolalic'))x.push('scripted/echolalic speech');if(hasMorphoErrors())x.push('morphosyntactic errors');if(hasPragmaticDeficit())x.push('pragmatic/social language deficits');if(hasSemanticDeficit())x.push('semantic deficits/literal thinking');if(hasSpeechSoundErrors())x.push('speech-sound errors');if(hasReducedIntell())x.push('reduced intelligibility');if(x.length)L.push('  • Language modifiers: '+x.join(', '));}
   if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('commSafety'))x.push('community safety');if(S.needsAdaptive.has('commIndependence'))x.push('community independence/life skills');L.push('  • Adaptive/self-care: '+x.join(', '));}
-  if(S.needsBehavior.size){const x=[];if(S.needsBehavior.has('aggression'))x.push('aggression');if(S.needsBehavior.has('sib'))x.push('self-injurious behavior (SIB)');if(S.needsBehavior.has('property'))x.push('property destruction');if(S.needsBehavior.has('tantrums'))x.push('tantrums/meltdowns');if(S.needsBehavior.has('elopement'))x.push('elopement');if(S.needsBehavior.has('noncompliance'))x.push('noncompliance/defiance');L.push('  • Behavior/interfering: '+x.join(', '));}
+  if(S.needsBehavior.size){const x=[];if(S.needsBehavior.has('aggression'))x.push('aggression');if(S.needsBehavior.has('sib'))x.push('self-injurious behavior (SIB)');if(S.needsBehavior.has('property'))x.push('property destruction');if(S.needsBehavior.has('tantrums'))x.push('tantrums/meltdowns');if(S.needsBehavior.has('elopement'))x.push('elopement');if(S.needsBehavior.has('noncompliance'))x.push('noncompliance/defiance');if(S.needsBehavior.has('rigidity'))x.push('rigidity/inflexibility');if(S.needsBehavior.has('vocalDisruption'))x.push('disruptive vocalizations');if(S.needsBehavior.has('pica'))x.push('pica');L.push('  • Behavior/interfering: '+x.join(', '));}
   if(S.safety.size){const x=[];if(S.safety.has('elopement_counsel'))x.push('elopement/wandering');if(S.safety.has('sib_safety_counsel'))x.push('self-injury safety');if(S.safety.has('water_counsel'))x.push('water/drowning');if(S.safety.has('road_counsel'))x.push('road/traffic safety');if(S.safety.has('fire_counsel'))x.push('environmental hazard');if(S.safety.has('bullying'))x.push('bullying/victimization');if(S.safety.has('internet'))x.push('internet/social media safety');if(x.length)L.push('  • Safety: '+x.join(', '));}
   if(S.needsSocial.size){const x=[];if(S.needsSocial.has('peer'))x.push('peer interaction');if(S.needsSocial.has('play'))x.push('play skills');if(S.needsSocial.has('reciprocity'))x.push('social reciprocity');if(S.needsSocial.has('emotion'))x.push('emotion recognition');if(S.needsSocial.has('perspective'))x.push('perspective-taking/Theory of Mind');if(S.needsSocial.has('conversation'))x.push('conversation skills');L.push('  • Social/play: '+x.join(', '));}
   if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory: '+x.join(', '));}
@@ -1544,15 +1556,78 @@ function generateNote() {
     const isMilitary=S.insuranceType==='tricare'||S.insuranceType==='champva';
     const lvParts2=[];if(S.asdLevelSC)lvParts2.push(`Level ${S.asdLevelSC} (Social Communication)`);if(S.asdLevelRRB)lvParts2.push(`Level ${S.asdLevelRRB} (Restricted/Repetitive Behaviors)`);
     const lvClause=lvParts2.length?', '+lvParts2.join(' / '):'';
+    // Tiered specific functional impairment strings for medical necessity documentation
+    const specR=[];
+    // Tier 1 — Behaviors of Danger: impact language, no frequency placeholder
+    if(S.needsBehavior.has('elopement'))       specR.push('elopement/wandering (any elopement event near roads, water, or other hazards poses imminent risk of death or severe injury; no clinically safe frequency threshold exists)');
+    if(S.needsBehavior.has('sib'))             specR.push('self-injurious behavior (SIB; even infrequent events carry risk of permanent tissue damage — no safe frequency threshold exists)');
+    if(S.needsBehavior.has('pica'))            specR.push('pica/ingestion of non-food items (any ingestion event is a medical emergency risk — no safe frequency threshold exists)');
+    if(S.needsBehavior.has('aggression'))      specR.push('aggression toward others (any physical aggression incident poses risk of injury to staff or peers, school disciplinary action, and potential legal consequences)');
+    // Tier 2 — Interfering behaviors: optional clinician-entered description, no placeholder if blank
+    if(S.needsBehavior.has('tantrums'))        specR.push('tantrums/meltdowns'+(S.behavFreq.tantrums?' ('+S.behavFreq.tantrums+')':''));
+    if(S.needsBehavior.has('noncompliance'))   specR.push('severe noncompliance'+(S.behavFreq.noncompliance?' ('+S.behavFreq.noncompliance+')':''));
+    if(S.needsBehavior.has('property'))        specR.push('property destruction'+(S.behavFreq.property?' ('+S.behavFreq.property+')':''));
+    if(S.needsBehavior.has('vocalDisruption')) specR.push('disruptive vocalizations'+(S.behavFreq.vocalDisruption?' ('+S.behavFreq.vocalDisruption+')':''));
+    if(S.needsBehavior.has('rigidity'))        specR.push('behavioral rigidity and significant difficulty with transitions'+(S.criteriaB.has('b3')?' (manifest in part through fixated interests limiting engaging with non-preferred tasks)':''));
+    if(S.emotionalReg)                         specR.push('emotional dysregulation'+(S.behavFreq.emotionalReg?' ('+S.behavFreq.emotionalReg+')':''));
+    // Tier 3 — Skill deficits: named, no frequency needed
+    if(S.needsComm.has('expressive'))          specR.push('expressive language delays');
+    if(S.needsComm.has('receptive'))           specR.push('receptive language delays');
+    if(S.needsComm.has('functional_aac'))      specR.push('functional communication/AAC needs');
+    if(S.needsComm.has('oral_motor'))          specR.push('oral motor/speech production impairments');
+    if(S.needsSocial.size>0){
+      const soc=[];
+      if(S.needsSocial.has('peer'))         soc.push('peer interaction');
+      if(S.needsSocial.has('play'))         soc.push('play skills');
+      if(S.needsSocial.has('reciprocity'))  soc.push('social reciprocity');
+      if(S.needsSocial.has('emotion'))      soc.push('emotion recognition');
+      if(S.needsSocial.has('perspective'))  soc.push('perspective-taking');
+      if(S.needsSocial.has('conversation')) soc.push('conversation skills');
+      specR.push('social skill impairments ('+soc.join(', ')+')');
+    }
+    if(S.needsAdaptive.size>0){
+      const adl=[];
+      if(S.needsAdaptive.has('toileting'))        adl.push('toileting');
+      if(S.needsAdaptive.has('dressing'))         adl.push('dressing');
+      if(S.needsAdaptive.has('feeding_adl'))      adl.push('self-feeding');
+      if(S.needsAdaptive.has('hygiene'))          adl.push('hygiene');
+      if(S.needsAdaptive.has('commSafety'))       adl.push('community safety');
+      if(S.needsAdaptive.has('commIndependence')) adl.push('community independence');
+      specR.push('adaptive skill impairments'+(adl.length?' ('+adl.join(', ')+')':''));
+    }
+    if(S.needsSensory.size>0) specR.push('sensory processing difficulties impacting regulation and participation');
+    if(S.needsMotor.size>0)   specR.push('motor skill impairments affecting daily functioning');
+    if(hasID())               specR.push('intellectual disability requiring intensive skills-based programming');
+    if(hasSigAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
+    if(asdLevel23()&&!specR.length) specR.push('ASD Level 2 or 3 support needs');
+    const specRStr=specR.length?specR.join('; '):abaR.reasons.join(', ');
+    // ABA target rationale map — one rationale sentence per target key
+    const TARGET_RATIONALE={
+      functional_comm:'Functional communication / requesting (manding): expressive language delays and/or AAC needs documented; systematic teaching of functional communication reduces reliance on challenging behavior as a communication mechanism.',
+      joint_attention:'Joint attention and social referencing: foundational prerequisite for language acquisition and social development; a primary early intervention target with a strong evidence base.',
+      imitation:'Imitation and observational learning: prerequisite for social modeling and generalized skill acquisition; a core early intervention target.',
+      self_help:'Self-help / daily living skills: significant adaptive skill impairment documented; ADL training is a core ABA domain and reduces caregiver burden and care dependency.',
+      safety_skills:'Safety skills and community awareness: documented safety risks require systematic behavioral safety training; targets include emergency stop response, proximity maintenance, and boundary recognition in community settings.',
+      play:'Play skills and peer interaction: social skill deficits documented; play-based ABA programming supports language development, social cognition, and the foundation for peer relationships.',
+      reduce_sib:'Reduction of self-injurious behavior (SIB): SIB is a Behavior of Danger — even infrequent events carry risk of permanent injury. A function-based behavior intervention plan (BIP) is required; FBA must precede intervention. Medical and behavioral co-management indicated.',
+      reduce_aggression:'Reduction of aggression toward others: aggression is a Behavior of Danger — any physical incident poses risk of injury to others and potential school/legal consequences. A function-based BIP is required; FBA must precede intervention.',
+      reduce_elopement:'Elopement reduction and safety awareness: elopement is a Behavior of Danger — any elopement event near roads or water poses imminent risk of death or severe injury. Immediate safety priority; function-based intervention and environmental safety measures (GPS tracking, safety ID) required concurrently.',
+      reduce_tantrum:'Meltdown/tantrum reduction and emotional regulation: emotional dysregulation documented; programming targets antecedent modification, coping skill development, and caregiver implementation strategies to reduce frequency and severity.',
+      reduce_stereotypy:'Reduction of interfering repetitive behaviors: programming targets repetitive behaviors with documented interference with learning, safety, or access to reinforcement, consistent with BACB ethical and neurodiversity-affirming practice standards. Stimming behaviors without documented functional interference are not appropriate reduction targets.',
+      reduce_pica:'Reduction of pica (ingestion of non-food items): pica is a Behavior of Danger — any ingestion event carries risk of foreign body obstruction, internal injury, or toxic exposure. Environmental modification, direct supervision protocol, and function-based behavioral intervention are required; coordinate with GI evaluation.',
+      self_reg:'Self-regulation and coping strategies: emotional regulation impairments documented; programming targets physiological arousal awareness, identification of regulatory states, and adaptive coping responses.',
+      transitions:'Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.',
+      academics:'Academic readiness / instruction-following skills: targets prerequisite learning behaviors (attending to instruction, following multi-step directions, task initiation and completion) rather than academic content instruction; appropriate for this developmental profile.'
+    };
     if(confirmed){
-      L.push(`ABA therapy is recommended as the primary evidence-based behavioral intervention for ${pr.obj} and is medically necessary given ${pr.poss} confirmed diagnosis of Autism Spectrum Disorder${lvClause} and the associated functional impairments in ${abaR.reasons.join(', ')}. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.`);
+      L.push(`ABA therapy is recommended as the primary evidence-based behavioral intervention for ${pr.obj} and is medically necessary given ${pr.poss} confirmed diagnosis of Autism Spectrum Disorder${lvClause}, with the following documented functional impairments establishing medical necessity: ${specRStr}. These impairments substantially limit ${pr.poss} ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.`);
       if(young){
         L.push(`Early Intensive Behavioral Intervention (EIBI) - a structured, comprehensive ABA-based program - is indicated for children under age 6. A Cochrane systematic review³ demonstrates robust improvement in language, cognitive, and adaptive behavior outcomes with EIBI. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Services should span home, clinic, and natural-environment settings; caregiver coaching is a core component of effective early intervention.`);
         L.push(`Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA (embedding behavioral principles within naturalistic, relationship-focused, and play-based interactions) carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intensive intervention when accessible.`);
       } else if(S.ageGroup==='schoolAge'){
-        L.push(`Comprehensive ABA services are recommended, incorporating a Functional Behavior Assessment (FBA) to guide individualized treatment planning. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Goals should be functional, meaningful in daily life, and coordinated with the school team.`);
+        L.push(`The documented impairments noted above exceed what can be addressed through school-based supports alone, periodic behavioral consultation, or less intensive outpatient services. Comprehensive ABA services are recommended, incorporating a Functional Behavior Assessment (FBA) to identify the antecedents, functions, and maintaining consequences of the specific behaviors listed above, and to guide individualized treatment planning. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Goals should be functional, meaningful in daily life, and coordinated with the school team.`);
       } else {
-        L.push(`Individualized ABA-based behavior support services are recommended. Programming should be age-appropriate, promote self-determination, and address: ${abaR.reasons.join(', ')}.`);
+        L.push(`The documented impairments noted above require individualized, function-based behavioral support that cannot be adequately addressed through less intensive consultation alone. ABA-based programming is recommended; services should be age-appropriate, prioritize self-determination and skill generalization across natural environments, and directly address the impairments established above. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria.`);
       }
       L.push('');
       L.push('Supporting References:');
@@ -1563,12 +1638,21 @@ function generateNote() {
     } else {
       // Suspected / under evaluation — simpler language, no citations
       if(young){
-        L.push(`Early behavioral intervention is recommended given ${pr.poss} age and developmental profile (${abaR.reasons.join(', ')}). ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.`);
+        L.push(`Early behavioral intervention is recommended given ${pr.poss} age and the following documented developmental impairments: ${specRStr}. ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.`);
         L.push(`Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intervention when accessible.`);
       } else if(S.ageGroup==='schoolAge'){
-        L.push(`ABA/behavioral support is recommended based on: ${abaR.reasons.join(', ')}. Functional Behavior Assessment (FBA) recommended to guide individualized programming. Goals should be functional, meaningful in daily life, and coordinated with the school team.`);
+        L.push(`ABA/behavioral support is recommended based on the following documented functional impairments: ${specRStr}. Functional Behavior Assessment (FBA) recommended to identify the functions of specific target behaviors and guide individualized programming. Goals should be functional, meaningful in daily life, and coordinated with the school team.`);
       } else {
-        L.push(`Behavior support services recommended given: ${abaR.reasons.join(', ')}. Programming should be individualized, age-appropriate, and promote self-determination.`);
+        L.push(`Behavior support services recommended based on the following documented functional impairments: ${specRStr}. Programming should be individualized, age-appropriate, and promote self-determination and skill generalization across natural environments.`);
+      }
+    }
+    // ABA Treatment Targets block — built from checked abaTargets using TARGET_RATIONALE lookup
+    if(S.abaTargets.size>0){
+      const targetLines=[...S.abaTargets].filter(k=>TARGET_RATIONALE[k]).map(k=>`  • ${TARGET_RATIONALE[k]}`);
+      if(targetLines.length){
+        L.push('ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):');
+        targetLines.forEach(tl=>L.push(tl));
+        L.push('');
       }
     }
     L.push('  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services. Parent training sessions will address: understanding the function of target behaviors, implementation of reinforcement strategies in natural routines, generalization of clinic and school skills to home settings, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.');
@@ -1582,7 +1666,6 @@ function generateNote() {
       L.push('    [Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.]');
     }
     if(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)) L.push('  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.');
-    if(S.abaTargets.has('reduce_stereotypy')) L.push('  Note: Stereotypy (repetitive behavior) is targeted only when the specific behavior has a documented functional impact on learning, safety, or access to reinforcement. Neutral stimming behaviors that do not interfere with functioning are not appropriate reduction targets per current BACB ethical standards.');
     L.push('');
   }
 
@@ -1749,6 +1832,9 @@ function generateNote() {
       if(S.comorbid.has('anxiety')) accomBeh.push('Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes');
       if(S.needsComm.size) accomBeh.push('Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations');
       if(S.comorbid.has('language_disorder')) accomBeh.push('Language: simplified verbal instructions, written directions provided alongside verbal, extended response time');
+      if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all student areas; direct staff supervision during transitions and mealtimes; school nurse notification with emergency ingestion action plan');
+      if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized BSP addressing function; reduced group size during high-disruption periods; staff trained in non-punitive response; alternative communication supports as indicated');
+      if(S.emotionalReg) accomBeh.push('Emotional regulation: designated calm-down space; break pass for self-initiated regulation breaks; de-escalation plan on file with all staff; advance notice of schedule changes');
       // Group 3: Academic
       const accomAcad=[];
       if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -1802,7 +1888,13 @@ function generateNote() {
     if(hN){L.push('  • Pediatric Neurology: Evaluation/management of '+(S.focalNeuroFindings?'focal neurological findings':'epilepsy/seizure disorder')+'.'+(S.comorbid.has('epilepsy')?' May require EEG, neuroimaging, and/or antiepileptic medication management.':''));}
     if(hQ){L.push('  • QbTest (Quantified Behavior Test): FDA-cleared objective measurement of attention, impulsivity, and activity level to support ADHD evaluation given confounding variables and/or insufficient corroborating data. To be scheduled following insurance verification. Results reviewed at follow-up.');}
     if(hP){const i=[];if(hasConfirmedADHD())i.push('ADHD');if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression');if(S.comorbid.has('ocd'))i.push('OCD');if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property'))i.push('severe interfering behaviors');L.push('  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: '+(i.join(', ')||'co-occurring concerns')+'. Behavioral strategies should be maximized prior to and concurrent with any medication.');}
-    if(hGI){L.push('  • Pediatric GI: Evaluation for GI symptoms (constipation, GERD, abdominal pain). GI symptoms may contribute to behavioral dysregulation in ASD.');}
+    if(hGI){
+      if(S.needsBehavior.has('pica')){
+        L.push('  • Pediatric GI: Referral indicated given documented pica. Evaluation for foreign body ingestion risk, nutritional deficiencies (iron, zinc, lead exposure), and gastrointestinal sequelae of non-food ingestion. Coordinate with ABA team on pica reduction protocol; GI and behavioral interventions are complementary and should proceed concurrently.');
+      } else {
+        L.push('  • Pediatric GI: Evaluation for GI symptoms (constipation, GERD, abdominal pain). GI symptoms may contribute to behavioral dysregulation in ASD.');
+      }
+    }
     if(hS){L.push('  • Diagnostic Sleep Study (Polysomnography): Referral for PSG given clinical suspicion for sleep-disordered breathing / obstructive sleep apnea. Results will guide further management including ENT evaluation if indicated.');}
     if(S.socialWork){
       const swLbls={apd_waiver:'APD/Medicaid waiver application assistance',financial:'financial resource counseling',caregiver_support:'caregiver support and mental health',community_nav:'community resource navigation',family_support:'family support coordination',family_safety:'family safety concerns'};
@@ -2437,20 +2529,27 @@ function _abaContent(){
   const domainPairs=[
     [S.needsComm.size>0,'expressive and/or receptive communication'],
     [S.needsBehavior.size>0,'behavioral regulation and reduction of interfering behaviors'],
-    [S.safety.size>0||S.needsBehavior.has('elopement'),'safety awareness and risk management'],
+    [S.safety.size>0||S.needsBehavior.has('elopement')||S.needsBehavior.has('pica'),'safety awareness and risk management'],
     [S.needsSensory.size>0,'sensory processing and modulation'],
     [S.needsAdaptive.size>0,'adaptive and daily living skills'],
     [S.needsSocial.size>0,'social interaction and peer relationships'],
     [S.needsMotor.size>0,'motor coordination and planning'],
     [S.emotionalReg,'emotional regulation'],
     [S.feeding,'feeding and mealtime behaviors'],
+    // S.academic intentionally excluded from ABA letter domains for school-age patients:
+    // academic instruction is the school district's FAPE obligation under IDEA and is frequently
+    // cited by insurers as grounds for denial. For toddler/preschool, pre-academic readiness
+    // skills are a defensible ABA target framed as developmental (not instructional).
+    [S.academic&&isYoung(),'pre-academic readiness and learning-to-learn skills'],
   ];
   const domains=domainPairs.filter(d=>d[0]).map(d=>d[1]);
 
   const hasSIB=S.safety.has('sib_safety_counsel')||S.abaTargets.has('reduce_sib');
   const hasElope=S.safety.has('elopement_counsel')||S.abaTargets.has('reduce_elopement');
   const hasAgg=S.abaTargets.has('reduce_aggression');
-  const safetyFlags=[hasSIB&&'self-injurious behavior (SIB)',hasElope&&'elopement/wandering',hasAgg&&'aggression toward others'].filter(Boolean);
+  const hasPica=S.needsBehavior.has('pica');
+  const hasVocal=S.needsBehavior.has('vocalDisruption');
+  const safetyFlags=[hasSIB&&'self-injurious behavior (SIB)',hasElope&&'elopement/wandering',hasAgg&&'aggression toward others',hasPica&&'pica (ingestion of non-food items)'].filter(Boolean);
 
   const TL={
     functional_comm:'Functional communication and requesting (manding)',
@@ -2502,6 +2601,9 @@ function _abaContent(){
   }
   if(safetyFlags.length>0){
     impPara+=` Of particular urgency, ${p.subj} exhibits ${safetyFlags.join(' and ')}, which further establish the medical necessity of ABA intervention with trained behavioral specialists who can implement evidence-based safety protocols and individualized behavioral support plans.`;
+  }
+  if(hasVocal){
+    impPara+=` ${p.cap} engages in repetitive or disruptive vocalizations that significantly interfere with ${p.poss} own access to instruction and with the learning environment of others in ${p.poss} educational setting, establishing medical necessity for individualized behavioral support beyond what general classroom management can provide.`;
   }
 
   // Evidence paragraph
@@ -2666,10 +2768,16 @@ function _iepLetterContent(){
   if(S.needsSocial&&S.needsSocial.size) impacts.push('Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.');
   if(S.needsBehavior.size){
     const bp=[];
-    if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) bp.push('behavioral safety concerns requiring active supervision');
-    if(S.needsBehavior.has('elopement')) bp.push('elopement risk requiring direct supervision at all times');
-    if(S.needsBehavior.has('tantrums')||S.needsBehavior.has('noncompliance')) bp.push('difficulty with emotional regulation and behavioral compliance that interrupts instruction');
-    if(S.needsBehavior.has('rigidity')) bp.push('inflexibility with routine changes and transitions that causes significant distress');
+    if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) bp.push('behavioral safety concerns requiring active supervision and impacting the safety of the student and others in the environment');
+    if(S.needsBehavior.has('elopement')) bp.push('elopement risk requiring direct supervision at all times, limiting ability to participate in group or less-structured activities');
+    if(S.needsBehavior.has('tantrums')||S.needsBehavior.has('noncompliance')) bp.push('difficulty with emotional regulation and behavioral compliance that interrupts instruction for this student and peers');
+    if(S.needsBehavior.has('rigidity')){
+      let rigStr='inflexibility with routine changes and transitions that causes significant distress and limits engagement with non-preferred tasks';
+      if(S.criteriaB.has('b3')) rigStr+='; rigidity is manifest in part through restricted or fixated interests that limit flexible engagement with non-preferred curriculum topics and transitions between subjects';
+      bp.push(rigStr);
+    }
+    if(S.needsBehavior.has('vocalDisruption')) bp.push('repetitive or disruptive vocalizations that interfere with this student\'s access to instruction and with the right of other students to learn in an undisrupted educational environment');
+    if(S.needsBehavior.has('pica')) bp.push('pica (ingestion of non-food items) requiring constant direct supervision and environmental safety modifications to prevent serious medical harm');
     const bStr=bp.length?bp.join('; '):null;
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
@@ -2834,6 +2942,9 @@ function _iepLetterContent(){
   const hasPFD=S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected');
   if(hasPFD) accomBeh.push('Pediatric Feeding Disorder: extended mealtime duration to accommodate oral-motor processing; adaptive utensils or positioning supports as recommended by feeding therapy team; permission to bring foods prepared to tolerated texture or presentation; staff awareness that mealtime difficulty is medical and developmental, not behavioral non-compliance; nurse health plan documenting any dysphagia precautions or choking risk protocols; SLP and/or OT feeding consultation to guide school mealtime support');
   if(!hasPFD&&!S.comorbid.has('arfid')&&(S.feeding||S.needsAdaptive.has('feeding_adl'))) accomBeh.push('Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that food selectivity in ASD is sensory-based and not volitional');
+  if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all classrooms, hallways, and areas the student accesses; non-food items secured or removed from reach; direct staff supervision during all transitions, unstructured periods, and mealtimes; school nurse notified with emergency action plan for suspected ingestion; cafeteria staff briefed; mouthing or ingestion incidents documented and reported to family same-day');
+  if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized behavior support plan (BSP) addressing antecedents and function of vocalizations; preferential seating to minimize acoustic disruption to peers; access to communication tools or fidgets as possible alternatives to vocal stimming; staff trained in non-punitive response protocols; reduced group size or separate testing environment during high-disruption periods');
+  if(S.emotionalReg) accomBeh.push('Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes');
   if(S.needsBehavior.has('rigidity')) accomBeh.push('Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)');
   const accomAcad=[];
   if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_suspected')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
@@ -3332,6 +3443,10 @@ function clearAll(){
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
   document.getElementById('criteriaStatus').innerHTML='';
+  // Reset behavFreq and hide its input rows
+  Object.assign(S.behavFreq,{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''});
+  document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
+  document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
   ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
@@ -3530,8 +3645,10 @@ function syncABATargetsFromNeeds(){
   if(S.academic)                                                            add('academics');
   // Early intervention core targets — fire for toddler/preschool with social or communication needs
   if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
-  // Stereotypy — fire when b1 (repetitive movements/speech) checked or any interfering behavior present
-  if(S.criteriaB.has('b1')||S.needsBehavior.size>0) add('reduce_stereotypy');
+  // Stereotypy — fire when b1 (repetitive movements/speech) checked, any interfering behavior present, or vocal disruption
+  if(S.criteriaB.has('b1')||S.needsBehavior.size>0||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
+  // Pica — specific high-risk behavior requiring dedicated ABA target
+  if(S.needsBehavior.has('pica')) add('reduce_pica');
   // Transitions + rigidity — fire when b2 (insistence on sameness) checked
   // B2 IS rigidity; also populate needsBehavior so IEP letter, accommodation, and counseling triggers activate
   if(S.criteriaB.has('b2')){
@@ -3560,13 +3677,13 @@ function syncSchoolSvcFromNeeds(){
       lbl.appendChild(badge);
     }
   };
-  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')) add('slp_school');
+  if(S.needsComm.size>0||S.langLevel||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
-  if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')){add('aide');add('fba');}
-  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')) add('counseling');
+  if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}
+  if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')||S.emotionalReg) add('counseling');
   if(S.comorbid.has('ld_suspected')) add('psychoed');
   if(hasID()) add('sped');
 }
@@ -3640,7 +3757,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(k==='criteriaD') S.criteriaD=inp.checked;
       else if(k==='criteriaE') S.criteriaE=inp.checked;
       else if(k==='single'){
-        if(v==='emotionalReg') S.emotionalReg=inp.checked;
+        if(v==='emotionalReg'){
+          S.emotionalReg=inp.checked;
+          const fr=document.querySelector('.beh-freq-row[data-for="emotionalReg"]');
+          if(fr) fr.style.display=inp.checked?'':'none';
+          if(!inp.checked) S.behavFreq.emotionalReg='';
+        }
         else if(v==='academic') S.academic=inp.checked;
         else if(v==='sleep') S.sleep=inp.checked;
         else if(v==='feeding') S.feeding=inp.checked;
@@ -3669,6 +3791,11 @@ document.addEventListener('DOMContentLoaded',()=>{
           arfidMechanism:S.arfidMechanism,arfidImpact:S.arfidImpact,
           socialWorkReasons:S.socialWorkReasons};
         if(m[k]) inp.checked?m[k].add(v):m[k].delete(v);
+        if(k==='needsBehavior'&&['tantrums','noncompliance','property','vocalDisruption'].includes(v)){
+          const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
+          if(fr) fr.style.display=inp.checked?'':'none';
+          if(!inp.checked) S.behavFreq[v]='';
+        }
         if(k==='specifiers'&&inp.checked){
           const langWith=['withLangImpairment','withSuspectedLang'];
           if(langWith.includes(v)){
@@ -3769,6 +3896,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 
   ['c','d','e'].forEach(k=>{const ta=document.getElementById('ev_'+k);if(ta)ta.addEventListener('input',()=>{S.ev[k]=ta.value;render();});});
+  document.querySelectorAll('.beh-freq-inp').forEach(inp=>{
+    inp.addEventListener('input',()=>{S.behavFreq[inp.dataset.freqkey]=inp.value.trim();render();});
+  });
   document.getElementById('strengthsField').addEventListener('input',function(){S.strengths=this.value;render();});
   document.getElementById('levelJustificationSCField').addEventListener('input',function(){S.asdLevelJustificationSC=this.value;render();});
   document.getElementById('levelJustificationRRBField').addEventListener('input',function(){S.asdLevelJustificationRRB=this.value;render();});
