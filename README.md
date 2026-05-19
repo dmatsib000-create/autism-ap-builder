@@ -14,7 +14,7 @@ The clinician fills in one left-side panel. Three outputs update in real time on
 |---|---|
 | **A&P Note** | Full problem-based Assessment & Plan, DSM-5 criteria table, clinical summary, therapy referrals, safety counseling, anticipatory guidance, and return-to-clinic interval |
 | **ABA Letter** | Letter of Medical Necessity for ABA insurance authorization, pre-filled with diagnosis, functional needs, severity level, requested hours, and treatment setting |
-| **IEP Letter** | Physician recommendation letter to the school, with service-specific rationale paragraphs, educational impact bullets, accommodation lists, and IDEA statutory citations |
+| **IEP Letter** | Physician recommendation letter to the school from the UF Behavior and Development Clinic, with service-specific rationale paragraphs, educational impact bullets, accommodation lists, and IDEA statutory citations |
 
 All output can be copied as rich text (for direct paste into Epic or Word), plain text, or **Epic format** (replaces `{placeholder}` fields with `***` cursor stops for Tab-navigation in the Epic note composer).
 
@@ -236,7 +236,7 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 
 ## Roadmap / known plan backlog
 
-A multi-session council review (DBP, clinical psychologist, BCBA-D, SLP, OT, PT, ESE director, claims examiner, English professor, general pediatrician, GUI/UX, Epic analyst, QA engineer) has produced an approved implementation plan covering:
+A multi-session council review has produced an approved implementation plan covering the items below. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
 - Community safety / independence checkbox split (commSafety vs. commIndependence)
 - Prior testing reviewed section with outcome dropdowns
