@@ -1733,7 +1733,7 @@ function generateNote() {
     }
     // Auto-generated IEP/504 accommodations — grouped into three categories
     if(S.ageGroup!=='toddler'){
-      // Group 1: Universal ASD (always shown for school-age+)
+      // Group 1: Core ASD accommodations (always shown for school-age+)
       const accomASD=[];
       accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
       accomASD.push('Visual supports: written or pictorial schedule, visual cues for task steps and transitions');
@@ -1755,7 +1755,7 @@ function generateNote() {
       if(anyAccom){
         L.push('');
         L.push('Recommended IEP/504 accommodations based on current evaluation findings:');
-        L.push('  Universal ASD Accommodations:');
+        L.push('  Core ASD-Related Accommodations:');
         accomASD.forEach(a=>L.push('    - '+a));
         if(accomBeh.length){
           L.push('  Behavioral and Emotional Accommodations:');
@@ -2799,15 +2799,20 @@ function _iepLetterContent(){
     svContent.sped=spedText;
   }
 
-  const accomASD=[];
-  accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
-  accomASD.push('Visual supports: written or pictorial schedule, visual cues for task steps and transitions');
-  if(S.needsSensory.size) accomASD.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools); alternative seating options');
-  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomASD.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  // Core ASD accommodations — near-universal, calibrated to developmental level
+  const accomCore=[];
+  accomCore.push('Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)');
+  accomCore.push('Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum');
+  // Individually indicated accommodations — conditional on documented evaluation findings
+  const accomIndividual=[];
+  if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
+  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  // Curriculum and assessment modifications — only when intellectual disability is documented
+  const accomIDMod=[];
   if(hasID()){
-    accomASD.push('Modified curriculum: alternate grade-level content standards aligned with functional level; IEP goals written to functional benchmarks rather than standard grade-level expectations');
-    accomASD.push('Alternate assessment: FAA (Florida Alternate Assessment) in place of standard statewide assessments where applicable, per Florida Rule 6A-1.0943 and IDEA');
-    accomASD.push('Specialized academic instruction: direct instruction in an appropriately supportive setting consistent with the degree of intellectual disability and IDEA Least Restrictive Environment (LRE) requirements');
+    accomIDMod.push('Modified curriculum: alternate grade-level content standards aligned with functional level; IEP goals written to functional benchmarks rather than standard grade-level expectations');
+    accomIDMod.push('Alternate assessment: FAA (Florida Alternate Assessment) in place of standard statewide assessments where applicable, per Florida Rule 6A-1.0943 and IDEA');
+    accomIDMod.push('Specialized academic instruction: direct instruction in an appropriately supportive setting consistent with the degree of intellectual disability and IDEA Least Restrictive Environment (LRE) requirements');
   }
   const accomBeh=[];
   if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
@@ -2828,7 +2833,7 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_math')) accomAcad.push('Math: calculator access for fact-dependent tasks, extended time, manipulatives, graph paper for number alignment');
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
-  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomASD,accomBeh,accomAcad,letterTypeLabel};
+  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel};
 }
 
 function generateIEPLetterHTML(){
@@ -2899,10 +2904,12 @@ function generateIEPLetterHTML(){
     });
   }
 
-  const anyAccom=c.accomASD.length||c.accomBeh.length||c.accomAcad.length;
+  const anyAccom=c.accomCore.length||c.accomIndividual.length||c.accomIDMod.length||c.accomBeh.length||c.accomAcad.length;
   if(anyAccom){
     h+=`<div class="aba-sec">Recommended Accommodations</div>`;
-    if(c.accomASD.length){h+=`<p><strong>Universal ASD Accommodations:</strong></p><ul>`;c.accomASD.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
+    if(c.accomCore.length){h+=`<p><strong>Core ASD-Related Accommodations:</strong> The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.</p><ul>`;c.accomCore.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
+    if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong> The following accommodations are recommended based on specific needs documented in this evaluation.</p><ul>`;c.accomIndividual.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
+    if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications:</strong> The following modifications are recommended based on the documented co-occurring intellectual disability and are required for FAPE under IDEA.</p><ul>`;c.accomIDMod.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul>`;c.accomBeh.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul>`;c.accomAcad.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
   }
@@ -2980,10 +2987,12 @@ function generateIEPLetterPlain(){
       t+=c.svContent[k]+'\n\n';
     });
   }
-  const anyAccom=c.accomASD.length||c.accomBeh.length||c.accomAcad.length;
+  const anyAccom=c.accomCore.length||c.accomIndividual.length||c.accomIDMod.length||c.accomBeh.length||c.accomAcad.length;
   if(anyAccom){
     t+=sep+'\nRECOMMENDED ACCOMMODATIONS\n'+sep+'\n';
-    if(c.accomASD.length){t+='Universal ASD Accommodations:\n';c.accomASD.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomCore.length){t+='Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomIndividual.length){t+='Individually Indicated Accommodations Based on Evaluation Findings:\n';c.accomIndividual.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomIDMod.length){t+='Curriculum and Assessment Modifications (based on documented intellectual disability; required for FAPE under IDEA):\n';c.accomIDMod.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomBeh.length){t+='Behavioral and Emotional Accommodations:\n';c.accomBeh.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
   }
@@ -3070,10 +3079,12 @@ async function copyIEPLetter(format){
           h+=`<p style="margin:6px 0">${e(c.svContent[k])}</p>`;
         });
       }
-      const anyA=c.accomASD.length||c.accomBeh.length||c.accomAcad.length;
+      const anyA=c.accomCore.length||c.accomIndividual.length||c.accomIDMod.length||c.accomBeh.length||c.accomAcad.length;
       if(anyA){
         h+=`<p style="${secSt}">Recommended Accommodations</p>`;
-        if(c.accomASD.length){h+=`<p><strong>Universal ASD Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomASD.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomCore.length){h+=`<p><strong>Core ASD-Related Accommodations:</strong> Implementation calibrated to developmental level and individual presentation.</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomIndividual.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications</strong> (based on documented intellectual disability):<br></p><ul style="margin:4px 0 4px 20px">`;c.accomIDMod.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
