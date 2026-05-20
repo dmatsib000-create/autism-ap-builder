@@ -268,14 +268,15 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 
 A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
-- Em dash reduction throughout note output
-- IEP letter pronoun substitution — singular-they verb agreement and article elision are fixed in `generateClinicalSummary` (`P1` grammar pass), but the IEP letter's own prose generators still produce "They has received… they carries…" patterns and need the same `v3()`/`aOr()` helpers
-- Line spacing normalization (collapse triple blank lines)
+- Em dash reduction in running prose (structural headers exempt)
+- Line spacing normalization (collapse triple blank lines if found in edge cases)
 - Additional comorbidity blocks and accommodation logic
-- Social cognition → soft SLP referral trigger
+- Social cognition → soft *medical* SLP referral trigger (school-side SLP already triggers from `needsSocial` conversation/reciprocity)
 - B4 (sensory) → sensory need suggestion
 - Leisure / recreation skills ABA target
 - Interoception as sensory subtype
-- Low-priority diagnostic workup: ASD-PEDS/MIGDAS-2 date fields, CARS-2 sentence fragment fix, rule-out closing sentence, em dash in suspected header
+- Audit `generateABALetter` and A&P note prose for singular-they verb-agreement patterns similar to the one just fixed in `generateIEPLetterPlain`
+- Implement print stylesheet (GUI Phase 7, approved by council but never shipped)
+- Three of the original IEP-letter critic items still likely pending: Florida-specific timeline language hedge, "specifically under the Autism eligibility category" → "including consideration of," BCBA-required wording on FBA, quarterly BIP-review claim, accommodation-as-entitlement framing
 
 See `C:\Users\davem\.claude\plans\partitioned-seeking-octopus.md` for the full approved plan.
