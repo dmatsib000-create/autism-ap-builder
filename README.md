@@ -284,6 +284,7 @@ A multi-session council review has produced an approved implementation plan. The
 - Social cognition → soft *medical* SLP referral trigger (school-side SLP already triggers from `needsSocial` conversation/reciprocity)
 - B4 (sensory) → sensory need suggestion
 - Leisure / recreation skills ABA target
+- Fecal smearing (scatolia) — add as a behavior-domain checkbox in Section 4 with auto-population of a corresponding ABA target; consider linkage to GI/constipation comorbid logic and to sensory (tactile/oral) domain
 - Interoception as sensory subtype
 - Implement print stylesheet (GUI Phase 7, approved by council but never shipped)
 
