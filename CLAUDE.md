@@ -37,6 +37,8 @@ Everything lives in one file: CSS in `<style>`, JavaScript in `<script>`. There 
 
 **`{placeholder}` syntax:** Used in ABA and IEP letter output for fields the clinician fills in after copying. Rendered with yellow CSS highlighting (`.aba-ph`, `.iep-ph`). The Epic copy format replaces `{...}` with `***` cursor stops.
 
+**Prose grammar helpers — `v3()` and `aOr()`:** Both are module-scope, defined just after `getPron()`. Any prose generator that uses a `getPron()`-derived subject (`pr.cap`, `pr.subj`, `pCap`, `pSub`, or a ternary involving those) MUST wrap finite verbs in `v3()` so the "they" pronoun renders grammatically ("they have" not "they has"). Do not redefine `v3()` locally inside a function — extend `V3_MAP` instead when new verbs are needed. Article elision before vowel-initial nouns ("an adolescent") uses `aOr(noun)`. See `docs/audits/verb-agreement.md` for the audit procedure to run when prose content is added.
+
 ### Code comments
 
 Leave concise inline comments when the reasoning is genuinely non-obvious — not to restate what the code does, but to explain *why* it is the way it is. Good candidates:
