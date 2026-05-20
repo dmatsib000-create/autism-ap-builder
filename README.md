@@ -73,9 +73,9 @@ Checkboxes for co-occurring diagnoses with ICD-10 codes. Each generates its own 
 - Anxiety disorder
 - Major depressive disorder
 - OCD
-- Trauma / PTSD
+- Trauma / adverse childhood experiences — appears in the A&P note by default; inclusion in the IEP letter is gated behind an explicit per-letter opt-in sub-checkbox (default off) since the IEP letter becomes part of the cumulative educational record. When on, the IEP letter uses functional language ("additional psychosocial history with ongoing impact on emotional regulation and stress response") rather than the ICD-10 code, and a reminder banner above the letter preview prompts the clinician to verify family consent
 - Language disorder
-- Specific learning disorders — reading (dyslexia), math, written expression, suspected
+- Specific learning disorders — reading (dyslexia), math, written expression, or suspected (domain-uncharacterized). Suspected SLD is mutually exclusive with the confirmed-domain options: checking any confirmed-domain LD clears `suspected` and vice versa, while multiple confirmed domains may coexist
 - DCD (developmental coordination disorder)
 - Sleep disorder
 - GI issues
@@ -247,7 +247,7 @@ Each school service generates a rationale paragraph (not just a label) connectin
 
 - **Single file** — no build system, no dependencies, no network requests. Open directly in any browser.
 - **No PHI is transmitted or stored** — everything runs locally in the browser.
-- **Mobile responsive** — a sticky Input / View Note toggle nav appears at ≤768px; touch targets enlarged throughout. Designed for desktop-first use but fully usable on a tablet or phone.
+- **Mobile responsive** — a sticky Input / View Note toggle nav appears at ≤768px; section headers also become sticky at `top:44px` (just below the nav) so the current section title stays visible while scrolling long forms; section collapse is animated via `max-height` transition with `inert` applied to collapsed bodies to keep tab-nav clean; touch targets enlarged throughout. Designed for desktop-first use but fully usable on a tablet or phone.
 - State resets completely with the **Clear All** button (with confirmation).
 - The file can be saved locally and used offline.
 - Smart/curly quotes in JS string literals will silently break the script — the CLAUDE.md has the PowerShell fix if this ever happens from copy-paste.
@@ -269,7 +269,7 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
 - Em dash reduction throughout note output
-- IEP letter pronoun substitution
+- IEP letter pronoun substitution — singular-they verb agreement and article elision are fixed in `generateClinicalSummary` (`P1` grammar pass), but the IEP letter's own prose generators still produce "They has received… they carries…" patterns and need the same `v3()`/`aOr()` helpers
 - Line spacing normalization (collapse triple blank lines)
 - Additional comorbidity blocks and accommodation logic
 - Social cognition → soft SLP referral trigger
