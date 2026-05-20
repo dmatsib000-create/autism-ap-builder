@@ -3468,6 +3468,9 @@ function generateIEPLetterPlain(){
   const pSub=p.subj;      // he / she / they / the child
   const pPoss=p.poss;     // his / her / their / the child's
   const pPossCap=pPoss.charAt(0).toUpperCase()+pPoss.slice(1);
+  // Singular-they verb agreement: swap third-person-singular verbs to bare form
+  // when the pronoun is "they". Mirrors v3() in generateClinicalSummary.
+  const v3=(w)=>{if(S.pronouns!=='they')return w;const m={is:'are',has:'have',was:'were',does:'do',carries:'carry',presents:'present',demonstrates:'demonstrate',shows:'show',exhibits:'exhibit',meets:'meet'};return m[w]||w;};
   const sep='─'.repeat(60);
   let t='NOTE: This letter is a physician recommendation to be submitted by the family as supporting\n';
   t+='documentation for their written request. Under IDEA, the parent/guardian must also submit\n';
@@ -3481,13 +3484,13 @@ function generateIEPLetterPlain(){
   t+=`I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
   let dxPara;
   if(S.diagStatus==='ruleOut'){
-    dxPara=`${pCap} is being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
+    dxPara=`${pCap} ${v3('is')} being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
   } else {
-    dxPara=`${pCap} has received a diagnosis of ${c.dxStr} (ICD-10-CM: ${c.dxCode})`;
+    dxPara=`${pCap} ${v3('has')} received a diagnosis of ${c.dxStr} (ICD-10-CM: ${c.dxCode})`;
     if(c.levelLabel) dxPara+=`, classified as ${c.levelLabel}`;
     if(c.specStr) dxPara+=` (${c.specStr})`;
     dxPara+=S.diagStatus==='confirmed'?', confirmed at the evaluation referenced above.':', as documented at the evaluation referenced above.';
-    if(c.coDxs.length) dxPara+=` In addition, ${pSub} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${c.coDxs.join('; ')}.`;
+    if(c.coDxs.length) dxPara+=` In addition, ${pSub} ${v3('carries')} the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${c.coDxs.join('; ')}.`;
     if(c.priorTestingCite) dxPara+=c.priorTestingCite;
   }
   t+=dxPara+'\n\n';
