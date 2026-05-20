@@ -287,6 +287,5 @@ A multi-session council review has produced an approved implementation plan. The
 - Interoception as sensory subtype
 - Audit `generateABALetter` and A&P note prose for singular-they verb-agreement patterns similar to the one just fixed in `generateIEPLetterPlain`
 - Implement print stylesheet (GUI Phase 7, approved by council but never shipped)
-- Three of the original IEP-letter critic items still likely pending: Florida-specific timeline language hedge, "specifically under the Autism eligibility category" → "including consideration of," BCBA-required wording on FBA, quarterly BIP-review claim, accommodation-as-entitlement framing
 
 See `C:\Users\davem\.claude\plans\partitioned-seeking-octopus.md` for the full approved plan.

@@ -18,24 +18,24 @@ The note and letters are clinical documentation aids. They are *not* a diagnosis
 
 ---
 
-## 2. Legal language in the IEP letter is not final
+## 2. Legal language in the IEP letter — review before sending
 
 The IEP letter is a physician recommendation. It is *not* a legal document. The school district's evaluation and IEP team determine eligibility, services, and accommodations — not the physician.
 
-**Known unresolved items in the current IEP letter template** (as of this writing):
+The current template has been reviewed against an external legal-language critic and updated:
 
-- The **60-calendar-day timeline** is the federal default under IDEA, but Florida and many states have their own evaluation timeline rules. The current letter does not always hedge this correctly. Before sending, verify the timeline language matches current Florida (or applicable state) practice.
-- The phrase **"specifically under the Autism eligibility category"** is acceptable as a *recommendation*, but the IEP team determines eligibility based on the school's evaluation. Some districts read this phrasing as overreach. Consider softening to "for consideration of Autism eligibility, among other categories supported by the evaluation."
-- The Functional Behavior Assessment (FBA) recommendation currently says **"should be conducted by a qualified behavior analyst (BCBA)"** — this is a clinical preference, not a federal IDEA requirement. Districts vary in how they staff FBAs.
-- The Behavior Intervention Plan (BIP) recommendation includes **"reviewed at minimum quarterly"** — this is best-practice language, not an IDEA legal requirement. Review with your local district if they read this as a stricter standard than they apply.
-- Some accommodation lists may read as **entitlements** rather than recommendations. Districts are not required to provide every accommodation a physician recommends; the team determines what's needed for FAPE.
+- Timeline language uses "60 school days" and cites Florida Rule 6A-6.0331(3)(d), not the federal default of 60 calendar days
+- Eligibility-category language asks for "consideration of the Autism eligibility category… and any additional eligibility categories supported by the evaluation results" — does not assert eligibility
+- FBA personnel language allows "BCBA *or* a school-based behavior specialist with documented training in functional behavior assessment"
+- BIP review cadence is "reviewed regularly by the IEP team based on collected data, with formal review recommended at minimum every quarter" — recommendation, not requirement
+- Accommodations section opens with: "These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports"
 
-Before sending an IEP letter:
-- Review the letter for any phrasing that could be read as overstating what IDEA or Florida rules require
-- Confirm any state-specific language (timelines, eligibility rules) reflects current Florida ESE practice
+What you should still do before sending:
 - Verify dates, names, and `{placeholder}` fields are filled in
+- Confirm any state-specific language reflects current practice if you're outside Florida (the template's Florida rule citations will not apply)
+- Read the full letter top-to-bottom once — clinical content matters as much as legal phrasing
 
-If a school district pushes back on letter language, that feedback is valuable — please pass it to the clinical lead so the template can be improved.
+If a school district pushes back on letter language, that feedback is valuable — please pass it to the clinical lead so the template can continue to improve.
 
 ---
 
