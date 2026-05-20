@@ -4,6 +4,16 @@ A clinical note generator for Developmental Behavioral Pediatrics autism evaluat
 
 **Live tool:** https://dmatsib000-create.github.io/autism-ap-builder/autism-ap-builder.html
 
+## For clinicians using this tool
+
+Start here — these three docs are written for the clinician using the tool, not the engineer maintaining it:
+
+- **[QUICKSTART.md](QUICKSTART.md)** — Generate your first note in 5 minutes. The minimum inputs to produce a usable A&P note, ABA letter, and IEP letter.
+- **[LIMITATIONS.md](LIMITATIONS.md)** — What this tool does *not* do. Read before sending any letter to a school district.
+- **[CHEATSHEET.html](CHEATSHEET.html)** — One-page printable reference. Open in a browser, `Ctrl+P` to PDF, pin next to your monitor.
+
+The rest of this README is the technical reference for the underlying logic, auto-rules, and code architecture. Useful for clinicians who want to dig deeper, and for anyone maintaining the tool.
+
 ---
 
 ## What it does
