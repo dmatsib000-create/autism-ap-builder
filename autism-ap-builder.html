@@ -4400,6 +4400,17 @@ document.addEventListener('DOMContentLoaded',()=>{
             if(sdCb) sdCb.checked=false;
           }
         }
+        // SLD mutex: confirmed-domain LDs (reading/math/written) are exclusive with
+        // ld_suspected. A child can carry multiple confirmed-domain LDs simultaneously,
+        // so the mutex is only across the confirmed↔suspected boundary, not within
+        // the confirmed group. Selecting any confirmed-domain LD clears ld_suspected;
+        // selecting ld_suspected clears all confirmed-domain LDs.
+        if(k==='comorbid'&&inp.checked){
+          const ldConfirmed=['ld_reading','ld_math','ld_written'];
+          const clearCb=(val)=>{const cb=document.querySelector(`input[data-key="comorbid"][value="${val}"]`);if(cb)cb.checked=false;S.comorbid.delete(val);S.comorbidInPlan.delete(val);};
+          if(ldConfirmed.includes(v)) clearCb('ld_suspected');
+          else if(v==='ld_suspected') ldConfirmed.forEach(clearCb);
+        }
         // Trauma → reveal IEP-disclosure sub-checkbox; reset the gate when trauma is unchecked.
         if(k==='comorbid'&&v==='trauma'){
           const gateRow=document.getElementById('traumaIepGateRow');
