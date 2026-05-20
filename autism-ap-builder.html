@@ -322,6 +322,21 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .mod-chip{padding:10px 14px;font-size:13px;min-height:44px}
   .r-opt{min-height:44px;padding:9px 6px}
   .sec-head{padding:13px 14px;font-size:12px;min-height:48px}
+  /* Sticky section headers on mobile — sit under #mobile-nav (top:0,z:50).
+     Wayfinding cue when scrolling long Section 4. Opt-out via data-test-mode.
+     .section uses overflow:hidden for rounded-corner clipping; that clips
+     position:sticky children, so it must be relaxed on mobile. The sec-head
+     keeps its own borders/background, so visual continuity is preserved. */
+  .section{overflow:visible}
+  .sec-head{position:sticky;top:44px;z-index:40;box-shadow:0 1px 2px rgba(15,15,25,.04)}
+  body[data-test-mode] .sec-head{position:static}
+  /* Animated collapse on mobile — body shrinks smoothly so the user sees the
+     section close (instead of teleporting). Replaces the scroll-then-collapse
+     dance, which was coupled to nav height and any other sticky offsets above. */
+  .sec-body{max-height:5000px;overflow:hidden;transition:max-height 180ms cubic-bezier(.2,.7,.2,1),padding 180ms cubic-bezier(.2,.7,.2,1)}
+  .sec-body.hidden{display:block;max-height:0;padding-top:0;padding-bottom:0}
+  /* Sec-dot remains a no-toggle tap target on the sticky header. */
+  .sec-dot{cursor:pointer;width:10px;height:10px;padding:2px;box-sizing:content-box}
   .rp-header{padding:8px 12px;gap:4px}
   /* Pill tabs collapse to 3-col grid, static border (no animated indicator) */
   .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:4px}
@@ -407,7 +422,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 1. Patient Profile -->
   <div class="section">
-    <div id="sh-profile" class="sec-head" onclick="toggleSec(this)">1 &mdash; Patient Profile <span>&#9660;</span></div>
+    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)">1 &mdash; Patient Profile <span>&#9660;</span></div>
     <div class="sec-body">
 
       <div class="field-group">
@@ -543,7 +558,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 2. Diagnostic Workup -->
   <div id="dxWorkupSection" class="section">
-    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
+    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:11px;color:#166534">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <p style="font-size:11px;color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
@@ -600,7 +615,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 3. DSM-5 Criteria -->
   <div class="section">
-    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
+    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
     <div class="sec-body">
       <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:11px;color:#92400e">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
@@ -702,7 +717,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 4. Functional Need Domains -->
   <div class="section">
-    <div id="sh-needs" class="sec-head" onclick="toggleSec(this)">4 &mdash; Functional Need Domains <span>&#9660;</span></div>
+    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)">4 &mdash; Functional Need Domains <span>&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Communication</span>
@@ -816,7 +831,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 5. Comorbid Conditions -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this)">5 &mdash; Comorbid Conditions <span>&#9660;</span></div>
+    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)">5 &mdash; Comorbid Conditions <span>&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:11px;color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
@@ -887,7 +902,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 6. School -->
   <div class="section">
-    <div id="sh-school" class="sec-head" onclick="toggleSec(this)">6 &mdash; School &amp; Educational Supports <span>&#9660;</span></div>
+    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)">6 &mdash; School &amp; Educational Supports <span>&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Placement</span>
@@ -935,7 +950,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 7. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this)">7 &mdash; Safety Counseling <span>&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)">7 &mdash; Safety Counseling <span>&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
@@ -952,7 +967,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 8. Anticipatory Guidance -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this)">8 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
+    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)">8 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
@@ -977,7 +992,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- ABA Parameters (shown when ABA is included in plan) -->
   <div id="abaParamsSection" class="section" style="display:none;border-color:#2563eb">
-    <div class="sec-head" style="background:#dbeafe;color:#1d4ed8" onclick="toggleSec(this)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
+    <div class="sec-head" style="background:#dbeafe;color:#1d4ed8" onclick="toggleSec(this,event)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:11px;color:var(--gray-600);margin-bottom:10px">These fields generate a standalone insurance-facing Letter of Medical Necessity. Use the <strong>ABA Letter</strong> tab in the preview to review and copy.</p>
 
@@ -1047,7 +1062,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this)">&#9881; Adjust Referrals <span>&#9660;</span></div>
+    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Private / Clinic Therapy Status</span>
@@ -3820,9 +3835,20 @@ function flashBtn(msg){
 // ─── SECTION TOGGLE ──────────────────────────────────────────────────────────
 // Chevron rotation is driven by .sec-head.collapsed (CSS handles the transform);
 // text remains '▼' so layout is stable, only rotation changes.
-function toggleSec(h){
+// On mobile, if the header is in its sticky/stuck state when tapped, scroll the
+// section back into natural position first so the user sees what's collapsing.
+function toggleSec(h,e){
+  // Dot is a no-toggle tap target — preserves the section's open state when
+  // the user reaches for the completion indicator on a sticky header.
+  if(e&&e.target&&e.target.classList&&e.target.classList.contains('sec-dot')){
+    e.stopPropagation();
+    return;
+  }
   const b=h.nextElementSibling;
   const hidden=b.classList.toggle('hidden');
+  // inert keeps tab-nav out of collapsed bodies (the animation leaves them in
+  // the DOM, unlike display:none, so without inert tab would land on hidden fields).
+  if(hidden) b.setAttribute('inert',''); else b.removeAttribute('inert');
   h.classList.toggle('collapsed',hidden);
 }
 
