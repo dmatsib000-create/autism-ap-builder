@@ -96,7 +96,7 @@ This determines whether the **IEP Letter** tab appears on the right, and which t
 The right panel updates live. Three tabs at the top:
 
 - **A&P Note** — for your medical chart (Epic)
-- **ABA Letter** — only appears for confirmed ASD with school-related need
+- **ABA Letter** — only appears for **confirmed** ASD when behavioral, language, adaptive, or social needs auto-trigger an ABA referral
 - **IEP Letter** — only appears when school documentation is selected
 
 For each tab, three copy buttons:
@@ -108,12 +108,20 @@ For each tab, three copy buttons:
 
 ---
 
+## Two important nuances
+
+**Trauma in Section 5.** Checking "Trauma / adverse childhood experiences" documents it in the A&P note (medical chart) automatically. It does **not** flow into the IEP letter unless you also check the indented sub-checkbox "Include in IEP letter." Leave that off unless the family has explicitly consented to share with the school. See [LIMITATIONS.md](LIMITATIONS.md) section 4 for why.
+
+**Suspected vs. confirmed SLD in Section 5.** "Suspected SLD" and the confirmed-domain options (reading / math / written) are mutually exclusive. Checking any confirmed-domain LD clears suspected, and vice versa. Multiple confirmed domains may coexist (e.g., reading + math). This prevents the letter from saying both "has a reading disability" and "has a suspected learning disability" in the same paragraph.
+
+---
+
 ## If something looks wrong
 
 - Click **Clear All** (top right) and start over — confirms first
 - Check Section 7 (Therapy / Referral Overrides) — anything auto-suggested can be manually excluded
 - Check Section 5 — if "Include plan" pill on a comorbidity is off, that condition won't get a plan block in the note
-- Review [LIMITATIONS.md](LIMITATIONS.md) before sending the IEP letter — there are known legal-language items still pending fixes
+- Review [LIMITATIONS.md](LIMITATIONS.md) before sending any IEP letter — it lists the review steps the clinician owns (placeholders, state-specific phrasing, top-to-bottom read-through)
 
 ---
 
