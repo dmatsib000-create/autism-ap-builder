@@ -50,6 +50,12 @@ Leave concise inline comments when the reasoning is genuinely non-obvious — no
 
 Skip comments for self-explanatory code, changelog-style notes ("added X to fix Y"), or anything already covered in this file. Those belong in commit messages, not source.
 
+**`WARY:` comment convention.** A `// WARY:` (or `/* WARY: */`) comment marks code that works but the maintainer has flagged as fragile, under-tested, or built on an approach they don't fully trust. Distinct from `TODO` (do this later) and `FIXME` (broken, fix soon). `WARY:` means "this is the best we have right now, but read this carefully before changing it." Greppable: `grep -rn "WARY:"` gives a full inventory. When you see one:
+
+- Read the full comment before modifying the line or function
+- Do not silently remove a `WARY:` marker. If you genuinely resolve the underlying concern, replace the marker with a brief explanation of why the wariness is no longer warranted (or move it to commit history if removed entirely)
+- If you make the wary code worse (e.g., add more silent-fallback behavior), update the comment to reflect the broadened concern
+
 ### Critical constraints
 
 - **Smart/curly quotes (U+2016 `'`, U+2017 `'`) must never appear in JS string literals.** They cause "Invalid or unexpected token" syntax errors and silently break the entire script with no console output. If editing triggers this (e.g., from auto-correct), run a PowerShell replace: `$content -replace [char]8216,"'" -replace [char]8217,"'"`.

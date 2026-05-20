@@ -1234,6 +1234,18 @@ function getPron() {
 // so "they" gets the bare verb form. See docs/audits/verb-agreement.md for the
 // audit procedure and the recurring bug pattern. Adding a new prose generator
 // or a new verb? Extend V3_MAP below, do not redefine v3() locally.
+//
+// WARY (architectural): v3() is a hardcoded lookup-table workaround for an
+// irregular grammar problem (singular-they verb agreement). It is fragile in
+// two ways: (a) the map must be extended every time a new third-person-singular
+// verb appears in clinical prose, and (b) the silent fallback below (||w)
+// returns ungrammatical output rather than failing loudly when a verb is
+// missing. The console.warn is a mitigation, not a fix. This whole approach
+// should be reconsidered if the verb count grows past ~20 or if we add an
+// authoring tool that lets non-engineers write prose. Possible replacements:
+// a real morphology library (overkill), template DSL with pronoun-aware
+// rendering, or moving prose templates into a structured format that pre-
+// resolves agreement at build time. None of these are urgent.
 const V3_MAP = {
   is:'are', has:'have', was:'were', does:'do',
   presents:'present', carries:'carry', demonstrates:'demonstrate',
@@ -1241,7 +1253,17 @@ const V3_MAP = {
   experiences:'experience', engages:'engage',
   communicates:'communicate', uses:'use'
 };
-function v3(w){ if(S.pronouns!=='they') return w; return V3_MAP[w] || w; }
+function v3(w){
+  if(S.pronouns!=='they') return w;
+  // WARY: silent fallback. If `w` is not in V3_MAP, we return the third-person-
+  // singular form unchanged — which is wrong for "they". The console.warn below
+  // surfaces this in dev so the missing verb can be added to V3_MAP, but the
+  // warning fires only if a dev opens the console with a "they" patient on the
+  // exact code path that uses the missing verb. A clinician in production with
+  // a "they" patient will see ungrammatical output without any signal.
+  if(!(w in V3_MAP)) console.warn('v3(): verb "'+w+'" not in V3_MAP — add it to prevent silent agreement bug for "they" patients');
+  return V3_MAP[w] || w;
+}
 // Article elision before vowel-initial noun: "a adolescent" → "an adolescent".
 // Conservative — only checks first character; doesn't handle silent-h edge cases.
 function aOr(n){ return /^[aeiouAEIOU]/.test((n||'').trim()) ? 'an '+n : 'a '+n; }
