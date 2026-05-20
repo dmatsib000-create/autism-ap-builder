@@ -2857,6 +2857,11 @@ function generateRichHTML(isPreview=false) {
 
 // ─── ABA LETTER OF MEDICAL NECESSITY ─────────────────────────────────────────
 function _abaContent(){
+  // Singular-they verb agreement helper, scoped to this function.
+  // Mirrors v3() in generateClinicalSummary and generateIEPLetterPlain.
+  // Verb map includes the third-person-singular forms used in the ABA letter prose:
+  // standard auxiliaries (is/has/was/does) plus medical-necessity narrative verbs.
+  const v3=(w)=>{if(S.pronouns!=='they')return w;const m={is:'are',has:'have',was:'were',does:'do',presents:'present',carries:'carry',demonstrates:'demonstrate',shows:'show',exhibits:'exhibit',meets:'meet',experiences:'experience',engages:'engage',communicates:'communicate',uses:'use'};return m[w]||w;};
   const p=getPron();
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const youngChild=S.ageGroup==='toddler'||S.ageGroup==='preschool';
@@ -2864,11 +2869,11 @@ function _abaContent(){
 
   const levelData={
     '1':['Level 1 — Requiring Support',
-      `Without support in place, deficits in social communication cause noticeable impairments in ${p.poss} functioning. ${p.cap} experiences difficulty initiating social interactions and demonstrates atypical or unsuccessful responses to social overtures from others. Behavioral inflexibility causes difficulties in at least one context. Individualized ABA therapy is medically necessary to establish functional communication, social, and adaptive skills and to build behavioral repertoires that reduce the need for caregiver-mediated support over time.`],
+      `Without support in place, deficits in social communication cause noticeable impairments in ${p.poss} functioning. ${p.cap} ${v3('experiences')} difficulty initiating social interactions and ${v3('demonstrates')} atypical or unsuccessful responses to social overtures from others. Behavioral inflexibility causes difficulties in at least one context. Individualized ABA therapy is medically necessary to establish functional communication, social, and adaptive skills and to build behavioral repertoires that reduce the need for caregiver-mediated support over time.`],
     '2':['Level 2 — Requiring Substantial Support',
-      `Marked deficits in verbal and nonverbal social communication skills are present; social impairments are apparent even with support in place. ${p.cap} exhibits behavioral inflexibility, difficulty coping with change, and restricted/repetitive behaviors that appear with sufficient frequency to be observable to others and that interfere with ${p.poss} functioning across multiple settings. ABA therapy at adequate intensity is medically necessary to address these substantial support needs, build foundational communication and adaptive skills, and reduce the frequency and severity of interfering behaviors.`],
+      `Marked deficits in verbal and nonverbal social communication skills are present; social impairments are apparent even with support in place. ${p.cap} ${v3('exhibits')} behavioral inflexibility, difficulty coping with change, and restricted/repetitive behaviors that appear with sufficient frequency to be observable to others and that interfere with ${p.poss} functioning across multiple settings. ABA therapy at adequate intensity is medically necessary to address these substantial support needs, build foundational communication and adaptive skills, and reduce the frequency and severity of interfering behaviors.`],
     '3':['Level 3 — Requiring Very Substantial Support',
-      `Severe deficits in verbal and nonverbal social communication cause marked functional impairment across all settings. ${p.cap} demonstrates minimal initiation of social interactions and limited response to social overtures from others. Extreme difficulty coping with change and restricted/repetitive behaviors interfere with functioning in all spheres of daily life. Intensive ABA therapy is medically necessary given the very substantial support needs documented, the severity of communication and behavioral impairments, and the significant risk to ${p.poss} safety and development without structured behavioral intervention.`]
+      `Severe deficits in verbal and nonverbal social communication cause marked functional impairment across all settings. ${p.cap} ${v3('demonstrates')} minimal initiation of social interactions and limited response to social overtures from others. Extreme difficulty coping with change and restricted/repetitive behaviors interfere with functioning in all spheres of daily life. Intensive ABA therapy is medically necessary given the very substantial support needs documented, the severity of communication and behavioral impairments, and the significant risk to ${p.poss} safety and development without structured behavioral intervention.`]
   };
   const asdLevelKey=(S.asdLevelSC&&S.asdLevelRRB)?String(Math.max(parseInt(S.asdLevelSC),parseInt(S.asdLevelRRB))):S.asdLevelSC||S.asdLevelRRB||'';
   const [levelLabel,levelText]=levelData[asdLevelKey]||['(level not specified)','ABA therapy is medically necessary given the documented functional impairments associated with this patient\'s Autism Spectrum Disorder diagnosis.'];
@@ -2952,19 +2957,24 @@ function _abaContent(){
   // Functional impairment paragraph
   let impPara='';
   if(domains.length>0){
-    impPara=`${p.cap} demonstrates clinically significant functional impairments across the following domains: ${domains.join('; ')}.`;
+    impPara=`${p.cap} ${v3('demonstrates')} clinically significant functional impairments across the following domains: ${domains.join('; ')}.`;
     if(S.langLevel&&!['ageAppropriate','unclearSLP'].includes(S.langLevel)){
       const langShort={nonverbal:'is nonverbal/minimally verbal',singleWord:'communicates primarily via single words',phrase:'uses two- to three-word phrases',simpleSentence:'uses simple sentences',verbal:'has multi-word verbal output below sentence level',conversational:'communicates conversationally with noted deficits'};
-      impPara+=` With respect to communication, ${p.subj} ${langShort[S.langLevel]||''}.`;
+      // Verb-in-data case: split off the lead verb so v3() can conjugate it for "they".
+      const langStr=langShort[S.langLevel]||'';
+      if(langStr){
+        const sp=langStr.indexOf(' ');
+        impPara+=` With respect to communication, ${p.subj} ${v3(langStr.slice(0,sp))} ${langStr.slice(sp+1)}.`;
+      }
     }
   } else {
-    impPara=`${p.cap} demonstrates functional impairments consistent with ${p.poss} ASD diagnosis that significantly interfere with ${p.poss} ability to participate in daily activities, access educational programming, and develop age-appropriate skills.`;
+    impPara=`${p.cap} ${v3('demonstrates')} functional impairments consistent with ${p.poss} ASD diagnosis that significantly interfere with ${p.poss} ability to participate in daily activities, access educational programming, and develop age-appropriate skills.`;
   }
   if(safetyFlags.length>0){
-    impPara+=` Of particular urgency, ${p.subj} exhibits ${safetyFlags.join(' and ')}, which further establish the medical necessity of ABA intervention with trained behavioral specialists who can implement evidence-based safety protocols and individualized behavioral support plans.`;
+    impPara+=` Of particular urgency, ${p.subj} ${v3('exhibits')} ${safetyFlags.join(' and ')}, which further establish the medical necessity of ABA intervention with trained behavioral specialists who can implement evidence-based safety protocols and individualized behavioral support plans.`;
   }
   if(hasVocal){
-    impPara+=` ${p.cap} engages in repetitive or disruptive vocalizations that significantly interfere with ${p.poss} own access to instruction and with the learning environment of others in ${p.poss} educational setting, establishing medical necessity for individualized behavioral support beyond what general classroom management can provide.`;
+    impPara+=` ${p.cap} ${v3('engages')} in repetitive or disruptive vocalizations that significantly interfere with ${p.poss} own access to instruction and with the learning environment of others in ${p.poss} educational setting, establishing medical necessity for individualized behavioral support beyond what general classroom management can provide.`;
   }
 
   // Evidence paragraph
