@@ -278,7 +278,6 @@ clinicalnotes_shared.py  — distributable version of clinicalnotes.py (prompts 
 
 A multi-session council review has produced an approved implementation plan. The council includes: DBP (lead), clinical psychologist, child & adolescent psychiatrist, BCBA-D, developmental therapist subcommittee (SLP/OT/PT), feeding therapist, ESE director, specialist medicine subcommittee (sleep, PM&R, neurology, GI, ENT), claims examiner, English professor, general pediatrician (UF BDC), software engineer / GUI/UX, technical reviewer / QA, clinical workflow specialist, and an autistic parent reviewer.
 
-- Em dash reduction in running prose (structural headers exempt)
 - Additional comorbidity blocks and accommodation logic
 - Social cognition → soft *medical* SLP referral trigger (school-side SLP already triggers from `needsSocial` conversation/reciprocity)
 - B4 (sensory) → sensory need suggestion
