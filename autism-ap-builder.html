@@ -513,6 +513,20 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
       </div>
 
+      <!-- Cognitive Data Source — visible only when cogProfile is ID or GDD tier.
+           Drives the bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
+           Brief screener (KBIT-2R etc.) and clinical impression do NOT support confirmation
+           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do. -->
+      <div class="field-group" id="cogDataSourceGroup" style="display:none">
+        <span class="field-label">Cognitive Data Source</span>
+        <div class="radio-grid">
+          <label class="r-opt" title="WISC-V, WPPSI-IV, DAS-II, SB-5, or equivalent — supports formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="comprehensive">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</label>
+          <label class="r-opt" title="KBIT-2R, RIAS-2, WASI-II, or equivalent — insufficient for formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="screener">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</label>
+          <label class="r-opt" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical">Clinical impression<br>/ observation only</label>
+          <label class="r-opt" title="Prior outside evaluation established diagnosis; supporting records not available for review"><input type="radio" name="cogDataSource" value="priorExternal">Unknown — prior<br>outside evaluation</label>
+        </div>
+      </div>
+
       <div class="field-group">
         <span class="field-label">Adaptive Behavior</span>
         <div class="radio-grid">
@@ -523,6 +537,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Commensurate<br>w/ cognitive level</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Age-appropriate<br>/ WNL</label>
         </div>
+        <!-- Standardized-assessment attestation. When checked together with a formally-impaired
+             adaptive selection AND a comprehensive cognitive battery, the bridge upgrades
+             withSuspectedID → withID. Acts as a single-click alternative to populating
+             Vineland-3/BASC-3 in priorTesting when the clinician knows formal data exists but
+             doesn't want to enter the instrument explicitly. -->
+        <label class="cb-row" style="margin-top:6px" title="Check if the adaptive impairment level above reflects a standardized adaptive measure (Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive). Required for formal ID/GDD diagnosis."><input type="checkbox" id="adaptiveStandardizedCb" onchange="S.adaptiveStandardized=this.checked;bridgeCogProfileToSpecifier(S.cogProfile);render()"> Based on standardized adaptive assessment</label>
       </div>
 
       <div class="field-group">
@@ -1160,7 +1180,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 // Derive a combined display level as Math.max(asdLevelSC, asdLevelRRB) where needed.
 const S = {
   ageGroup:'', pronouns:'', langLevel:'', langModifiers:new Set(),
-  cogProfile:'', unevenCog:false, unevenCogDesc:'', adaptProfile:'', strengths:'',
+  cogProfile:'', unevenCog:false, unevenCogDesc:'', cogDataSource:'', adaptProfile:'', adaptiveStandardized:false, strengths:'',
   diagStatus:'', asdLevelSC:'', asdLevelRRB:'', asdLevelJustificationSC:'', asdLevelJustificationRRB:'',
   visitType:'',
   rtcInterval:'',
@@ -1205,6 +1225,13 @@ const isMinVerbal = () => S.langLevel==='nonverbal'||S.langLevel==='singleWord';
 // phrase/simpleSentence excluded — psychotherapy requires meta-language (self-reflection, abstract reasoning)
 const isVerbalEnough = () => ['simpleSentence','conversational','ageAppropriate'].includes(S.langLevel);
 const hasSigAdaptive = () => S.adaptProfile==='severelyImpaired'||S.adaptProfile==='moderatelyImpaired'||S.adaptProfile==='mildlyImpaired'||S.adaptProfile==='belowPotential';
+// ID-confirmation gating helpers — drive bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
+// withID requires formal evidence on BOTH cognitive (comprehensive battery, not screener) AND adaptive
+// (formally-impaired severity + standardized assessment basis) domains per DSM-5/AAIDD criteria.
+const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaired','mildlyImpaired','belowPotential'].includes(S.adaptProfile);
+const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
+const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
+const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
 const asdLevel23 = () => S.asdLevelSC>='2'||S.asdLevelRRB>='2';
 const hasPragmaticDeficit = () => S.langModifiers.has('pragmatic');
 const hasMorphoErrors = () => S.langModifiers.has('morphosyntactic');
@@ -1636,9 +1663,15 @@ function generateNote() {
     comorbs.push(`Intellectual disability, ${idSev} (${idCode})`);
     if(!hasID()) comorbs.push('[DOCUMENTATION NOTE: "With intellectual disability" specifier is checked but no ID severity is selected in Cognitive Profile. ICD-10 code defaults to F79 (unspecified severity). Select a severity in Cognitive Profile for precise coding.]');
   }
-  if(S.specifiers.has('withSuspectedID')) comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)');
+  if(S.specifiers.has('withSuspectedID')){
+    const attribution = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation; supporting records not available for direct review at this visit)' : '';
+    comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+attribution);
+  }
   if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)');
-  if(S.specifiers.has('withSuspectedGDD')) comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)');
+  if(S.specifiers.has('withSuspectedGDD')){
+    const attribution = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation; supporting records not available for direct review at this visit)' : '';
+    comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)'+attribution);
+  }
   if(S.comorbid.has('adhd_combined')) comorbs.push('ADHD, Combined presentation (F90.2)');
   if(S.comorbid.has('adhd_inattentive')) comorbs.push('ADHD, Predominantly inattentive (F90.0)');
   if(S.comorbid.has('adhd_hyperactive')) comorbs.push('ADHD, Predominantly hyperactive-impulsive (F90.1)');
@@ -1767,8 +1800,11 @@ function generateNote() {
   }L.push('');
   let n=1;
 
-  // Diagnostic Workup
-  const hasDxWorkup=S.teacherMaterials.size>0||S.dxEvalPath||S.priorTesting.size>0;
+  // Diagnostic Workup — also fires when ID/GDD is suspected so the comprehensive evaluation
+  // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
+  // documented but the suspected-ID gating still demands a formal evaluation recommendation).
+  const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
+  const hasDxWorkup=S.teacherMaterials.size>0||S.dxEvalPath||S.priorTesting.size>0||hasSuspectedIDorGDD;
   if(hasDxWorkup){
     const onlyPriorTesting=S.priorTesting.size>0&&!S.dxEvalPath&&!S.teacherMaterials.size;
     L.push(n+++'. '+(onlyPriorTesting?'PRIOR TESTING REVIEWED':'DIAGNOSTIC WORKUP & NEXT STEPS'));
@@ -1867,6 +1903,14 @@ function generateNote() {
       if(adaptConsist.length) L.push('Behavioral/adaptive assessments reviewed: '+adaptConsist.join(', ')+'. Results indicate significant impairment consistent with the neurodevelopmental profile documented at this evaluation; see prior evaluation documentation for details.');
       if(adaptEquiv.length) L.push('Behavioral/adaptive assessments reviewed (mild/at-risk findings): '+adaptEquiv.join(', ')+'. Results indicate mild impairment or at-risk elevations; findings were considered in the overall clinical formulation.');
       if(adaptNormal.length) L.push('Behavioral/adaptive assessments reviewed (within normal limits): '+adaptNormal.join(', ')+'. Results were within normal limits or age-appropriate at the time of prior evaluation.');
+    }
+    // Comprehensive cognitive/adaptive evaluation referral — fires when ID or GDD is suspected
+    // (but not when the diagnosis was already established by a prior outside evaluation).
+    // Names the instruments that satisfy DSM-5/AAIDD diagnostic standards so the family and
+    // school know what to ask for.
+    if((S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'){
+      L.push('');
+      L.push('Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: (a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite). Formal eligibility for an Intellectual Disability or Global Developmental Delay diagnosis cannot be established until both components are completed.');
     }
     L.push('');
   }
@@ -3366,13 +3410,23 @@ function _iepLetterContent(){
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
   if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
-  // Curriculum and assessment modifications — only when intellectual disability is documented
+  // Curriculum and assessment modifications — only when intellectual disability is confirmed
+  // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
+  // academic instruction; those are placement-defining recommendations that require formal
+  // cognitive and adaptive testing per IDEA evaluation procedures.
   const accomIDMod=[];
-  if(hasID()){
+  if(hasID()&&S.specifiers.has('withID')){
     accomIDMod.push('Modified curriculum: alternate grade-level content standards aligned with functional level; IEP goals written to functional benchmarks rather than standard grade-level expectations');
     accomIDMod.push('Alternate assessment: FAA (Florida Alternate Assessment) in place of standard statewide assessments where applicable, per Florida Rule 6A-1.0943 and IDEA');
     accomIDMod.push('Specialized academic instruction: direct instruction in an appropriately supportive setting consistent with the degree of intellectual disability and IDEA Least Restrictive Environment (LRE) requirements');
   }
+  // Suspected ID/GDD note for the IEP letter — explicitly tells the school NOT to assign
+  // educational ID eligibility on the basis of this letter alone. Suppressed when the
+  // diagnosis was already established by a prior outside evaluation (cogDataSource='priorExternal'),
+  // since in that case the dx is real and the school can verify via records request.
+  const suspectedIDNote = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'
+    ? 'Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA evaluation procedures and should include a comprehensive standardized cognitive battery, a standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive composite), and academic achievement testing.'
+    : '';
   const accomBeh=[];
   if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
   if(S.comorbid.has('anxiety')) accomBeh.push('Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes');
@@ -3406,7 +3460,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite};
+  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote};
 }
 
 function generateIEPLetterHTML(){
@@ -3441,6 +3495,7 @@ function generateIEPLetterHTML(){
     if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
   }
   h+=`<p>${dxPara}</p>`;
+  if(c.suspectedIDNote) h+=`<p style="margin-top:10px"><em>${e(c.suspectedIDNote)}</em></p>`;
 
   if(c.impacts.length){
     h+=`<div class="aba-sec">Educational Impact</div>`;
@@ -3534,6 +3589,7 @@ function generateIEPLetterPlain(){
     if(c.priorTestingCite) dxPara+=c.priorTestingCite;
   }
   t+=dxPara+'\n\n';
+  if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.impacts.length){
     t+=sep+'\nEDUCATIONAL IMPACT\n'+sep+'\n';
     t+='These conditions result in the following challenges that require specialized support in the educational setting:\n';
@@ -3625,6 +3681,7 @@ async function copyIEPLetter(format){
         if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
       }
       h+=`<p style="margin-bottom:10px">${dxPara}</p>`;
+      if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.impacts.length){
         h+=`<p style="${secSt}">Educational Impact</p>`;
         h+=`<p>These conditions result in the following challenges that require specialized support in the educational setting:</p><ul style="margin:4px 0 4px 20px">`;
@@ -3824,6 +3881,20 @@ function toggleUnevenCog(){
   if(w) w.style.display=S.unevenCog?'block':'none';
 }
 
+// Cognitive Data Source is only meaningful for ID/GDD tiers — for other cognitive
+// profiles, suspected/confirmed has no upgrade pathway and the control would just
+// add noise.
+function toggleCogDataSourceVisibility(){
+  const g=document.getElementById('cogDataSourceGroup');
+  if(!g) return;
+  const isIdOrGdd = ['id_mild','id_moderate','id_severe','gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  g.style.display = isIdOrGdd ? '' : 'none';
+  if(!isIdOrGdd && S.cogDataSource){
+    S.cogDataSource='';
+    document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  }
+}
+
 // ─── MOBILE PANEL TOGGLE ─────────────────────────────────────────────────────
 function showMobilePanel(which){
   document.body.classList.toggle('mob-output',which==='output');
@@ -3982,7 +4053,7 @@ function clearAll(opts){
   syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('active'));
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
-  Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',unevenCog:false,unevenCogDesc:'',adaptProfile:'',strengths:'',
+  Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',unevenCog:false,unevenCogDesc:'',cogDataSource:'',adaptProfile:'',adaptiveStandardized:false,strengths:'',
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
     visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',
@@ -4017,6 +4088,8 @@ function clearAll(opts){
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+  const adapStdCb=document.getElementById('adaptiveStandardizedCb');if(adapStdCb)adapStdCb.checked=false;
+  toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
   render();
 }
@@ -4119,8 +4192,13 @@ function bridgeCogProfileToSpecifier(cogVal){
     if(cb) cb.checked=false;
   });
   let toCheck=null;
-  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck='withID';
-  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck='withGDD';
+  // Default ID/GDD to SUSPECTED. Upgrade to confirmed only when cognitive data source is a
+  // comprehensive battery (or prior outside evaluation), adaptive functioning is formally
+  // impaired, AND adaptive impairment is backed by standardized assessment (Vineland-3/BASC-3
+  // consistent in priorTesting, OR the clinician-attested standardized-assessment checkbox).
+  const confirmable = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
+  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmable ? 'withID' : 'withSuspectedID';
+  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmable ? 'withGDD' : 'withSuspectedGDD';
   else if(cogVal==='borderline') toCheck='withBIF';
   else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)) toCheck='withoutID';
   // cogVal==='unknown' → leave all unchecked; clinician decides
@@ -4337,7 +4415,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       const nm=inp.name;
       if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();}
       else if(nm==='langLevel') S.langLevel='';
-      else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');}
+      else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
+      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);}
       else if(nm==='adaptProfile') S.adaptProfile='';
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
@@ -4362,7 +4441,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
       if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();}
       else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
-      else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);}
+      else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);toggleCogDataSourceVisibility();}
+      // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
+      // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
+      // (per council D4 — avoid surprise specifier flips from far-away controls).
+      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);}
       else if(nm==='adaptProfile') S.adaptProfile=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;
       else if(nm==='diagStatus'){S.diagStatus=inp.value;document.getElementById('levelGroup').style.display=inp.value==='confirmed'?'':'none';}
