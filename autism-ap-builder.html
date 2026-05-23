@@ -1400,6 +1400,12 @@ function ruleGenetics() {
                               || S.congenitalAnomalies))
   };
 }
+// ruleNeurology fires on developmentalRegression alone without requiring a
+// non-empty diagStatus. Intentional asymmetry with ruleGenetics: active or
+// historical regression is itself a neurological event that warrants neurology
+// input regardless of whether autism evaluation has progressed. A genetics
+// referral can wait for more diagnostic context; a neurology referral for
+// regression should not.
 function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure||S.developmentalRegression}; }
 function rulePsychiatry() {
   const med=hasConfirmedADHD()||S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd');
@@ -2343,37 +2349,51 @@ function generateNote() {
       //   confirmed dx → straightforward necessity claim
       //   under-evaluation + ongoing regression → defer necessity to the urgency
       //     parenthetical inside addFlags (avoids doubled-hedge)
-      //   any other under-evaluation case → "warrant genetics input" lead
+      //   under-evaluation + any other clinical finding → "warrant" lead
+      //   override-forced with no flags → clinician-judgment phrasing (no
+      //     unsupported "clinical findings" claim)
+      const hasAnyGxFlag = S.developmentalRegression || S.dysmorphism === 'confirmed' || S.dysmorphism === 'suspected' || S.congenitalAnomalies;
       let leadSentence;
       if(S.diagStatus === 'confirmed'){
         leadSentence = 'The patient carries a confirmed neurodevelopmental diagnosis';
       } else if(S.developmentalRegression && S.regressionTiming === 'ongoing'){
         leadSentence = 'The patient is under evaluation for a neurodevelopmental disorder';
-      } else {
+      } else if(hasAnyGxFlag){
         leadSentence = 'The patient is under evaluation for a neurodevelopmental disorder, with clinical findings that warrant genetics input during the diagnostic workup';
+      } else {
+        // Override-forced inclusion with no clinical flags AND not confirmed —
+        // avoid asserting "clinical findings" that aren't backed by state.
+        leadSentence = 'The patient is under evaluation for a neurodevelopmental disorder; genetics input is requested per clinician judgment';
       }
       L.push('  • Genetics: Referral to clinical genetics is medically necessary. '+leadSentence+sevPhrase+addFlags+'. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.');
-      L.push('    Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹');
-      L.push('    Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹');
-      L.push('    Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.');
+      // 6-space continuation indent (not 4) is intentional: the rich-HTML
+      // renderer's bullet-continuation branch matches /^      \S/. Lines with
+      // 4-space indent are used elsewhere in the note for sub-bullets and must
+      // not be hijacked by that branch.
+      L.push('      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹');
+      L.push('      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹');
+      L.push('      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.');
     }
     if(hEEG){L.push('  • EEG (ordered): Given history concerning for seizure activity (staring spells, atypical developmental regression, or other non-emergent seizure-like events), EEG is ordered. Referral to pediatric neurology if results are abnormal or if focal neurological findings are present.');}
     if(hN){
-      // Trigger-priority order: focal neuro > epilepsy > regression-only.
-      // When regression coexists with focal/epilepsy, the primary trigger drives
-      // the lead clause and regression gets a brief appended note.
-      if(S.focalNeuroFindings || S.comorbid.has('epilepsy')){
-        let neuroLine = '  • Pediatric Neurology: Evaluation/management of '+(S.focalNeuroFindings?'focal neurological findings':'epilepsy/seizure disorder')+'.'+(S.comorbid.has('epilepsy')?' May require EEG, neuroimaging, and/or antiepileptic medication management.':'');
-        if(S.developmentalRegression) neuroLine += ' Documented developmental regression also noted; coordinate workup with clinical genetics referral.';
-        L.push(neuroLine);
-      } else if(S.developmentalRegression){
-        if(S.regressionTiming === 'ongoing') L.push('  • Pediatric Neurology: Urgent evaluation of active developmental regression. Consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral.');
-        else if(S.regressionTiming === 'distant') L.push('  • Pediatric Neurology: Routine evaluation given history of developmental regression in early childhood. Etiologic workup coordinated with clinical genetics; expedited evaluation not required unless trajectory changes.');
-        else L.push('  • Pediatric Neurology: Expedited evaluation for developmental regression of uncertain timing; clarify trajectory and consider EEG/MRI per neurologist judgment.');
-      } else {
-        // Fallback for any other neurology trigger (e.g., neurologyNowForSeizure alone)
-        L.push('  • Pediatric Neurology: Evaluation/management of neurological concern.');
+      // Compose neurology prose from the set of triggers that fired. Each
+      // trigger contributes its own clause; clauses are joined with periods so
+      // concurrent signals are preserved (e.g., regression + neurologyNowForSeizure
+      // both express in output rather than one being silently dropped).
+      const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+      const clauses = [];
+      if(S.focalNeuroFindings) clauses.push('evaluation/management of focal neurological findings');
+      if(S.comorbid.has('epilepsy')) clauses.push('evaluation/management of epilepsy/seizure disorder (may require EEG, neuroimaging, and/or antiepileptic medication management)');
+      if(S.developmentalRegression){
+        if(S.regressionTiming === 'ongoing') clauses.push('urgent evaluation of active developmental regression — consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral');
+        else if(S.regressionTiming === 'distant') clauses.push('routine evaluation given history of developmental regression in early childhood, currently stable trajectory; etiologic workup coordinated with clinical genetics; expedited evaluation not required unless trajectory changes');
+        else clauses.push('expedited evaluation for developmental regression of uncertain timing; clarify trajectory and consider EEG/MRI per neurologist judgment');
       }
+      // neurologyNowForSeizure adds its own clause unless epilepsy is already
+      // confirmed (in which case the urgency framing is implicit).
+      if(S.neurologyNowForSeizure && !S.comorbid.has('epilepsy')) clauses.push('evaluation for seizure-concerning history, referral placed without awaiting EEG results');
+      const neuroBody = clauses.length ? clauses.map(cap).join('. ') + '.' : 'Evaluation/management of neurological concern.';
+      L.push('  • Pediatric Neurology: ' + neuroBody);
     }
     if(hQ){L.push('  • QbTest (Quantified Behavior Test): FDA-cleared objective measurement of attention, impulsivity, and activity level to support ADHD evaluation given confounding variables and/or insufficient corroborating data. To be scheduled following insurance verification. Results reviewed at follow-up.');}
     if(hP){const i=[];if(hasConfirmedADHD())i.push('ADHD');if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression');if(S.comorbid.has('ocd'))i.push('OCD');if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property'))i.push('severe interfering behaviors');L.push('  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: '+(i.join(', ')||'co-occurring concerns')+'. Behavioral strategies should be maximized prior to and concurrent with any medication.');}
@@ -2393,11 +2413,18 @@ function generateNote() {
     }
     if(hG){
       // References emitted once at end of MEDICAL REFERRALS section, gated on the
-      // genetics referral firing. Numbered to match superscript markers above.
+      // genetics referral firing. Array-driven so the enumeration auto-numbers
+      // and stays in sync if a future maintainer adds/removes a citation.
+      // CAVEAT: the superscript markers (¹,²) in the prose above are still
+      // literal — if you add a 3rd citation here, also add ³ markers to the
+      // relevant claims in the prose. No runtime check enforces this coupling.
+      const gxCitations = [
+        'Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219',
+        'Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6',
+      ];
       L.push('');
       L.push('  References (genetics):');
-      L.push('    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219');
-      L.push('    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6');
+      gxCitations.forEach((c, i) => L.push('    ' + (i+1) + '. ' + c));
     }
     L.push('');
   }
@@ -3029,11 +3056,14 @@ function generateRichHTML(isPreview=false) {
       if(!inUL){html+=`<ul style="margin:3px 0 3px 18px;padding:0">`;inUL=true;}
       html+=`<li style="margin-bottom:3px">${linkify(line.replace(/^  • /,''))}</li>`;
     }
-    // Bullet-continuation: 4-space-indented prose under a bullet (e.g., genetics
-    // referral continuation paragraphs and reference lines). Stays inside the
-    // current <ul> with list-style:none so the parent referral bullet doesn't
-    // fragment into separate <ul> blocks when copied as rich text.
-    else if(inUL && /^    \S/.test(line)){
+    // Bullet-continuation: 6-space-indented prose under a bullet. Stays inside
+    // the current <ul> with list-style:none so the parent referral bullet
+    // doesn't fragment into separate <ul> blocks when copied as rich text.
+    // 6 spaces (not 4) so this branch only matches lines we intentionally emit
+    // as bullet-continuation — 4-space-indented sub-items used elsewhere in
+    // the note (ADHD med tables, AAC, safety targets, accommodations) keep
+    // falling through to the default <p> branch as they did pre-genetics.
+    else if(inUL && /^      \S/.test(line)){
       html+=`<li style="list-style:none;margin:1px 0 3px 18px;font-size:10.5pt;color:#374151">${linkify(line.trim())}</li>`;
     }
     else if(/^       Evidence:/.test(line)){closeUL();html+=`<p style="margin:2px 0 5px 44px;font-style:italic;color:#4b5563;font-size:10pt">${e(line.trim())}</p>`;}
@@ -4209,6 +4239,10 @@ function clearAll(opts){
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
   Object.keys(S.overrides).forEach(k=>{S.overrides[k]='auto';});
   document.getElementById('levelGroup').style.display='none';
+  // Hide the conditional regression-timing sub-row that the developmentalRegression
+  // checkbox toggles. clearAll bypasses the change handler that normally controls
+  // its visibility, so without this the sub-row would remain orphaned after Clear All.
+  const rtRow=document.getElementById('regressionTimingRow');if(rtRow)rtRow.style.display='none';
   document.getElementById('showDSMTable').checked=true;
   document.getElementById('showDSMLines').checked=false;
   document.getElementById('levelJustificationSCField').value='';
