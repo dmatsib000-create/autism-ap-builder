@@ -668,6 +668,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <div id="spec-gdd-rows">
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGDD"> With Global Developmental Delay (GDD) — confirmed</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — approx. IQ 70–79, does not meet ID criteria</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
@@ -1439,6 +1440,7 @@ const SPEC_LABELS={
   withSuspectedGDD:'with Global Developmental Delay (GDD) — provisional, formal evaluation underway',
   withBIF:'with borderline intellectual functioning (BIF)',
   withoutID:'without intellectual impairment',
+  withoutGDD:'without global developmental delay (development appropriate for age)',
   withLangImpairment:'with co-occurring language impairment (confirmed)',
   withSuspectedLang:'with suspected/uncharacterized language impairment (SLP evaluation pending)',
   withoutLangImpairment:'without language impairment',
@@ -3289,6 +3291,7 @@ function _iepLetterContent(){
     withSuspectedGDD:'with Global Developmental Delay, formal evaluation underway',
     withBIF:'with borderline intellectual functioning (BIF)',
     withoutID:'without intellectual impairment',
+    withoutGDD:'without global developmental delay',
     withLangImpairment:'with co-occurring language impairment',
     withSuspectedLang:'with suspected language impairment, SLP evaluation pending',
     withoutLangImpairment:'without language impairment',
@@ -4213,11 +4216,28 @@ function updateSectionHeaders(){
 }
 
 // ─── COG PROFILE → SPECIFIER BRIDGE ─────────────────────────────────────────
+// COG_SPEC_EXCL — the mutually-exclusive cognitive-profile specifier group.
+// Used by bridgeCogProfileToSpecifier (forward: cogProfile → specifier) AND by the
+// specifier checkbox click handler (sideways mutex AND backward: specifier → cogProfile).
+// Single source of truth — do not duplicate this list.
+const COG_SPEC_EXCL = ['withID','withSuspectedID','withGDD','withSuspectedGDD','withBIF','withoutID','withoutGDD'];
+// COG_PROFILE_COMPAT — for each specifier, the cogProfile values that are clinically
+// consistent with it. When a clinician manually checks a specifier and the current
+// cogProfile is not in the compatible set, cogProfile is cleared (the click handler
+// back-propagates so the cogProfile radio doesn't sit in a contradictory state).
+const COG_PROFILE_COMPAT = {
+  withID:           ['id_mild','id_moderate','id_severe'],
+  withSuspectedID:  ['id_mild','id_moderate','id_severe'],
+  withGDD:          ['gdd','gdd_mild','gdd_moderate','gdd_severe'],
+  withSuspectedGDD: ['gdd','gdd_mild','gdd_moderate','gdd_severe'],
+  withBIF:          ['borderline'],
+  withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown',''],
+  withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown',''],
+};
 function bridgeCogProfileToSpecifier(cogVal){
-  // Clear the mutually-exclusive ID/GDD specifier group, then pre-check the
+  // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
   // matching specifier. Clinician can still manually override after.
-  const excl=['withID','withSuspectedID','withGDD','withSuspectedGDD','withBIF','withoutID'];
-  excl.forEach(k=>{
+  COG_SPEC_EXCL.forEach(k=>{
     S.specifiers.delete(k);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
     if(cb) cb.checked=false;
@@ -4231,7 +4251,13 @@ function bridgeCogProfileToSpecifier(cogVal){
   if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmable ? 'withID' : 'withSuspectedID';
   else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmable ? 'withGDD' : 'withSuspectedGDD';
   else if(cogVal==='borderline') toCheck='withBIF';
-  else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)) toCheck='withoutID';
+  else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)){
+    // For toddler/preschool, the parallel "without GDD" specifier is the conceptually-correct
+    // choice — DSM-5 ID criteria don't apply under age 5; GDD is the relevant developmental
+    // category. Older ages use withoutID.
+    const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
+    toCheck = young ? 'withoutGDD' : 'withoutID';
+  }
   // cogVal==='unknown' → leave all unchecked; clinician decides
   if(toCheck){
     S.specifiers.add(toCheck);
@@ -4326,7 +4352,7 @@ function updateAgeBasedVisibility(){
     const hide=older&&S.ageGroup!=='';
     gddRows.style.display=hide?'none':'';
     if(hide){
-      S.specifiers.delete('withGDD');S.specifiers.delete('withSuspectedGDD');
+      S.specifiers.delete('withGDD');S.specifiers.delete('withSuspectedGDD');S.specifiers.delete('withoutGDD');
       gddRows.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
     }
   }
@@ -4600,18 +4626,28 @@ document.addEventListener('DOMContentLoaded',()=>{
           } else if(v==='withoutLangImpairment'){
             langWith.forEach(w=>{S.specifiers.delete(w);const cb=document.querySelector(`input[data-key="specifiers"][value="${w}"]`);if(cb)cb.checked=false;});
           }
-          // ID/GDD/BIF/withoutID are mutually exclusive — selecting any one clears the others.
+          // ID/GDD/BIF/without group are mutually exclusive — selecting any one clears the others.
           // Council review 2026-05-19 (Cases 11, 16): clinician toggling withSuspectedGDD after
           // cogProfile bridge had already set withGDD produced stuttering "with GDD; with GDD..." text.
-          const cogExcl=['withID','withSuspectedID','withGDD','withSuspectedGDD','withBIF','withoutID'];
-          if(cogExcl.includes(v)){
-            cogExcl.filter(x=>x!==v).forEach(other=>{
+          // COG_SPEC_EXCL defined near bridgeCogProfileToSpecifier — single source of truth.
+          if(COG_SPEC_EXCL.includes(v)){
+            COG_SPEC_EXCL.filter(x=>x!==v).forEach(other=>{
               if(S.specifiers.has(other)){
                 S.specifiers.delete(other);
                 const cb=document.querySelector(`input[data-key="specifiers"][value="${other}"]`);
                 if(cb) cb.checked=false;
               }
             });
+            // Back-propagate: when a manually-clicked specifier contradicts the current cogProfile
+            // (e.g., clinician clicks withoutID while cogProfile=id_mild), clear cogProfile so the
+            // radio doesn't sit in a contradictory state. Without this, the rendered note pulls
+            // "with mild intellectual disability" from cogProfile while the specifier line says
+            // "without intellectual impairment" — contradictory.
+            if(inp.checked && S.cogProfile && COG_PROFILE_COMPAT[v] && !COG_PROFILE_COMPAT[v].includes(S.cogProfile)){
+              S.cogProfile='';
+              document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+              toggleCogDataSourceVisibility();
+            }
           }
         }
         if(k==='schoolSvc'){
