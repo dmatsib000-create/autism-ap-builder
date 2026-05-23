@@ -3075,7 +3075,10 @@ function _abaContent(){
   if(isMilitary) evidPara+=` The National Academies of Sciences, Engineering, and Medicine (NASEM, 2025)${youngChild?' (Ref. 4)':' (Ref. 3)'} evaluated the TRICARE Autism Care Demonstration and reaffirmed the medical necessity and effectiveness of ABA therapy for military-connected individuals with ASD.`;
 
   // Specifiers in ABA letter: those that support or contextualize medical necessity
-  // (withGenetic and withNDD strengthen case for TRICARE/ChampVA; withID/withBIF affect intensity rationale)
+  // (withGenetic and withNDD strengthen case for TRICARE/ChampVA; withID/withBIF affect intensity rationale).
+  // withoutID and withoutGDD are intentionally OMITTED — no-impairment specifiers do not
+  // contextualize ABA medical necessity (they may even weaken authorization), so they are
+  // surfaced in the A&P note and IEP letter but not the ABA letter.
   const abaSpecMap={
     withID:'with accompanying intellectual disability',
     withSuspectedID:'with suspected intellectual disability',
@@ -4225,14 +4228,19 @@ const COG_SPEC_EXCL = ['withID','withSuspectedID','withGDD','withSuspectedGDD','
 // consistent with it. When a clinician manually checks a specifier and the current
 // cogProfile is not in the compatible set, cogProfile is cleared (the click handler
 // back-propagates so the cogProfile radio doesn't sit in a contradictory state).
+// 'unknown' is intentionally included in EVERY with* / without* compat set: the
+// clinician selecting 'unknown' is signalling "cognitive level not yet
+// characterized," which is compatible with any specifier they then manually add
+// (e.g., withSuspectedID on a kid with no testing yet but suspected ID). Excluding
+// 'unknown' from a with* compat set would silently wipe that deliberate selection.
 const COG_PROFILE_COMPAT = {
-  withID:           ['id_mild','id_moderate','id_severe'],
-  withSuspectedID:  ['id_mild','id_moderate','id_severe'],
-  withGDD:          ['gdd','gdd_mild','gdd_moderate','gdd_severe'],
-  withSuspectedGDD: ['gdd','gdd_mild','gdd_moderate','gdd_severe'],
-  withBIF:          ['borderline'],
-  withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown',''],
-  withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown',''],
+  withID:           ['id_mild','id_moderate','id_severe','unknown'],
+  withSuspectedID:  ['id_mild','id_moderate','id_severe','unknown'],
+  withGDD:          ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
+  withSuspectedGDD: ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
+  withBIF:          ['borderline','unknown'],
+  withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
+  withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
 };
 function bridgeCogProfileToSpecifier(cogVal){
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
@@ -4343,7 +4351,7 @@ function updateAgeBasedVisibility(){
     idCogGroup.style.display=hideIDCog?'none':'contents';
     if(hideIDCog&&hasID()){
       S.cogProfile='';
-      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -4364,7 +4372,7 @@ function updateAgeBasedVisibility(){
     gddCogGroup.style.display=hideGddCog?'none':'contents';
     if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
-      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -4483,7 +4491,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;
-      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();}
+      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
       else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);}
@@ -4509,7 +4517,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     inp.addEventListener('change',()=>{
       const nm=inp.name;
       document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
-      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();}
+      // ageGroup change: also re-fire bridge so the no-impairment specifier (withoutID vs
+      // withoutGDD) resynchronizes with the new age category. Without this, switching from
+      // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
+      // leaves withoutGDD orphaned then deleted by updateAgeBasedVisibility with no replacement.
+      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
       else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
       else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);toggleCogDataSourceVisibility();}
       // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
@@ -4643,10 +4655,16 @@ document.addEventListener('DOMContentLoaded',()=>{
             // radio doesn't sit in a contradictory state. Without this, the rendered note pulls
             // "with mild intellectual disability" from cogProfile while the specifier line says
             // "without intellectual impairment" — contradictory.
+            // Also clear evidence flags (cogDataSource, adaptiveStandardized) via the same helper
+            // used by age-cleanup — otherwise a stale adaptiveStandardized=true silently
+            // auto-confirms the next cogProfile pick without re-attestation.
             if(inp.checked && S.cogProfile && COG_PROFILE_COMPAT[v] && !COG_PROFILE_COMPAT[v].includes(S.cogProfile)){
               S.cogProfile='';
               document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
               toggleCogDataSourceVisibility();
+              clearIdGddEvidenceFlags();
+              const adapStdCb=document.getElementById('adaptiveStandardizedCb');
+              if(adapStdCb) adapStdCb.checked=false;
             }
           }
         }
