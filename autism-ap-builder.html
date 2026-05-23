@@ -1329,7 +1329,8 @@ function ruleABA() {
   if(S.ageGroup==='toddler') r.push('toddler age group');
   if(S.ageGroup==='preschool') r.push('preschool age group');
   if(isMinVerbal()) r.push('nonverbal/minimally verbal');
-  if(hasID()) r.push('intellectual disability');
+  // Confirmed-ID-only — see comment on parallel specR push in ABA medical-necessity block.
+  if(hasID()&&S.specifiers.has('withID')) r.push('intellectual disability');
   if(hasSigAdaptive()) r.push('significant adaptive impairment');
   if(S.needsBehavior.size>0) r.push('interfering behaviors');
   if(S.safety.size>0) r.push('safety needs');
@@ -1657,20 +1658,23 @@ function generateNote() {
 
   const comorbs=[];
   // GDD / ID — derived from specifiers (appear first, as primary co-occurring Dx)
+  // Provenance attribution — when the basis for the ID/GDD diagnosis is a prior outside
+  // evaluation whose records aren't available for direct review, append a qualifier so
+  // the chart never asserts a fully-vetted dx on unverified data. Applies to confirmed
+  // and suspected branches symmetrically.
+  const priorExtAttribution = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation; supporting records not available for direct review at this visit)' : '';
   if(S.specifiers.has('withID')){
     const idCode={id_mild:'F70',id_moderate:'F71',id_severe:'F72'}[S.cogProfile]||'F79';
     const idSev={id_mild:'mild',id_moderate:'moderate',id_severe:'severe'}[S.cogProfile]||'unspecified severity';
-    comorbs.push(`Intellectual disability, ${idSev} (${idCode})`);
+    comorbs.push(`Intellectual disability, ${idSev} (${idCode})`+priorExtAttribution);
     if(!hasID()) comorbs.push('[DOCUMENTATION NOTE: "With intellectual disability" specifier is checked but no ID severity is selected in Cognitive Profile. ICD-10 code defaults to F79 (unspecified severity). Select a severity in Cognitive Profile for precise coding.]');
   }
   if(S.specifiers.has('withSuspectedID')){
-    const attribution = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation; supporting records not available for direct review at this visit)' : '';
-    comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+attribution);
+    comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+priorExtAttribution);
   }
-  if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)');
+  if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)'+priorExtAttribution);
   if(S.specifiers.has('withSuspectedGDD')){
-    const attribution = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation; supporting records not available for direct review at this visit)' : '';
-    comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)'+attribution);
+    comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)'+priorExtAttribution);
   }
   if(S.comorbid.has('adhd_combined')) comorbs.push('ADHD, Combined presentation (F90.2)');
   if(S.comorbid.has('adhd_inattentive')) comorbs.push('ADHD, Predominantly inattentive (F90.0)');
@@ -1807,7 +1811,12 @@ function generateNote() {
   const hasDxWorkup=S.teacherMaterials.size>0||S.dxEvalPath||S.priorTesting.size>0||hasSuspectedIDorGDD;
   if(hasDxWorkup){
     const onlyPriorTesting=S.priorTesting.size>0&&!S.dxEvalPath&&!S.teacherMaterials.size;
-    L.push(n+++'. '+(onlyPriorTesting?'PRIOR TESTING REVIEWED':'DIAGNOSTIC WORKUP & NEXT STEPS'));
+    // Section header reflects the actual content. When the only workup is the
+    // cognitive/adaptive eval referral (suspected ID/GDD with no ASD-side workup),
+    // 'DIAGNOSTIC WORKUP & NEXT STEPS' would mislead the reader into expecting ASD content.
+    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !S.dxEvalPath && S.priorTesting.size===0;
+    const sectionTitle = onlySuspectedIDWorkup ? 'COGNITIVE / ADAPTIVE EVALUATION' : (onlyPriorTesting ? 'PRIOR TESTING REVIEWED' : 'DIAGNOSTIC WORKUP & NEXT STEPS');
+    L.push(n+++'. '+sectionTitle);
     if(S.teacherMaterials.size){
       const tmLabels={
         uf_classroom:'UF Classroom Observation Form — structured observational data from classroom setting',
@@ -1967,7 +1976,12 @@ function generateNote() {
     }
     if(S.needsSensory.size>0) specR.push('sensory processing difficulties impacting regulation and participation');
     if(S.needsMotor.size>0)   specR.push('motor skill impairments affecting daily functioning');
-    if(hasID())               specR.push('intellectual disability requiring intensive skills-based programming');
+    // Confirmed-ID-only justification line. Suspected ID is intentionally NOT pushed
+    // here — the ABA medical-necessity narrative should not assert confirmed ID when
+    // the diagnosis line above says "suspected." Phase 2: revisit appropriate
+    // language for the suspected case (e.g., severity-based justification without
+    // claiming the ID diagnosis).
+    if(hasID()&&S.specifiers.has('withID')) specR.push('intellectual disability requiring intensive skills-based programming');
     if(hasSigAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
     if(asdLevel23()&&!specR.length) specR.push('ASD Level 2 or 3 support needs');
     const specRStr=specR.length?specR.join('; '):abaR.reasons.join(', ');
@@ -3396,7 +3410,10 @@ function _iepLetterContent(){
 
   if(S.schoolSvc.has('sped')){
     let spedText='Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student\'s present levels of performance and updated at each annual IEP review.';
-    if(hasID()){
+    // Confirmed-ID-only language. Mirrors the accomIDMod gating below — without the
+    // withID specifier check, this paragraph would assert "confirmed intellectual
+    // disability" on a letter whose diagnosis line says "suspected," contradicting itself.
+    if(hasID()&&S.specifiers.has('withID')){
       spedText+=' Given the confirmed intellectual disability, the IEP team should consider: (1) a modified curriculum aligned to the student\'s functional level rather than standard grade-level expectations; (2) eligibility for the Florida Alternate Assessment (FAA) in place of standard statewide assessments, per Florida Rule 6A-1.0943; and (3) transition planning goals beginning no later than age 16, with functional skills and supported employment pathways as appropriate to the level of intellectual disability.';
     }
     svContent.sped=spedText;
@@ -3424,8 +3441,19 @@ function _iepLetterContent(){
   // educational ID eligibility on the basis of this letter alone. Suppressed when the
   // diagnosis was already established by a prior outside evaluation (cogDataSource='priorExternal'),
   // since in that case the dx is real and the school can verify via records request.
+  // Phase 2 decision deferred: whether to also suppress when S.diagStatus==='ruleOut'.
+  // Current behavior keeps the caveat on rule-out letters because the suspected-ID
+  // workup recommendation is still clinically true even when ASD is being ruled out.
+  // Revisit if clinicians report this language feels off-topic on rule-out letters.
   const suspectedIDNote = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'
     ? 'Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA evaluation procedures and should include a comprehensive standardized cognitive battery, a standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive composite), and academic achievement testing.'
+    : '';
+  // Documentation prompt paired with the existing A&P note prompt at line ~1664.
+  // Fires when the withID specifier is checked but no ID severity is selected in
+  // Cognitive Profile — the IEP letter would otherwise say "with intellectual
+  // disability" in the dx line while accomIDMod is silently empty.
+  const idDocPrompt = S.specifiers.has('withID') && !hasID()
+    ? 'Note to clinician: The "with intellectual disability" specifier is checked but no ID severity (Mild, Moderate, Severe) is selected in the Cognitive Profile section of the tool. Please select a severity so accommodation recommendations specific to the level of intellectual disability render correctly in this letter.'
     : '';
   const accomBeh=[];
   if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
@@ -3460,7 +3488,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote};
+  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt};
 }
 
 function generateIEPLetterHTML(){
@@ -3495,6 +3523,7 @@ function generateIEPLetterHTML(){
     if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
   }
   h+=`<p>${dxPara}</p>`;
+  if(c.idDocPrompt) h+=`<p style="margin-top:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
   if(c.suspectedIDNote) h+=`<p style="margin-top:10px"><em>${e(c.suspectedIDNote)}</em></p>`;
 
   if(c.impacts.length){
@@ -3589,6 +3618,7 @@ function generateIEPLetterPlain(){
     if(c.priorTestingCite) dxPara+=c.priorTestingCite;
   }
   t+=dxPara+'\n\n';
+  if(c.idDocPrompt) t+='['+c.idDocPrompt+']\n\n';
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.impacts.length){
     t+=sep+'\nEDUCATIONAL IMPACT\n'+sep+'\n';
@@ -3681,6 +3711,7 @@ async function copyIEPLetter(format){
         if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
       }
       h+=`<p style="margin-bottom:10px">${dxPara}</p>`;
+      if(c.idDocPrompt) h+=`<p style="margin-bottom:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.impacts.length){
         h+=`<p style="${secSt}">Educational Impact</p>`;
@@ -4288,6 +4319,7 @@ function updateAgeBasedVisibility(){
       S.cogProfile='';
       idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
+      clearIdGddEvidenceFlags();
     }
   }
   if(gddRows){
@@ -4308,8 +4340,20 @@ function updateAgeBasedVisibility(){
       S.cogProfile='';
       gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
+      clearIdGddEvidenceFlags();
     }
   }
+}
+
+// Age-driven cleanup must also clear evidence flags; otherwise stale
+// comprehensive/standardized state from the prior age can silently auto-confirm
+// the next selected cogProfile when the clinician picks a tier valid for the new age.
+function clearIdGddEvidenceFlags(){
+  S.cogDataSource='';
+  S.adaptiveStandardized=false;
+  document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  const adapStdCb=document.getElementById('adaptiveStandardizedCb'); if(adapStdCb) adapStdCb.checked=false;
+  toggleCogDataSourceVisibility();
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
