@@ -14,7 +14,7 @@
   --accent:var(--blue);--accent-soft:var(--blue-light);--accent-hover:var(--blue-dark);
   /* Neutral scale — warmed slightly toward clinical-paper neutral */
   --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
-  --gray-300:#d2d2d8;--gray-400:#9b9ba3;--gray-500:#6b6b75;
+  --gray-300:#d2d2d8;--gray-400:#74747e;--gray-500:#6b6b75;  /* gray-400 darkened from #9b9ba3 to hit 4.62:1 on white (WCAG AA normal text >=4.5:1); leaves visual separation from gray-500 */
   --gray-600:#4a4a55;--gray-700:#363640;--gray-800:#1f1f28;--gray-900:#111118;
   /* Semantic colors */
   --amber:#d97706;--amber-light:#fef3c7;
@@ -60,7 +60,7 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
 .app-header h1{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
 .app-header .sub{margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.header-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.88);white-space:nowrap}
+.header-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.96);white-space:nowrap}
 .header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
 .header-actions{display:flex;gap:6px;align-items:center}
 .btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:12px;font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
@@ -239,7 +239,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* ── Visit type highlight when unset ─── */
 .vt-unset .dx-banner-label-vt{color:var(--amber)!important}
 /* ── Sticky note actions bar ────────── */
-.note-sticky-bar{padding:7px 14px;border-top:1px solid var(--gray-200);display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;background:white;flex-shrink:0}
+.note-sticky-bar{position:sticky;bottom:0;z-index:10;padding:7px 14px;border-top:1px solid var(--gray-200);display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;background:white;flex-shrink:0}  /* position:sticky as belt-and-suspenders; flex parent also pins it */
 /* ── Contextual dx-active highlight ─── */
 .dx-active{border-color:var(--amber)!important;box-shadow:0 0 0 2px var(--amber-light)!important}
 .dx-active .sec-head{background:var(--amber-light)!important}
@@ -267,7 +267,9 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-sig{margin-top:24px;border-top:1px solid var(--gray-300);padding-top:12px;font-size:10pt;color:var(--gray-600);line-height:2.2}
 .aba-doc .aba-ref{font-size:9.5pt;color:var(--gray-700);margin-bottom:6px;padding-left:18px;text-indent:-18px}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
-.iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic}
+/* Placeholder highlighting for ABA + IEP letters — yellow tint + italic + dotted underline.
+   Italic and underline are non-color cues for colorblind safety. Keep .aba-ph and .iep-ph in sync. */
+.aba-ph,.iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic;border-bottom:1px dotted #92400e}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
@@ -300,6 +302,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 .confirm-inline{display:inline-flex;align-items:center;gap:6px}
 .confirm-inline .confirm-prompt{font-size:11px;color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
 .confirm-inline .btn{padding:4px 10px;font-size:11px}
+
+/* Desktop click-target floor for the chip/option family. Mobile @768 override
+   below upgrades these to 44px for touch. Excludes .btn-sm and .ov-sel which
+   are intentionally compact secondary controls. */
+.r-opt,.mod-chip,.ov-pill,.tab-btn,.ev-obs-chip,.ev-src-chip,.str-chip{min-height:32px}
 
 /* ── Mobile responsive — keyboard, touch targets, no horizontal scroll ─ */
 @media(max-width:768px){
