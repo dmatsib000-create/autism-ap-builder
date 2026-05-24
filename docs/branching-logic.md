@@ -1186,6 +1186,8 @@ The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile sel
 
 **Maintainer note**: do not "fix" this asymmetry by adding `else if(cogVal==='borderline') toCheck='withBIF';` to the bridge or by introducing a `withSuspectedBIF` specifier. The inline comment at line 4407 reinforces this. Coupled to the BIF age-gate (hide for toddler/preschool, line 4505 area) — together they ensure BIF is only documentable for older patients and only as a deliberate clinician choice.
 
+**Note on cogDataSource visibility (added in PR-D)**: `borderline` *does* now expose the cogDataSource selector — the visibility check in `toggleCogDataSourceVisibility` includes `isBif`. The clinician records which instrument grounded the BIF call (BIF inherits the ID-tier IQ-instrument labels because BIF is an IQ-defined construct). This does **not** change the no-auto-bridge rule — `withBIF` is still a deliberate manual selection. The source data only flows downstream via the spec-label qualifier (see §11.12).
+
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
 Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*
@@ -1209,7 +1211,19 @@ F88 has no severity sub-coding in ICD-10, so the prose adjective ("mild" / "mode
 
 The F88 diagnosis lines (confirmed and suspected) in `generateNote()` use the **comma form** (`Global Developmental Delay, mild (F88)`) to match the ID dx-line cadence (`Intellectual disability, mild (F70)`). The spec-label strings use the **adjective form** (`with mild Global Developmental Delay`) because that reads more naturally in running prose.
 
-**Maintainer note**: do not turn this into a `withGDD_mild`/`withGDD_moderate`/`withGDD_severe` proliferation in `SPEC_LABELS`. Severity is derived from `cogProfile`, not from the specifier itself — adding keyed labels would break that single source of truth and create two paths to the same conclusion. If a future change adds a new spec-label consumer for GDD, route it through `withGddSev()`.
+**Maintainer note**: do not turn this into a `withGDD_mild`/`withGDD_moderate`/`withGDD_severe` proliferation in `SPEC_LABELS`. Severity is derived from `cogProfile`, not from the specifier itself — adding keyed labels would break that single source of truth and create two paths to the same conclusion. If a future change adds a new spec-label consumer for GDD, route it through `applySpecLabelTransforms()` (see §11.12).
+
+### 11.12 Spec-label transforms — unified pipeline
+
+All three spec-label consumers (A&P note, ABA letter, IEP letter) run their per-specifier labels through a single helper `applySpecLabelTransforms(k, label)`, which composes three transforms in order:
+
+1. `withGddSev(label)` — adjective severity injection for GDD (see §11.11).
+2. `withBifSourceQualifier(k, label)` — appended parenthetical on `withBIF` when `cogDataSource` is `screener` or `clinical`. Output: `"with borderline intellectual functioning (BIF) (brief screening only; comprehensive cognitive battery recommended to confirm)"` or the `clinical impression only` variant.
+3. `withLowAvgQualifier(k, label)` — appended parenthetical on `withoutGDD` when `cogProfile==='lowAverage'` and `ageGroup` is `toddler` or `preschool`. Output: `"without global developmental delay (development appropriate for age) (based on currently available information; formal developmental assessment recommended to further characterize)"`.
+
+The qualifiers are intentionally additive (concatenation, not text-replacement) so the underlying SPEC_LABELS / abaSpecMap / specMap strings remain the single source of truth for the core label content. Each transform short-circuits when its key or state preconditions aren't met.
+
+**Maintainer note**: when adding a new spec-label consumer, route it through `applySpecLabelTransforms()` rather than calling the SPEC_LABELS lookup directly. When adding a new transform, register it inside `applySpecLabelTransforms()` rather than wrapping the consumers individually — consumer-level wrapping is what the original audit found to be unmaintainable.
 
 ---
 

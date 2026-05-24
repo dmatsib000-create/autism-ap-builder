@@ -1496,6 +1496,39 @@ function withGddSev(label){
   if(!sev||!label) return label;
   return label.replace('Global Developmental Delay', sev+' Global Developmental Delay');
 }
+// BIF source qualifier: when the borderline call rests on a brief screener
+// or a clinical impression rather than a comprehensive battery, append a
+// parenthetical recommending confirmatory testing. Addresses the audit
+// finding that a KBIT-2R-grounded BIF call and a WISC-V-grounded BIF call
+// previously produced identical prose. Applies only to the withBIF spec
+// (not other BIF-adjacent specifiers, which do not exist).
+function withBifSourceQualifier(k,label){
+  if(k!=='withBIF'||!label) return label;
+  if(S.cogProfile!=='borderline') return label;
+  if(S.cogDataSource==='screener') return label+' (brief screening only; comprehensive cognitive battery recommended to confirm)';
+  if(S.cogDataSource==='clinical') return label+' (clinical impression only; comprehensive cognitive battery recommended to confirm)';
+  return label;
+}
+// Low-average qualifier: a "low average" cognitive profile in a toddler or
+// preschool patient cannot rest on a comprehensive source under the current
+// model (cogDataSource is not exposed for non-impairment profiles, and
+// developmental screening at this age has lower psychometric weight). The
+// withoutGDD ("development appropriate for age") assertion is therefore
+// softened with a recommendation for formal developmental assessment. Older
+// patients are not affected — by age 6+ the tool gates to IQ-based reasoning
+// and the lowAverage call carries adequate weight on its own.
+function withLowAvgQualifier(k,label){
+  if(k!=='withoutGDD'||!label) return label;
+  if(S.cogProfile!=='lowAverage') return label;
+  if(S.ageGroup!=='toddler'&&S.ageGroup!=='preschool') return label;
+  return label+' (based on currently available information; formal developmental assessment recommended to further characterize)';
+}
+function applySpecLabelTransforms(k,label){
+  label=withGddSev(label);
+  label=withBifSourceQualifier(k,label);
+  label=withLowAvgQualifier(k,label);
+  return label;
+}
 const SPEC_LABELS={
   withID:'with accompanying intellectual disability (confirmed by formal assessment)',
   withSuspectedID:'with suspected intellectual disability — formal evaluation pending',
@@ -1710,7 +1743,7 @@ function generateNote() {
     if(S.asdLevelSC) lvParts.push(`Level ${S.asdLevelSC} (Social Communication)`);
     if(S.asdLevelRRB) lvParts.push(`Level ${S.asdLevelRRB} (Restricted/Repetitive Behaviors)`);
     if(lvParts.length) dx+=', '+lvParts.join(' / ');
-    const specs=[...S.specifiers].map(k=>withGddSev(SPEC_LABELS[k])).filter(Boolean);
+    const specs=[...S.specifiers].map(k=>applySpecLabelTransforms(k,SPEC_LABELS[k])).filter(Boolean);
     if(specs.length) dx+=', '+specs.join('; ');
     dx+='\nICD-10-CM: F84.0';
     L.push(dx);
@@ -3254,7 +3287,7 @@ function _abaContent(){
     withNDD:'with associated neurodevelopmental/behavioral/mental disorder',
     withCatatonia:'with catatonia'
   };
-  const abaSpecStr=[...S.specifiers].map(k=>withGddSev(abaSpecMap[k])).filter(Boolean).join('; ');
+  const abaSpecStr=[...S.specifiers].map(k=>applySpecLabelTransforms(k,abaSpecMap[k])).filter(Boolean).join('; ');
 
   return {today,p,asdLevelKey,levelLabel,levelText,abaSpecStr,domains,safetyFlags,targets,settings,hoursText,refs,openPara,impPara,evidPara,youngChild,isMilitary};
 }
@@ -3466,7 +3499,7 @@ function _iepLetterContent(){
     withNDD:'with associated neurodevelopmental, behavioral, or mental health condition',
     withCatatonia:'with catatonia'
   };
-  const specStr=[...S.specifiers].map(k=>withGddSev(specMap[k])).filter(Boolean).join('; ');
+  const specStr=[...S.specifiers].map(k=>applySpecLabelTransforms(k,specMap[k])).filter(Boolean).join('; ');
 
   // Service-specific rationale paragraphs
   const svContent={};
@@ -4116,16 +4149,27 @@ function toggleCogDataSourceVisibility(){
   if(!g) return;
   const isId  = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile);
   const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
-  const isIdOrGdd = isId || isGdd;
-  g.style.display = isIdOrGdd ? '' : 'none';
-  if(!isIdOrGdd && S.cogDataSource){
+  // Borderline is exposed to cogDataSource so the clinician can record which
+  // instrument grounded the BIF call. BIF is an IQ-defined construct, so it
+  // inherits the ID-tier IQ-instrument labels. The no-auto-bridge rule for
+  // borderline (see bridgeCogProfileToSpecifier) is unchanged — clinician
+  // still checks withBIF manually. The downstream qualifier
+  // (withBifSourceQualifier) softens the spec label when the source is a
+  // screener or clinical impression, addressing the audit finding that a
+  // KBIT-2R-grounded BIF call and a WISC-V-grounded BIF call previously
+  // produced identical prose.
+  const isBif = S.cogProfile==='borderline';
+  const isVisibleTier = isId || isGdd || isBif;
+  g.style.display = isVisibleTier ? '' : 'none';
+  if(!isVisibleTier && S.cogDataSource){
     S.cogDataSource='';
     document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
   }
-  // Swap label text to match the active cogProfile tier. ID-tier → IQ instruments;
-  // GDD-tier → DQ developmental instruments. The label.label-text spans are the swap
-  // targets; the radio values themselves are not changed.
-  if(isIdOrGdd){
+  // Swap label text to match the active cogProfile tier. ID-tier and BIF →
+  // IQ instruments; GDD-tier → DQ developmental instruments. The
+  // label.label-text spans are the swap targets; the radio values themselves
+  // are not changed.
+  if(isVisibleTier){
     const labels = isGdd ? GDD_COGDATASOURCE_LABELS : ID_COGDATASOURCE_LABELS;
     g.querySelectorAll('label[data-cds-key]').forEach(lab=>{
       const key=lab.getAttribute('data-cds-key');
