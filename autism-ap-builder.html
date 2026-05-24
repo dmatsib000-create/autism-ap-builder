@@ -516,15 +516,20 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <!-- Cognitive Data Source — visible only when cogProfile is ID or GDD tier.
            Drives the bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
            Brief screener (KBIT-2R etc.) and clinical impression do NOT support confirmation
-           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do. -->
+           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do.
+           Label text inside .label-text is swapped at runtime by toggleCogDataSourceVisibility
+           based on whether the active cogProfile is in the ID tier or the GDD tier — ID-tier
+           shows IQ instruments (WISC etc.); GDD-tier shows developmental instruments
+           (Bayley, Mullen, Griffiths, DAYC-2). -->
       <div class="field-group" id="cogDataSourceGroup" style="display:none">
         <span class="field-label">Cognitive Data Source</span>
         <div class="radio-grid">
-          <label class="r-opt" title="WISC-V, WPPSI-IV, DAS-II, SB-5, or equivalent — supports formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="comprehensive">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</label>
-          <label class="r-opt" title="KBIT-2R, RIAS-2, WASI-II, or equivalent — insufficient for formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="screener">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</label>
-          <label class="r-opt" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical">Clinical impression<br>/ observation only</label>
-          <label class="r-opt" title="Prior outside evaluation established diagnosis; supporting records not available for review"><input type="radio" name="cogDataSource" value="priorExternal">Unknown — prior<br>outside evaluation</label>
+          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</span></label>
+          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</span></label>
+          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression<br>/ observation only</span></label>
+          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Unknown — prior<br>outside evaluation</span></label>
         </div>
+        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screeners (e.g., KBIT-2R) have documented floor effects in children under 5; result is best treated as preliminary pending formal developmental assessment.</div>
       </div>
 
       <div class="field-group">
@@ -4061,14 +4066,54 @@ function toggleUnevenCog(){
 // Cognitive Data Source is only meaningful for ID/GDD tiers — for other cognitive
 // profiles, suspected/confirmed has no upgrade pathway and the control would just
 // add noise.
+// Instrument labels are tier-conditional: ID-tier shows IQ instruments
+// (WISC, DAS, SB, WPPSI / KBIT-2R, RIAS-2, WASI-II); GDD-tier shows developmental
+// instruments (Bayley-4, Mullen, Griffiths, DAYC-2 / ASQ-3, DAYC-2 Screener).
+// The value space ("comprehensive", "screener", "clinical", "priorExternal") is
+// unchanged — only the displayed instrument list swaps. cogSourceSupportsConfirmation
+// continues to treat any "comprehensive" or "priorExternal" selection as confirmable
+// regardless of which instrument list is visible.
+const ID_COGDATASOURCE_LABELS = {
+  comprehensive: 'Comprehensive battery<br>(WISC, DAS, SB, WPPSI)',
+  screener: 'Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)',
+  clinical: 'Clinical impression<br>/ observation only',
+  priorExternal: 'Unknown — prior<br>outside evaluation'
+};
+const GDD_COGDATASOURCE_LABELS = {
+  comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
+  screener: 'Brief developmental screener<br>(e.g. ASQ-3, DAYC-2 Screener)',
+  clinical: 'Clinical impression<br>/ observation only',
+  priorExternal: 'Unknown — prior<br>outside evaluation'
+};
 function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
   if(!g) return;
-  const isIdOrGdd = ['id_mild','id_moderate','id_severe','gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  const isId  = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile);
+  const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  const isIdOrGdd = isId || isGdd;
   g.style.display = isIdOrGdd ? '' : 'none';
   if(!isIdOrGdd && S.cogDataSource){
     S.cogDataSource='';
     document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  }
+  // Swap label text to match the active cogProfile tier. ID-tier → IQ instruments;
+  // GDD-tier → DQ developmental instruments. The label.label-text spans are the swap
+  // targets; the radio values themselves are not changed.
+  if(isIdOrGdd){
+    const labels = isGdd ? GDD_COGDATASOURCE_LABELS : ID_COGDATASOURCE_LABELS;
+    g.querySelectorAll('label[data-cds-key]').forEach(lab=>{
+      const key=lab.getAttribute('data-cds-key');
+      const span=lab.querySelector('.label-text');
+      if(span && labels[key]) span.innerHTML = labels[key];
+    });
+  }
+  // Floor-effect warning: brief screeners have documented floor effects in children
+  // under 5 (Pitts & Mervis 2016, KBIT-2 in Williams syndrome; AACAP Practice Parameter).
+  // Show as a passive informational note when the combination applies.
+  const warn = document.getElementById('screenerYoungWarning');
+  if(warn){
+    const showWarn = S.cogDataSource==='screener' && (S.ageGroup==='toddler' || S.ageGroup==='preschool');
+    warn.style.display = showWarn ? '' : 'none';
   }
 }
 
@@ -4656,10 +4701,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;
-      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
+      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
-      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);}
+      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='adaptProfile') S.adaptProfile='';
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
@@ -4688,13 +4733,29 @@ document.addEventListener('DOMContentLoaded',()=>{
       // withoutGDD) resynchronizes with the new age category. Without this, switching from
       // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
       // leaves withoutGDD orphaned then deleted by updateAgeBasedVisibility with no replacement.
-      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
+      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
-      else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);toggleCogDataSourceVisibility();}
+      else if(nm==='cogProfile'){
+        // Tier-transition guard: if the new cogProfile crosses the ID↔GDD boundary,
+        // clear cogDataSource so the new tier's instrument labels don't sit on a
+        // stale selection from the previous tier. Within-tier moves (e.g. id_mild →
+        // id_moderate) preserve the cogDataSource selection.
+        const prevTier = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile) ? 'id'
+          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile) ? 'gdd' : '';
+        const newTier  = ['id_mild','id_moderate','id_severe'].includes(inp.value) ? 'id'
+          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(inp.value) ? 'gdd' : '';
+        if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){
+          S.cogDataSource='';
+          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+        }
+        S.cogProfile=inp.value;
+        bridgeCogProfileToSpecifier(inp.value);
+        toggleCogDataSourceVisibility();
+      }
       // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
       // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
       // (per council D4 — avoid surprise specifier flips from far-away controls).
-      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);}
+      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='adaptProfile') S.adaptProfile=inp.value;
       else if(nm==='dysmorphism') S.dysmorphism=inp.value;
       else if(nm==='regressionTiming') S.regressionTiming=inp.value;

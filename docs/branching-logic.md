@@ -95,7 +95,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | Property | Type | Drives |
 |---|---|---|
 | `cogProfile` | string | Triggers `bridgeCogProfileToSpecifier()` → adds/removes specifiers; influences §3 (severity context), §9 (ABA target auto-add), §10 (IEP `accomIDMod`) |
-| `cogDataSource` | string | Distinguishes confirmed vs suspected ID pathway |
+| `cogDataSource` | string | Distinguishes confirmed vs suspected ID/GDD pathway. Value space (`comprehensive` / `screener` / `clinical` / `priorExternal`) is fixed; **visible labels are tier-conditional** — ID-tier shows IQ instruments (WISC, DAS, SB, WPPSI / KBIT-2R, RIAS-2, WASI-II), GDD-tier shows developmental instruments (Bayley-4, Mullen, Griffiths, DAYC-2 / ASQ-3, DAYC-2 Screener). `cogSourceSupportsConfirmation()` treats any `comprehensive` or `priorExternal` selection as confirmable regardless of which label is showing. Cleared on cogProfile ID↔GDD tier transition to prevent stale-label-matched-selection states. |
 | `adaptProfile` | string | Adaptive functioning narrative |
 | `adaptiveStandardized` | boolean | Gate for ID-confirmation strength |
 | `unevenCog` + `unevenCogDesc` | boolean + string | Note prose for scatter |
@@ -1167,7 +1167,13 @@ The condition includes "severe behavior + age school+" but "severe" is implied f
 
 `rule*().reasons[]` strings are concatenated comma-joined into letter prose. No format contract exists — a contributor pushing a sentence-cased string with trailing punctuation will produce malformed letter output. No automated check.
 
-### 11.6 BIF asymmetry — intentional design (`autism-ap-builder.html:4407`)
+### 11.6 Floor-effect warning for screener + young (`autism-ap-builder.html` `toggleCogDataSourceVisibility`)
+
+When `S.cogDataSource === 'screener'` AND `S.ageGroup ∈ {toddler, preschool}`, a passive italic note appears below the cogDataSource group warning that brief screeners (e.g. KBIT-2R) have documented floor effects in children under 5 (Pitts & Mervis 2016, KBIT-2 in Williams syndrome). The warning is informational only — it does not block the selection, change downstream gating, or alter the bridge logic. Clinically a 4-year-old screener result indicating borderline-or-below cannot reliably distinguish BIF from mild ID/GDD per the AACAP Practice Parameter; the clinically-correct documentation is the GDD-suspected pathway, which the tool already supports.
+
+**Maintainer note**: the warning is rendered by `toggleCogDataSourceVisibility()` based on the conjunction of `S.cogDataSource` and `S.ageGroup`. Any new entry path that mutates either of those fields must call `toggleCogDataSourceVisibility()` for the warning to track correctly. Currently called from cogProfile / cogDataSource / ageGroup change handlers (both select and deselect paths).
+
+### 11.7 BIF asymmetry — intentional design (`autism-ap-builder.html:4407`)
 
 The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile selections to `withID`/`withSuspectedID` and GDD-tier selections to `withGDD`/`withSuspectedGDD` — but does **not** auto-bridge `borderline` to `withBIF`. There is also no `withSuspectedBIF` specifier. Both asymmetries are intentional.
 
@@ -1175,17 +1181,17 @@ The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile sel
 
 **Maintainer note**: do not "fix" this asymmetry by adding `else if(cogVal==='borderline') toCheck='withBIF';` to the bridge or by introducing a `withSuspectedBIF` specifier. The inline comment at line 4407 reinforces this. Coupled to the BIF age-gate (hide for toddler/preschool, line 4505 area) — together they ensure BIF is only documentable for older patients and only as a deliberate clinician choice.
 
-### 11.7 Smart-quote injection risk (CLAUDE.md "Critical constraints")
+### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
 Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*
 
 Editing flow that triggers this most often: a clipboard paste, an editor with smart-quote autocorrect enabled, or an AI-generated edit that smartens quotes. The recovery is documented in CLAUDE.md.
 
-### 11.8 Em-dash injection in prose (CLAUDE.md "Critical constraints")
+### 11.9 Em-dash injection in prose (CLAUDE.md "Critical constraints")
 
 Generated note prose must avoid em dashes (`—`). They're permitted in structural section headers but read as overwritten in clinical prose. Easy to introduce when adding new prose generators.
 
-### 11.9 Box-drawing characters in JS literals (CLAUDE.md "Critical constraints")
+### 11.10 Box-drawing characters in JS literals (CLAUDE.md "Critical constraints")
 
 The `─` (U+2500) and `═` (U+2550) characters in the note output's section dividers are intentional. Replacing them with ASCII `---` would change every divider in clinical output and degrade the visual structure clinicians rely on.
 
