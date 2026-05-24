@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Autism A&P Builder — A clinician's guide to how it decides</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#d4e4f7',       /* Ice Blue */
+      primaryTextColor: '#1a2433',   /* dark steel */
+      primaryBorderColor: '#4a6fa5', /* Steel Blue */
+      lineColor: '#4a6fa5',
+      secondaryColor: '#fafafa',
+      tertiaryColor: '#ffffff',
+      fontFamily: 'DejaVu Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif'
+    },
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+  });
+</script>
+<style>
+  /* Theme: Arctic Frost
+     Ice Blue #d4e4f7 · Steel Blue #4a6fa5 · Silver #c0c0c0 · Crisp White #fafafa
+     Cool, clinical, trustworthy — designed for healthcare content. */
+  :root {
+    --ink: #1a2433;            /* dark steel — primary text */
+    --bg: #fafafa;             /* Crisp White */
+    --panel: #ffffff;          /* sidebar + cards */
+    --accent: #4a6fa5;         /* Steel Blue — primary accent */
+    --accent-soft: #d4e4f7;    /* Ice Blue — light accent surfaces */
+    --accent-deep: #34507a;    /* darker Steel Blue — hover, emphasis */
+    --rule: #c0c0c0;           /* Silver — borders/dividers */
+    --muted: #6b7f9c;           /* muted Steel Blue — secondary text */
+    --link: #4a6fa5;            /* Steel Blue — links */
+    --vignette-bg: #fff8e1;     /* soft warm cream — contrasts cool theme to draw the eye */
+    --vignette-border: #d4a017; /* muted gold — warmer than the original yellow */
+    --vignette-text: #7a5a00;
+    /* Font stack — DejaVu Sans first per theme spec, with cross-platform fallbacks */
+    --font-sans: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'DejaVu Sans Mono', 'SF Mono', Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 0;
+  }
+  /* TOC sidebar */
+  .toc {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 28px 20px 28px 28px;
+    border-right: 1px solid var(--rule);
+    background: var(--panel);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .toc h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 0 0 12px 0;
+    font-weight: 600;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc;
+  }
+  .toc ol li {
+    counter-increment: toc;
+    margin: 6px 0;
+  }
+  .toc ol li a {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+  }
+  .toc ol li a::before {
+    content: counter(toc) ". ";
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .toc ol li a:hover {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+  }
+  .toc .brand {
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc .brand .title {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .toc .brand .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  /* Main content */
+  .content {
+    max-width: 760px;
+    padding: 48px 40px 96px 40px;
+    background: var(--bg);
+  }
+  .content section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+  .content h1 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.25;
+    margin: 0 0 10px 0;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .content h1 .num {
+    display: inline-block;
+    width: 36px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .content h2 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: 32px;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .content p { margin: 12px 0; }
+  .content a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .content a:hover { background: var(--accent-soft); }
+  /* Lede paragraph after each h1 */
+  .lede {
+    font-size: 17px;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 14px 10px 16px;
+    margin: 16px 0 24px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  /* Vignette boxes (collapsible) */
+  details.vignette {
+    background: var(--vignette-bg);
+    border-left: 3px solid var(--vignette-border);
+    padding: 12px 18px;
+    margin: 20px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  details.vignette > summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--vignette-text);
+    list-style: none;
+  }
+  details.vignette > summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.15s;
+    font-size: 11px;
+    color: var(--vignette-text);
+  }
+  details.vignette[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  details.vignette > summary:hover {
+    color: #5a4100;
+  }
+  details.vignette[open] > summary {
+    margin-bottom: 10px;
+  }
+  /* "For the technically curious" appendix - more subdued */
+  details.tech {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    padding: 10px 16px;
+    margin: 18px 0;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+  details.tech > summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+    list-style: none;
+  }
+  details.tech > summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.15s;
+    font-size: 10px;
+  }
+  details.tech[open] > summary::before { transform: rotate(90deg); }
+  details.tech[open] > summary { margin-bottom: 8px; }
+  /* Output samples — shown in monospace block to mimic the rendered note */
+  .output-sample {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-wrap;
+    border-radius: 0 4px 4px 0;
+  }
+  .output-sample .label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-deep);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  /* Tech link at end of each section */
+  .tech-link {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 32px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+    font-style: italic;
+  }
+  /* Mermaid container styling */
+  .mermaid {
+    background: var(--panel);
+    padding: 18px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(74, 111, 165, 0.08);
+  }
+  /* Placeholder styling — visible during draft phase */
+  .placeholder {
+    background: #fef2f2;
+    border: 1px dashed #fca5a5;
+    padding: 14px 18px;
+    color: #991b1b;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  /* Page header banner */
+  .page-header {
+    grid-column: 1 / -1;
+    padding: 22px 40px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+    color: var(--bg);
+    border-bottom: 1px solid var(--rule);
+  }
+  .page-header .h-title {
+    font-family: var(--font-sans);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .page-header .h-sub {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    opacity: 0.88;
+    margin-top: 4px;
+  }
+  .page-header .h-verified {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    opacity: 0.72;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+  }
+  .page-header .h-verified code {
+    background: rgba(255,255,255,0.15);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11.5px;
+  }
+  .page-header .h-verified a {
+    color: var(--bg);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  /* Responsive — narrow screens */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+    }
+    .content { padding: 24px 20px 60px 20px; }
+  }
+  @media print {
+    .toc { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; padding: 0; }
+    details { open: true; }
+    details > summary { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <header class="page-header">
+    <div class="h-title">Autism A&amp;P Builder — A clinician's guide to how it decides</div>
+    <div class="h-sub">Plain-English companion to the technical reference at <code>docs/branching-logic.md</code></div>
+    <div class="h-verified">Last verified against commit: <code>413b336</code> · Living document — see <a href="#s12">§12 maintenance</a></div>
+  </header>
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="brand">
+      <div class="title">A clinician's guide</div>
+      <div class="sub">How the tool decides what to put in your note</div>
+    </div>
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s0">About this guide &amp; how the tool runs</a></li>
+      <li><a href="#s1">How the tool turns your inputs into a finished note</a></li>
+      <li><a href="#s2">How the tool tailors output to the patient's age</a></li>
+      <li><a href="#s3">Why the tool asks for two severity ratings, not one</a></li>
+      <li><a href="#s4">How the tool checks whether you've met the DSM-5 bar</a></li>
+      <li><a href="#s5">When the ABA and IEP Letter tabs appear (and when they hide)</a></li>
+      <li><a href="#s6">What happens when you check a comorbidity</a></li>
+      <li><a href="#s7">How therapy and referral recommendations are decided — and how to override them</a></li>
+      <li><a href="#s8">How the tool handles pronouns and gendered language</a></li>
+      <li><a href="#s9">What goes into the ABA Letter, and what's deliberately left out</a></li>
+      <li><a href="#s10">What goes into the IEP Letter, and the trauma opt-in</a></li>
+      <li><a href="#s11">Places where the tool can quietly go wrong — and what to watch for</a></li>
+      <li><a href="#s12">How this document is maintained</a></li>
+    </ol>
+  </nav>
+
+  <main class="content">
+
+    <section id="s0">
+      <h1><span class="num">0</span>About this guide &amp; how the tool runs</h1>
+
+      <p class="lede">This is a plain-English companion to the technical reference <code>docs/branching-logic.md</code>. It explains how the Autism A&amp;P Builder decides what to put in your generated note, ABA letter, and IEP letter — without requiring you to read code or use Git. The goal is to give you enough understanding to <em>predict</em>, <em>trust</em>, <em>spot</em>, and <em>explain</em> the tool's behavior to a colleague.</p>
+
+      <h2>How to open the tool</h2>
+
+      <p>The Autism A&amp;P Builder is a single HTML file (<code>autism-ap-builder.html</code>). Double-click it; it opens in any modern browser (Chrome, Edge, Firefox, Safari). No installation, no login, no internet connection required for the tool itself.</p>
+
+      <h2>Where your inputs live</h2>
+
+      <p>Everything you enter stays on your computer. The tool makes no network requests, sends no data to any server, and stores nothing on a remote service. PHI is safe to enter; nothing leaves your machine. The trade-off: there is also <strong>no "save" function</strong>. If you close the browser tab, your inputs are gone. The intended workflow is: fill out the form for one patient, copy the output to Epic (or wherever it belongs), then close. Treat each session as a one-shot.</p>
+
+      <h2>What "copy to Epic" actually does</h2>
+
+      <p>The copy buttons format the output specifically for paste-into-Epic — they convert the bracket placeholders (the yellow-highlighted <code>{...}</code> fields) into Epic's <code>***</code> cursor-stop syntax. This lets you tab through the placeholders in Epic after pasting, filling in patient-specific details (dose, date, etc.) without leaving the keyboard. The preview area shows the placeholders highlighted; the clipboard receives the Epic-formatted version.</p>
+
+      <h2>How to use this page</h2>
+
+      <p>This is a reference doc — read it once cover-to-cover if you're learning the tool, then come back to specific sections when you want to look something up. The table of contents on the left jumps to each section. Within each section, the "Example: see this in action" boxes are collapsed by default; click to expand. The "for the technical detail" link at the bottom of each section takes you to the matching section of the technical reference for the codebase-level explanation.</p>
+
+      <h2>A note about acronyms</h2>
+
+      <p>This guide assumes familiarity with general clinical terms (DSM-5, ICD-10, comorbidity, ABA, IEP), but expands less common ones on first use. If you encounter an acronym that isn't expanded somewhere on the page, that's a documentation gap — flag it.</p>
+    </section>
+
+    <section id="s1">
+      <h1><span class="num">1</span>How the tool turns your inputs into a finished note</h1>
+
+      <p class="lede">There is no "save" button, and nothing is stored separately. Every time you check a box or change a dropdown, the tool re-builds your entire note from scratch using your current inputs. The A&amp;P note, the ABA letter, and the IEP letter are not three different templates; they are three different views of the same underlying information.</p>
+
+      <p>This mental model — <em>your inputs are the single source of truth, and the outputs are derived from them in real time</em> — explains nearly everything else in this guide. When you change a comorbidity checkbox, the comorbidity appears in your A&amp;P note, but it may also trigger a new referral in your plan, add language to the IEP letter, and shift the ABA letter's justification — because all of those outputs are reading from the same place.</p>
+
+      <h2>The end-to-end picture</h2>
+
+      <div class="mermaid">
+flowchart LR
+    A["What you enter:<br/>age, severity, criteria,<br/>comorbidities, needs..."] --> B["Tool re-builds<br/>the note instantly"]
+    B --> C["A&amp;P Note"]
+    B --> D["ABA Letter<br/>(when eligible)"]
+    B --> E["IEP Letter<br/>(when eligible)"]
+    C --> F["Copy to<br/>Epic / chart"]
+    D --> F
+    E --> F
+    style D stroke-dasharray: 5 5
+    style E stroke-dasharray: 5 5
+      </div>
+
+      <p>The dashed boxes for the ABA and IEP letters reflect that they only appear as tabs when your patient is eligible for them. (Section <a href="#s5">5</a> covers exactly when they appear and disappear.) The A&amp;P note tab is always visible.</p>
+
+      <h2>Three practical consequences</h2>
+
+      <p><strong>1. Changing an input changes everything that depends on it.</strong> If you copy the note to Epic, then go back and uncheck a comorbidity, your next copy will reflect the change — including in places you might not have expected, like the ABA letter's medical-necessity paragraph.</p>
+
+      <p><strong>2. You can go back and change anything at any time.</strong> The tool re-renders from your <em>current</em> state on every change, so an input you set early in the visit can always be revised later — the output updates immediately to reflect it. The form does, however, have a natural top-to-bottom flow: some controls appear only after their parent input is set (for example, the trauma IEP opt-in only appears after you check the trauma comorbidity, and the cognitive-data-source question only appears after you select an ID or GDD profile). Filling the form in roughly its visual order helps make sure you see every relevant control; revising in any order is always safe.</p>
+
+      <p><strong>3. What you see in the preview is exactly what you will copy.</strong> There is no hidden formatting, no "template" being filled in behind the scenes. If the preview reads correctly, the paste into Epic will too.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are working on a note for a 4-year-old being evaluated for autism. You have entered the basics — preschool age group, suspected ASD, some social communication concerns — and you are looking at the preview.</p>
+        <p>Now you check the <em>anxiety</em> comorbidity box. Without you doing anything else, the preview re-builds:</p>
+        <ul>
+          <li>The Assessment list grows a new line: <em>"Anxiety disorder"</em></li>
+          <li>The Plan grows three new lines: a psychiatry referral, a psychotherapy referral, and PCIT (Parent-Child Interaction Therapy, because the patient's age qualifies for the parent-coaching evidence base)</li>
+          <li>The IEP Letter's accommodations section grows new bullets for a calm-down space and graduated exposure</li>
+          <li>An anxiety-specific override pill appears in the right-side panel, in case you want to suppress one of the new referrals</li>
+        </ul>
+        <p>One checkbox; four downstream changes. None of it requires a save, a "regenerate," or another click. The note in your preview right now is the note you would paste.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#1-state-model--output-pipeline">§1 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s2">
+      <h1><span class="num">2</span>How the tool tailors output to the patient's age</h1>
+
+      <p class="lede">Age is the most consulted input in the entire tool. More than fifteen separate decisions read your age-group selection — what services to recommend, which letter tabs to show, what language to use in the ABA letter, which screenings apply. Picking the right group matters; almost everything downstream pivots on it.</p>
+
+      <h2>The five age groups</h2>
+
+      <p>The tool offers five groups. The age ranges are clinical conventions, not hard cutoffs — pick the group whose developmental window best fits the patient.</p>
+
+      <ul>
+        <li><strong>Toddler</strong> (about 12–35 months) — IDEA Part C eligible (the federal early-intervention program for ages 0–2), no IEP yet, Early Steps is the Florida entry point</li>
+        <li><strong>Preschool</strong> (about 3–5 years) — FDLRS (Florida Diagnostic &amp; Learning Resources System) available if not yet in public school; NDBI-style (Naturalistic Developmental Behavioral Intervention) ABA framing</li>
+        <li><strong>School-age</strong> (about 6–11 years) — school-based services under IDEA Part B (ages 3–21), FBA-style (Functional Behavior Assessment) ABA framing</li>
+        <li><strong>Adolescent</strong> (about 12–17 years) — self-advocacy and consent education enter the picture</li>
+        <li><strong>Young adult</strong> (18+) — workplace and legal-awareness framing</li>
+      </ul>
+
+      <h2>The big shifts to know about</h2>
+
+      <p><strong>The IEP Letter tab disappears for toddlers.</strong> Toddlers receive IDEA Part C services (in Florida, through Early Steps), not IEPs (which begin at age 3 under IDEA Part B). If you mark your patient as a toddler, the IEP Letter tab simply isn't there — by design, so you don't accidentally direct services to the wrong system.</p>
+
+      <p><strong>The ABA letter language changes between young and school-age.</strong> For toddlers and preschoolers, the letter frames ABA in NDBI terms and cites the EIBI (Early Intensive Behavioral Intervention) evidence base. For school-age and older, it shifts to FBA-driven, functional-behavior language. Both are clinically appropriate to their age groups, but they read differently — useful to know if you're comparing letters across patients.</p>
+
+      <p><strong>"Academics" is not a valid ABA target for school-age patients.</strong> If you check the academic-needs box for a school-age patient, the tool will <em>not</em> add "academics" to the ABA target list. This is intentional: school-age academic instruction is the school district's obligation under IDEA (Individuals with Disabilities Education Act), and listing it in an ABA letter creates a real risk of insurance denial. For toddlers and preschoolers, academics can appear (pre-academic skills are pre-Part B and fair game).</p>
+
+      <p><strong>Several recommendations are age-gated.</strong> Social skills groups exclude toddlers (developmental fit) and young adults (psychotherapy is recommended instead). QbTest (a computerized attention measure used in ADHD evaluation) excludes patients under 6 (instrument norms). Early Steps fires only for toddlers; FDLRS only for preschoolers not yet in public school. The right group selection makes the right referrals show up automatically.</p>
+
+      <h2>What does <em>not</em> depend on age</h2>
+
+      <p>A few things look like they should be age-gated but aren't — and shouldn't be. DSM-5 criteria (Section <a href="#s4">4</a>) apply identically across ages. The severity levels (Section <a href="#s3">3</a>) mean the same thing for a toddler and a young adult. The comorbidity list and its downstream effects (Section <a href="#s6">6</a>) don't change with age. If you find yourself wishing one of these <em>did</em> depend on age, double-check the clinical rationale — the age-independence is deliberate.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You're documenting a patient and you change the age group from <em>preschool</em> to <em>school-age</em>. With no other changes, here's what shifts:</p>
+        <ul>
+          <li>The ABA letter's evidence section drops the EIBI/NDBI reference and shifts to FBA-driven language</li>
+          <li>If you had previously marked academic needs, the "academics" ABA target disappears from the target list</li>
+          <li>The FDLRS referral disappears from the Plan (FDLRS is preschool-only)</li>
+          <li>The QbTest recommendation becomes available (if ADHD is suspected)</li>
+          <li>If your patient was being referred to Early Steps, that referral disappears (toddler-only — preschool already excluded it)</li>
+          <li>The IEP Letter tab, which was visible, stays visible — school-age qualifies (assuming you've already selected a school-document status, which is the IEP tab's other gate; see Section <a href="#s5">5</a>)</li>
+        </ul>
+        <p>None of these are bugs; each reflects a real clinical or regulatory difference between the two age windows.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#2-age-group-routing">§2 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s3">
+      <h1><span class="num">3</span>Why the tool asks for two severity ratings, not one</h1>
+
+      <p class="lede">DSM-5 doesn't let you assign a single "Level 2" to ASD. It requires two separate severity ratings — one for social communication, one for restricted and repetitive behaviors — because a patient can need substantial support in one domain and only modest support in the other. The tool enforces this by giving you two independent dropdowns.</p>
+
+      <h2>What the two dropdowns mean</h2>
+
+      <p><strong>Social Communication (SC)</strong> rates how much support the patient needs with social-communication deficits — initiating interactions, maintaining conversation, reading social cues, integrating verbal and nonverbal communication.</p>
+
+      <p><strong>Restricted/Repetitive Behaviors (RRB)</strong> rates how much support the patient needs with restricted interests, repetitive behaviors, insistence on sameness, and sensory differences.</p>
+
+      <p>Each dropdown has the standard three options: Level 1 (requiring support), Level 2 (requiring substantial support), Level 3 (requiring very substantial support). You can also leave one or both blank.</p>
+
+      <h2>How the tool combines the two</h2>
+
+      <p>Several outputs need a single severity number — the ABA letter's medical-necessity paragraph, the IEP letter's diagnosis line, the badge in the header. When the tool needs one number, it uses the <em>higher</em> of the two domain ratings.</p>
+
+      <p>This is intentional and clinically conservative. A patient at Level 2 for restricted/repetitive behaviors and Level 1 for social communication gets the Level 2 narrative in their ABA letter — supporting the higher intensity of services their RRB severity justifies. If you'd prefer the letter to reflect the lower number, the override system (Section <a href="#s7">7</a>) won't help you here; you'd need to change the rating itself.</p>
+
+      <p>If you set only one of the two dropdowns, the tool uses whichever one you set. If you leave both blank, the letter falls back to language like <em>"(level not specified)"</em> — a signal to come back and complete the rating before sending.</p>
+
+      <h2>Where each rating shows up separately</h2>
+
+      <p>The A&amp;P note prints both ratings independently, with their separate justification fields if you wrote them. The diagnosis line in both letters reads something like <em>"Level 2 (Requiring Substantial Support) — Social Communication and Restricted/Repetitive Behaviors,"</em> naming both domains so the receiving clinician sees the full picture.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You're documenting a verbally fluent 8-year-old with significant sensory differences, intense restricted interests, and rigidity around transitions. Their social communication is mildly impaired but generally functional.</p>
+        <p>You set <strong>Social Communication = Level 1</strong> and <strong>Restricted/Repetitive Behaviors = Level 2</strong>.</p>
+        <p>Here's what happens to the outputs:</p>
+        <ul>
+          <li>The A&amp;P note prints both ratings on separate lines, with whatever justification text you wrote for each</li>
+          <li>The ABA letter's medical-necessity paragraph uses the <strong>Level 2</strong> narrative (the higher of the two), supporting more intensive ABA hours</li>
+          <li>The IEP letter's diagnosis label reads <em>"Level 2 (requiring substantial support)"</em></li>
+          <li>The badge in the form header shows a combined "2" rating, with smaller ring indicators for each domain</li>
+        </ul>
+        <p>If your patient's pattern were reversed (Level 2 SC, Level 1 RRB), the combined level would still be Level 2 — the rule picks the higher domain, not the average.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#3-asd-severity-two-domain-model">§3 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s4">
+      <h1><span class="num">4</span>How the tool checks whether you've met the DSM-5 bar</h1>
+
+      <p class="lede">DSM-5 requires five things for an ASD diagnosis: all three of Criterion A (social-communication deficits), at least two of Criterion B (restricted/repetitive behaviors), and Criteria C, D, and E all met. The tool watches your selections in real time and tells you whether you've crossed the bar — but it won't stop you from documenting an exception you intend to make.</p>
+
+      <h2>The gate</h2>
+
+      <div class="mermaid">
+flowchart TD
+    A["Have you checked all 3<br/>Criterion A items?<br/>(a1, a2, a3)"] -->|Yes| B
+    A -->|No| X
+    B["Have you checked at<br/>least 2 Criterion B items?<br/>(b1, b2, b3, b4)"] -->|Yes| C
+    B -->|No| X
+    C["Are Criteria C, D,<br/>and E all checked?"] -->|Yes| Y["✓ DSM-5 criteria<br/>complete"]
+    C -->|No| X["⚠ Incomplete<br/>(warning if you mark<br/>diagnosis 'confirmed')"]
+      </div>
+
+      <p>Reading the diagram top to bottom: you need all three Criterion A items, at least two of the four Criterion B items, and all three of C/D/E. Anything less puts you in the "incomplete" state.</p>
+
+      <h2>What the criteria actually are</h2>
+
+      <p><strong>Criterion A</strong> is the social-communication trio: <em>(a1)</em> deficits in social-emotional reciprocity, <em>(a2)</em> deficits in nonverbal communicative behaviors, <em>(a3)</em> deficits in developing and maintaining relationships. You need <strong>all three</strong>.</p>
+
+      <p><strong>Criterion B</strong> is the restricted/repetitive set: <em>(b1)</em> stereotyped or repetitive motor movements or speech, <em>(b2)</em> insistence on sameness or routines, <em>(b3)</em> highly restricted interests, <em>(b4)</em> hyper- or hypo-reactivity to sensory input. You need <strong>at least two of the four</strong>.</p>
+
+      <p><strong>Criterion C</strong>: symptoms present in early developmental period.<br>
+      <strong>Criterion D</strong>: symptoms cause clinically significant impairment.<br>
+      <strong>Criterion E</strong>: not better explained by intellectual disability or global developmental delay alone.</p>
+
+      <h2>What happens when criteria are incomplete</h2>
+
+      <p>If you mark the diagnosis status as <em>confirmed</em> but the criteria don't all check out, the tool displays a warning banner at the top of the form: something like <em>"⚠ DSM-5 criteria incomplete — A: 2/3 · B: 1/4 · C/D/E: missing C."</em> The banner is intentionally prominent but it does <em>not</em> block you. The tool will still generate a confirmed-ASD A&amp;P note and ABA letter if you proceed — on the assumption that you may have a clinically valid reason to document an exception (re-evaluation, follow-up after prior diagnosis, etc.). The warning's job is to make sure the omission is deliberate, not accidental.</p>
+
+      <p>If your diagnosis status is <em>suspected</em> or <em>ruling out</em>, no warning fires — partial criteria are expected at that stage.</p>
+
+      <h2>One auto-cascade worth knowing about</h2>
+
+      <p>Checking Criterion <strong>B2</strong> (insistence on sameness) automatically marks "rigidity" as a behavioral need behind the scenes, which in turn adds "transitions" as an ABA target. This is the only criterion that auto-cascades into the needs and targets sections — chosen because B2 and rigidity are operationally the same thing. Unchecking B2 reverses both. If you ever wonder why "transitions" suddenly appeared in your ABA target list, this is usually why.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are documenting a 5-year-old with clear social-communication deficits across the board, intense restricted interests, and notable sensory hyper-reactivity, but no observed motor stereotypies or insistence on sameness.</p>
+        <p>You check a1, a2, a3 (Criterion A complete), b3 and b4 (two of four Criterion B items — meets the minimum), and C, D, E. The badge in the header turns green: <em>✓ DSM-5 criteria complete.</em></p>
+        <p>Now you change your mind and uncheck b3. Criterion B drops to 1 out of 4 (just b4 remains), below the threshold. The badge turns yellow and a banner appears: <em>"⚠ DSM-5 criteria incomplete — A: 3/3 · B: 1/4 · C/D/E: met."</em> If you leave the diagnosis status set to <em>confirmed</em>, the warning persists but the letters still generate. If you change diagnosis status to <em>suspected</em>, the warning disappears.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#4-dsm-5-criteria-mapping">§4 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s5">
+      <h1><span class="num">5</span>When the ABA and IEP Letter tabs appear (and when they hide)</h1>
+
+      <p class="lede">The A&amp;P Note tab is always there. The ABA Letter and IEP Letter tabs only appear when your patient is eligible — when generating the letter would actually make clinical and regulatory sense. If a tab disappears while you're looking at it, the tool automatically switches you back to the A&amp;P Note so you don't end up staring at an empty pane.</p>
+
+      <h2>The visibility rules</h2>
+
+      <div class="mermaid">
+flowchart TD
+    A[A&amp;P Note tab] -->|Always| AV[Visible]
+    B[ABA Letter tab] --> B1{Diagnosis status<br/>= 'confirmed'?}
+    B1 -->|No| BH1[Hidden]
+    B1 -->|Yes| B2{ABA recommendation<br/>included for this patient?}
+    B2 -->|No| BH2[Hidden]
+    B2 -->|Yes| BV[Visible]
+    C[IEP Letter tab] --> C1{School-document<br/>status selected?}
+    C1 -->|No| CH1[Hidden]
+    C1 -->|Yes| C2{Patient is<br/>NOT a toddler?}
+    C2 -->|No, toddler| CH2[Hidden]
+    C2 -->|Yes| CV[Visible]
+      </div>
+
+      <h2>Why each gate exists</h2>
+
+      <p><strong>The ABA Letter requires a confirmed diagnosis.</strong> The letter is a medical-necessity attestation for insurance authorization, and writing one without a confirmed ASD diagnosis would be clinically inappropriate. There is no way to generate this letter for a suspected diagnosis — you'd have to confirm first. The override system (Section <a href="#s7">7</a>) can force ABA to "included" for a patient who otherwise wouldn't trigger it, but it cannot bypass the confirmed-diagnosis check.</p>
+
+      <p><strong>The ABA Letter also requires ABA to be a recommended service.</strong> If your patient's profile doesn't trigger any ABA-suggesting condition (severity, behavior, age, etc.), the tab stays hidden. If you believe ABA is warranted but the auto-rule disagrees, the override pill for ABA will force the tab to appear (assuming the diagnosis is also confirmed).</p>
+
+      <p><strong>The IEP Letter requires a school-document selection.</strong> If you haven't indicated whether your patient is in public school, private school, or homeschool, the tool doesn't know how to frame the letter — so the tab stays hidden until you make that choice.</p>
+
+      <p><strong>The IEP Letter is never available for toddlers.</strong> Toddlers receive Part C services through Early Steps; IEPs begin at age 3 under Part B. Writing an IEP letter for a toddler would route services to the wrong system. (See Section <a href="#s2">2</a>.)</p>
+
+      <h2>What happens when a tab disappears mid-edit</h2>
+
+      <p>If you're looking at the ABA Letter tab and then change something that hides it (e.g., you switch diagnosis status from <em>confirmed</em> to <em>suspected</em>), the tool automatically jumps you back to the A&amp;P Note. The same happens with the IEP Letter tab. This prevents the confusing experience of "I was just here a second ago — where did the content go?"</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You're working on a confirmed-ASD note for an 8-year-old in public school. Both the ABA Letter and IEP Letter tabs are visible. You're currently viewing the ABA Letter tab.</p>
+        <p>You realize you marked the diagnosis as <em>confirmed</em> too early — you actually want it set to <em>suspected</em> while you finalize one more screening. You change the dropdown.</p>
+        <p>Immediately:</p>
+        <ul>
+          <li>The ABA Letter tab disappears (confirmed-diagnosis gate now fails)</li>
+          <li>You're automatically switched to the A&amp;P Note tab</li>
+          <li>The IEP Letter tab stays visible (it doesn't depend on the diagnosis being confirmed)</li>
+        </ul>
+        <p>If you later switch back to <em>confirmed</em>, the ABA Letter tab reappears — and you can click it again. The tool didn't delete or reset anything; the letter content rebuilds from your current inputs the moment the tab is available.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#5-output-tab-visibility">§5 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s6">
+      <h1><span class="num">6</span>What happens when you check a comorbidity</h1>
+
+      <p class="lede">Checking a comorbidity box is rarely a one-line change. Most comorbidities trigger a coordinated cascade: the comorbidity appears in your A&amp;P note with its ICD-10 code, the IEP letter grows new accommodation language, and one or more therapy or referral recommendations may fire. The cascade is intentional — a single click produces a full documentation update.</p>
+
+      <h2>The cascade in plain language</h2>
+
+      <p>For each comorbidity you check, the tool does up to three things:</p>
+
+      <ol>
+        <li><strong>Adds it to the A&amp;P note</strong> with the correct ICD-10 code and clinical phrasing. (You can also separately decide whether each comorbidity appears in the Plan section via a "show in Plan" checkbox.)</li>
+        <li><strong>Adds matching language to the IEP letter</strong> — education-focused phrasing about classroom accommodations, executive function supports, mealtime protocols, etc.</li>
+        <li><strong>Fires any therapy or referral recommendations</strong> that the comorbidity warrants — e.g., anxiety triggers psychiatry, psychotherapy, and PCIT (for younger patients). See Section <a href="#s7">7</a> for how the recommendation rules work.</li>
+      </ol>
+
+      <h2>A representative sample</h2>
+
+      <p>The tool supports more than twenty comorbidity options. The table below is a representative sample showing the cascade pattern; the full mapping is in the technical reference.</p>
+
+      <table style="width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px;">
+        <thead><tr style="background:var(--accent-soft); text-align:left;">
+          <th style="padding:8px 10px; border:1px solid var(--rule);">If you check…</th>
+          <th style="padding:8px 10px; border:1px solid var(--rule);">A&amp;P note adds</th>
+          <th style="padding:8px 10px; border:1px solid var(--rule);">IEP letter adds</th>
+          <th style="padding:8px 10px; border:1px solid var(--rule);">Referrals fire</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">ADHD (combined)</td><td style="padding:8px 10px; border:1px solid var(--rule);">F90.2</td><td style="padding:8px 10px; border:1px solid var(--rule);">Executive-function accommodations</td><td style="padding:8px 10px; border:1px solid var(--rule);">Psychiatry, QbTest (school-age+)</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">Anxiety</td><td style="padding:8px 10px; border:1px solid var(--rule);">F41.x</td><td style="padding:8px 10px; border:1px solid var(--rule);">Calm space, gradual exposure</td><td style="padding:8px 10px; border:1px solid var(--rule);">Psychiatry, psychotherapy, PCIT</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">SLD — reading (dyslexia)</td><td style="padding:8px 10px; border:1px solid var(--rule);">F81.0</td><td style="padding:8px 10px; border:1px solid var(--rule);">Text-to-speech, audiobooks, extended time</td><td style="padding:8px 10px; border:1px solid var(--rule);">— (no medical referral)</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">DCD (motor coordination)</td><td style="padding:8px 10px; border:1px solid var(--rule);">F82</td><td style="padding:8px 10px; border:1px solid var(--rule);">Handwriting / fine-motor accommodations</td><td style="padding:8px 10px; border:1px solid var(--rule);">OT, PT</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">Epilepsy</td><td style="padding:8px 10px; border:1px solid var(--rule);">G40.x</td><td style="padding:8px 10px; border:1px solid var(--rule);">Seizure protocol, post-ictal accommodations</td><td style="padding:8px 10px; border:1px solid var(--rule);">Neurology</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">ARFID</td><td style="padding:8px 10px; border:1px solid var(--rule);">F50.82</td><td style="padding:8px 10px; border:1px solid var(--rule);">Safe foods at meals, no staff pressure</td><td style="padding:8px 10px; border:1px solid var(--rule);">GI</td></tr>
+          <tr><td style="padding:8px 10px; border:1px solid var(--rule);">Trauma</td><td style="padding:8px 10px; border:1px solid var(--rule);">In clinical narrative</td><td style="padding:8px 10px; border:1px solid var(--rule);"><strong>Only if you opt in</strong> (see below)</td><td style="padding:8px 10px; border:1px solid var(--rule);">Trauma-informed therapy</td></tr>
+        </tbody>
+      </table>
+
+      <h2>The trauma opt-in</h2>
+
+      <p>Trauma is the one comorbidity that does <em>not</em> automatically appear in the IEP letter. The reason: the IEP letter goes into the educational record, which has different privacy and access properties than the medical record. By default, the tool documents trauma in your A&amp;P note (medical chart) but omits it from the IEP letter. If you decide the school needs to know — to coordinate trauma-informed accommodations, for example — you can check a small opt-in box that appears once trauma is selected. When you opt in, a warning banner appears at the top of the IEP letter preview to make the inclusion deliberate.</p>
+
+      <h2>One mutual-exclusion rule</h2>
+
+      <p>Specific learning disabilities have a small twist: if you check any of the confirmed-domain options (reading, math, or written expression), the "suspected SLD" box clears automatically — and vice versa. The two states are clinically incompatible (a patient can't be both certainly diagnosed and uncertainly suspected with the same condition), so the tool enforces the exclusion for you.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You're documenting a 7-year-old with confirmed ASD, attention concerns, and reading struggles. You check three comorbidity boxes: <strong>ADHD (combined)</strong>, <strong>SLD — reading</strong>, and <strong>anxiety</strong>.</p>
+        <p>With three clicks, here's what the documentation now contains:</p>
+        <ul>
+          <li>The Assessment list grows three lines with the F90.2, F81.0, and F41.x codes</li>
+          <li>The Plan adds: psychiatry referral (for ADHD and anxiety), psychotherapy referral (for anxiety), QbTest (school-age, ADHD), and PCIT is suggested because of the patient's age</li>
+          <li>The IEP letter accommodations section grows: extended time and preferential seating (ADHD), text-to-speech and audiobooks (reading SLD), calm-down space and graduated exposure (anxiety)</li>
+          <li>The override panel grows new pills for each of the new referrals, in case you want to suppress one</li>
+        </ul>
+        <p>Total clicks: three. Total documentation produced: about 12 distinct additions across three outputs.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#6-comorbidity-cascade">§6 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s7">
+      <h1><span class="num">7</span>How therapy and referral recommendations are decided — and how to override them</h1>
+
+      <p class="lede">Every therapy and referral the tool can recommend goes through a two-step process. First, an automatic rule decides whether the recommendation would fire by default based on the patient's profile. Second, a per-recommendation override pill in the right-side panel lets you force it on, force it off, or accept the default. Eighteen separate rules cover everything from ABA to genetics to QbTest, and they all follow this same shape.</p>
+
+      <h2>The two-step shape</h2>
+
+      <div class="mermaid">
+flowchart LR
+    A["Patient profile<br/>(your inputs)"] --> B["Auto-rule<br/>(e.g. 'Should ABA fire<br/>for this patient?')"]
+    O["Override pill<br/>(auto / force-on / force-off)"] --> R
+    B --> R{"What does the<br/>override say?"}
+    R -->|Auto| RA["Use what the<br/>auto-rule decided"]
+    R -->|Force on| RY["Recommend it<br/>(regardless of rule)"]
+    R -->|Force off| RN["Don't recommend it<br/>(regardless of rule)"]
+      </div>
+
+      <p>Every recommendation in the tool follows this exact pattern. If you understand it for one recommendation, you understand it for all eighteen.</p>
+
+      <h2>What the auto-rules look at</h2>
+
+      <p>Each rule asks one clinical question and answers "yes" or "no." A few representative examples:</p>
+
+      <ul>
+        <li><strong>ABA</strong> fires if the patient is a toddler or preschooler, OR is minimally verbal, OR has confirmed intellectual disability, OR has significant adaptive impairment, OR has behavioral/safety needs, OR is at ASD Level 2 or 3 in either domain. (Any one of these is enough.)</li>
+        <li><strong>Genetics</strong> fires for any confirmed ASD diagnosis, OR — if diagnosis status is suspected — for any patient with intellectual disability, developmental regression, dysmorphic features, congenital anomalies, or focal neurological findings.</li>
+        <li><strong>QbTest</strong> fires when ADHD is suspected AND the patient is school-age or older. (The age gate is because QbTest's normative data starts at age 6.)</li>
+        <li><strong>Early Steps</strong> fires only when the patient is a toddler AND a diagnosis is either confirmed or suspected.</li>
+      </ul>
+
+      <p>The other fourteen rules follow the same pattern — each one a focused clinical question with a yes/no answer. The technical reference has the full list with line-by-line conditions.</p>
+
+      <h2>The override pills</h2>
+
+      <p>Each rule has a pill in the right-side panel labeled with the recommendation name. The pill cycles through three states each time you click it: <strong>auto → force on → force off → auto</strong>.</p>
+
+      <ul>
+        <li><strong>Auto</strong> (the default) — the recommendation follows whatever the auto-rule decided. The pill background is soft blue when the rule says yes, or soft gray when the rule says no. You can tell at a glance which recommendations the tool is suggesting.</li>
+        <li><strong>Force on</strong> — the recommendation is included regardless of the rule. The pill turns a saturated green. Use this when you want to recommend something the auto-rule didn't catch.</li>
+        <li><strong>Force off</strong> — the recommendation is excluded regardless of the rule. The pill turns dim gray. Use this when the auto-rule fires something you've considered and decided against (e.g., the family declined a referral).</li>
+      </ul>
+
+      <p>The visual distinction between "auto says yes" (soft blue) and "force on" (saturated green) is intentional: at a glance, you can tell which recommendations came from the tool's logic and which you actively pushed in. This matters when you're reviewing a colleague's note or your own note from a previous visit — the override states are a record of your clinical judgment, not just passive defaults.</p>
+
+      <h2>One important thing the override does <em>not</em> do</h2>
+
+      <p>The override system controls whether a recommendation is included. It does <strong>not</strong> bypass the hard gates on the letter tabs (Section <a href="#s5">5</a>). You can force ABA "on" for a patient with a suspected (not confirmed) diagnosis — the ABA section will appear in the form, and the recommendation will fire — but the ABA Letter tab will still be hidden until you change the diagnosis status to confirmed. The override is for clinical content; the letter gate is for documentation appropriateness.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are documenting a 4-year-old with confirmed ASD, behavior concerns, and Level 2 social-communication severity. No overrides set yet — everything is on auto.</p>
+        <p>The ABA pill turns soft blue (auto says yes — multiple triggers fire) and the ABA Letter tab is visible.</p>
+        <p>The patient's parents have asked you to also pursue a genetics consult, even though no specific genetic features are present. The Genetics pill is currently soft blue (the auto-rule fired because the diagnosis is confirmed). Genetics is already going to be recommended — nothing to do.</p>
+        <p>But on PT: the auto-rule sees no gross-motor needs and no DCD comorbidity, so the PT pill is soft gray (auto says no). The parents have flagged that the child trips often and tires quickly on stairs — you want PT recommended anyway. You click the PT pill once: it turns saturated green (force on). The Plan section now shows a PT referral, and any letter content that mentions services now includes PT.</p>
+        <p>Later, you decide that the psychiatry recommendation that auto-fired (because of severe behaviors) is too aggressive for this family right now — they want to try behavioral interventions first. You click the Psychiatry pill twice: auto → force on → force off. It turns dim gray. The psychiatry line disappears from the Plan, and your decision-to-defer is recorded in the override state.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#7-therapy-recommendations--override-system">§7 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s8">
+      <h1><span class="num">8</span>How the tool handles pronouns and gendered language</h1>
+
+      <p class="lede">The tool generates a lot of prose — full paragraphs about the patient that read naturally as English sentences. To do that, it needs to know which pronouns to use. You pick from <em>he</em>, <em>she</em>, <em>they</em>, or leave it blank for a noun-phrase fallback ("the child" or "the individual" depending on age). The tool then handles the grammar for you.</p>
+
+      <h2>The four pronoun options</h2>
+
+      <ul>
+        <li><strong>he</strong> — "He demonstrates...", "his profile...", "himself..."</li>
+        <li><strong>she</strong> — "She demonstrates...", "her profile...", "herself..."</li>
+        <li><strong>they</strong> — singular "they"; "They demonstrate...", "their profile...", "themselves..." (note the plural verb form)</li>
+        <li><strong>blank</strong> — falls back to a noun phrase: "the child" for younger patients, "the individual" for adolescents and young adults</li>
+      </ul>
+
+      <h2>Why singular "they" is a small grammatical landmine</h2>
+
+      <p>If you pick <em>they</em>, every sentence about the patient needs the plural verb form. "They demonstrate" is correct; "They demonstrates" reads as broken English. The tool handles this by translating verbs through a small lookup table when the pronoun is set to <em>they</em> — "demonstrates" becomes "demonstrate," "is" becomes "are," "has" becomes "have," and so on.</p>
+
+      <p>The table covers the verbs the tool actually uses in its generated prose. If a future verb gets added to the prose without being added to this lookup table, the singular-they sentence will read ungrammatically without any warning to you. There's a maintenance audit (in the technical reference) that the tool's author runs when prose content is added, but it's not automatic.</p>
+
+      <h2>The noun-phrase fallback</h2>
+
+      <p>When you leave the pronoun field blank, the tool falls back to a generic noun phrase keyed to age:</p>
+
+      <ul>
+        <li>Toddler, preschool, school-age → <strong>"the child"</strong></li>
+        <li>Adolescent, young adult → <strong>"the individual"</strong></li>
+      </ul>
+
+      <p>This is meant as a graceful default for cases where the pronoun hasn't been entered yet or the family hasn't specified. Note that this generic phrasing also affects how possessives read ("the child's profile") and the reflexive form (recently fixed to use "themselves" — the singular-they reflexive — to avoid the awkward "the childself" output the prior version produced).</p>
+
+      <h2>What this means in practice</h2>
+
+      <p><strong>Pick the pronoun early.</strong> Pronoun selection threads through every paragraph the tool generates. Changing it mid-edit is fine — the tool re-renders the note instantly — but it's one of those inputs that's easy to forget.</p>
+
+      <p><strong>If the family has specified a pronoun, use it.</strong> The tool supports <em>he</em>, <em>she</em>, and singular <em>they</em>. If the family has indicated a preference, the prose should reflect it; the noun-phrase fallback is a last resort, not a default.</p>
+
+      <p><strong>If you spot ungrammatical output, flag it.</strong> A "they presents" or "they has" anywhere in your generated note is a sign that a verb was missed during a content addition. Report it so the lookup table can be updated.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are documenting a verbally fluent 10-year-old whose family has indicated they use <em>they/them</em> pronouns. You set the pronoun dropdown to <em>they</em>.</p>
+        <p>The A&amp;P note's prose now reads naturally with the plural verb forms:</p>
+        <div class="output-sample"><span class="label">Excerpt from A&amp;P note</span>They are a 10-year-old presenting for a follow-up evaluation of autism spectrum disorder. They demonstrate good basic conversational skills with familiar adults but have difficulty initiating play with peers. Their sensory profile is notable for hyper-reactivity to loud environments...</div>
+        <p>Compare to the same note with pronoun set to <em>blank</em>:</p>
+        <div class="output-sample"><span class="label">Excerpt with blank pronoun (school-age fallback)</span>The child is a 10-year-old presenting for a follow-up evaluation of autism spectrum disorder. The child demonstrates good basic conversational skills with familiar adults but has difficulty initiating play with peers. The child's sensory profile is notable for hyper-reactivity to loud environments...</div>
+        <p>Both are grammatical and clinically usable; the pronoun version is more natural for clinical reading and respects the family's stated preference.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#8-pronoun--verb-agreement">§8 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s9">
+      <h1><span class="num">9</span>What goes into the ABA Letter, and what's deliberately left out</h1>
+
+      <p class="lede">The ABA Letter is a medical-necessity attestation for insurance authorization. Its content is assembled from your inputs in a specific order — diagnosis, severity, functional impairment, target behaviors, settings, and dosing — and a few things are intentionally omitted because including them would weaken the authorization. Understanding what's in (and what's not) helps you read the generated letter critically before sending.</p>
+
+      <h2>The hard gate</h2>
+
+      <p>The ABA Letter only generates when the diagnosis status is set to <em>confirmed</em>. There is no path to the letter from a suspected or rule-out status. (See Section <a href="#s5">5</a>.) This is by design: writing a medical-necessity letter without a confirmed diagnosis is clinically inappropriate.</p>
+
+      <h2>What the letter contains</h2>
+
+      <p><strong>A diagnosis line</strong> stating ASD with the combined severity level (the higher of your two domain ratings — see Section <a href="#s3">3</a>) and naming both domains. Example: <em>"Level 2 (Requiring Substantial Support) — Social Communication and Restricted/Repetitive Behaviors."</em></p>
+
+      <p><strong>A medical-necessity paragraph</strong> that explains why ABA is warranted for this specific patient. The paragraph lists the reasons the auto-rule fired — age, severity, behavior needs, safety concerns, etc. — and is the section most likely to determine whether the insurer authorizes.</p>
+
+      <p><strong>A functional impairment paragraph</strong> that describes the domains where the patient demonstrates clinically significant impairment, based on which needs categories you've checked (communication, behavior, social, sensory, motor, adaptive). If any safety flags are present (SIB, elopement, aggression, pica), the paragraph adds an urgency clause.</p>
+
+      <p><strong>A target list</strong> of behaviors ABA will address. Targets auto-populate from your needs and clinical-flag selections (see "How targets get populated" below). You can also manually add or remove targets via the checkboxes in the ABA section of the form.</p>
+
+      <p><strong>A settings section</strong> listing where ABA should be delivered (home, clinic, school, community, telehealth — whichever you checked) and the recommended hours per week.</p>
+
+      <p><strong>Specifiers</strong> that contextualize the diagnosis when relevant (intellectual disability, language impairment, genetic condition, etc.). Note the omissions below.</p>
+
+      <h2>How targets get populated</h2>
+
+      <p>The tool's "auto-populate ABA targets" feature watches your needs and clinical flag selections and adds matching targets automatically. For example, checking "elopement" under behavior needs auto-adds "reduce_elopement" to the target list; checking "expressive communication" auto-adds "functional_comm"; checking "menstrual care" under adaptive needs auto-adds "menstrual_care."</p>
+
+      <p><strong>This auto-population is one-directional — it only adds.</strong> If you uncheck a target manually, the tool will not re-add it the next time you open the form. This is intentional: it protects your manual curation from being overwritten by surprise re-population. The only exception is rigidity, which is tied to Criterion B2 (see Section <a href="#s4">4</a>) and resets if you uncheck B2.</p>
+
+      <p>Practical consequence: if you've manually removed a target you don't think applies, it stays removed. If you want it back, re-check it manually.</p>
+
+      <h2>What's deliberately left out</h2>
+
+      <p><strong>The "without intellectual disability" and "without language impairment" specifiers do not appear in the ABA letter, even when you've checked them.</strong> The reasoning is authorization-focused: these "absence" specifiers don't help establish medical necessity for ABA and, in the insurance reviewer's eyes, can be read as weakening the case for intensive services. The A&amp;P note still prints them (because they're clinically accurate documentation); the ABA letter omits them because the letter has a different audience and purpose.</p>
+
+      <p>If you spot a specifier missing from the ABA letter that's in your A&amp;P note, this is usually why. It's not a bug; it's an intentional omission.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are writing an ABA Letter for a 5-year-old with confirmed ASD, Level 2 social communication, Level 1 RRB, and significant behavior concerns. You've checked: tantrums, aggression, expressive communication needs, and sensory needs. ABA hours: 25 per week, in clinic and home.</p>
+        <p>The generated letter contains:</p>
+        <div class="output-sample"><span class="label">Diagnosis line</span>Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (Requiring Substantial Support) — Social Communication and Restricted/Repetitive Behaviors</div>
+        <div class="output-sample"><span class="label">Medical-necessity paragraph (excerpt)</span>Applied Behavior Analysis is medically necessary given preschool age group, behavioral support needs, and ASD Level 2 or 3 severity. The patient demonstrates clinically significant functional impairments across expressive and/or receptive communication; behavioral regulation; and sensory processing and integration...</div>
+        <div class="output-sample"><span class="label">Target list (auto-populated from your needs selections)</span>• reduce_tantrum
+• reduce_aggression
+• functional_comm
+• imitation
+• joint_attention</div>
+        <p>What you do <em>not</em> see in the letter: any "without" specifier you may have checked, even though those will appear in your A&amp;P note. If you manually uncheck "imitation" because you've decided it's not a current priority for this family, it stays unchecked — the auto-populator will not re-add it on your next visit.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#9-aba-letter-content-rules">§9 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s10">
+      <h1><span class="num">10</span>What goes into the IEP Letter, and the trauma opt-in</h1>
+
+      <p class="lede">The IEP Letter is written to the school team to support an Individualized Education Program (or 504 plan, depending on placement). Unlike the ABA letter, it does not require a confirmed diagnosis — it can fire for suspected ASD too, using "under evaluation" framing. Its content is organized around educational impact: how the patient's profile affects learning, what services the school should provide, and what accommodations belong in the IEP.</p>
+
+      <h2>The diagnosis label</h2>
+
+      <p>The letter's opening diagnosis line shifts based on diagnosis status:</p>
+
+      <ul>
+        <li><strong>Confirmed</strong> → "Autism Spectrum Disorder (ICD-10: F84.0)" plus the severity level</li>
+        <li><strong>Suspected</strong> → "Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)"</li>
+        <li><strong>Rule-out</strong> → "Neurodevelopmental evaluation (ICD-10: Z03.89)"</li>
+      </ul>
+
+      <p>The Z03.89 code (encounter for observation for suspected disease, ruled out) is the right placeholder for not-yet-confirmed cases; the school team can interpret the framing appropriately.</p>
+
+      <h2>What the letter contains</h2>
+
+      <p><strong>An educational impact section</strong> that translates each of your patient's checked needs categories into classroom-facing language: communication difficulties affect classroom participation, behavioral concerns affect safety and self-regulation, sensory differences affect attention and arousal, etc. Each domain becomes a bullet only if you've checked something in the corresponding needs category.</p>
+
+      <p><strong>A services-recommended section</strong> with rationales for any school-based services you've selected: speech therapy, OT, PT, counseling, social skills, paraprofessional support, extended school year, low student-to-teacher ratio, and so on. Each service block names the goals and the rationale, so the school's team can match the request to their service catalog.</p>
+
+      <p><strong>An accommodations section</strong> with four sub-categories:</p>
+
+      <ol>
+        <li><strong>Core accommodations</strong> — universal ASD-friendly supports that every student receives unless explicitly excluded (predictable schedule, visual supports calibrated to developmental level)</li>
+        <li><strong>Individual accommodations</strong> — sensory, motor, and language-specific supports triggered by the needs categories you've checked</li>
+        <li><strong>ID-modification accommodations</strong> — modified curriculum and alternate assessment, included only when intellectual disability is <em>confirmed</em> (not suspected) and the "with ID" specifier is set</li>
+        <li><strong>Behavioral, emotional, and feeding accommodations</strong> — comorbidity-driven supports (anxiety calm-down spaces, ADHD extended time, ARFID safe-food protocols, epilepsy seizure plans, etc.)</li>
+      </ol>
+
+      <p><strong>An academic accommodations section</strong> for any learning disabilities you've documented — text-to-speech for reading SLD, calculator access for math SLD, speech-to-text for written-expression SLD, and so on.</p>
+
+      <h2>The trauma opt-in</h2>
+
+      <p>If you've checked trauma as a comorbidity, the IEP letter will <strong>not</strong> include any reference to it by default. A small opt-in checkbox appears once trauma is selected: <em>"Include trauma in IEP letter."</em> The default is unchecked.</p>
+
+      <p>The reason: the IEP letter goes into the educational record, which has different privacy and access properties than the medical record. Including trauma in an educational document means it may be visible to school staff, substitute teachers, and (in some districts) administrative reviewers who don't need to know. Excluding it by default protects the family's privacy unless you specifically decide the school needs to know to coordinate trauma-informed accommodations.</p>
+
+      <p>If you do opt in, a yellow warning banner appears at the top of the IEP letter preview to make sure the inclusion is deliberate and reviewable before you send.</p>
+
+      <h2>One ID-specifier edge case</h2>
+
+      <p>If you've checked "with suspected ID" or "with suspected GDD" but the cognitive data didn't come from a formal prior external evaluation, the IEP letter adds a note: educational eligibility under the ID category should not be assigned on the basis of this letter alone, and a comprehensive psychoeducational evaluation is required per IDEA. This protects the school from over-assigning a categorical eligibility based on suspected (not confirmed) findings, and protects the patient from being prematurely tracked into modified curriculum.</p>
+
+      <details class="vignette"><summary>Example: see this in action</summary>
+        <p>You are writing an IEP Letter for a 9-year-old with confirmed ASD, Level 1 severity in both domains, mild anxiety, and a confirmed reading-domain learning disability. The patient is in public school. You've selected the following school services: SLP, counseling, sensory accommodations, visual supports, and psychoeducational evaluation.</p>
+        <p>The letter contains:</p>
+        <ul>
+          <li>A diagnosis line: <em>"Autism Spectrum Disorder (ICD-10: F84.0) — Level 1 (requiring support)"</em></li>
+          <li>A list of comorbidities: anxiety disorder, specific learning disorder in reading (dyslexia)</li>
+          <li>An educational impact section noting communication, social, and SLD-reading impacts on classroom function</li>
+          <li>Service-rationale blocks for SLP (with goals for pragmatics and conversation skills), counseling (anxiety-focused), sensory accommodations (in coordination with OT consult), visual supports (daily schedule, transition warnings), and a psychoeducational evaluation (to characterize reading-SLD scope)</li>
+          <li>Accommodations: predictable schedule and visual supports (core); anxiety calm-down space (behavioral); text-to-speech, audiobooks, and extended time (academic, for reading SLD)</li>
+        </ul>
+        <p>No mention of any trauma history, even if it's in the A&amp;P note, unless you opted in.</p>
+      </details>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#10-iep-letter-content-rules">§10 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s11">
+      <h1><span class="num">11</span>Places where the tool can quietly go wrong — and what to watch for</h1>
+
+      <p class="lede">The tool's biggest risk isn't a crash or a freeze — it's silently producing slightly wrong output that you don't notice until it's already in the chart. This section catalogs the known fragile areas: places where a mistake can slip through without any warning. Knowing where to look helps you catch problems before they reach the patient's record.</p>
+
+      <h2>Ungrammatical singular-they verbs</h2>
+
+      <p>As described in Section <a href="#s8">8</a>, when you pick <em>they</em> as the pronoun, every verb about the patient needs the plural form. The tool translates verbs using a lookup table, but the table covers only the verbs that were known at the time the prose was last updated. If a new sentence is added to the generated note using a verb the table doesn't know, you'll get output like <em>"They presents with..."</em> or <em>"They has a history of..."</em> — ungrammatical, but without any in-app warning.</p>
+
+      <p><strong>What to watch for:</strong> any verb ending in -s immediately after "they" in your generated note, ABA letter, or IEP letter when the pronoun is set to <em>they</em>. If you see one, flag it.</p>
+
+      <h2>Auto-populated ABA targets that no longer apply</h2>
+
+      <p>The ABA target auto-populator adds targets when you check needs, but it only adds — it never removes. If you check a need, then later uncheck it (or the underlying clinical picture changes), the ABA target stays in the list until you manually uncheck it. This is intentional protection against surprise loss of manually-curated targets, but it means a stale target can linger.</p>
+
+      <p><strong>What to watch for:</strong> before sending an ABA letter, scan the target list. Anything that no longer reflects current clinical priorities should be manually unchecked.</p>
+
+      <h2>Severity ratings left blank</h2>
+
+      <p>If you forget to set both severity ratings (Section <a href="#s3">3</a>), the ABA letter falls back to the language <em>"(level not specified)"</em> in its medical-necessity paragraph. The letter still generates, but it reads as incomplete to the insurance reviewer.</p>
+
+      <p><strong>What to watch for:</strong> the header badge ring shows the combined level visually. If it's empty or grayed, you haven't set the severities yet.</p>
+
+      <h2>Stale overrides during a long evaluation session</h2>
+
+      <p>During a long visit, you may set an override pill to force-on or force-off early in the session — based on the patient information you had at that moment — and then forget to revisit it after the clinical picture changes. The tool does not auto-revert an override when its underlying rationale no longer applies. The "force on" green and "force off" gray pills are visually distinct from "auto," but they're easy to miss when you're focused on filling in new information later in the visit.</p>
+
+      <p><strong>What to watch for:</strong> at the end of a visit, do a quick scan of the override panel. Any green or dim-gray pill should be a deliberate, still-current choice, not a leftover from earlier in the session.</p>
+
+      <p>Note: the tool does <em>not</em> save state across browser sessions (see Section <a href="#s0">0</a>). Closing the browser resets every override back to auto on next open.</p>
+
+      <h2>Specifier mismatch between cognitive profile and ID specifier</h2>
+
+      <p>When you change the cognitive profile dropdown (e.g., from "average" to "ID, moderate"), the tool automatically updates the matching ID/GDD/BIF (Borderline Intellectual Functioning) specifier to keep them in sync. But the auto-update fires only on specific control changes; if you set the specifier manually first and then change the cognitive profile, the manual change will be overwritten. This is by design (the cognitive profile is treated as the source of truth), but the silent overwrite can surprise a clinician who set the specifier deliberately.</p>
+
+      <p><strong>What to watch for:</strong> if you've made a deliberate manual choice on an ID specifier, set the cognitive profile dropdown first, then make the specifier adjustment. Reverse order risks losing the manual choice.</p>
+
+      <h2>Trauma defaults to omitted from the IEP letter</h2>
+
+      <p>This isn't a bug — it's the intentional behavior described in Section <a href="#s10">10</a> — but it's worth keeping on the watch-list. If you check trauma as a comorbidity and assume it will appear in both letters automatically, the IEP letter will omit it. If you want it included, you have to opt in explicitly.</p>
+
+      <p><strong>What to watch for:</strong> after checking trauma, decide consciously whether the school needs to know. The opt-in checkbox is the only path; defaulting to omission is the safe direction for patient privacy.</p>
+
+      <h2>The pattern</h2>
+
+      <p>The fragile areas share a common shape: <em>the tool does something silently and reasonably, but if the underlying assumption no longer holds, you won't get a warning.</em> The remedy is the same in every case: before you send a note or letter, do a quick scan of the output for the specific things above. None of them are common — but each has been chosen for this section because it has happened, or could plausibly happen, without obvious in-app feedback.</p>
+
+      <p class="tech-link">For the technical detail, see <a href="branching-logic.md#11-known-fragile-areas">§11 in the technical reference</a>.</p>
+    </section>
+
+    <section id="s12">
+      <h1><span class="num">12</span>How this document is maintained</h1>
+
+      <p class="lede">This guide is a <em>living document</em>: it is intended to stay accurate as the underlying tool evolves. It is stored alongside the program's source code, updated whenever changes to the program would otherwise leave the guide stale. This short section explains the chain it sits in, when to update it, and how to verify the update.</p>
+
+      <h2>Where this document fits</h2>
+
+      <p>The Autism A&amp;P Builder has two reference documents, and they form a chain. The first link in that chain is the program itself — the source code. The second link is the <strong>technical reference</strong>, written for the maintainer and for future Claude Code sessions making changes to the program. The third link is <strong>this guide</strong>, which translates the technical reference into the plain English a non-programmer clinician needs.</p>
+
+      <p>Read the chain as: code is the source of truth; the technical reference describes the code; this guide describes the technical reference. When a change ripples through, it flows in the same direction — and each step in the chain is responsible for staying in sync with the step above it.</p>
+
+      <h2>When this guide should be updated</h2>
+
+      <ul>
+        <li><strong>Whenever a change to the program affects user-visible behavior</strong> — a new rule, a changed gate, a renamed UI element, an output that now reads differently. If a clinician would notice the difference, this guide should reflect it.</li>
+        <li><strong>Whenever the technical reference is updated.</strong> If the technical reference has a new section, a renumbered section, or a substantive change to an existing section, this guide should be checked for the corresponding update.</li>
+        <li><strong>Whenever a vignette in this guide no longer matches what actually happens.</strong> Vignettes are the most concrete claims in this guide, so they're also the most likely to drift if the program changes underneath them. A wrong vignette is worse than no vignette.</li>
+        <li><strong>Whenever a clinical term or acronym used in the program changes.</strong> If the form's labels shift, this guide's prose should too.</li>
+      </ul>
+
+      <h2>The verification checklist</h2>
+
+      <p>The first five steps below can be done by anyone using the guide. The last two are technical and live with whoever is maintaining the project (a developer or a Claude Code session). If you are a clinician noticing a problem, the first five let you confirm the problem is real — then hand off to the maintainer for the technical save.</p>
+
+      <ol>
+        <li>Open this file in a browser. Confirm it loads with no visible breakage.</li>
+        <li>Walk each Mermaid diagram (the flowcharts on the page). Confirm it renders properly, without showing raw flowchart text. For diagrams you touched, confirm the rendered shapes match what you described in the surrounding prose.</li>
+        <li>Mentally walk each vignette in the section(s) you changed. Imagine entering the inputs the vignette describes into the actual tool. Does the described downstream cascade still match what the tool would do? If not, update the vignette.</li>
+        <li>Confirm every acronym used in the section is either already-defined elsewhere in the guide or expanded on its first appearance in your change.</li>
+        <li>Open the browser's developer console briefly (press F12 in most browsers, then click the Console tab). Refresh the page. No red error messages should appear. <em>If you don't know how to open the console, ask a colleague who does — or skip this step and rely on the visible-breakage check.</em></li>
+        <li><em>(Technical step — for the maintainer.)</em> Update the <em>Last verified against commit</em> line in the page header to the current short commit hash (the seven-character identifier shown at the top of the project's commit history).</li>
+        <li><em>(Technical step — for the maintainer.)</em> Commit the change — that is, save it to the project's shared version history — with a message describing what behavior the update tracks, and push the commit to the project's repository.</li>
+      </ol>
+
+      <h2>A note for the maintainer or Claude Code session updating this guide</h2>
+
+      <p><em>Clinicians reading the guide for orientation can skip this subsection — it's procedural notes for whoever does the technical edit.</em></p>
+
+      <p>If you are a Claude Code session asked to update this document: a maintenance-specific prompt has been authored separately for this task and supersedes the creation prompt. The maintenance prompt is intentionally surgical — it instructs you to make targeted edits rather than regenerate the document, and it pins the tone, depth, structure, and voice as non-negotiable. Ask the maintainer for the prompt if you have not been handed it.</p>
+
+      <p>Two invariants this guide depends on:</p>
+
+      <ul>
+        <li>The section numbering of this guide mirrors the technical reference. Sections §0 through §11 in this guide correspond to the same-numbered sections there. Adding, removing, or renumbering sections breaks the invariant; don't do it without also updating the technical reference and re-verifying every cross-link.</li>
+        <li>This guide never mentions function names, line numbers, or programming code in the body of any section. The filename of the sibling technical reference appears only at the closing "for the technical detail" link of each section, never in body prose. That constraint is the audience contract — breaking it leaks the technical layer into a document written specifically to shield clinicians from it.</li>
+      </ul>
+
+      <p class="tech-link">For the technical reference's own maintenance protocol, see <a href="branching-logic.md#12-maintenance-protocol">§12 in the technical reference</a>.</p>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>
