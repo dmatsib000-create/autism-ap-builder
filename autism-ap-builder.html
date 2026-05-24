@@ -499,7 +499,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">GDD —<br>moderate delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">GDD —<br>severe delays</label>
           </div>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label>
+          <div id="cogProfileBifWrap" style="display:contents"><label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label></div>
           <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average<br>(110–119)</label>
@@ -516,15 +516,20 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <!-- Cognitive Data Source — visible only when cogProfile is ID or GDD tier.
            Drives the bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
            Brief screener (KBIT-2R etc.) and clinical impression do NOT support confirmation
-           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do. -->
+           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do.
+           Label text inside .label-text is swapped at runtime by toggleCogDataSourceVisibility
+           based on whether the active cogProfile is in the ID tier or the GDD tier — ID-tier
+           shows IQ instruments (WISC etc.); GDD-tier shows developmental instruments
+           (Bayley, Mullen, Griffiths, DAYC-2). -->
       <div class="field-group" id="cogDataSourceGroup" style="display:none">
         <span class="field-label">Cognitive Data Source</span>
         <div class="radio-grid">
-          <label class="r-opt" title="WISC-V, WPPSI-IV, DAS-II, SB-5, or equivalent — supports formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="comprehensive">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</label>
-          <label class="r-opt" title="KBIT-2R, RIAS-2, WASI-II, or equivalent — insufficient for formal ID/GDD diagnosis"><input type="radio" name="cogDataSource" value="screener">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</label>
-          <label class="r-opt" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical">Clinical impression<br>/ observation only</label>
-          <label class="r-opt" title="Prior outside evaluation established diagnosis; supporting records not available for review"><input type="radio" name="cogDataSource" value="priorExternal">Unknown — prior<br>outside evaluation</label>
+          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</span></label>
+          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</span></label>
+          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression<br>/ observation only</span></label>
+          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Unknown — prior<br>outside evaluation</span></label>
         </div>
+        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
       </div>
 
       <div class="field-group">
@@ -543,6 +548,14 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              Vineland-3/BASC-3 in priorTesting when the clinician knows formal data exists but
              doesn't want to enter the instrument explicitly. -->
         <label class="cb-row" style="margin-top:6px" title="Check if the adaptive impairment level above reflects a standardized adaptive measure (Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive). Required for formal ID/GDD diagnosis."><input type="checkbox" id="adaptiveStandardizedCb" onchange="S.adaptiveStandardized=this.checked;bridgeCogProfileToSpecifier(S.cogProfile);render()"> Based on standardized adaptive assessment</label>
+        <!-- BIF + impaired-adaptive cross-check. Fires only when cogProfile=borderline
+             paired with mildly/moderately/severely-impaired adaptive — the exact
+             differential zone where the BIF vs mild ID call lives (AACN 2020;
+             Wexler 2023). Passive informational; auto-hides on predicate change.
+             Visual treatment shares the floor-effect-warning family but uses a
+             left-border accent to differentiate from purely-informational notes,
+             since this hint carries a clinical recommendation. -->
+        <div id="bifAdaptiveCrossCheck" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px;padding:6px 10px;border-left:3px solid #f59e0b;background:#fffaf0"></div>
       </div>
 
       <div class="field-group">
@@ -670,7 +683,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — approx. IQ 70–79, does not meet ID criteria</label>
+            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:11px;font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -1476,6 +1489,62 @@ function updateOverallLevelBadge(){
   const names={'1':'Requires Support','2':'Requires Substantial Support','3':'Requires Very Substantial Support'};
   el.innerHTML=`<div style="margin-top:7px;padding:4px 10px;background:${bg[lv]};color:white;border-radius:4px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600">&#9654; Overall: Level ${lv} — ${names[lv]}</div>`;
 }
+// GDD severity rendering: F88 has no severity sub-coding in ICD-10, so the prose
+// adjective ("mild" / "moderate" / "severe") is the only place where the severity
+// tier the clinician selected on cogProfile actually surfaces in output. Mehler
+// 2016 (JAMA Pediatrics) endorses descriptive severity language for the under-6
+// DQ band, and the audit framework treats absence-of-severity in formal output
+// as a state-3 finding. Helper + wrapper applied at all three spec-label
+// consumers (A&P note, ABA letter, IEP letter) and at the F88 dx lines.
+function gddSevWord(){
+  return {gdd_mild:'mild',gdd_moderate:'moderate',gdd_severe:'severe'}[S.cogProfile]||'';
+}
+function withGddSev(label){
+  const sev=gddSevWord();
+  if(!sev||!label) return label;
+  return label.replace('Global Developmental Delay', sev+' Global Developmental Delay');
+}
+// BIF source qualifier: when the borderline call rests on a brief screener
+// or a clinical impression rather than a comprehensive battery, append a
+// parenthetical recommending confirmatory testing. Addresses the audit
+// finding that a KBIT-2R-grounded BIF call and a WISC-V-grounded BIF call
+// previously produced identical prose. Applies only to the withBIF spec
+// (not other BIF-adjacent specifiers, which do not exist).
+function withBifSourceQualifier(k,label){
+  if(k!=='withBIF'||!label) return label;
+  // Route through the single-source-of-truth predicate so a future broadening
+  // of bifSpecifierAllowed() (e.g., adding an age check) propagates here
+  // automatically rather than requiring a parallel edit.
+  if(!bifSpecifierAllowed()) return label;
+  if(S.cogDataSource==='screener') return label+' (brief screening only; comprehensive cognitive battery recommended to confirm)';
+  if(S.cogDataSource==='clinical') return label+' (clinical impression only; comprehensive cognitive battery recommended to confirm)';
+  // priorExternal attribution — mirrors the priorExtAttribution pattern used
+  // for ID/GDD dx lines around line 1716. Without this, a BIF call grounded
+  // in an outside report produced bare prose indistinguishable from one
+  // grounded in a same-visit comprehensive battery (PR-G R1.1).
+  if(S.cogDataSource==='priorExternal') return label+' (per prior outside evaluation; supporting records not available for direct review at this visit)';
+  return label;
+}
+// Low-average qualifier: a "low average" cognitive profile in a toddler or
+// preschool patient cannot rest on a comprehensive source under the current
+// model (cogDataSource is not exposed for non-impairment profiles, and
+// developmental screening at this age has lower psychometric weight). The
+// withoutGDD ("development appropriate for age") assertion is therefore
+// softened with a recommendation for formal developmental assessment. Older
+// patients are not affected — by age 6+ the tool gates to IQ-based reasoning
+// and the lowAverage call carries adequate weight on its own.
+function withLowAvgQualifier(k,label){
+  if(k!=='withoutGDD'||!label) return label;
+  if(S.cogProfile!=='lowAverage') return label;
+  if(S.ageGroup!=='toddler'&&S.ageGroup!=='preschool') return label;
+  return label+' (based on currently available information; formal developmental assessment recommended to further characterize)';
+}
+function applySpecLabelTransforms(k,label){
+  label=withGddSev(label);
+  label=withBifSourceQualifier(k,label);
+  label=withLowAvgQualifier(k,label);
+  return label;
+}
 const SPEC_LABELS={
   withID:'with accompanying intellectual disability (confirmed by formal assessment)',
   withSuspectedID:'with suspected intellectual disability — formal evaluation pending',
@@ -1690,7 +1759,7 @@ function generateNote() {
     if(S.asdLevelSC) lvParts.push(`Level ${S.asdLevelSC} (Social Communication)`);
     if(S.asdLevelRRB) lvParts.push(`Level ${S.asdLevelRRB} (Restricted/Repetitive Behaviors)`);
     if(lvParts.length) dx+=', '+lvParts.join(' / ');
-    const specs=[...S.specifiers].map(k=>SPEC_LABELS[k]).filter(Boolean);
+    const specs=[...S.specifiers].map(k=>applySpecLabelTransforms(k,SPEC_LABELS[k])).filter(Boolean);
     if(specs.length) dx+=', '+specs.join('; ');
     dx+='\nICD-10-CM: F84.0';
     L.push(dx);
@@ -1718,9 +1787,15 @@ function generateNote() {
   if(S.specifiers.has('withSuspectedID')){
     comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+priorExtAttribution);
   }
-  if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)'+priorExtAttribution);
+  if(S.specifiers.has('withGDD')){
+    const gddSev=gddSevWord();
+    const gddSevSuffix=gddSev?', '+gddSev:'';
+    comorbs.push('Global Developmental Delay'+gddSevSuffix+' (F88)'+priorExtAttribution);
+  }
   if(S.specifiers.has('withSuspectedGDD')){
-    comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)'+priorExtAttribution);
+    const gddSev=gddSevWord();
+    const gddSevSuffix=gddSev?', '+gddSev:'';
+    comorbs.push('Global Developmental Delay'+gddSevSuffix+' — provisional, formal evaluation underway (F88)'+priorExtAttribution);
   }
   if(S.comorbid.has('adhd_combined')) comorbs.push('ADHD, Combined presentation (F90.2)');
   if(S.comorbid.has('adhd_inattentive')) comorbs.push('ADHD, Predominantly inattentive (F90.0)');
@@ -3228,7 +3303,7 @@ function _abaContent(){
     withNDD:'with associated neurodevelopmental/behavioral/mental disorder',
     withCatatonia:'with catatonia'
   };
-  const abaSpecStr=[...S.specifiers].map(k=>abaSpecMap[k]).filter(Boolean).join('; ');
+  const abaSpecStr=[...S.specifiers].map(k=>applySpecLabelTransforms(k,abaSpecMap[k])).filter(Boolean).join('; ');
 
   return {today,p,asdLevelKey,levelLabel,levelText,abaSpecStr,domains,safetyFlags,targets,settings,hoursText,refs,openPara,impPara,evidPara,youngChild,isMilitary};
 }
@@ -3440,7 +3515,7 @@ function _iepLetterContent(){
     withNDD:'with associated neurodevelopmental, behavioral, or mental health condition',
     withCatatonia:'with catatonia'
   };
-  const specStr=[...S.specifiers].map(k=>specMap[k]).filter(Boolean).join('; ');
+  const specStr=[...S.specifiers].map(k=>applySpecLabelTransforms(k,specMap[k])).filter(Boolean).join('; ');
 
   // Service-specific rationale paragraphs
   const svContent={};
@@ -4061,14 +4136,70 @@ function toggleUnevenCog(){
 // Cognitive Data Source is only meaningful for ID/GDD tiers — for other cognitive
 // profiles, suspected/confirmed has no upgrade pathway and the control would just
 // add noise.
+// Instrument labels are tier-conditional: ID-tier shows IQ instruments
+// (WISC, DAS, SB, WPPSI / KBIT-2R, RIAS-2, WASI-II); GDD-tier shows developmental
+// instruments (Bayley-4, Mullen, Griffiths, DAYC-2 / ASQ-3, DAYC-2 Screener).
+// The value space ("comprehensive", "screener", "clinical", "priorExternal") is
+// unchanged — only the displayed instrument list swaps. cogSourceSupportsConfirmation
+// continues to treat any "comprehensive" or "priorExternal" selection as confirmable
+// regardless of which instrument list is visible.
+const ID_COGDATASOURCE_LABELS = {
+  comprehensive: 'Comprehensive battery<br>(WISC, DAS, SB, WPPSI)',
+  screener: 'Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)',
+  clinical: 'Clinical impression<br>/ observation only',
+  priorExternal: 'Unknown — prior<br>outside evaluation'
+};
+const GDD_COGDATASOURCE_LABELS = {
+  comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
+  // GDD-tier screener tier lists the developmental screening tools clinicians actually
+  // see in this age range (ASQ-3, SWYC, DAYC-2 Screener) plus KBIT-2R for age 4+ since
+  // KBIT-2R is normed 4+ and frequently encountered on preschoolers. KBIT-2R remains an
+  // IQ screener, not a developmental tool — the floor-effect warning (see
+  // toggleCogDataSourceVisibility) distinguishes the two concerns in its text.
+  screener: 'Brief screener<br>(ASQ-3, SWYC, DAYC-2 Screener; or KBIT-2R if age 4+)',
+  clinical: 'Clinical impression<br>/ observation only',
+  priorExternal: 'Unknown — prior<br>outside evaluation'
+};
 function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
   if(!g) return;
-  const isIdOrGdd = ['id_mild','id_moderate','id_severe','gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
-  g.style.display = isIdOrGdd ? '' : 'none';
-  if(!isIdOrGdd && S.cogDataSource){
+  const isId  = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile);
+  const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  // Borderline is exposed to cogDataSource so the clinician can record which
+  // instrument grounded the BIF call. BIF is an IQ-defined construct, so it
+  // inherits the ID-tier IQ-instrument labels. The no-auto-bridge rule for
+  // borderline (see bridgeCogProfileToSpecifier) is unchanged — clinician
+  // still checks withBIF manually. The downstream qualifier
+  // (withBifSourceQualifier) softens the spec label when the source is a
+  // screener or clinical impression, addressing the audit finding that a
+  // KBIT-2R-grounded BIF call and a WISC-V-grounded BIF call previously
+  // produced identical prose.
+  const isBif = S.cogProfile==='borderline';
+  const isVisibleTier = isId || isGdd || isBif;
+  g.style.display = isVisibleTier ? '' : 'none';
+  if(!isVisibleTier && S.cogDataSource){
     S.cogDataSource='';
     document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  }
+  // Swap label text to match the active cogProfile tier. ID-tier and BIF →
+  // IQ instruments; GDD-tier → DQ developmental instruments. The
+  // label.label-text spans are the swap targets; the radio values themselves
+  // are not changed.
+  if(isVisibleTier){
+    const labels = isGdd ? GDD_COGDATASOURCE_LABELS : ID_COGDATASOURCE_LABELS;
+    g.querySelectorAll('label[data-cds-key]').forEach(lab=>{
+      const key=lab.getAttribute('data-cds-key');
+      const span=lab.querySelector('.label-text');
+      if(span && labels[key]) span.innerHTML = labels[key];
+    });
+  }
+  // Floor-effect warning: brief screeners have documented floor effects in children
+  // under 5 (Pitts & Mervis 2016, KBIT-2 in Williams syndrome; AACAP Practice Parameter).
+  // Show as a passive informational note when the combination applies.
+  const warn = document.getElementById('screenerYoungWarning');
+  if(warn){
+    const showWarn = S.cogDataSource==='screener' && (S.ageGroup==='toddler' || S.ageGroup==='preschool');
+    warn.style.display = showWarn ? '' : 'none';
   }
 }
 
@@ -4388,7 +4519,31 @@ const COG_PROFILE_COMPAT = {
   withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
 };
 // keep docs/branching-logic.md §1 in sync (specifier bridge — cogProfile change auto-populates specifiers Set; called from ageGroup/cogProfile/cogDataSource/adaptiveStandardized changes)
+// Single source of truth for whether the withBIF specifier is allowed in the
+// current state. BIF is the only cognitive specifier without a "suspected"
+// graceful-degradation pathway (no withSuspectedBIF exists, per Greenspan
+// 2017 — see §11.7 of docs/branching-logic.md). Every other cog tier softens
+// automatically when source data is weak: ID/GDD auto-bridge to withSuspected*
+// when cogDataSource is screener/clinical/empty; without* tiers assert
+// absence-of-impairment whose stakes are lower. BIF has only the one endpoint,
+// so the gate must enforce upstream what the auto-bridge enforces for the
+// other tiers — namely that a source is on file before the diagnosis is
+// asserted. The carried-forward-outside-diagnosis case is supported by
+// cogDataSource='priorExternal' (treated as confirmation-equivalent per PR-D).
+function bifSpecifierAllowed(){
+  return S.cogProfile==='borderline' && !!S.cogDataSource;
+}
+
 function bridgeCogProfileToSpecifier(cogVal){
+  // Preserve a manually-checked withBIF across bridge re-fires. Without this,
+  // the COG_SPEC_EXCL clear below would silently uncheck withBIF on every
+  // re-fire (cogDataSource change, adaptiveStandardized toggle, ageGroup
+  // change) because there is no auto-add branch for borderline (intentional;
+  // see Greenspan 2017 rationale below). The preserve only fires when the
+  // gate condition is still met — bifSpecifierAllowed() now requires both
+  // cogProfile='borderline' AND a non-empty cogDataSource, so clearing the
+  // source via deselect correctly drops withBIF via the gate logic below.
+  const preserveBif = bifSpecifierAllowed() && S.specifiers.has('withBIF');
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
   // matching specifier. Clinician can still manually override after.
   COG_SPEC_EXCL.forEach(k=>{
@@ -4397,14 +4552,28 @@ function bridgeCogProfileToSpecifier(cogVal){
     if(cb) cb.checked=false;
   });
   let toCheck=null;
-  // Default ID/GDD to SUSPECTED. Upgrade to confirmed only when cognitive data source is a
-  // comprehensive battery (or prior outside evaluation), adaptive functioning is formally
-  // impaired, AND adaptive impairment is backed by standardized assessment (Vineland-3/BASC-3
-  // consistent in priorTesting, OR the clinician-attested standardized-assessment checkbox).
-  const confirmable = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
-  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmable ? 'withID' : 'withSuspectedID';
-  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmable ? 'withGDD' : 'withSuspectedGDD';
-  else if(cogVal==='borderline') toCheck='withBIF';
+  // ID confirmation requires the full predicate — DSM-5-TR ID criteria mandate
+  // BOTH IQ deficit AND adaptive deficit AND onset in developmental period.
+  // The tool enforces this via cogSourceSupportsConfirmation + adaptive-impaired
+  // + standardized-adaptive evidence.
+  //
+  // GDD (F88) confirmation is intentionally LESS strict. F88 is used when ID
+  // cannot be reliably assessed (typically under 5); adaptive deficits are
+  // typical but not strictly required by DSM-5-TR or AACAP. A comprehensive
+  // developmental battery (e.g., Bayley-4 which includes cognitive + adaptive
+  // subscales, or Mullen, Griffiths, DAYC-2) is sufficient on its own. The
+  // adaptive section continues to inform downstream prose but no longer gates
+  // the confirmed-vs-suspected GDD bridge. (PR-G R2.1; clinical-council reopens
+  // — revisits the PR-C-era assumption that ID and GDD share a predicate.)
+  const confirmableId  = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
+  const confirmableGdd = cogSourceSupportsConfirmation();
+  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmableId ? 'withID' : 'withSuspectedID';
+  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmableGdd ? 'withGDD' : 'withSuspectedGDD';
+  // BIF is intentionally NOT auto-bridged. There is no `withSuspectedBIF` and no data-source
+  // confirmation pathway for BIF; bridging would send a "the tool thinks this fits" signal
+  // unsupported by literature (Greenspan 2017). The clinician selects `borderline` here to
+  // record their assessment; the withBIF specifier (line ~673) must be checked manually.
+  // Do NOT re-add an `else if(cogVal==='borderline')` branch here.
   else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)){
     // For toddler/preschool, the parallel "without GDD" specifier is the conceptually-correct
     // choice — DSM-5 ID criteria don't apply under age 5; GDD is the relevant developmental
@@ -4417,6 +4586,95 @@ function bridgeCogProfileToSpecifier(cogVal){
     S.specifiers.add(toCheck);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${toCheck}"]`);
     if(cb) cb.checked=true;
+  }
+  if(preserveBif){
+    S.specifiers.add('withBIF');
+    const cb=document.querySelector(`input[data-key="specifiers"][value="withBIF"]`);
+    if(cb) cb.checked=true;
+  }
+  toggleBifSpecifierGate();
+  // Re-evaluate the BIF + impaired-adaptive cross-check on every bridge fire
+  // (covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized changes).
+  // adaptProfile changes do not call the bridge per the council-D4 invariant
+  // (avoid surprise specifier flips from far-away controls), so the adaptProfile
+  // change handler calls toggleBifAdaptiveCrossCheck() directly.
+  toggleBifAdaptiveCrossCheck();
+}
+
+// withBIF gate — the checkbox is the only specifier in the list whose downstream
+// prose can be asserted with no upstream cog* signal because BIF has no
+// withSuspected*  graceful-degradation pathway (Greenspan 2017). Without this
+// gate, a clinician can produce bare "with borderline intellectual functioning
+// (BIF)" identical to a WISC-V-backed call. The gate enforces both arms of
+// bifSpecifierAllowed(): cogProfile='borderline' AND a non-empty cogDataSource.
+// When the gate closes while withBIF is currently checked (e.g., clinician
+// deselects cogDataSource after checking withBIF), this function also removes
+// withBIF from S.specifiers and unchecks the DOM — preserve-style behavior
+// would silently keep a now-unsupported diagnosis on the chart.
+function toggleBifSpecifierGate(){
+  const row = document.getElementById('withBifRow');
+  const cb = document.querySelector('input[data-key="specifiers"][value="withBIF"]');
+  const note = document.getElementById('withBifGateNote');
+  if(!cb) return;
+  const profileOk = S.cogProfile==='borderline';
+  const sourceOk = !!S.cogDataSource;
+  const allow = profileOk && sourceOk;
+  // Row visibility: the entire withBIF specifier row is hidden unless the
+  // clinician has selected Borderline as the cognitive profile. This avoids
+  // displaying a contested specifier that the clinician hasn't signalled
+  // intent to use; once they pick Borderline, the row appears with a
+  // contextual hint walking them through the remaining source step.
+  if(row) row.style.display = profileOk ? '' : 'none';
+  cb.disabled = !allow;
+  // Gate-closed cleanup: never leave a checked-but-disabled withBIF behind.
+  // Load-bearing for any future direct caller that bypasses the bridge
+  // (init call, render() hook, state-restoration path). When invoked from
+  // the end of bridgeCogProfileToSpecifier(), the COG_SPEC_EXCL loop has
+  // already deleted withBIF — so this branch is dead via that path. Do not
+  // remove without confirming no non-bridge caller exists.
+  if(!allow && S.specifiers.has('withBIF')){
+    S.specifiers.delete('withBIF');
+    cb.checked = false;
+  }
+  if(note){
+    // Note only matters when the row is visible (profileOk). When the row
+    // is hidden the note is hidden along with it. When visible-but-not-allowed,
+    // the only remaining unmet condition is the data-source step.
+    if(profileOk && !sourceOk){
+      note.style.display = '';
+      note.textContent = '(requires a Cognitive Data Source selection)';
+    } else {
+      note.style.display = 'none';
+    }
+  }
+}
+
+// BIF + impaired-adaptive cross-check. Fires when cogProfile=borderline is paired
+// with mildly/moderately/severely-impaired adaptive function — the differential
+// zone where the BIF vs mild ID call lives. AACN 2020 / Wexler 2023 found no
+// meaningful adaptive-function gap between FSIQ 70–79 and 80–89, which means
+// clinicians making the BIF call in the presence of adaptive impairment are
+// making a threshold judgment about whether the picture meets ID criteria.
+// Passive informational only — does not flip any specifier; the clinician's
+// final call may still be BIF (e.g., adaptive deficits explained by ADHD,
+// mood, trauma, or informant variability). belowPotential is intentionally
+// excluded — that descriptor implies the clinician has already attributed the
+// adaptive gap to a non-cognitive cause.
+const IMPAIRED_ADAPTIVE_WORDS = {
+  mildlyImpaired:    'mild',
+  moderatelyImpaired:'moderate',
+  severelyImpaired:  'severe'
+};
+function toggleBifAdaptiveCrossCheck(){
+  const el = document.getElementById('bifAdaptiveCrossCheck');
+  if(!el) return;
+  const sevWord = IMPAIRED_ADAPTIVE_WORDS[S.adaptProfile];
+  const fire = S.cogProfile==='borderline' && !!sevWord;
+  if(fire){
+    el.textContent = 'Note: Borderline IQ paired with '+sevWord+' adaptive impairment may meet DSM-5-TR criteria for mild intellectual disability. Consider whether the clinical picture better fits ID over BIF, or whether the adaptive deficits are better explained by another cause (ADHD, mood, trauma, informant variability).';
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
   }
 }
 
@@ -4499,6 +4757,26 @@ function updateAgeBasedVisibility(){
       S.cogProfile='';
       idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
+      clearIdGddEvidenceFlags();
+    }
+  }
+  // BIF cogProfile option — not valid for toddler/preschool. BIF is defined by IQ testing
+  // (DSM-5-TR R41.83), which is not reliable under age 5; the GDD-mild pathway is the
+  // conceptually-correct documentation route for under-5 patients with mild delays.
+  // Same display:contents wrapper constraint as idCogGroup/gddCogGroup.
+  const bifCogGroup=document.getElementById('cogProfileBifWrap');
+  if(bifCogGroup){
+    const hideBifCog=young&&S.ageGroup!=='';
+    bifCogGroup.style.display=hideBifCog?'none':'contents';
+    if(hideBifCog&&S.cogProfile==='borderline'){
+      S.cogProfile='';
+      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      bridgeCogProfileToSpecifier('');
+      // Mirror the idCogGroup/gddCogGroup teardown pattern: stale cogDataSource
+      // and adaptiveStandardized flags from the prior age can silently auto-
+      // confirm the next selected cogProfile when the clinician picks a tier
+      // valid for the new age. See the function comment just above
+      // clearIdGddEvidenceFlags() for the documented invariant.
       clearIdGddEvidenceFlags();
     }
   }
@@ -4629,6 +4907,14 @@ function syncSchoolSvcFromNeeds(){
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
+  // Sync the withBIF gate to initial state. The HTML default `disabled` and
+  // static note text happen to match the empty-cogProfile state, but routing
+  // initial render through the gate function keeps the static HTML and the
+  // JS-rendered text from drifting apart on future edits, and protects any
+  // future state-restoration path (URL params, load-from-template) that
+  // mutates S.cogProfile/S.cogDataSource without firing the bridge.
+  toggleBifSpecifierGate();
+  toggleBifAdaptiveCrossCheck();
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
@@ -4638,11 +4924,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;
-      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
+      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
-      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);}
-      else if(nm==='adaptProfile') S.adaptProfile='';
+      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
+      else if(nm==='adaptProfile'){S.adaptProfile='';toggleBifAdaptiveCrossCheck();}
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
       else if(nm==='asdLevelSC') S.asdLevelSC='';
@@ -4670,14 +4956,34 @@ document.addEventListener('DOMContentLoaded',()=>{
       // withoutGDD) resynchronizes with the new age category. Without this, switching from
       // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
       // leaves withoutGDD orphaned then deleted by updateAgeBasedVisibility with no replacement.
-      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);}
+      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
-      else if(nm==='cogProfile'){S.cogProfile=inp.value;bridgeCogProfileToSpecifier(inp.value);toggleCogDataSourceVisibility();}
+      else if(nm==='cogProfile'){
+        // Tier-transition guard: classify by INSTRUMENT FAMILY, not by ICD tier.
+        // ID and BIF both rest on IQ instruments (WISC/DAS/SB/WPPSI), so a within-
+        // IQ move preserves the cogDataSource selection. GDD rests on developmental
+        // instruments (Bayley-4/Mullen/Griffiths/DAYC-2). Crossing the IQ↔dev
+        // boundary must clear cogDataSource so the new instrument label set
+        // doesn't sit on a stale selection from the previous family (e.g., a
+        // GDD-tier 'comprehensive' = Bayley-4 silently relabelled as 'comprehensive'
+        // = WISC-V after switching to borderline).
+        const tierOf = v => ['id_mild','id_moderate','id_severe','borderline'].includes(v) ? 'iq'
+          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(v) ? 'dev' : '';
+        const prevTier = tierOf(S.cogProfile);
+        const newTier  = tierOf(inp.value);
+        if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){
+          S.cogDataSource='';
+          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+        }
+        S.cogProfile=inp.value;
+        bridgeCogProfileToSpecifier(inp.value);
+        toggleCogDataSourceVisibility();
+      }
       // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
       // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
       // (per council D4 — avoid surprise specifier flips from far-away controls).
-      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);}
-      else if(nm==='adaptProfile') S.adaptProfile=inp.value;
+      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;toggleBifAdaptiveCrossCheck();}
       else if(nm==='dysmorphism') S.dysmorphism=inp.value;
       else if(nm==='regressionTiming') S.regressionTiming=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;
@@ -4791,6 +5097,20 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
         }
         if(k==='specifiers'&&inp.checked){
+          // Defense-in-depth: the withBIF checkbox is gated via the `disabled`
+          // attribute (toggleBifSpecifierGate), but synthetic events or browser
+          // quirks could in theory deliver a `change` event past a disabled
+          // input. Fail closed — bifSpecifierAllowed() is the single source of
+          // truth; we revert the DOM checkbox AND undo the generic Set-add
+          // that fired earlier in this same handler (see line ~4995, the
+          // m[k].add(v) call that runs before any per-key block). Without
+          // this delete, the guard would only fix the visible state and
+          // leave withBIF asserted in S.specifiers.
+          if(v==='withBIF' && !bifSpecifierAllowed()){
+            S.specifiers.delete('withBIF');
+            inp.checked=false;
+            return;
+          }
           const langWith=['withLangImpairment','withSuspectedLang'];
           if(langWith.includes(v)){
             S.specifiers.delete('withoutLangImpairment');
@@ -4826,6 +5146,13 @@ document.addEventListener('DOMContentLoaded',()=>{
               clearIdGddEvidenceFlags();
               const adapStdCb=document.getElementById('adaptiveStandardizedCb');
               if(adapStdCb) adapStdCb.checked=false;
+              // Re-sync BIF gate + cross-check: this back-propagate cleared S.cogProfile
+              // and S.cogDataSource but does NOT route through bridgeCogProfileToSpecifier(),
+              // so toggleBifSpecifierGate() would otherwise leave withBifRow visible and
+              // cb.disabled stale from the prior borderline state. Mirrors the
+              // bridge's pairing at the bottom of bridgeCogProfileToSpecifier().
+              toggleBifSpecifierGate();
+              toggleBifAdaptiveCrossCheck();
             }
           }
         }

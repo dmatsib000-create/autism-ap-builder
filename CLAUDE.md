@@ -15,6 +15,7 @@ claude_code/
 ├── docs/                        Tracked living references
 │   ├── branching-logic.md                       Technical reference (maintainer + Claude audience)
 │   ├── branching-logic-for-clinicians.html      Plain-English clinician companion (living spec)
+│   ├── references.md                            Centralized bibliography (short handles + verification ledger)
 │   ├── quickstart.png                           Tool screenshot (used in README)
 │   └── audits/                                  Per-area audit procedures
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
@@ -23,6 +24,13 @@ claude_code/
 ```
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, and `docs/` are tracked in git and pushed to GitHub. Everything else is local.
+
+### Reference-doc maintenance (mandatory in-commit updates)
+
+Two living docs in `docs/` carry an "update in the same commit" rule:
+
+- **`docs/branching-logic.md`** — see its own §12 Maintenance protocol for the list of files/constructs that trigger an update obligation.
+- **`docs/references.md`** — the centralized bibliography. **When you add or remove a citation in any tracked file** (inline JS comment in `autism-ap-builder.html`, an A&P note reference line, an ABA letter reference line, an IEP letter reference, or anywhere in `docs/`), update `docs/references.md` in the same commit. When you remove a citation, first grep for its short handle (e.g., `grep -rn "\[mehler-2016\]"`) to find every consumer and decide whether each needs updating, replacing, or removing too. Do not invent bibliographic details — if a full citation is not in hand, mark the entry `needs verification` and surface that to the maintainer.
 
 ---
 
