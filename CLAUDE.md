@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This directory contains two independent clinical tools for a Developmental Behavioral Pediatrics (DBP) practice.
 
+### Repo layout
+
+```
+claude_code/
+├── autism-ap-builder.html       Main app (tracked, public)
+├── README.md  CLAUDE.md         Tracked
+├── docs/                        Tracked (audits, screenshots)
+├── clinicalnotes/               Local-only Python CLI project (untracked)
+├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
+└── scratch/                     Working drafts: skill updates, prompts, test files (untracked)
+```
+
+Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, and `docs/` are tracked in git and pushed to GitHub. Everything else is local.
+
 ---
 
 ## autism-ap-builder.html
@@ -65,19 +79,22 @@ Skip comments for self-explanatory code, changelog-style notes ("added X to fix 
 
 ---
 
-## clinicalnotes.py / clinicalnotes_shared.py
+## clinicalnotes/ (clinicalnotes.py / clinicalnotes_shared.py)
 
-Python CLI tools that pipe clinical text through the UF institutional AI API and stream output to the terminal. PHI is never written to disk.
+Python CLI tools that pipe clinical text through the UF institutional AI API and stream output to the terminal. PHI is never written to disk. Lives in the `clinicalnotes/` subfolder (untracked — local-only project, never pushed to GitHub).
 
 ### Running
 
 ```
-# Private version (API key from environment variable LOCAL_AI_KEY)
-python clinicalnotes.py
-python clinicalnotes.py --mode caregiver-history
+# From repo root:
+python clinicalnotes/clinicalnotes.py
+python clinicalnotes/clinicalnotes.py --mode caregiver-history
 
 # Shared version (prompts for API key at runtime — safe to distribute)
-python clinicalnotes_shared.py
+python clinicalnotes/clinicalnotes_shared.py
+
+# Or cd into the folder first:
+cd clinicalnotes && python clinicalnotes.py
 ```
 
 ### Setup
