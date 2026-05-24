@@ -1274,7 +1274,9 @@ function getPron() {
   };
   if (m[S.pronouns]) return m[S.pronouns];
   const n = ['adolescent','youngAdult'].includes(S.ageGroup) ? 'the individual' : 'the child';
-  return {subj:n, obj:n, poss:n+"'s", refl:n+'self', cap:n.charAt(0).toUpperCase()+n.slice(1)};
+  // refl: singular-they reflexive ('themselves') reads naturally with the noun-phrase fallback
+  // ('the child themselves'), unlike the broken concat 'the childself' / 'the individualself' it replaces.
+  return {subj:n, obj:n, poss:n+"'s", refl:'themselves', cap:n.charAt(0).toUpperCase()+n.slice(1)};
 }
 
 // ─── PROSE GRAMMAR HELPERS ───────────────────────────────────────────────────
