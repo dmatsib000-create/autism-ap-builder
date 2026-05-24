@@ -292,6 +292,7 @@ The branches below all read `S.ageGroup` directly or via a helper like `isYoung(
 |---|---|---|---|
 | IEP tab visibility | 3938 | `ageGroup !== 'toddler'` (plus `schoolDoc !== ''`) | Hide IEP tab for toddlers |
 | NDBI vs FBA prose in ABA letter | 2067–2068 | `isYoung()` → NDBI; `'schoolAge'` → FBA | Letter language shifts |
+| Cognitive-profile tier age gates | 4494, 4505, 4517 | `young` hides ID tier + BIF radios; `older` hides GDD tier | DSM-5/AACAP: ID/BIF require IQ testing (unreliable <5); GDD doesn't apply ≥5. Teardown clears `cogProfile` and calls `bridgeCogProfileToSpecifier('')` to drop the matching specifier |
 | Adolescent/adult safety targets | 2099 | `['adolescent','youngAdult'].includes(ageGroup)` | Add consent education + legal awareness to safety targets |
 | ABA modality emphasis | 2105 | `['schoolAge','adolescent','youngAdult'].includes(ageGroup)` | NET primary, DTT only for initial acquisition |
 | Self-advocacy in psychotherapy goals | 2125 | adolescent/youngAdult | Integrates self-determination language |
@@ -1166,17 +1167,25 @@ The condition includes "severe behavior + age school+" but "severe" is implied f
 
 `rule*().reasons[]` strings are concatenated comma-joined into letter prose. No format contract exists — a contributor pushing a sentence-cased string with trailing punctuation will produce malformed letter output. No automated check.
 
-### 11.6 Smart-quote injection risk (CLAUDE.md "Critical constraints")
+### 11.6 BIF asymmetry — intentional design (`autism-ap-builder.html:4407`)
+
+The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile selections to `withID`/`withSuspectedID` and GDD-tier selections to `withGDD`/`withSuspectedGDD` — but does **not** auto-bridge `borderline` to `withBIF`. There is also no `withSuspectedBIF` specifier. Both asymmetries are intentional.
+
+**Rationale**: BIF (R41.83) is a DSM-5-TR clinical-attention category, not a developmental-disability diagnosis. It has only one endpoint (`withBIF`) and no data-source-driven confirmation gate, so the auto-bridge would send a "the tool thinks this fits" signal unsupported by literature (Greenspan 2017, *Current Opinion in Psychiatry*). The clinician selects `borderline` to record their assessment of cognitive profile; the `withBIF` specifier checkbox must be checked manually as a deliberate documentation choice. Compounding this with a "suspected BIF" variant would weaken an already-contested category.
+
+**Maintainer note**: do not "fix" this asymmetry by adding `else if(cogVal==='borderline') toCheck='withBIF';` to the bridge or by introducing a `withSuspectedBIF` specifier. The inline comment at line 4407 reinforces this. Coupled to the BIF age-gate (hide for toddler/preschool, line 4505 area) — together they ensure BIF is only documentable for older patients and only as a deliberate clinician choice.
+
+### 11.7 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
 Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*
 
 Editing flow that triggers this most often: a clipboard paste, an editor with smart-quote autocorrect enabled, or an AI-generated edit that smartens quotes. The recovery is documented in CLAUDE.md.
 
-### 11.7 Em-dash injection in prose (CLAUDE.md "Critical constraints")
+### 11.8 Em-dash injection in prose (CLAUDE.md "Critical constraints")
 
 Generated note prose must avoid em dashes (`—`). They're permitted in structural section headers but read as overwritten in clinical prose. Easy to introduce when adding new prose generators.
 
-### 11.8 Box-drawing characters in JS literals (CLAUDE.md "Critical constraints")
+### 11.9 Box-drawing characters in JS literals (CLAUDE.md "Critical constraints")
 
 The `─` (U+2500) and `═` (U+2550) characters in the note output's section dividers are intentional. Replacing them with ASCII `---` would change every divider in clinical output and degrade the visual structure clinicians rely on.
 

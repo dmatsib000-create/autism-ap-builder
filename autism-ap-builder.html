@@ -499,7 +499,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">GDD —<br>moderate delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">GDD —<br>severe delays</label>
           </div>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label>
+          <div id="cogProfileBifWrap" style="display:contents"><label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label></div>
           <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
           <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average<br>(110–119)</label>
@@ -670,7 +670,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — approx. IQ 70–79, does not meet ID criteria</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -4404,7 +4404,11 @@ function bridgeCogProfileToSpecifier(cogVal){
   const confirmable = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
   if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmable ? 'withID' : 'withSuspectedID';
   else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmable ? 'withGDD' : 'withSuspectedGDD';
-  else if(cogVal==='borderline') toCheck='withBIF';
+  // BIF is intentionally NOT auto-bridged. There is no `withSuspectedBIF` and no data-source
+  // confirmation pathway for BIF; bridging would send a "the tool thinks this fits" signal
+  // unsupported by literature (Greenspan 2017). The clinician selects `borderline` here to
+  // record their assessment; the withBIF specifier (line ~673) must be checked manually.
+  // Do NOT re-add an `else if(cogVal==='borderline')` branch here.
   else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)){
     // For toddler/preschool, the parallel "without GDD" specifier is the conceptually-correct
     // choice — DSM-5 ID criteria don't apply under age 5; GDD is the relevant developmental
@@ -4500,6 +4504,20 @@ function updateAgeBasedVisibility(){
       idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
+    }
+  }
+  // BIF cogProfile option — not valid for toddler/preschool. BIF is defined by IQ testing
+  // (DSM-5-TR R41.83), which is not reliable under age 5; the GDD-mild pathway is the
+  // conceptually-correct documentation route for under-5 patients with mild delays.
+  // Same display:contents wrapper constraint as idCogGroup/gddCogGroup.
+  const bifCogGroup=document.getElementById('cogProfileBifWrap');
+  if(bifCogGroup){
+    const hideBifCog=young&&S.ageGroup!=='';
+    bifCogGroup.style.display=hideBifCog?'none':'contents';
+    if(hideBifCog&&S.cogProfile==='borderline'){
+      S.cogProfile='';
+      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      bridgeCogProfileToSpecifier('');
     }
   }
   if(gddRows){
