@@ -675,7 +675,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withBIF"> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83)</label>
+            <label class="cb-row" id="withBifRow" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:11px;font-style:italic;margin-left:4px">(requires Cognitive Profile = Borderline)</span></label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -4504,6 +4504,14 @@ const COG_PROFILE_COMPAT = {
 };
 // keep docs/branching-logic.md §1 in sync (specifier bridge — cogProfile change auto-populates specifiers Set; called from ageGroup/cogProfile/cogDataSource/adaptiveStandardized changes)
 function bridgeCogProfileToSpecifier(cogVal){
+  // Preserve a manually-checked withBIF across bridge re-fires. Without this,
+  // the COG_SPEC_EXCL clear below would silently uncheck withBIF on every
+  // re-fire (cogDataSource change, adaptiveStandardized toggle, ageGroup
+  // change) because there is no auto-add branch for borderline (intentional;
+  // see Greenspan 2017 rationale below). The preserve only fires when the
+  // clinician's stated cogProfile is still borderline — switching cogProfile
+  // away from borderline correctly drops withBIF.
+  const preserveBif = cogVal==='borderline' && S.specifiers.has('withBIF');
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
   // matching specifier. Clinician can still manually override after.
   COG_SPEC_EXCL.forEach(k=>{
@@ -4537,6 +4545,30 @@ function bridgeCogProfileToSpecifier(cogVal){
     const cb=document.querySelector(`input[data-key="specifiers"][value="${toCheck}"]`);
     if(cb) cb.checked=true;
   }
+  if(preserveBif){
+    S.specifiers.add('withBIF');
+    const cb=document.querySelector(`input[data-key="specifiers"][value="withBIF"]`);
+    if(cb) cb.checked=true;
+  }
+  toggleBifSpecifierGate();
+}
+
+// withBIF gate — the checkbox is the only specifier in the list whose downstream
+// prose can be asserted with no upstream cogProfile signal. Without this gate,
+// a clinician can click withBIF while cogProfile is empty or 'unknown' and the
+// chart prints bare "with borderline intellectual functioning (BIF)" identical
+// to a WISC-V-backed call. Per the Fix #4 council (Round 3), the gate disables
+// the checkbox until cogProfile='borderline' and surfaces a visible inline note
+// explaining the requirement. The carried-forward-outside-diagnosis case is
+// supported via the priorExternal cogDataSource value (tooltip on the label
+// row documents this).
+function toggleBifSpecifierGate(){
+  const cb = document.querySelector('input[data-key="specifiers"][value="withBIF"]');
+  const note = document.getElementById('withBifGateNote');
+  if(!cb) return;
+  const allow = S.cogProfile==='borderline';
+  cb.disabled = !allow;
+  if(note) note.style.display = allow ? 'none' : '';
 }
 
 // ─── AGE-BASED VISIBILITY ────────────────────────────────────────────────────
@@ -4633,6 +4665,12 @@ function updateAgeBasedVisibility(){
       S.cogProfile='';
       bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
       bridgeCogProfileToSpecifier('');
+      // Mirror the idCogGroup/gddCogGroup teardown pattern: stale cogDataSource
+      // and adaptiveStandardized flags from the prior age can silently auto-
+      // confirm the next selected cogProfile when the clinician picks a tier
+      // valid for the new age. See the function comment just above
+      // clearIdGddEvidenceFlags() for the documented invariant.
+      clearIdGddEvidenceFlags();
     }
   }
   if(gddRows){
@@ -4806,14 +4844,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
       else if(nm==='cogProfile'){
-        // Tier-transition guard: if the new cogProfile crosses the ID↔GDD boundary,
-        // clear cogDataSource so the new tier's instrument labels don't sit on a
-        // stale selection from the previous tier. Within-tier moves (e.g. id_mild →
-        // id_moderate) preserve the cogDataSource selection.
-        const prevTier = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile) ? 'id'
-          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile) ? 'gdd' : '';
-        const newTier  = ['id_mild','id_moderate','id_severe'].includes(inp.value) ? 'id'
-          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(inp.value) ? 'gdd' : '';
+        // Tier-transition guard: classify by INSTRUMENT FAMILY, not by ICD tier.
+        // ID and BIF both rest on IQ instruments (WISC/DAS/SB/WPPSI), so a within-
+        // IQ move preserves the cogDataSource selection. GDD rests on developmental
+        // instruments (Bayley-4/Mullen/Griffiths/DAYC-2). Crossing the IQ↔dev
+        // boundary must clear cogDataSource so the new instrument label set
+        // doesn't sit on a stale selection from the previous family (e.g., a
+        // GDD-tier 'comprehensive' = Bayley-4 silently relabelled as 'comprehensive'
+        // = WISC-V after switching to borderline).
+        const tierOf = v => ['id_mild','id_moderate','id_severe','borderline'].includes(v) ? 'iq'
+          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(v) ? 'dev' : '';
+        const prevTier = tierOf(S.cogProfile);
+        const newTier  = tierOf(inp.value);
         if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){
           S.cogDataSource='';
           document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
