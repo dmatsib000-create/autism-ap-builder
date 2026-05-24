@@ -1200,6 +1200,17 @@ Generated note prose must avoid em dashes (`—`). They're permitted in structur
 
 The `─` (U+2500) and `═` (U+2550) characters in the note output's section dividers are intentional. Replacing them with ASCII `---` would change every divider in clinical output and degrade the visual structure clinicians rely on.
 
+### 11.11 GDD severity injection — adjective vs comma form
+
+F88 has no severity sub-coding in ICD-10, so the prose adjective ("mild" / "moderate" / "severe") is the only place GDD severity surfaces in output. Two helpers in `autism-ap-builder.html` (declared just above `SPEC_LABELS`):
+
+- `gddSevWord()` — returns the severity word derived from `S.cogProfile` (`gdd_mild` → `'mild'`, etc.); returns `''` for the unspecified `gdd` bucket so the fallback prose stays clean.
+- `withGddSev(label)` — inserts the severity adjective before the literal string `"Global Developmental Delay"` in any spec-label string. Used at the three spec-label consumers (A&P note `SPEC_LABELS` consumer, ABA letter `abaSpecMap` consumer, IEP letter `specMap` consumer).
+
+The F88 diagnosis lines (confirmed and suspected) in `generateNote()` use the **comma form** (`Global Developmental Delay, mild (F88)`) to match the ID dx-line cadence (`Intellectual disability, mild (F70)`). The spec-label strings use the **adjective form** (`with mild Global Developmental Delay`) because that reads more naturally in running prose.
+
+**Maintainer note**: do not turn this into a `withGDD_mild`/`withGDD_moderate`/`withGDD_severe` proliferation in `SPEC_LABELS`. Severity is derived from `cogProfile`, not from the specifier itself — adding keyed labels would break that single source of truth and create two paths to the same conclusion. If a future change adds a new spec-label consumer for GDD, route it through `withGddSev()`.
+
 ---
 
 ## 12. Maintenance protocol

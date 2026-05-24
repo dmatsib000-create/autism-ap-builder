@@ -1481,6 +1481,21 @@ function updateOverallLevelBadge(){
   const names={'1':'Requires Support','2':'Requires Substantial Support','3':'Requires Very Substantial Support'};
   el.innerHTML=`<div style="margin-top:7px;padding:4px 10px;background:${bg[lv]};color:white;border-radius:4px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600">&#9654; Overall: Level ${lv} — ${names[lv]}</div>`;
 }
+// GDD severity rendering: F88 has no severity sub-coding in ICD-10, so the prose
+// adjective ("mild" / "moderate" / "severe") is the only place where the severity
+// tier the clinician selected on cogProfile actually surfaces in output. Mehler
+// 2016 (JAMA Pediatrics) endorses descriptive severity language for the under-6
+// DQ band, and the audit framework treats absence-of-severity in formal output
+// as a state-3 finding. Helper + wrapper applied at all three spec-label
+// consumers (A&P note, ABA letter, IEP letter) and at the F88 dx lines.
+function gddSevWord(){
+  return {gdd_mild:'mild',gdd_moderate:'moderate',gdd_severe:'severe'}[S.cogProfile]||'';
+}
+function withGddSev(label){
+  const sev=gddSevWord();
+  if(!sev||!label) return label;
+  return label.replace('Global Developmental Delay', sev+' Global Developmental Delay');
+}
 const SPEC_LABELS={
   withID:'with accompanying intellectual disability (confirmed by formal assessment)',
   withSuspectedID:'with suspected intellectual disability — formal evaluation pending',
@@ -1695,7 +1710,7 @@ function generateNote() {
     if(S.asdLevelSC) lvParts.push(`Level ${S.asdLevelSC} (Social Communication)`);
     if(S.asdLevelRRB) lvParts.push(`Level ${S.asdLevelRRB} (Restricted/Repetitive Behaviors)`);
     if(lvParts.length) dx+=', '+lvParts.join(' / ');
-    const specs=[...S.specifiers].map(k=>SPEC_LABELS[k]).filter(Boolean);
+    const specs=[...S.specifiers].map(k=>withGddSev(SPEC_LABELS[k])).filter(Boolean);
     if(specs.length) dx+=', '+specs.join('; ');
     dx+='\nICD-10-CM: F84.0';
     L.push(dx);
@@ -1723,9 +1738,15 @@ function generateNote() {
   if(S.specifiers.has('withSuspectedID')){
     comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+priorExtAttribution);
   }
-  if(S.specifiers.has('withGDD')) comorbs.push('Global Developmental Delay (F88)'+priorExtAttribution);
+  if(S.specifiers.has('withGDD')){
+    const gddSev=gddSevWord();
+    const gddSevSuffix=gddSev?', '+gddSev:'';
+    comorbs.push('Global Developmental Delay'+gddSevSuffix+' (F88)'+priorExtAttribution);
+  }
   if(S.specifiers.has('withSuspectedGDD')){
-    comorbs.push('Global Developmental Delay — provisional, formal evaluation underway (F88)'+priorExtAttribution);
+    const gddSev=gddSevWord();
+    const gddSevSuffix=gddSev?', '+gddSev:'';
+    comorbs.push('Global Developmental Delay'+gddSevSuffix+' — provisional, formal evaluation underway (F88)'+priorExtAttribution);
   }
   if(S.comorbid.has('adhd_combined')) comorbs.push('ADHD, Combined presentation (F90.2)');
   if(S.comorbid.has('adhd_inattentive')) comorbs.push('ADHD, Predominantly inattentive (F90.0)');
@@ -3233,7 +3254,7 @@ function _abaContent(){
     withNDD:'with associated neurodevelopmental/behavioral/mental disorder',
     withCatatonia:'with catatonia'
   };
-  const abaSpecStr=[...S.specifiers].map(k=>abaSpecMap[k]).filter(Boolean).join('; ');
+  const abaSpecStr=[...S.specifiers].map(k=>withGddSev(abaSpecMap[k])).filter(Boolean).join('; ');
 
   return {today,p,asdLevelKey,levelLabel,levelText,abaSpecStr,domains,safetyFlags,targets,settings,hoursText,refs,openPara,impPara,evidPara,youngChild,isMilitary};
 }
@@ -3445,7 +3466,7 @@ function _iepLetterContent(){
     withNDD:'with associated neurodevelopmental, behavioral, or mental health condition',
     withCatatonia:'with catatonia'
   };
-  const specStr=[...S.specifiers].map(k=>specMap[k]).filter(Boolean).join('; ');
+  const specStr=[...S.specifiers].map(k=>withGddSev(specMap[k])).filter(Boolean).join('; ');
 
   // Service-specific rationale paragraphs
   const svContent={};
