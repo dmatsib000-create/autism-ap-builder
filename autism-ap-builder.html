@@ -5146,6 +5146,13 @@ document.addEventListener('DOMContentLoaded',()=>{
               clearIdGddEvidenceFlags();
               const adapStdCb=document.getElementById('adaptiveStandardizedCb');
               if(adapStdCb) adapStdCb.checked=false;
+              // Re-sync BIF gate + cross-check: this back-propagate cleared S.cogProfile
+              // and S.cogDataSource but does NOT route through bridgeCogProfileToSpecifier(),
+              // so toggleBifSpecifierGate() would otherwise leave withBifRow visible and
+              // cb.disabled stale from the prior borderline state. Mirrors the
+              // bridge's pairing at the bottom of bridgeCogProfileToSpecifier().
+              toggleBifSpecifierGate();
+              toggleBifAdaptiveCrossCheck();
             }
           }
         }
