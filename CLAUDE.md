@@ -15,6 +15,7 @@ claude_code/
 ├── docs/                        Tracked living references
 │   ├── branching-logic.md                       Technical reference (maintainer + Claude audience)
 │   ├── branching-logic-for-clinicians.html      Plain-English clinician companion (living spec)
+│   ├── quickstart.png                           Tool screenshot (used in README)
 │   └── audits/                                  Per-area audit procedures
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
 ├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
