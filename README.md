@@ -497,13 +497,23 @@ For trauma comorbid, IEP inclusion is gated behind an explicit per-letter opt-in
 
 Each output tab has its own sticky copy bar with tab-specific buttons.
 
-**A&P Note tab (top-level toolbar):**
+**A&P Note tab — top-level toolbar:**
 
-| Button | What it copies |
+| Button | What it does |
 |---|---|
 | Print | Triggers the browser print dialog with a clean printable stylesheet |
 | Copy Plain | Full note in plain text with monospace section dividers |
 | ★ Copy Rich Text | Full note as formatted HTML — pastes with fonts, bold, and structure into Word or Epic SmartText |
+| Clear All | Resets the entire form to defaults (with an inline confirmation prompt) |
+
+**A&P Note tab — per-pane partial-copy bar** (bottom of the output preview, for copying just one section instead of the full note):
+
+| Button | What it copies |
+|---|---|
+| Assessment (plain) | Just the Assessment section in plain text |
+| Plan (plain) | Just the Plan section in plain text |
+| All (plain) | Full note in plain text (same as the top-level Copy Plain) |
+| ★ Copy Rich Text | Full note as formatted HTML (same as the top-level Copy Rich Text) |
 
 **ABA Letter tab and IEP Letter tab (same three buttons each):**
 
