@@ -529,7 +529,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression<br>/ observation only</span></label>
           <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Unknown — prior<br>outside evaluation</span></label>
         </div>
-        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screeners (e.g., KBIT-2R) have documented floor effects in children under 5; result is best treated as preliminary pending formal developmental assessment.</div>
+        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
       </div>
 
       <div class="field-group">
@@ -4081,11 +4081,12 @@ const ID_COGDATASOURCE_LABELS = {
 };
 const GDD_COGDATASOURCE_LABELS = {
   comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
-  // KBIT-2R is normed 4+ and clinicians do encounter it on preschoolers. Listed here
-  // (the screener tier) rather than the comprehensive tier because it remains an IQ
-  // screener, not a comprehensive developmental assessment. The floor-effect warning
-  // (see toggleCogDataSourceVisibility) fires for screener+young exactly to flag this case.
-  screener: 'Brief screener<br>(ASQ-3, DAYC-2 Screener; or KBIT-2R if age 4+)',
+  // GDD-tier screener tier lists the developmental screening tools clinicians actually
+  // see in this age range (ASQ-3, SWYC, DAYC-2 Screener) plus KBIT-2R for age 4+ since
+  // KBIT-2R is normed 4+ and frequently encountered on preschoolers. KBIT-2R remains an
+  // IQ screener, not a developmental tool — the floor-effect warning (see
+  // toggleCogDataSourceVisibility) distinguishes the two concerns in its text.
+  screener: 'Brief screener<br>(ASQ-3, SWYC, DAYC-2 Screener; or KBIT-2R if age 4+)',
   clinical: 'Clinical impression<br>/ observation only',
   priorExternal: 'Unknown — prior<br>outside evaluation'
 };
