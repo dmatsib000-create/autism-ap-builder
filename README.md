@@ -4,6 +4,11 @@ A single-file clinical note generator for pediatric autism evaluations. Produces
 
 **Try it now:** https://dmatsib000-create.github.io/autism-ap-builder/autism-ap-builder.html
 
+**Reference docs:**
+
+- [Clinician's guide](docs/branching-logic-for-clinicians.html) — plain English; what the tool decides and why, with diagrams and vignettes
+- [Technical reference](docs/branching-logic.md) — for maintainers and future Claude Code sessions making code changes
+
 ## Why this tool exists
 
 The tool generates a full A&P note, ABA Letter of Medical Necessity, and IEP physician letter in about 15 minutes — three deliverables that, at this level of detail, would otherwise take an hour or more, and that most clinical workflows skip or shortcut entirely. One form on the left; three coordinated outputs on the right, updating in real time as you check boxes. No more staring at a blank Epic note after a 90-minute evaluation visit.
