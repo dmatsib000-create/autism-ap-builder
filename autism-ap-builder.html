@@ -675,7 +675,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
-            <label class="cb-row" id="withBifRow" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:11px;font-style:italic;margin-left:4px">(requires Cognitive Profile = Borderline)</span></label>
+            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:11px;font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -1504,7 +1504,10 @@ function withGddSev(label){
 // (not other BIF-adjacent specifiers, which do not exist).
 function withBifSourceQualifier(k,label){
   if(k!=='withBIF'||!label) return label;
-  if(S.cogProfile!=='borderline') return label;
+  // Route through the single-source-of-truth predicate so a future broadening
+  // of bifSpecifierAllowed() (e.g., adding an age check) propagates here
+  // automatically rather than requiring a parallel edit.
+  if(!bifSpecifierAllowed()) return label;
   if(S.cogDataSource==='screener') return label+' (brief screening only; comprehensive cognitive battery recommended to confirm)';
   if(S.cogDataSource==='clinical') return label+' (clinical impression only; comprehensive cognitive battery recommended to confirm)';
   return label;
@@ -4503,15 +4506,31 @@ const COG_PROFILE_COMPAT = {
   withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
 };
 // keep docs/branching-logic.md §1 in sync (specifier bridge — cogProfile change auto-populates specifiers Set; called from ageGroup/cogProfile/cogDataSource/adaptiveStandardized changes)
+// Single source of truth for whether the withBIF specifier is allowed in the
+// current state. BIF is the only cognitive specifier without a "suspected"
+// graceful-degradation pathway (no withSuspectedBIF exists, per Greenspan
+// 2017 — see §11.7 of docs/branching-logic.md). Every other cog tier softens
+// automatically when source data is weak: ID/GDD auto-bridge to withSuspected*
+// when cogDataSource is screener/clinical/empty; without* tiers assert
+// absence-of-impairment whose stakes are lower. BIF has only the one endpoint,
+// so the gate must enforce upstream what the auto-bridge enforces for the
+// other tiers — namely that a source is on file before the diagnosis is
+// asserted. The carried-forward-outside-diagnosis case is supported by
+// cogDataSource='priorExternal' (treated as confirmation-equivalent per PR-D).
+function bifSpecifierAllowed(){
+  return S.cogProfile==='borderline' && !!S.cogDataSource;
+}
+
 function bridgeCogProfileToSpecifier(cogVal){
   // Preserve a manually-checked withBIF across bridge re-fires. Without this,
   // the COG_SPEC_EXCL clear below would silently uncheck withBIF on every
   // re-fire (cogDataSource change, adaptiveStandardized toggle, ageGroup
   // change) because there is no auto-add branch for borderline (intentional;
   // see Greenspan 2017 rationale below). The preserve only fires when the
-  // clinician's stated cogProfile is still borderline — switching cogProfile
-  // away from borderline correctly drops withBIF.
-  const preserveBif = cogVal==='borderline' && S.specifiers.has('withBIF');
+  // gate condition is still met — bifSpecifierAllowed() now requires both
+  // cogProfile='borderline' AND a non-empty cogDataSource, so clearing the
+  // source via deselect correctly drops withBIF via the gate logic below.
+  const preserveBif = bifSpecifierAllowed() && S.specifiers.has('withBIF');
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
   // matching specifier. Clinician can still manually override after.
   COG_SPEC_EXCL.forEach(k=>{
@@ -4554,21 +4573,51 @@ function bridgeCogProfileToSpecifier(cogVal){
 }
 
 // withBIF gate — the checkbox is the only specifier in the list whose downstream
-// prose can be asserted with no upstream cogProfile signal. Without this gate,
-// a clinician can click withBIF while cogProfile is empty or 'unknown' and the
-// chart prints bare "with borderline intellectual functioning (BIF)" identical
-// to a WISC-V-backed call. Per the Fix #4 council (Round 3), the gate disables
-// the checkbox until cogProfile='borderline' and surfaces a visible inline note
-// explaining the requirement. The carried-forward-outside-diagnosis case is
-// supported via the priorExternal cogDataSource value (tooltip on the label
-// row documents this).
+// prose can be asserted with no upstream cog* signal because BIF has no
+// withSuspected*  graceful-degradation pathway (Greenspan 2017). Without this
+// gate, a clinician can produce bare "with borderline intellectual functioning
+// (BIF)" identical to a WISC-V-backed call. The gate enforces both arms of
+// bifSpecifierAllowed(): cogProfile='borderline' AND a non-empty cogDataSource.
+// When the gate closes while withBIF is currently checked (e.g., clinician
+// deselects cogDataSource after checking withBIF), this function also removes
+// withBIF from S.specifiers and unchecks the DOM — preserve-style behavior
+// would silently keep a now-unsupported diagnosis on the chart.
 function toggleBifSpecifierGate(){
+  const row = document.getElementById('withBifRow');
   const cb = document.querySelector('input[data-key="specifiers"][value="withBIF"]');
   const note = document.getElementById('withBifGateNote');
   if(!cb) return;
-  const allow = S.cogProfile==='borderline';
+  const profileOk = S.cogProfile==='borderline';
+  const sourceOk = !!S.cogDataSource;
+  const allow = profileOk && sourceOk;
+  // Row visibility: the entire withBIF specifier row is hidden unless the
+  // clinician has selected Borderline as the cognitive profile. This avoids
+  // displaying a contested specifier that the clinician hasn't signalled
+  // intent to use; once they pick Borderline, the row appears with a
+  // contextual hint walking them through the remaining source step.
+  if(row) row.style.display = profileOk ? '' : 'none';
   cb.disabled = !allow;
-  if(note) note.style.display = allow ? 'none' : '';
+  // Gate-closed cleanup: never leave a checked-but-disabled withBIF behind.
+  // Load-bearing for any future direct caller that bypasses the bridge
+  // (init call, render() hook, state-restoration path). When invoked from
+  // the end of bridgeCogProfileToSpecifier(), the COG_SPEC_EXCL loop has
+  // already deleted withBIF — so this branch is dead via that path. Do not
+  // remove without confirming no non-bridge caller exists.
+  if(!allow && S.specifiers.has('withBIF')){
+    S.specifiers.delete('withBIF');
+    cb.checked = false;
+  }
+  if(note){
+    // Note only matters when the row is visible (profileOk). When the row
+    // is hidden the note is hidden along with it. When visible-but-not-allowed,
+    // the only remaining unmet condition is the data-source step.
+    if(profileOk && !sourceOk){
+      note.style.display = '';
+      note.textContent = '(requires a Cognitive Data Source selection)';
+    } else {
+      note.style.display = 'none';
+    }
+  }
 }
 
 // ─── AGE-BASED VISIBILITY ────────────────────────────────────────────────────
@@ -4800,6 +4849,13 @@ function syncSchoolSvcFromNeeds(){
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
+  // Sync the withBIF gate to initial state. The HTML default `disabled` and
+  // static note text happen to match the empty-cogProfile state, but routing
+  // initial render through the gate function keeps the static HTML and the
+  // JS-rendered text from drifting apart on future edits, and protects any
+  // future state-restoration path (URL params, load-from-template) that
+  // mutates S.cogProfile/S.cogDataSource without firing the bridge.
+  toggleBifSpecifierGate();
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
@@ -4982,6 +5038,20 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
         }
         if(k==='specifiers'&&inp.checked){
+          // Defense-in-depth: the withBIF checkbox is gated via the `disabled`
+          // attribute (toggleBifSpecifierGate), but synthetic events or browser
+          // quirks could in theory deliver a `change` event past a disabled
+          // input. Fail closed — bifSpecifierAllowed() is the single source of
+          // truth; we revert the DOM checkbox AND undo the generic Set-add
+          // that fired earlier in this same handler (see line ~4995, the
+          // m[k].add(v) call that runs before any per-key block). Without
+          // this delete, the guard would only fix the visible state and
+          // leave withBIF asserted in S.specifiers.
+          if(v==='withBIF' && !bifSpecifierAllowed()){
+            S.specifiers.delete('withBIF');
+            inp.checked=false;
+            return;
+          }
           const langWith=['withLangImpairment','withSuspectedLang'];
           if(langWith.includes(v)){
             S.specifiers.delete('withoutLangImpairment');

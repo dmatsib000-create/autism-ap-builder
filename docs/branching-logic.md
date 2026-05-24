@@ -1194,14 +1194,36 @@ The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile sel
 
 **Teardown symmetry invariant (closed in PR-E)**: `updateAgeBasedVisibility` has three cogProfile-teardown branches (idCogGroup, gddCogGroup, bifCogGroup). All three must call `clearIdGddEvidenceFlags()` after clearing `S.cogProfile`. The function's own comment at the definition of `clearIdGddEvidenceFlags` warns that omitting this call lets stale `cogDataSource` and `adaptiveStandardized` flags silently auto-confirm the *next* selected cogProfile. PR-D introduced the bifCogGroup branch without the call; PR-E added it. When adding any future cogProfile teardown branch, mirror this pattern.
 
-**withBIF specifier gate (added in PR-E Fix #4)**: the `withBIF` specifier checkbox is the only entry in the specifier list whose downstream prose can be asserted with no upstream cogProfile signal. Without a gate, a clinician can click `withBIF` while cogProfile is empty or 'unknown' and the chart prints bare "with borderline intellectual functioning (BIF)" — identical to a WISC-V-backed call. The fix:
+**withBIF specifier gate (PR-E Fix #4, tightened post-code-review)**: BIF is the only cognitive specifier without a "suspected" graceful-degradation pathway. Every other cog tier softens automatically when source data is weak (ID/GDD auto-bridge to `withSuspected*` when `cogSourceSupportsConfirmation()` returns false; without* tiers assert lower-stakes absence-of-impairment). BIF has only `withBIF` as an endpoint — there is no `withSuspectedBIF` by design (Greenspan 2017 rationale at §11.7). So the gate must enforce upstream what the auto-bridge enforces for the other tiers: a data source must be on file before the diagnosis is asserted.
 
-1. HTML — the checkbox is declared `disabled` by default ([autism-ap-builder.html](../autism-ap-builder.html) ~line 678), and the row carries an inline note `(requires Cognitive Profile = Borderline)` plus a tooltip pointing the clinician at the carried-forward-outside-diagnosis pathway (cogProfile = Borderline + cogDataSource = Prior outside evaluation).
-2. JS — a new helper `toggleBifSpecifierGate()` toggles the `disabled` attribute and the note visibility based on `S.cogProfile==='borderline'`. The helper is called at the end of `bridgeCogProfileToSpecifier()`, so every cogProfile change re-evaluates the gate. The bridge's existing COG_SPEC_EXCL clear already removes `withBIF` from `S.specifiers` when cogProfile changes away from borderline, so the gate only needs to manage the DOM state.
+**Two-part gate** — `bifSpecifierAllowed()` returns `S.cogProfile==='borderline' && !!S.cogDataSource`. Single source of truth, referenced from both `toggleBifSpecifierGate()` and the `preserveBif` guard in the bridge.
 
-**Council decision (Round 3, 93%)**: the carried-forward case is not a workflow A blocks; it's the same priorExternal pathway PR-D already supports. A tentative-impression "withBIF without cogProfile" case is not audit-defensible (per the five-state framework: state 2 has no BIF analog by design — there is no `withSuspectedBIF`). Therefore A's hard gate does not block any audit-defensible workflow.
+1. **HTML** — the row is declared `style="display:none"` and the checkbox `disabled` by default ([autism-ap-builder.html](../autism-ap-builder.html) ~line 678), with an inline `<span id="withBifGateNote">` and a `title` tooltip pointing at the carried-forward-outside-diagnosis pathway (cogProfile = Borderline + cogDataSource = Prior outside evaluation).
+2. **JS** — `toggleBifSpecifierGate()` manages three things:
+   - **Row visibility** — the entire `<label id="withBifRow">` is hidden unless `cogProfile === 'borderline'`. This is a **distinct, looser condition** from the gate-allow predicate: the row appears as soon as the clinician signals intent to document BIF (by picking Borderline), and the inline contextual hint then walks them through the remaining source step.
+   - **Checkbox enable/disable** — the `disabled` attribute follows `bifSpecifierAllowed()` (both arms).
+   - **State cleanup** — when the gate closes while withBIF is currently checked, the function removes `withBIF` from `S.specifiers` and unchecks the DOM. Without this cleanup, deselecting cogDataSource while withBIF is set would leave a stale specifier silently emitting bare BIF prose in the chart.
+3. **Bridge integration** — the helper is called at the end of `bridgeCogProfileToSpecifier()`, so every cogProfile or cogDataSource change re-evaluates the gate. The bridge's `preserveBif` (which re-adds withBIF after the COG_SPEC_EXCL clear) uses `bifSpecifierAllowed()` so the preserve and the gate share the same predicate — they cannot drift apart.
+4. **Init** — `toggleBifSpecifierGate()` is also called once at `DOMContentLoaded` so the row visibility, disabled state, and note text are JS-rendered on first load rather than relying on the static HTML defaults matching the initial state.
+5. **Defense-in-depth** — the specifier checkbox change handler has a fail-closed guard: if a synthetic event delivers a `change` for withBIF past the disabled attribute (rare browser quirk), the handler reverts both the DOM and the generic Set-add that fires earlier in the same handler chain.
+6. **Downstream consistency** — `withBifSourceQualifier` also routes through `bifSpecifierAllowed()` rather than an inline cogProfile check, so any future broadening of the predicate propagates to the qualifier automatically.
 
-**Maintainer note**: do not add a `withSuspectedBIF` specifier or an inline-source selector to the withBIF checkbox row in an attempt to "soften" the gate. Both alternatives were considered and rejected in the Round 3 council — the no-`withSuspectedBIF` rule is intentional (Greenspan 2017; see §11.7 above), and the inline-source alternative (Option F) produces output identical to the existing cogProfile=borderline + cogDataSource=clinical pathway with significantly more code.
+**Why a single source predicate**: the original PR-E gate only checked `cogProfile==='borderline'`. The follow-up code review found that a clinician could still produce bare BIF prose by setting cogProfile=borderline and checking withBIF without picking a cogDataSource. Extending the gate's predicate to also require cogDataSource — and routing both the gate and the bridge's preserve through `bifSpecifierAllowed()` — closes that gap and prevents future drift between the two consumers.
+
+**Pathways through the tightened gate**:
+
+| cogProfile | cogDataSource | withBIF | Result |
+|---|---|---|---|
+| borderline | comprehensive | ✓ | `with borderline intellectual functioning (BIF)` — bare, confirmation-equivalent |
+| borderline | priorExternal | ✓ | `with borderline intellectual functioning (BIF)` — bare; carried-forward outside diagnosis case |
+| borderline | screener | ✓ | `... (BIF) (brief screening only; comprehensive cognitive battery recommended to confirm)` |
+| borderline | clinical | ✓ | `... (BIF) (clinical impression only; comprehensive cognitive battery recommended to confirm)` |
+| borderline | *(empty)* | — | **withBIF blocked**; note: `(requires a Cognitive Data Source selection)` |
+| *(not borderline)* | any | — | **withBIF blocked**; note: `(requires Cognitive Profile = Borderline)` |
+
+Every path through the gate produces either qualified or appropriately-attributed BIF prose; no path produces bare BIF with no source on file.
+
+**Maintainer note**: do not add a `withSuspectedBIF` specifier or an inline-source selector to the withBIF checkbox row in an attempt to "soften" the gate. The no-`withSuspectedBIF` rule is intentional (Greenspan 2017). When adding a new spec-label consumer for BIF, route it through `applySpecLabelTransforms()` (§11.12) — `withBifSourceQualifier` handles screener/clinical sources; priorExternal and comprehensive correctly produce bare prose because the gate guarantees no data-less BIF assertion can pass.
 
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
