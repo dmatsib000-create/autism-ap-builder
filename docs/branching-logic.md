@@ -1247,6 +1247,27 @@ A passive informational hint fires in the adaptive section when `cogProfile==='b
 
 **Maintainer note**: do not extend the predicate to `cogProfile==='lowAverage' + impaired adaptive`. The AACN/Wexler argument empirically applies there too, but the coding pathway differs (lowAverage doesn't land in R41.83), and the clinical question shifts from "BIF vs mild ID" to "lowAverage vs mild ID via adaptive criterion." Different question, different hint text would be needed. Flag as separable future work.
 
+### 11.14 ID vs GDD predicate split (PR-G)
+
+The `confirmable` predicate at [autism-ap-builder.html:4559](../autism-ap-builder.html#L4559) is split into two predicates as of PR-G:
+
+- `confirmableId = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed()` — unchanged from prior behavior. DSM-5-TR ID criteria mandate cognitive deficit + adaptive deficit + onset in developmental period; the tool enforces this via cogSource (comprehensive or priorExternal) + adaptive-impaired + standardized-adaptive evidence (Vineland-3/BASC-3 consistent in priorTesting OR the clinician-attested checkbox).
+- `confirmableGdd = cogSourceSupportsConfirmation()` — loosened. F88 GDD is used when ID cannot be reliably assessed (typically under 5); adaptive deficits are typical but not strictly required by DSM-5-TR or AACAP. A comprehensive developmental battery (Bayley-4, Mullen, Griffiths, DAYC-2) is sufficient on its own to drop the "provisional/suspected" framing. The adaptive section continues to inform downstream prose but no longer gates the confirmed-vs-suspected GDD bridge.
+
+**Rationale and council provenance.** The pre-PR-G predicate over-enforced on Bayley-4 (which itself includes adaptive subscales — the predicate's adaptive requirement was partly redundant) and added friction in the common comprehensive-developmental-battery case. The implementation council (Option α, 91.4%) chose the simplest fix that aligns with the F88 definition. `clinical-council reopens` — revisits the PR-C-era assumption that ID and GDD share a single predicate.
+
+**Maintainer note**: do not collapse `confirmableId` and `confirmableGdd` back into a single `confirmable`. The asymmetry is load-bearing. If a future change adds a third tier (e.g., a separate `confirmableBif`), follow the same pattern — extract the predicate, name it explicitly, and route the cogVal branch through it.
+
+### 11.15 BIF priorExternal attribution (PR-G)
+
+The `withBifSourceQualifier` transform at [autism-ap-builder.html:1513](../autism-ap-builder.html#L1513) now appends a priorExternal attribution string when `cogDataSource === 'priorExternal'`:
+
+> `"(per prior outside evaluation; supporting records not available for direct review at this visit)"`
+
+This mirrors the `priorExtAttribution` pattern used for the ID/GDD F70/F71/F72/F88 dx lines around line 1716. Before PR-G, a BIF call grounded in an outside report produced bare prose indistinguishable from one grounded in a same-visit comprehensive battery — a documentation-discipline gap surfaced by the Concern 1 clinical-validity council (Asymmetry 6, 96.5% combined confidence).
+
+**Maintainer note**: BIF prose now has four output variants (bare for comprehensive, screener qualifier, clinical qualifier, priorExternal attribution). When adding a fifth cogDataSource value (if ever), add the corresponding branch in `withBifSourceQualifier` rather than leaving the new value to fall through to bare prose.
+
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
 Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*

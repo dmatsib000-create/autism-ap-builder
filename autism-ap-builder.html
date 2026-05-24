@@ -1518,6 +1518,11 @@ function withBifSourceQualifier(k,label){
   if(!bifSpecifierAllowed()) return label;
   if(S.cogDataSource==='screener') return label+' (brief screening only; comprehensive cognitive battery recommended to confirm)';
   if(S.cogDataSource==='clinical') return label+' (clinical impression only; comprehensive cognitive battery recommended to confirm)';
+  // priorExternal attribution — mirrors the priorExtAttribution pattern used
+  // for ID/GDD dx lines around line 1716. Without this, a BIF call grounded
+  // in an outside report produced bare prose indistinguishable from one
+  // grounded in a same-visit comprehensive battery (PR-G R1.1).
+  if(S.cogDataSource==='priorExternal') return label+' (per prior outside evaluation; supporting records not available for direct review at this visit)';
   return label;
 }
 // Low-average qualifier: a "low average" cognitive profile in a toddler or
@@ -4547,13 +4552,23 @@ function bridgeCogProfileToSpecifier(cogVal){
     if(cb) cb.checked=false;
   });
   let toCheck=null;
-  // Default ID/GDD to SUSPECTED. Upgrade to confirmed only when cognitive data source is a
-  // comprehensive battery (or prior outside evaluation), adaptive functioning is formally
-  // impaired, AND adaptive impairment is backed by standardized assessment (Vineland-3/BASC-3
-  // consistent in priorTesting, OR the clinician-attested standardized-assessment checkbox).
-  const confirmable = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
-  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmable ? 'withID' : 'withSuspectedID';
-  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmable ? 'withGDD' : 'withSuspectedGDD';
+  // ID confirmation requires the full predicate — DSM-5-TR ID criteria mandate
+  // BOTH IQ deficit AND adaptive deficit AND onset in developmental period.
+  // The tool enforces this via cogSourceSupportsConfirmation + adaptive-impaired
+  // + standardized-adaptive evidence.
+  //
+  // GDD (F88) confirmation is intentionally LESS strict. F88 is used when ID
+  // cannot be reliably assessed (typically under 5); adaptive deficits are
+  // typical but not strictly required by DSM-5-TR or AACAP. A comprehensive
+  // developmental battery (e.g., Bayley-4 which includes cognitive + adaptive
+  // subscales, or Mullen, Griffiths, DAYC-2) is sufficient on its own. The
+  // adaptive section continues to inform downstream prose but no longer gates
+  // the confirmed-vs-suspected GDD bridge. (PR-G R2.1; clinical-council reopens
+  // — revisits the PR-C-era assumption that ID and GDD share a predicate.)
+  const confirmableId  = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
+  const confirmableGdd = cogSourceSupportsConfirmation();
+  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmableId ? 'withID' : 'withSuspectedID';
+  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmableGdd ? 'withGDD' : 'withSuspectedGDD';
   // BIF is intentionally NOT auto-bridged. There is no `withSuspectedBIF` and no data-source
   // confirmation pathway for BIF; bridging would send a "the tool thinks this fits" signal
   // unsupported by literature (Greenspan 2017). The clinician selects `borderline` here to
