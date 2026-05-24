@@ -548,6 +548,14 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              Vineland-3/BASC-3 in priorTesting when the clinician knows formal data exists but
              doesn't want to enter the instrument explicitly. -->
         <label class="cb-row" style="margin-top:6px" title="Check if the adaptive impairment level above reflects a standardized adaptive measure (Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive). Required for formal ID/GDD diagnosis."><input type="checkbox" id="adaptiveStandardizedCb" onchange="S.adaptiveStandardized=this.checked;bridgeCogProfileToSpecifier(S.cogProfile);render()"> Based on standardized adaptive assessment</label>
+        <!-- BIF + impaired-adaptive cross-check. Fires only when cogProfile=borderline
+             paired with mildly/moderately/severely-impaired adaptive — the exact
+             differential zone where the BIF vs mild ID call lives (AACN 2020;
+             Wexler 2023). Passive informational; auto-hides on predicate change.
+             Visual treatment shares the floor-effect-warning family but uses a
+             left-border accent to differentiate from purely-informational notes,
+             since this hint carries a clinical recommendation. -->
+        <div id="bifAdaptiveCrossCheck" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px;padding:6px 10px;border-left:3px solid #f59e0b;background:#fffaf0"></div>
       </div>
 
       <div class="field-group">
@@ -4570,6 +4578,12 @@ function bridgeCogProfileToSpecifier(cogVal){
     if(cb) cb.checked=true;
   }
   toggleBifSpecifierGate();
+  // Re-evaluate the BIF + impaired-adaptive cross-check on every bridge fire
+  // (covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized changes).
+  // adaptProfile changes do not call the bridge per the council-D4 invariant
+  // (avoid surprise specifier flips from far-away controls), so the adaptProfile
+  // change handler calls toggleBifAdaptiveCrossCheck() directly.
+  toggleBifAdaptiveCrossCheck();
 }
 
 // withBIF gate — the checkbox is the only specifier in the list whose downstream
@@ -4617,6 +4631,35 @@ function toggleBifSpecifierGate(){
     } else {
       note.style.display = 'none';
     }
+  }
+}
+
+// BIF + impaired-adaptive cross-check. Fires when cogProfile=borderline is paired
+// with mildly/moderately/severely-impaired adaptive function — the differential
+// zone where the BIF vs mild ID call lives. AACN 2020 / Wexler 2023 found no
+// meaningful adaptive-function gap between FSIQ 70–79 and 80–89, which means
+// clinicians making the BIF call in the presence of adaptive impairment are
+// making a threshold judgment about whether the picture meets ID criteria.
+// Passive informational only — does not flip any specifier; the clinician's
+// final call may still be BIF (e.g., adaptive deficits explained by ADHD,
+// mood, trauma, or informant variability). belowPotential is intentionally
+// excluded — that descriptor implies the clinician has already attributed the
+// adaptive gap to a non-cognitive cause.
+const IMPAIRED_ADAPTIVE_WORDS = {
+  mildlyImpaired:    'mild',
+  moderatelyImpaired:'moderate',
+  severelyImpaired:  'severe'
+};
+function toggleBifAdaptiveCrossCheck(){
+  const el = document.getElementById('bifAdaptiveCrossCheck');
+  if(!el) return;
+  const sevWord = IMPAIRED_ADAPTIVE_WORDS[S.adaptProfile];
+  const fire = S.cogProfile==='borderline' && !!sevWord;
+  if(fire){
+    el.textContent = 'Note: Borderline IQ paired with '+sevWord+' adaptive impairment may meet DSM-5-TR criteria for mild intellectual disability. Consider whether the clinical picture better fits ID over BIF, or whether the adaptive deficits are better explained by another cause (ADHD, mood, trauma, informant variability).';
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
   }
 }
 
@@ -4856,6 +4899,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // future state-restoration path (URL params, load-from-template) that
   // mutates S.cogProfile/S.cogDataSource without firing the bridge.
   toggleBifSpecifierGate();
+  toggleBifAdaptiveCrossCheck();
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
@@ -4869,7 +4913,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
       else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile') S.adaptProfile='';
+      else if(nm==='adaptProfile'){S.adaptProfile='';toggleBifAdaptiveCrossCheck();}
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
       else if(nm==='asdLevelSC') S.asdLevelSC='';
@@ -4924,7 +4968,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
       // (per council D4 — avoid surprise specifier flips from far-away controls).
       else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile') S.adaptProfile=inp.value;
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;toggleBifAdaptiveCrossCheck();}
       else if(nm==='dysmorphism') S.dysmorphism=inp.value;
       else if(nm==='regressionTiming') S.regressionTiming=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;

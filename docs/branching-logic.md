@@ -1225,6 +1225,28 @@ Every path through the gate produces either qualified or appropriately-attribute
 
 **Maintainer note**: do not add a `withSuspectedBIF` specifier or an inline-source selector to the withBIF checkbox row in an attempt to "soften" the gate. The no-`withSuspectedBIF` rule is intentional (Greenspan 2017). When adding a new spec-label consumer for BIF, route it through `applySpecLabelTransforms()` (§11.12) — `withBifSourceQualifier` handles screener/clinical sources; priorExternal and comprehensive correctly produce bare prose because the gate guarantees no data-less BIF assertion can pass.
 
+### 11.13 BIF + impaired-adaptive cross-check (PR-F)
+
+A passive informational hint fires in the adaptive section when `cogProfile==='borderline'` is paired with adaptProfile ∈ `{mildlyImpaired, moderatelyImpaired, severelyImpaired}`. The hint surfaces the differential-zone question the literature (AACN 2020; Wexler 2023) makes most active for the BIF call — empirical data show no meaningful adaptive-function gap between FSIQ 70–79 and 80–89, so adaptive impairment paired with borderline IQ is exactly the population where the BIF vs mild ID call is live.
+
+**Hint behavior**:
+- Fires only on the three impaired adaptive levels. `belowPotential` is intentionally excluded — that descriptor implies the clinician has already attributed the adaptive gap to a non-cognitive cause (Level 1/2 ASD pattern).
+- Auto-hides when the predicate becomes false (cogProfile changes away, adaptive changes to a non-impaired or `belowPotential` level). No dismiss-and-record mechanism — sticking with the floor-effect-warning pattern.
+- Severity word is interpolated from adaptProfile via `IMPAIRED_ADAPTIVE_WORDS`.
+- Text explicitly names alternative causes (ADHD, mood, trauma, informant variability) so the clinician knows the hint is informational, not prescriptive — final call may still be BIF when adaptive deficits are better explained by something else.
+
+**Wiring**:
+- The function `toggleBifAdaptiveCrossCheck()` is called from three places:
+  - End of `bridgeCogProfileToSpecifier()` — covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized changes (all of which fire the bridge).
+  - The `adaptProfile` change/deselect handlers — direct calls because the adaptProfile change handler does NOT fire the bridge (per council-D4 invariant: avoid surprise specifier flips from far-away controls).
+  - The DOMContentLoaded init hook — keeps the static HTML default in sync with state.
+
+**Visual treatment**: gray italic on a warm-cream background with a yellow-amber left-border accent — same color family as the floor-effect warning (gray italic) but with the border-left differentiator distinguishing it as carrying a clinical recommendation rather than pure information. The two warnings cannot co-fire (floor-effect requires `young`; BIF cross-check requires `borderline`, which is gated to `older`).
+
+**Council decision (Round 3, 91%)**: option A from the 3-voice council (DBP attending + clinical workflow analyst + UX designer). The combined-confidence residual reflects honest uncertainty about post-implementation behavioral effect (will clinicians actually reconsider, or will the hint become noise?) and reverse-flow asymmetry (clinicians who set adaptive first, then cogProfile, get a less salient hint). Both are only observable from in-clinic use; revisit after a month.
+
+**Maintainer note**: do not extend the predicate to `cogProfile==='lowAverage' + impaired adaptive`. The AACN/Wexler argument empirically applies there too, but the coding pathway differs (lowAverage doesn't land in R41.83), and the clinical question shifts from "BIF vs mild ID" to "lowAverage vs mild ID via adaptive criterion." Different question, different hint text would be needed. Flag as separable future work.
+
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
 Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*
