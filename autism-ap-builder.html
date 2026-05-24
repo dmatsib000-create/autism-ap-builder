@@ -1197,6 +1197,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 // ─── STATE ───────────────────────────────────────────────────────────────────
 // DSM-5 uses two separate severity domains; there is no single asdLevel field.
 // Derive a combined display level as Math.max(asdLevelSC, asdLevelRRB) where needed.
+// keep docs/branching-logic.md §1.2 in sync (state model — every property here)
 const S = {
   ageGroup:'', pronouns:'', langLevel:'', langModifiers:new Set(),
   cogProfile:'', unevenCog:false, unevenCogDesc:'', cogDataSource:'', adaptProfile:'', adaptiveStandardized:false, strengths:'',
@@ -1264,6 +1265,7 @@ const isLangAgeAppropriate = () => S.langModifiers.has('langAgeAppropriate');
 const hasHyperlexia = () => S.strengths.toLowerCase().includes('hyperlexia');
 const hasAnyArticulation = () => hasSpeechSoundErrors() || hasReducedIntell();
 
+// keep docs/branching-logic.md §8 in sync (getPron, V3_MAP, v3, aOr — all defined sequentially below)
 function getPron() {
   const m = {
     he:{subj:'he',obj:'him',poss:'his',refl:'himself',cap:'He'},
@@ -1344,6 +1346,7 @@ function getLangDescription() {
 // ─── RULES ENGINE ────────────────────────────────────────────────────────────
 // Each rule returns {include: boolean}. resolveOv() applies manual overrides on top.
 // ruleABA() also returns {reasons: string[]} — used to populate the ABA letter justification.
+// keep docs/branching-logic.md §7 in sync (all 18 rule* functions + resolveOv below)
 function ruleABA() {
   const r=[];
   if(S.ageGroup==='toddler') r.push('toddler age group');
@@ -1440,6 +1443,7 @@ function resolveOv(key,rule) {
 }
 
 // ─── DSM-5 VALIDATION ────────────────────────────────────────────────────────
+// keep docs/branching-logic.md §4 in sync (criteria gate; A=3, B>=2, C&&D&&E)
 function validateCriteria() {
   const a=S.criteriaA.size, b=S.criteriaB.size, cde=S.criteriaC&&S.criteriaD&&S.criteriaE;
   return {aCount:a, bCount:b, cde, complete:a===3&&b>=2&&cde};
@@ -1669,6 +1673,7 @@ function therapyStatusLine(svc, label){
   return null;
 }
 
+// keep docs/branching-logic.md §1.1 in sync (output pipeline; returns {main, assessment, plan})
 function generateNote() {
   const pr=getPron();
   const L=[];
@@ -3081,6 +3086,7 @@ function generateRichHTML(isPreview=false) {
 }
 
 // ─── ABA LETTER OF MEDICAL NECESSITY ─────────────────────────────────────────
+// keep docs/branching-logic.md §9 in sync (ABA letter content; confirmed-only gate, syncABATargetsFromNeeds, domain filter, safety-flag urgency clause, abaSpecMap omissions)
 function _abaContent(){
   // v3() is module-scope (defined just after getPron); see V3_MAP for the verb list.
   const p=getPron();
@@ -3341,6 +3347,7 @@ async function copyABALetter(format){
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
+// keep docs/branching-logic.md §10 in sync (IEP letter content; schoolDoc+ageGroup tab gate, F84.0 vs Z03.89, trauma opt-in, 13 service blocks, 4 accommodation categories)
 function _iepLetterContent(){
   const levelNumMap={1:'Level 1 (requiring support)',2:'Level 2 (requiring substantial support)',3:'Level 3 (requiring very substantial support)'};
   const scLvl=parseInt(S.asdLevelSC)||0;
@@ -3920,6 +3927,7 @@ function setPreviewMode(mode){
 }
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
+// keep docs/branching-logic.md §1.1 + §5 in sync (master render loop; tab visibility gates for ABA + IEP, fallback to note tab when active tab hides)
 function render(){
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
@@ -3993,6 +4001,7 @@ function updateCriteriaBadge(v){
 }
 
 // ─── OVERRIDES ───────────────────────────────────────────────────────────────
+// keep docs/branching-logic.md §7.5 in sync (one entry per override pill; each binds a key to a rule function)
 const OV_DEFS=[
   {key:'aba',label:'ABA therapy',rule:ruleABA},{key:'pcit',label:'PCIT',rule:rulePCIT},
   {key:'psychotherapy',label:'Psychotherapy',rule:rulePsychotherapy},{key:'socialSkills',label:'Social Skills Group',rule:ruleSocialSkills},
@@ -4376,6 +4385,7 @@ const COG_PROFILE_COMPAT = {
   withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
   withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
 };
+// keep docs/branching-logic.md §1 in sync (specifier bridge — cogProfile change auto-populates specifiers Set; called from ageGroup/cogProfile/cogDataSource/adaptiveStandardized changes)
 function bridgeCogProfileToSpecifier(cogVal){
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
   // matching specifier. Clinician can still manually override after.
@@ -4532,6 +4542,7 @@ function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // schoolSvcManualOff tracks services the clinician explicitly unchecked so they are not re-added.
 
 // Needs checkboxes → pre-populate ABA targets (add-only; manual unchecks are preserved)
+// keep docs/branching-logic.md §9.2 in sync (add-only by design; rigidity tied to B2 is the one exception)
 function syncABATargetsFromNeeds(){
   // rigidity is derived from B2 (not directly checkable); reset before re-evaluating
   // (intentional exception to add-only: rigidity has no standalone checkbox)
