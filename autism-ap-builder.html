@@ -4081,7 +4081,11 @@ const ID_COGDATASOURCE_LABELS = {
 };
 const GDD_COGDATASOURCE_LABELS = {
   comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
-  screener: 'Brief developmental screener<br>(e.g. ASQ-3, DAYC-2 Screener)',
+  // KBIT-2R is normed 4+ and clinicians do encounter it on preschoolers. Listed here
+  // (the screener tier) rather than the comprehensive tier because it remains an IQ
+  // screener, not a comprehensive developmental assessment. The floor-effect warning
+  // (see toggleCogDataSourceVisibility) fires for screener+young exactly to flag this case.
+  screener: 'Brief screener<br>(ASQ-3, DAYC-2 Screener; or KBIT-2R if age 4+)',
   clinical: 'Clinical impression<br>/ observation only',
   priorExternal: 'Unknown — prior<br>outside evaluation'
 };
