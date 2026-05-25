@@ -281,6 +281,20 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .therapy-status-row.inactive{opacity:.45}
 .therapy-status-row.inactive .r-opt{cursor:not-allowed;pointer-events:none;background:var(--gray-50);border-color:var(--gray-200);color:var(--gray-400)}
 .therapy-status-row.inactive .ts-label{color:var(--gray-400)}
+/* Social Work tile (clinician-judgment referral, not auto-rule-driven). Looks like a
+   regular .ov-pill but click-toggles a bool and pairs with a small ⓘ button that opens
+   a popover containing the 6 reasons checkboxes. The wrap is a flex container that the
+   parent .ov-pill-grid treats as a single flex item. The popover reuses the .info-popover
+   pattern from PR-M (positioned absolute below the wrap).  */
+.ov-sw-wrap{position:relative;display:inline-flex;align-items:stretch;gap:0}
+.ov-sw-wrap .ov-pill{border-top-right-radius:0;border-bottom-right-radius:0;border-right:none;flex:1}
+.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:#166534;cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
+.ov-sw-reasons-btn:hover{filter:brightness(.96)}
+.ov-sw-reasons-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.ov-sw-reasons-btn[aria-expanded="true"]{background:#bbf7d0}
+.ov-sw-popover-body{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
+.ov-sw-popover-body input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 /* ── Note preview — document style ─── */
 .note-doc{font-family:var(--font);font-size:12px;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
@@ -4382,15 +4396,23 @@ const OV_DEFS=[
   {key:'gi',label:'GI referral',rule:ruleGI},{key:'sleep_ref',label:'Sleep study referral (diagnostic PSG)',rule:ruleSleepRef},
   {key:'eeg',label:'EEG (order)',rule:ruleEEG},{key:'earlySteps',label:'Early Steps referral (FL)',rule:ruleEarlySteps},
   {key:'fdlrs',label:'FDLRS referral (FL)',rule:ruleFDLRS},{key:'card',label:'CARD information',rule:ruleCARD},
+  // Social Work is special — no auto-rule (clinician judgment is the gate). The "rule"
+  // returns S.socialWork so resolveOv treats it like any auto-driven referral; the tile
+  // is rendered with toggle semantics in renderOverrides() rather than cycle. Reasons
+  // sub-options live in §8 and are mirrored via a popover on the tile.
+  {key:'socialWork',label:'Social work referral',rule:()=>({include:S.socialWork,reasons:[]})},
 ];
 // Clinical clusters for the override-pill grid. SLP, OT, PT, ABA are first-three-then-fourth
 // in 'core' so they land in the top-left scan zone. Medical/diagnostic referrals cluster
 // together below; Florida-specific resources sit at the bottom. Adding a new referral:
 // add to OV_DEFS for label+rule, then add the key to the appropriate group below.
+// 'Clinician-judgment referrals' is for tiles where the clinician's decision IS the gate
+// (no auto-rule produces a useful prediction). Social work currently the only member.
 const OV_GROUPS=[
   {title:'Core therapies', keys:['slp','ot','pt','aba','pcit','psychotherapy','socialSkills']},
   {title:'Medical & diagnostic referrals', keys:['audiology','genetics','neurology','qbtest','psychiatry','gi','sleep_ref','eeg']},
   {title:'Florida resources', keys:['earlySteps','fdlrs','card']},
+  {title:'Clinician-judgment referrals', keys:['socialWork']},
 ];
 // True when a referral is currently included in the output — either the auto rule says
 // include OR the clinician has manually overridden to 'yes'. Used to enable/disable the
@@ -4424,11 +4446,25 @@ function updateTherapyStatusEnablement(){
     row.classList.toggle('inactive', !isTherapyActive(key));
   });
 }
+// Labels for socialWorkReasons sub-options. Single source of truth — also consumed by
+// the prose generator at line ~2698 (kept in sync manually; if you add a reason here,
+// add it to the prose map AND to the §8 HTML checkboxes).
+const SW_REASON_LABELS = {
+  apd_waiver: 'APD/Medicaid waiver application assistance',
+  financial: 'Financial resource counseling',
+  caregiver_support: 'Caregiver support and mental health',
+  community_nav: 'Community resource navigation',
+  family_support: 'Family support coordination',
+  family_safety: 'Family safety concerns'
+};
+
 function renderOverrides(){
   const p=document.getElementById('overridePanel');if(!p)return;
+  // Standard tile renderer for the 18 auto-rule-driven referrals.
   const pillFor = key => {
     const d = OV_DEFS.find(x => x.key === key);
     if(!d) return '';
+    if(key === 'socialWork') return socialWorkTileHTML(d);
     const r=d.rule(),ov=S.overrides[d.key],eff=resolveOv(d.key,r);
     let cls,lbl;
     if(ov==='yes'){cls='ov-yes';lbl='Override · Included';}
@@ -4443,6 +4479,108 @@ function renderOverrides(){
   ).join('');
 }
 
+// Special tile for Social Work — toggle semantics + reasons popover. Visually matches the
+// other tiles but click toggles S.socialWork directly (no auto/yes/no cycle, since there's
+// no auto-rule to defer to). When active, an inline ⓘ-style button opens a popover with
+// the 6 reasons checkboxes; popover state is rendered fresh from S.socialWorkReasons on
+// each open (no DOM sync drift). §8 checkbox changes sync back via the next render() pass.
+function socialWorkTileHTML(d){
+  const active = !!S.socialWork;
+  const cls = active ? 'ov-yes' : 'auto-no';
+  const count = S.socialWorkReasons.size;
+  const stateLine = active
+    ? `Active${count ? ' · ' + count + ' reason' + (count>1?'s':'') : ' · click ⋯ to add reasons'}`
+    : 'Not active · clinician judgment';
+  const tip = active
+    ? 'Click to deactivate. Click the ⋯ button to edit reasons.'
+    : 'Click to activate social work referral.';
+  const tile = `<button class="ov-pill ${cls}" onclick="toggleSocialWorkTile()" title="${tip}"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${stateLine}</span></button>`;
+  const reasonsBtn = active
+    ? `<button type="button" class="ov-sw-reasons-btn" aria-expanded="false" aria-controls="socialWorkPopover" data-info-toggle="socialWorkPopover" onclick="event.stopPropagation();openSocialWorkPopover()" title="Edit social work reasons">⋯</button>`
+    : '';
+  const popover = active
+    ? `<div id="socialWorkPopover" class="info-popover" role="region" aria-label="Social work reasons" hidden></div>`
+    : '';
+  return `<div class="ov-sw-wrap">${tile}${reasonsBtn}${popover}</div>`;
+}
+
+// Toggle handler for the Social Work tile. Mutates S.socialWork, mirrors to the §8
+// checkbox + reasons-row visibility, and clears reasons on deactivation. Auto-opens
+// the popover on activation so the clinician is invited to specify reasons immediately.
+function toggleSocialWorkTile(){
+  const newActive = !S.socialWork;
+  S.socialWork = newActive;
+  // Mirror to §8 main checkbox
+  const swCb = document.querySelector('input[data-key="single"][value="socialWork"]');
+  if(swCb) swCb.checked = newActive;
+  // Mirror to §8 reasons row visibility
+  const swr = document.getElementById('socialWorkReasonsRow');
+  if(swr) swr.style.display = newActive ? '' : 'none';
+  if(!newActive){
+    // Deactivation clears reasons + their §8 checkboxes
+    S.socialWorkReasons.clear();
+    document.querySelectorAll('input[data-key="socialWorkReasons"]').forEach(c => c.checked = false);
+  }
+  render();
+  // render() early-returns on fresh load (!hasInput) without calling renderOverrides;
+  // explicit call here guarantees the tile reflects the new state regardless of path.
+  renderOverrides();
+  if(newActive){
+    // Auto-open the popover so reasons can be set right away. setTimeout 0 lets the
+    // browser commit the renderOverrides DOM mutation before openSocialWorkPopover
+    // tries to find the popover element it just rendered.
+    setTimeout(openSocialWorkPopover, 0);
+  }
+}
+
+// Render the popover body fresh from S.socialWorkReasons and surface it. Checkbox change
+// handlers inside the popover update both S AND the corresponding §8 sub-checkboxes so
+// the two displays stay synchronized.
+function openSocialWorkPopover(){
+  const pop = document.getElementById('socialWorkPopover');
+  const btn = document.querySelector('.ov-sw-reasons-btn[data-info-toggle="socialWorkPopover"]');
+  if(!pop || !btn) return;
+  // Close any other open info popovers first (one-at-a-time discipline, mirrors PR-M)
+  document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]').forEach(other => {
+    if(other !== btn){
+      other.setAttribute('aria-expanded','false');
+      const otherId = other.getAttribute('data-info-toggle');
+      const otherPop = otherId && document.getElementById(otherId);
+      if(otherPop) otherPop.hidden = true;
+    }
+  });
+  // Render checkboxes from S
+  pop.innerHTML = '<div class="ov-sw-popover-body">'
+    + Object.entries(SW_REASON_LABELS).map(([val, label]) => {
+        const checked = S.socialWorkReasons.has(val) ? ' checked' : '';
+        return `<label><input type="checkbox" data-sw-reason="${val}"${checked}> ${label}</label>`;
+      }).join('')
+    + '</div>';
+  // Wire change handlers — sync to S AND to the §8 sub-checkboxes.
+  // Update the tile's state line surgically (NOT via renderOverrides) — full re-render
+  // would tear down this popover mid-interaction.
+  pop.querySelectorAll('input[data-sw-reason]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const val = inp.dataset.swReason;
+      if(inp.checked) S.socialWorkReasons.add(val);
+      else S.socialWorkReasons.delete(val);
+      // Mirror to §8 sub-checkbox
+      const mirror = document.querySelector(`input[data-key="socialWorkReasons"][value="${val}"]`);
+      if(mirror) mirror.checked = inp.checked;
+      // Surgical update of the tile's "N reasons" state line; preserves this popover.
+      const stateEl = document.querySelector('.ov-sw-wrap .ov-pill-state');
+      if(stateEl){
+        const count = S.socialWorkReasons.size;
+        stateEl.textContent = count
+          ? `Active · ${count} reason${count > 1 ? 's' : ''}`
+          : 'Active · click ⋯ to add reasons';
+      }
+      render(); // updates downstream note prose
+    });
+  });
+  btn.setAttribute('aria-expanded', 'true');
+  pop.hidden = false;
+}
 let priorTestingExpanded=false;
 function togglePriorExpander(){
   priorTestingExpanded=!priorTestingExpanded;
@@ -5364,9 +5502,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       return;
     }
     // Click outside any open popover or its button closes the popover.
+    // Extended in social-work-tile work to also catch .ov-sw-reasons-btn triggers
+    // (same .info-popover surface, different trigger selector).
     const inOpenPopover = e.target.closest('.info-popover');
     if(inOpenPopover) return;
-    document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(openBtn=>{
+    document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]').forEach(openBtn=>{
       openBtn.setAttribute('aria-expanded','false');
       const id = openBtn.getAttribute('data-info-toggle');
       const pop = id && document.getElementById(id);
@@ -5375,7 +5515,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   document.addEventListener('keydown',e=>{
     if(e.key !== 'Escape') return;
-    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"]');
+    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]');
     if(!openBtns.length) return;
     openBtns.forEach(btn=>{
       btn.setAttribute('aria-expanded','false');
