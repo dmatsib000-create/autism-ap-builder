@@ -2695,7 +2695,7 @@ function generateNote() {
       if(S.focalNeuroFindings) clauses.push('evaluation/management of focal neurological findings');
       if(S.comorbid.has('epilepsy')) clauses.push('evaluation/management of epilepsy/seizure disorder (may require EEG, neuroimaging, and/or antiepileptic medication management)');
       if(S.developmentalRegression){
-        if(S.regressionTiming === 'ongoing') clauses.push('urgent evaluation of active developmental regression — consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral');
+        if(S.regressionTiming === 'ongoing') clauses.push('urgent evaluation of active developmental regression: consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral');
         else if(S.regressionTiming === 'distant') clauses.push('routine evaluation given history of developmental regression in early childhood, currently stable trajectory; etiologic workup coordinated with clinical genetics; expedited evaluation not required unless trajectory changes');
         else clauses.push('expedited evaluation for developmental regression of uncertain timing; clarify trajectory and consider EEG/MRI per neurologist judgment');
       }
