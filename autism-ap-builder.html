@@ -4252,6 +4252,19 @@ function setPreviewMode(mode){
 // Sets variant class for color + text. Hides when no pathway is computed (no cogProfile).
 // PR-K: appends a secondary line declaring any manually-pinned COG_SPEC_EXCL keys so the
 // pill→specifier divergence (when present) is visible at the cluster focal point.
+// Human-readable label per COG_SPEC_EXCL key, used by the pathway pill's
+// secondary line so raw camelCase identifiers (withSuspectedGDD, withGDD)
+// don't leak into focal-point copy. Kept in sync with the visible checkbox
+// labels in the Specifiers section.
+const SPEC_LABEL = {
+  withID: 'With intellectual disability',
+  withSuspectedID: 'With suspected ID',
+  withGDD: 'With GDD',
+  withSuspectedGDD: 'With suspected GDD',
+  withBIF: 'With borderline intellectual functioning',
+  withoutID: 'Without ID',
+  withoutGDD: 'Without GDD',
+};
 function renderPathwayPill(){
   const el=document.getElementById('pathwayPill');
   if(!el) return;
@@ -4268,15 +4281,28 @@ function renderPathwayPill(){
   // since the clinician cares about WHAT the spec currently says vs. the pathway.
   const manualActive = COG_SPEC_EXCL.filter(k =>
     S.specifiersManuallySet.has(k) && S.specifiers.has(k));
+  // Divergence-without-pin: bridgeCogProfileToSpecifier() adds the recommended
+  // key to S.specifiers but NOT to S.specifiersManuallySet. If the clinician
+  // unchecks that auto-bridged key, the uncheck-of-unpinned branch at the
+  // change handler is a no-op on the Set, so without this check the pill
+  // would show nothing — no manual note and no Re-sync affordance — even
+  // though the chart now diverges from the pathway recommendation.
+  const pathwayDivergent = !!p.specKey && !S.specifiers.has(p.specKey);
+  // Parallel "Verb: Human-label" pattern so both divergent states read as
+  // siblings (same sentence shape, same length envelope, no raw key leaks).
+  // Council 2026-05-25 follow-up to PR #7 visual-hierarchy audit.
+  const labelOf = k => SPEC_LABEL[k] || k;
   const manualNote = manualActive.length
-    ? `<span class="pp-manual">Manual override: ${manualActive.join(', ')} pinned</span>`
-    : '';
-  // PR-L δ: "Re-sync with pathway" release button. Visible whenever ANY pin exists
-  // (including uncheck-pins not reflected in manualActive), since those still block the
-  // bridge from auto-asserting. Button calls resyncPathwayPin() which clears the Set and
-  // re-fires the bridge.
-  const resetBtn = S.specifiersManuallySet.size
-    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Clear manual overrides and re-apply the auto-recommended specifier. You can also release a single pin by unchecking it.">Re-sync with pathway</button>`
+    ? `<span class="pp-manual">Overridden: ${manualActive.map(labelOf).join(', ')}</span>`
+    : pathwayDivergent
+      ? `<span class="pp-manual">Unchecked: ${labelOf(p.specKey)} (recommended)</span>`
+      : '';
+  // Re-sync visible whenever any pin exists OR the pathway recommends a
+  // specifier that isn't currently asserted. Button calls resyncPathwayPin()
+  // which clears the Set and re-fires the bridge — covers both cases since the
+  // bridge re-asserts the recommended specifier when no pins block.
+  const resetBtn = (S.specifiersManuallySet.size || pathwayDivergent)
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier (and clear any manual pins).">Re-sync with pathway</button>`
     : '';
   el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
   el.style.display='';
