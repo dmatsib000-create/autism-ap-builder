@@ -5529,7 +5529,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
+    // Listen on BOTH the input and the wrapping label: when the user clicks the label's
+    // text/button area (which is the entire visible target for .r-opt — there's no exposed
+    // radio circle), mousedown fires on the label, not on the label-forwarded input. Without
+    // the label listener, _wasChecked stays undefined and the re-click deselect path never
+    // triggers for any data-bind radio.
     inp.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
+    const lbl=inp.closest('label');
+    if(lbl) lbl.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
     inp.addEventListener('click',()=>{
       if(!inp._wasChecked) return; // normal selection — change handler takes over
       inp.checked=false;
