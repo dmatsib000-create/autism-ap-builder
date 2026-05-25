@@ -1385,12 +1385,14 @@ const S = {
 };
 
 // ─── PERSISTENCE (PR-N) ──────────────────────────────────────────────────────
-// Per-browser encrypted auto-save with passphrase. Output of UI persistence council;
-// see docs/branching-logic.md §12 for the full council deliberation. This commit
-// implements Concerns A (auto-save trigger δ refined), B-default (encryption ε without
-// the WebAuthn opt-in), C (banner + Clear + copy-to-Epic soft modal), and E (time-bomb
-// soft prompt + hard delete). Concern D (export/import) and B-opt-in (WebAuthn "Remember
-// this device") and F (audit-logging documentation) are deferred to subsequent commits.
+// keep docs/branching-logic.md §13 in sync
+// Per-browser encrypted auto-save with passphrase + cross-device export. Output of the
+// persistence council; see docs/branching-logic.md §13 for the full deliberation and
+// docs/references.md `[truevault-hipaa-guide]` for HIPAA grounding. Implements Concerns
+// A (auto-save δ refined), B-default (encryption ε without WebAuthn opt-in), C (banner +
+// Clear + copy-to-Epic soft modal), D (export/import β refined), E (time-bomb δ). Concern
+// B-opt-in (WebAuthn "Remember this device") deferred pending real-workstation probe.
+// Concern F (audit logging) intentionally NOT implemented; see §13.8 for the rationale.
 //
 // HIPAA grounding (Truevault HIPAA Developer's Guide §04):
 //   - Encryption is "addressable" → implemented (Concern B)

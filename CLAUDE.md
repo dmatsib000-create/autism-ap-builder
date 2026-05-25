@@ -89,6 +89,21 @@ Skip comments for self-explanatory code, changelog-style notes ("added X to fix 
 - The `─` (U+2500) and `═` (U+2550) box-drawing characters in JS string literals are intentional section dividers in note output — do not replace them with ASCII.
 - **Avoid em dashes (`—`) in generated note prose.** Prefer a comma, semicolon, colon, or parenthetical instead. Em dashes are acceptable only in structural headers (e.g., `── Problem 1: ... — under evaluation ──`) where they serve as visual separators, not in running sentences.
 
+### Persistence module (PR-N)
+
+Encrypted local auto-save + cross-device export, lives in the `// ─── PERSISTENCE (PR-N) ───` block in the script (search for `PERS_STORAGE_KEY`). Key invariants:
+
+- All cryptography uses **`crypto.subtle` (WebCrypto)** — no external libraries. PBKDF2-SHA256 (250k iter) → AES-GCM 256-bit. Single-file constraint preserved.
+- **Passphrase never persists.** The derived AES key lives in module-scope `_persKey` (in-memory only) and is gone when the browser closes. Auto-save can't write without a key.
+- **Sets serialize via custom replacer/reviver** (`persReplacer` / `persReviver`). When adding a new Set field to `S`, no extra work is needed — the replacer detects any Set instance. When adding a new non-Set non-scalar field (e.g., a Map), extend the replacer.
+- **localStorage key is versioned**: `dbp-autism-ap-state-v1`. If you change the encrypted blob's structure incompatibly, bump to `-v2` and add a migration path in `persReadBlob`.
+- **`persDisable()` is called from `clearAll()`** — Clear All button intentionally wipes localStorage too. Without this, post-Clear refresh would prompt to restore an empty-form session (confusing).
+- **Auto-save fires on render() (debounced 500ms) + force-saves on copy-to-Epic ('all'), Clear, and `beforeunload`.** Do not remove the `persScheduleSave()` call from `render()`.
+- **Time-bomb**: blobs >24h are silently deleted on next page load; 4h–24h trigger a soft "Restore?" prompt. Mirrors HIPAA addressable "Automatic Logoff" specification.
+- **Export string format**: `DBP1:` prefix + base64-encoded bundle. Version-tagged so future formats can coexist.
+- **Audit logging is intentionally not implemented** — see `docs/branching-logic.md §13` for the deployment-model rationale.
+- HIPAA grounding: see `docs/references.md` `[truevault-hipaa-guide]` and `docs/branching-logic.md §13`.
+
 ---
 
 ## clinicalnotes/ (clinicalnotes.py / clinicalnotes_shared.py)

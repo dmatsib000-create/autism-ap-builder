@@ -20,6 +20,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§4 Service coverage & insurance](#4-service-coverage--insurance)
 - [§5 Comorbidity & medication](#5-comorbidity--medication)
 - [§6 DSM-5 / ICD-10 source documents](#6-dsm-5--icd-10-source-documents)
+- [§7 HIPAA compliance & persistence design](#7-hipaa-compliance--persistence-design)
 
 ---
 
@@ -188,6 +189,22 @@ National Center for Health Statistics. **International Classification of Disease
 - **Used for:** all ICD-10-CM codes appearing in the A&P note (F84.0, F70/F71/F72, F88, R41.83, F90.0/.1/.2, F41.9, F32.9, F42.9, G40.909, K59.00, R63.32/.31/.30, F50.82, G47.9, Z03.89).
 - **Supports the claim:** Code assignments throughout the tool. F88 has no severity sub-coding in ICD-10-CM — the rationale for `[mehler-2016]`-style prose adjectives at output.
 - **Verified:**
+
+---
+
+## 7. HIPAA compliance & persistence design
+
+Grounding for the persistence module (PR-N). The HIPAA Security Rule splits implementation specifications into "required" and "addressable" — addressable specs must still be implemented "if reasonable and appropriate," and the guide below explicitly recommends implementing them in the default case.
+
+### `[truevault-hipaa-guide]` — Developers Guide to HIPAA Compliance (TrueVault)
+
+TrueVault. **Developers Guide to HIPAA Compliance, Version 1.0.** GitHub: `truevault-safe/hipaa-compliance-developers-guide`, 2014–2023 (1,739 stars). <https://github.com/truevault-safe/hipaa-compliance-developers-guide>
+
+- **Used for:** all HIPAA Security Rule interpretation in the persistence module ([autism-ap-builder.html](../autism-ap-builder.html) PERSISTENCE block); §13 of `docs/branching-logic.md`; the persistence design council deliberation.
+- **Supports the claim:** Specifically §04 Technical Safeguards — Encryption and Automatic Logoff are addressable specifications that should be implemented by default ("when in doubt, implement"); Disposal and Media Re-Use are required; Workstation Security is required but handled by the institution rather than the tool. §09 Mobile Applications — encryption guidance extends to any client-side PHI storage, including browser localStorage.
+- **Companion references:** authoritative HHS sources cited in the guide — [Technical Safeguards PDF](https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/administrative/securityrule/techsafeguards.pdf), [Physical Safeguards PDF](https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/administrative/securityrule/physsafeguards.pdf). Always defer to HHS over the secondary guide if they conflict.
+- **Caveats:** The Truevault guide is plain-English secondary literature ("we're not lawyers" disclaimer in §00). For tool-as-deployed-in-clinic compliance questions, the operative authority is the UF compliance office, not this guide. The guide is appropriate for **design decisions** (what addressable specs should the tool implement); UF compliance is appropriate for **deployment decisions** (is this tool approved for clinical use under our BAA).
+- **Verified:** DM 2026-05-25 (table of contents + §04 + §09 fetched via `gh api`)
 
 ---
 

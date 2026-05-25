@@ -1321,6 +1321,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - Adding/removing/renaming any property on `S`
 - Adding/removing any HTML control that mutates a `Set` on `S`
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
+- Anything in the `// ─── PERSISTENCE ───` block: `persEnable`, `persDisable`, `persEncryptState`, `persDecryptState`, `persScheduleSave`, `persForceSave`, `persExportSession`, `persImportSession`, `persSyncDomFromState`, `renderPersistenceBanner`, the `PERS_STORAGE_KEY` / `PERS_*_HOURS` / `PERS_PBKDF2_ITERATIONS` constants, the `dbp-autism-ap-state-v1` storage format. See §13.
 
 If you're not sure whether your change qualifies, check [§1.2](#12-the-s-object--property-reference) — if your change touches anything listed there, update this doc.
 
@@ -1376,3 +1377,133 @@ This doc was originally validated by paste-testing into a fresh Claude with no p
 5. Repeat with other targeted questions
 
 If Reader Claude struggles or contradicts itself, the relevant section needs more clarity. Reader-testing prompts are documented in the change log of this file (commit history).
+
+---
+
+## 13. Persistence module (PR-N)
+
+Encrypted local auto-save + cross-device export. Output of the persistence council; grounded in `[truevault-hipaa-guide]`. Implemented across two commits on `feat/persistence-pr-n`:
+
+- **C1** — Core: encryption, auto-save, restore, time-bomb, multi-patient defense
+- **C2** — Export/Import: cross-device session strings
+
+Web Authentication API "Remember this device" (Concern B ε opt-in) is **deferred** pending real-workstation verification at UF; the council recommendation crossed 94% combined but residual uncertainty centered on whether institutional Windows Hello policies allow `navigator.credentials.create()`. Treat as a future commit or separate PR after a workstation probe.
+
+### 13.1 What problem it solves
+
+Before PR-N, browser refresh / accidental tab close / crash → total data loss for the in-visit form state. The maintainer experienced this in clinic. PR-N adds a safety net: encrypted state survives refresh/crash; can be restored via passphrase; can be ported to a different device via export.
+
+### 13.2 Storage model
+
+Two storage surfaces:
+
+| Surface | Where | Lifetime | Audience |
+|---|---|---|---|
+| Auto-save blob | `localStorage['dbp-autism-ap-state-v1']` | Per-browser; gone on Clear All or 24h staleness | Same clinician, same device, same browser |
+| Export string | Wherever the clinician pastes (Epic / OneDrive / etc.) | Until they delete it from that store | Same clinician on different device, OR shared with colleague |
+
+Both surfaces use the same cryptographic primitives (PBKDF2-SHA256 250k iter → AES-GCM 256-bit, all via `crypto.subtle`). Passphrases for the two surfaces are **independent** — clinician can use one passphrase for routine browser auto-save and a different (re-derivable) one for cross-device handoff.
+
+Auto-save blob structure:
+
+```json
+{
+  "ciphertext": "<base64>",
+  "iv": "<base64>",
+  "salt": "<base64>",
+  "savedAt": "<ISO timestamp>"
+}
+```
+
+The `savedAt` field is **outside** the encrypted payload so that the pre-restore UI can show "Encrypted session from [time]?" without unlocking. The timestamp alone is not PHI under HIPAA §164.514 (no identifier, no health information).
+
+Export string format: `DBP1:` + base64-encoded JSON of `{v:1, salt, iv, ct, exportedAt}`. The `DBP1:` prefix is the version marker; future formats become `DBP2:` etc. and coexist.
+
+### 13.3 Auto-save trigger
+
+Per Concern A (δ refined): debounced **500 ms** by default + **force-save** on critical events:
+
+- Copy-to-Epic with `part==='all'` (the end-of-visit moment)
+- Clear All button
+- `beforeunload` (tab close, navigation away, reload)
+
+Auto-save is **off by default on a fresh session**. The clinician must click "Enable auto-save" in the banner and set a passphrase. This deliberate opt-in matches the "passphrase never persists" invariant — if it auto-enabled, we would need somewhere to derive the key from, and there is no good answer.
+
+### 13.4 Multi-patient defense
+
+Per Concern C (γ refined): the persistence banner is **always visible** when persistence is on (amber stripe). It carries the timestamp of the last save. The "Clear & disable" button wipes form state + localStorage atomically.
+
+In addition, a **soft modal** fires after the main copy-to-Epic action: "Done with this patient? Clear form?" — clinician chooses Keep (continue editing) or Yes, clear now. Only fires on `copyNote('*', 'all')`, not on partial assessment/plan copies (those are mid-visit operations).
+
+Multi-patient leakage mode this prevents: clinician finishes Patient A, copies note to Epic, opens form for Patient B without refreshing — Patient A's selections persist into Patient B's form. With the soft modal, the natural end-of-visit gesture (copy-to-Epic) becomes the prompt to clear.
+
+### 13.5 Time-bomb (Concern E δ)
+
+Two thresholds, encoded in `PERS_STALE_PROMPT_HOURS` (4h) and `PERS_STALE_DELETE_HOURS` (24h):
+
+- **0–4h since last save**: silent restore prompt on page load (the standard flow)
+- **4–24h since last save**: still prompts but treated as stale by `persIsStale()` — caller has the option to surface a confirmation
+- **>24h since last save**: blob auto-deleted by `persCheckStaleness()` before the prompt fires; clinician sees a fresh "Auto-save off" state
+
+Maps to HIPAA "Automatic Logoff" addressable specification (`[truevault-hipaa-guide]` §04 → Technical Safeguards → Access Control).
+
+### 13.6 Encryption (Concern B ε without WebAuthn opt-in)
+
+PBKDF2-SHA256 with 250 000 iterations (OWASP 2023 minimum), 16-byte random salt, AES-GCM 256-bit with 12-byte random IV per save. All primitives from `crypto.subtle` — no external libraries, no CDN imports. Single-file constraint preserved.
+
+The key (`CryptoKey` object) is held in module-scope `_persKey` and never serialized. On browser close, the key is gone; the only way back in is re-entering the passphrase.
+
+PBKDF2 iteration count is set high deliberately. At 250k iterations the derivation takes ~150–400 ms on a typical workstation — slow enough to meaningfully resist brute-force on a stolen localStorage blob, fast enough that the clinician does not notice the delay during routine save/restore.
+
+### 13.7 Export string (Concern D β refined)
+
+`DBP1:` + base64(JSON bundle). On export, the bundle includes its own salt (separate from the auto-save salt), so the export passphrase can differ from the auto-save passphrase. The clinician is prompted to use a re-derivable convention (e.g., "last 4 of MRN + visit date") so they can recover the session later without storing the passphrase anywhere.
+
+Import does **not** auto-enable persistence. After a successful import, the clinician sees the restored form but auto-save is still off; they can explicitly enable it (with a separate passphrase if they choose) for ongoing work.
+
+### 13.8 Audit logging — deliberately not implemented (Concern F γ)
+
+HIPAA Security Rule §164.312(b) "Audit Controls" is a **required** specification: implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use ePHI.
+
+The tool does NOT implement an in-app audit log. Reasoning (output of the persistence council, Concern F):
+
+1. **No central destination.** The tool runs entirely client-side. An audit log written to localStorage is read-only by the same clinician who generated it — it offers no separation between actor and reviewer.
+2. **Single-user deployment.** The tool's deployment model is one clinician using their own browser. There is no second party who could review the log.
+3. **Workstation-level audit exists.** UF institutional workstation policies log actual workstation access; that is the audit-of-record for clinical use of this tool.
+4. **No transmission to log.** A central log destination would require either institutional infrastructure (Splunk / similar) or a SaaS log service — both require BAAs and architectural changes incompatible with the single-file no-backend model.
+
+The council judgment was that documenting this deliberate carve-out is more defensible than implementing a non-functional audit log. **If the deployment model ever changes** — multi-clinician sharing, institutional rollout, hosted instance — **this decision must be reopened.**
+
+Documented in code at the persistence module entry point. UF compliance review should be informed of this carve-out if the tool ever leaves single-clinician scope.
+
+### 13.9 Known residuals
+
+1. **Web Authentication API "Remember this device" not yet implemented.** Council recommended at 94%; residual concern was institutional workstation compatibility. Pending real-workstation probe.
+2. **UF compliance review has not ratified this design.** Council recommendation is defensible but not authoritative. Strong recommendation: surface PR-N to UF privacy office before clinical use, especially if used on workstations beyond the maintainer's own.
+3. **Passphrase loss is unrecoverable.** No backdoor exists or should exist. Documented in modal hints. Re-derivable conventions (last 4 of MRN + visit date) mitigate.
+4. **Export string is PHI-bearing storage.** Once the clinician pastes it into Epic / OneDrive / etc., that destination must itself be HIPAA-compliant. The export modal carries a warning to this effect, but the tool cannot enforce destination choice.
+5. **Banner can be tuned out.** The "always-visible amber stripe" works on day one; banner-blindness research suggests it loses signal over weeks. Mitigation: the soft modal on copy-to-Epic is a second line; the Clear & disable button is the third. No mitigation eliminates the failure mode entirely.
+
+### 13.10 Verification probes (preview MCP)
+
+Run all on a fresh page load. Each probe ends with the previous state cleared.
+
+1. **Cold load** → banner shows "Auto-save off" with three buttons (Enable / Export / Import)
+2. **Enable + save** → ciphertext written to localStorage; spot-check that no clinical value appears in plaintext via `localStorage.getItem(...).includes('id_mild')`
+3. **Round-trip** → wipe S, call `persDecryptState(passphrase, blob)`, confirm full restore including Set fields (use `instanceof Set` check, not array equality)
+4. **Wrong passphrase** → `OperationError` thrown, no partial decrypt
+5. **Time-bomb hard delete** → set `savedAt` 25h in the past, reload, confirm `persCheckStaleness` removed the blob
+6. **Time-bomb soft prompt** → set `savedAt` 5h in the past, confirm `persIsStale` returns true; 1h in the past returns false
+7. **Clear All** → confirms wipes form + localStorage + flips banner to off
+8. **Debounce** → three rapid clicks → one save fires 500 ms later
+9. **Export → wipe → import round-trip** → state perfectly preserved (scalars, booleans, Sets)
+10. **Import: wrong passphrase** → clean inline error in modal, no state corruption
+11. **Import: malformed blob** → error "must start with DBP1:"
+
+### 13.11 Update protocol for this section
+
+If you add a new field to `S`, the persistence module **automatically handles it** if it is a scalar, boolean, plain object, or Set (the replacer/reviver covers all four). No work needed in the persistence module.
+
+If you add a field of a NEW type (Map, Date, custom class), you MUST extend `persReplacer` and `persReviver` together. Round-trip test the new field before commit.
+
+If you change the `S` object's identity at runtime (e.g., reassigning `S = newObject` instead of mutating), the restore path will break — `persSyncDomFromState()` and `persImportSession`'s "for k of Object.keys(S) delete S[k]" loop assume `S` is mutated in place.
