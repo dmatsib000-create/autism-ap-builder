@@ -21,6 +21,12 @@ The app generates three pieces of clinical output — an **A&P note**, an **ABA 
 - The `// WARY:` source-comment convention (described in §11) marks code the maintainer has flagged as fragile — relevant warnings are surfaced inline as **WARY:** callouts in the affected section
 - **SC** = Social Communication; **RRB** = Restricted/Repetitive Behaviors (the DSM-5 two-domain split used throughout)
 
+**REVERSAL markers.** When a prior decision documented in this file is overturned by a later council, the original entry is preserved (history isn't rewritten) but a marker is appended directly under its heading:
+
+> **REVERSED YYYY-MM-DD** — see entry "[Title of superseding entry]" for the current decision. Reason: [one sentence].
+
+The forward pointer lives in the marker; the backward pointer lives in the `clinical-council reopens` tag in the new entry's commit message and in any inline code comment that flagged the reversal. Together they make the audit trail navigable from either end — a reader landing on a superseded entry learns immediately that it's no longer in force, without having to grep for `reopens` tags.
+
 **Reading order by section:**
 
 | Section | Type | Why it matters |
@@ -1237,9 +1243,11 @@ A passive informational hint fires in the adaptive section when `cogProfile==='b
 
 **Wiring**:
 - The function `toggleBifAdaptiveCrossCheck()` is called from three places:
-  - End of `bridgeCogProfileToSpecifier()` — covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized changes (all of which fire the bridge).
-  - The `adaptProfile` change/deselect handlers — direct calls because the adaptProfile change handler does NOT fire the bridge (per council-D4 invariant: avoid surprise specifier flips from far-away controls).
+  - End of `bridgeCogProfileToSpecifier()` — covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized, AND adaptProfile changes (all of which fire the bridge as of PR-J).
+  - The `adaptProfile` change/deselect handlers — explicit call alongside the bridge re-fire, so the cross-check updates even if a future refactor decouples it from the bridge.
   - The DOMContentLoaded init hook — keeps the static HTML default in sync with state.
+
+  > **REVERSED 2026-05-25 (PR-J)** — the prior council-D4 invariant ("adaptProfile change handler does NOT fire the bridge; avoid surprise specifier flips from far-away controls") is no longer in force. PR-J reopens D4. The pathway pill introduced in PR-I C2 renders the bridge result at the cluster focal point in the same render frame, so the flip is now visible at the clinician's focus rather than hidden 200px below. See §11.16 below for the convergence rationale and the commit message for `PR-J: Bridge converges on currentClinicalPathway()`.
 
 **Visual treatment**: gray italic on a warm-cream background with a yellow-amber left-border accent — same color family as the floor-effect warning (gray italic) but with the border-left differentiator distinguishing it as carrying a clinical recommendation rather than pure information. The two warnings cannot co-fire (floor-effect requires `young`; BIF cross-check requires `borderline`, which is gated to `older`).
 
@@ -1267,6 +1275,21 @@ The `withBifSourceQualifier` transform at [autism-ap-builder.html:1513](../autis
 This mirrors the `priorExtAttribution` pattern used for the ID/GDD F70/F71/F72/F88 dx lines around line 1716. Before PR-G, a BIF call grounded in an outside report produced bare prose indistinguishable from one grounded in a same-visit comprehensive battery — a documentation-discipline gap surfaced by the Concern 1 clinical-validity council (Asymmetry 6, 96.5% combined confidence).
 
 **Maintainer note**: BIF prose now has four output variants (bare for comprehensive, screener qualifier, clinical qualifier, priorExternal attribution). When adding a fifth cogDataSource value (if ever), add the corresponding branch in `withBifSourceQualifier` rather than leaving the new value to fall through to bare prose.
+
+### 11.16 Pill/bridge convergence (PR-J)
+
+Concern 2.5 mini-council; α+β at 95.7% combined. Closes the pill-vs-bridge divergence that PR-I C1+C2 shipped as an honest residual: the pathway pill recomputed on every `render()` but `bridgeCogProfileToSpecifier()` did not re-fire on `adaptProfile` changes (per the prior council-D4 invariant). A clinician selecting `severelyImpaired + standardized adaptive` *after* picking `cogProfile=id_mild + comprehensive` would see the pill correctly say "Confirmed Mild ID" while the auto-bridged specifier checkbox still showed `withSuspectedID`. Two summaries of the same clinical picture on the same screen, disagreeing.
+
+**Two changes in one council outcome:**
+
+- **α** — adaptProfile change handler now calls `bridgeCogProfileToSpecifier(S.cogProfile)`. Mirrors the pattern already used by cogDataSource and adaptiveStandardized handlers.
+- **β** — `currentClinicalPathway()` was extended to include a `specKey` field on every return shape (`'withID'`, `'withSuspectedID'`, `'withGDD'`, `'withSuspectedGDD'`, `null` for BIF and unknown, `'withoutID'`/`'withoutGDD'` for normal range by age). `bridgeCogProfileToSpecifier()` now derives the specifier key from `currentClinicalPathway()?.specKey` instead of duplicating the inline decision tree. One predicate, two consumers (pill + bridge), zero drift possible.
+
+**D4 reversal rationale.** Prior council finding D4 said: avoid surprise specifier flips from far-away controls — the specifier checkbox sits ~200px below the clinician's focus on the adaptive section, and an automatic flip would feel like the tool moving things behind their back. That reasoning was sound when D4 was written. PR-I C2 introduced the pathway pill at the top of the Cognitive Profile section, which renders the bridge's decision in the same render frame as any input change. The flip is now visible at the clinician's focal point rather than hidden, so the original D4 risk no longer applies. `clinical-council reopens D4` — see the §11.13 wiring note above for the back-pointer.
+
+**Known residual (pre-existing, not introduced by PR-J).** Manual specifier overrides remain volatile under adjacent control changes — clinician unchecks `withID` to assert `withSuspectedID`, then changes adaptive, auto-bridge re-overrides intent. PR-L addressed this separately by introducing `S.specifiersManuallySet` and the three release paths (uncheck the pin, "Re-sync with pathway" button on the pill, cogProfile change clears all pins).
+
+**Maintainer note**: when adding a new cog/adaptive predicate that affects the bridge, extend `currentClinicalPathway()`'s `specKey` return rather than adding inline logic in `bridgeCogProfileToSpecifier()`. The single-predicate property is load-bearing.
 
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
