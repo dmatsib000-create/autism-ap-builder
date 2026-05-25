@@ -135,7 +135,6 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:10px;font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
 .pathway-pill .pp-reset:hover{opacity:1;background:rgba(255,255,255,.5)}
 .pathway-pill .pp-reset:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
-.spec-manual-caption{font-size:10px;color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
 /* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
    (same area, purely informational) — this one carries a clinical recommendation, so it
    gets darker amber border + tint, font-weight 500, and a ⚠ icon prefix. Inline display
@@ -4260,34 +4259,25 @@ function renderPathwayPill(){
   // Reset variant classes, then add the current one.
   el.classList.remove('pp-confirmed','pp-suspected','pp-bif','pp-typical');
   if(p.variant) el.classList.add(p.variant);
-  // PR-K: manual override secondary line. Shown only when the clinician has manually
-  // pinned a COG_SPEC_EXCL key that is ALSO currently checked (i.e., actively asserted in
-  // the chart). Pinned-but-unchecked keys (e.g., user unchecked withID then checked
-  // withSuspectedID — both are in S.specifiersManuallySet but only withSuspectedID is
-  // asserted) are kept in the Set for bridge-respect logic but filtered from this display
-  // since the clinician cares about WHAT the spec currently says vs. the pathway.
-  const manualActive = COG_SPEC_EXCL.filter(k =>
-    S.specifiersManuallySet.has(k) && S.specifiers.has(k));
-  // Divergence-without-pin: bridgeCogProfileToSpecifier() adds the recommended
-  // key to S.specifiers but NOT to S.specifiersManuallySet. If the clinician
-  // unchecks that auto-bridged key, the uncheck-of-unpinned branch at the
-  // change handler is a no-op on the Set, so without this check the pill
-  // would show nothing — no manual note and no Re-sync affordance — even
-  // though the chart now diverges from the pathway recommendation.
+  // Single divergence signal: the chart diverges from the pathway recommendation
+  // when pathway has a specKey but it isn't currently in S.specifiers. This covers
+  // both interaction histories that used to be distinguished — clinician pinned a
+  // non-recommended spec (S.specifiersManuallySet contains a key) and clinician
+  // unchecked the auto-bridged spec (Set is empty). Council 2026-05-25 collapsed
+  // the prior 3-state surfacing (Manual override pinned / Pathway specifier not
+  // asserted / aligned) into this 2-state surfacing because the pin/unpin
+  // distinction is interaction-trace, not clinical-trace, and the pill's job is
+  // focal-point summary not interaction history. The internal manual-pin
+  // abstraction (S.specifiersManuallySet, anyManualInGroup guard) is preserved
+  // so adjacent-input changes don't stomp the clinician's explicit choice.
   const pathwayDivergent = !!p.specKey && !S.specifiers.has(p.specKey);
-  const manualNote = manualActive.length
-    ? `<span class="pp-manual">Manual override: ${manualActive.join(', ')} pinned</span>`
-    : pathwayDivergent
-      ? `<span class="pp-manual">Pathway-recommended specifier (${p.specKey}) not asserted</span>`
-      : '';
-  // Re-sync visible whenever any pin exists OR the pathway recommends a
-  // specifier that isn't currently asserted. Button calls resyncPathwayPin()
-  // which clears the Set and re-fires the bridge — covers both cases since the
-  // bridge re-asserts the recommended specifier when no pins block.
-  const resetBtn = (S.specifiersManuallySet.size || pathwayDivergent)
-    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier (and clear any manual pins).">Re-sync with pathway</button>`
+  const divergentNote = pathwayDivergent
+    ? `<span class="pp-manual">Chart diverges from pathway recommendation</span>`
     : '';
-  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
+  const resetBtn = pathwayDivergent
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier.">Re-sync with pathway</button>`
+    : '';
+  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${divergentNote}${resetBtn}`;
   el.style.display='';
 }
 
@@ -4303,31 +4293,6 @@ function resyncPathwayPin(){
   render();
 }
 
-// PR-K: per-specifier "(manual)" caption. Called from render() alongside renderPathwayPill().
-// Adds/removes a small caption next to each COG_SPEC_EXCL checkbox label so a clinician
-// scrolling past the Specifiers section can spot which keys are pinned.
-function renderManualSpecCaptions(){
-  COG_SPEC_EXCL.forEach(k=>{
-    const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
-    if(!cb) return;
-    const lab=cb.closest('label');
-    if(!lab) return;
-    let cap=lab.querySelector('.spec-manual-caption');
-    // Only caption currently-asserted manual pins. A clinician who unchecked an auto-
-    // bridged key and didn't pin a replacement gets no visible caption — the unchecked
-    // state itself is the signal; "(manual)" on an empty checkbox would be confusing.
-    const shouldShow=S.specifiersManuallySet.has(k) && S.specifiers.has(k);
-    if(shouldShow && !cap){
-      cap=document.createElement('span');
-      cap.className='spec-manual-caption';
-      cap.textContent='(manual)';
-      lab.appendChild(cap);
-    } else if(!shouldShow && cap){
-      cap.remove();
-    }
-  });
-}
-
 function render(){
   // Adjust-Referrals coupling — both run unconditionally at the top so the various
   // early-return paths below (no-input, ABA-preview, IEP-preview) still get the
@@ -4340,7 +4305,6 @@ function render(){
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
-  renderManualSpecCaptions();
 
   // ABA inclusion logic — show/hide params section and tab
   const abaIncluded=resolveOv('aba',ruleABA());
