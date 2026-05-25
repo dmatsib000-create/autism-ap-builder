@@ -101,18 +101,23 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
 .field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
-/* Subgroup layout for clinically-clustered radio options (e.g. Cognitive Profile's
-   ID/GDD/BIF/normal-range/other tiers). Each .subgroup is a flex-wrap row within a
-   vertical .subgroup-stack; .subgroup-label sits across the full row. Replaces the
-   prior display:contents pinning that flattened these into a single grid. The
-   subgroup wrapper IDs (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are
-   preserved so the age-cleanup logic in updateAgeBasedVisibility() still resolves;
-   those handlers toggle style.display between 'none' and '' (empty string) so this
-   class's flex layout takes over when visible. */
-.subgroup-stack{display:flex;flex-direction:column;gap:6px}
-.subgroup{display:flex;flex-wrap:wrap;gap:3px;padding:6px 0 2px;border-top:1px solid var(--border-default)}
-.subgroup:first-child{border-top:none;padding-top:0}
-.subgroup-label{flex-basis:100%;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+/* ε.3 chip-strip layout for severity-ordered radio clusters (Cognitive Profile).
+   A single horizontal flex-wrap row of tier-wrappers replaces the prior boxed
+   .subgroup-stack with per-tier labels. Chips within a tier hug each other
+   (3px gap); tier-wrappers sit further apart (12px gap) and wrap as units, so
+   a tier never splits across visual rows at form-panel widths ≥~720px.
+   Honest residual: below that width (screens narrower than ~1366px) the
+   Normal range tier (5 chips, ~615px wide) exceeds the container and wraps
+   internally — graceful degradation, no clipping. Tier-wrapper IDs
+   (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are preserved so
+   updateAgeBasedVisibility() still resolves; those handlers toggle
+   style.display between 'none' and '' (empty string) so .chip-tier's
+   display:flex takes over when visible. The .unknown-tier modifier right-
+   floats the Unknown chip to the row's far edge as a visual escape from the
+   severity continuum. */
+.chip-strip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.chip-tier{display:flex;flex-wrap:wrap;gap:3px}
+.chip-tier.unknown-tier{margin-left:auto}
 /* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
    Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
    Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
@@ -601,42 +606,37 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              when no cogProfile is selected. Driven by currentClinicalPathway() so the
              pill text and the auto-bridged specifier checkbox share a single source of truth. -->
         <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
-        <!-- Uneven/splinter checkbox elevated above the subgroup-stack per PR-I C5 — surfaces
+        <!-- Uneven/splinter checkbox elevated above the chip-strip per PR-I C5 — surfaces
              the modifier in the natural pre-selection scan order rather than being buried
-             below a 5-subgroup grid where it was easily missed. -->
+             below a multi-tier grid where it was easily missed. -->
         <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
         <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
           <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
           <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
-        <div class="subgroup-stack">
-          <div class="subgroup" id="cogProfileIdGroup">
-            <span class="subgroup-label">Intellectual disability</span>
+        <div class="chip-strip">
+          <div class="chip-tier" id="cogProfileIdGroup">
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
           </div>
-          <div class="subgroup" id="gddCogGroup">
-            <span class="subgroup-label">Global developmental delay</span>
+          <div class="chip-tier" id="gddCogGroup">
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">Mild delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">Moderate delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">Severe delays</label>
           </div>
-          <div class="subgroup" id="cogProfileBifWrap">
-            <span class="subgroup-label">Sub-threshold</span>
+          <div class="chip-tier" id="cogProfileBifWrap">
             <label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline intellectual functioning (BIF)</label>
           </div>
-          <div class="subgroup">
-            <span class="subgroup-label">Normal range</span>
+          <div class="chip-tier">
             <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average (110–119)</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior (120–129)</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior / gifted (130+)</label>
           </div>
-          <div class="subgroup">
-            <span class="subgroup-label">Evaluation status</span>
+          <div class="chip-tier unknown-tier">
             <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown / under evaluation</label>
           </div>
         </div>
@@ -5285,11 +5285,11 @@ function updateAgeBasedVisibility(){
     }
   }
   // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
-  // Toggle subgroup visibility. The subgroup wrappers (cogProfileIdGroup, gddCogGroup,
-  // cogProfileBifWrap) now use the .subgroup CSS class (display:flex with flex-wrap) —
+  // Toggle tier-wrapper visibility. The wrappers (cogProfileIdGroup, gddCogGroup,
+  // cogProfileBifWrap) use the .chip-tier CSS class (display:flex with flex-wrap) —
   // restore to '' (empty string) when shown so the class's flex layout takes over.
-  // Prior history: these used display:contents to flow children directly into a single
-  // .radio-grid; the visible-subgroup redesign replaced that with boxed subgroups.
+  // Prior history: ε.3 chip-strip replaced the boxed .subgroup-stack with per-tier
+  // labels; before that, display:contents flattened these into a single .radio-grid.
   const idCogGroup=document.getElementById('cogProfileIdGroup');
   if(idCogGroup){
     const hideIDCog=young&&S.ageGroup!=='';
