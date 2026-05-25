@@ -314,7 +314,14 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .svc-auto-badge{font-size:9px;padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
 .plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
 .prior-test-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.outcome-sel{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
+.outcome-sel{font-size:13px;padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
+.outcome-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+/* When the row's checkbox is checked but the outcome is empty, the dropdown
+   is the gating control for chart emission — without an outcome value, every
+   downstream emission path silently no-ops. Amber treatment makes the unmet
+   predicate impossible to read past. Matches the --amber/--amber-light token
+   pair used elsewhere for warning surfaces (bif-crosscheck, abaLevelWarn). */
+.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:#92400e;font-weight:600;box-shadow:0 0 0 2px #fde68a}
 .sub-options{margin:2px 0 4px 22px;padding:5px 8px;background:var(--gray-50);border-radius:4px;border-left:2px solid var(--blue-light)}
 .sub-options .sub-label{font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
 /* PHI-tightening: year-only date input. HIPAA Safe Harbor §164.514(b)(2)(C) permits
@@ -4311,6 +4318,7 @@ function render(){
   // toggles the .inactive class on each row based on current activity.
   syncTherapyStatusFromActivity();
   updateTherapyStatusEnablement();
+  updatePriorTestOutcomeRequired();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -4589,6 +4597,19 @@ function togglePriorExpander(){
 function updatePriorExpander(){
   if(S.priorTesting.size>0) priorTestingExpanded=true;
   _applyPriorExpander();
+}
+// Marks rows where the clinician has selected an instrument but hasn't picked
+// an outcome — the predicate that gates every chart emission for that instrument
+// (assessment paragraph, ABA letter cite, IEP letter cite, hasFormalAdaptiveConsistent).
+// Without this signal the row looks complete but emits nothing, which is the
+// failure mode David hit 2026-05-25.
+function updatePriorTestOutcomeRequired(){
+  document.querySelectorAll('.prior-test-row').forEach(row=>{
+    const cb=row.querySelector('input[type=checkbox][data-key="priorTesting"]');
+    const sel=row.querySelector('select.outcome-sel');
+    const needsOutcome=!!(cb && sel && cb.checked && !sel.value);
+    row.classList.toggle('outcome-required', needsOutcome);
+  });
 }
 function _applyPriorExpander(){
   const list=document.getElementById('priorTestList');
