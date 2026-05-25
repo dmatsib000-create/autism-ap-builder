@@ -101,7 +101,62 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
 .field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
-#cogProfileIdGroup{display:contents}
+/* Subgroup layout for clinically-clustered radio options (e.g. Cognitive Profile's
+   ID/GDD/BIF/normal-range/other tiers). Each .subgroup is a flex-wrap row within a
+   vertical .subgroup-stack; .subgroup-label sits across the full row. Replaces the
+   prior display:contents pinning that flattened these into a single grid. The
+   subgroup wrapper IDs (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are
+   preserved so the age-cleanup logic in updateAgeBasedVisibility() still resolves;
+   those handlers toggle style.display between 'none' and '' (empty string) so this
+   class's flex layout takes over when visible. */
+.subgroup-stack{display:flex;flex-direction:column;gap:6px}
+.subgroup{display:flex;flex-wrap:wrap;gap:3px;padding:6px 0 2px;border-top:1px solid var(--border-default)}
+.subgroup:first-child{border-top:none;padding-top:0}
+.subgroup-label{flex-basis:100%;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+/* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
+   Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
+   Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
+   color signal AND a text label, so colorblind-safe. */
+.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;border-radius:14px;padding:4px 12px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
+.pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
+.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
+.pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
+/* PR-K: manual override surfacing. When the clinician has pinned a COG_SPEC_EXCL key,
+   the pill grows a second line declaring the override; each pinned specifier checkbox
+   in the Specifiers section also gets a "(manual)" caption. Both signals are required so
+   the divergence is visible at the cluster focal point AND at the specifier itself. */
+.pathway-pill .pp-manual{display:block;width:100%;margin-top:3px;font-size:10.5px;font-weight:500;opacity:.85;font-style:italic;letter-spacing:.01em}
+/* PR-L δ: explicit release affordance — visible only when manual pins exist. Clicking
+   clears S.specifiersManuallySet and re-fires the bridge so the pathway-recommended
+   specifier takes over. Styled as an inline pill-family button so it reads as part
+   of the pathway pill, not a foreign control. */
+.pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:10px;font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+.pathway-pill .pp-reset:hover{opacity:1;background:rgba(255,255,255,.5)}
+.pathway-pill .pp-reset:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
+.spec-manual-caption{font-size:10px;color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
+/* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
+   (same area, purely informational) — this one carries a clinical recommendation, so it
+   gets darker amber border + tint, font-weight 500, and a ⚠ icon prefix. Inline display
+   is set by toggleBifAdaptiveCrossCheck(); the ::before fires when display becomes non-none. */
+.bif-crosscheck{font-size:13px;color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
+.bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:15px;color:#b45309;font-weight:700}
+/* Keyboard-accessible disclosure for instrument-list info on Cog Data Source options (PR-K).
+   The .info-btn is a focusable ⓘ button placed next to a radio label; clicking or pressing
+   Enter/Space toggles aria-expanded and shows/hides the .info-popover. Keyboard reachable
+   (button element, Tab-focusable), screen-reader announced (aria-controls + aria-expanded +
+   role="region" + aria-label on the popover). Replaces the prior title-attr-only path which
+   was inaccessible to keyboard-only users and inconsistently surfaced by screen readers. */
+.r-opt-wrap{display:inline-flex;align-items:center;gap:3px;position:relative}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);font-size:12px;cursor:pointer;padding:0;line-height:1;font-family:inherit;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.info-btn:hover,.info-btn:focus-visible{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
+.info-btn[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+.info-popover{position:absolute;top:calc(100% + 4px);left:0;z-index:20;min-width:260px;max-width:380px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--gray-300);border-radius:var(--radius);box-shadow:var(--shadow-sm);font-size:12px;line-height:1.55;color:var(--gray-700);white-space:normal}
+.info-popover[hidden]{display:none}
+.info-popover strong{color:var(--gray-800);font-weight:600}
+/* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -487,29 +542,49 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
       <div class="field-group">
         <span class="field-label">Cognitive Profile</span>
-        <div class="radio-grid">
-          <div id="cogProfileIdGroup" style="display:contents">
+        <!-- Clinical pathway pill — auto-updated by renderPathwayPill() in render().
+             Displays the downstream specifier the current cog/adaptive selections imply
+             (e.g., "Pathway: Suspected GDD — awaiting comprehensive battery"). Hidden
+             when no cogProfile is selected. Driven by currentClinicalPathway() so the
+             pill text and the auto-bridged specifier checkbox share a single source of truth. -->
+        <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
+        <!-- Uneven/splinter checkbox elevated above the subgroup-stack per PR-I C5 — surfaces
+             the modifier in the natural pre-selection scan order rather than being buried
+             below a 5-subgroup grid where it was easily missed. -->
+        <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
+        <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
+          <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
+        </div>
+        <div class="subgroup-stack">
+          <div class="subgroup" id="cogProfileIdGroup">
+            <span class="subgroup-label">Intellectual disability</span>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
           </div>
-          <div id="gddCogGroup" style="display:contents">
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">GDD —<br>unspecified</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">GDD —<br>mild delays</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">GDD —<br>moderate delays</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">GDD —<br>severe delays</label>
+          <div class="subgroup" id="gddCogGroup">
+            <span class="subgroup-label">Global developmental delay</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">Mild delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">Moderate delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">Severe delays</label>
           </div>
-          <div id="cogProfileBifWrap" style="display:contents"><label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label></div>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average<br>(110–119)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior<br>(120–129)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior /<br>gifted (130+)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown /<br>under evaluation</label>
-        </div>
-        <label class="cb-row" style="margin-top:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
-        <div id="unevenCogWrap" style="display:none;margin:2px 0 0 26px">
-          <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
+          <div class="subgroup" id="cogProfileBifWrap">
+            <span class="subgroup-label">Sub-threshold</span>
+            <label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline intellectual functioning (BIF)</label>
+          </div>
+          <div class="subgroup">
+            <span class="subgroup-label">Normal range</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average (110–119)</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior (120–129)</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior / gifted (130+)</label>
+          </div>
+          <div class="subgroup">
+            <span class="subgroup-label">Evaluation status</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown / under evaluation</label>
+          </div>
         </div>
       </div>
 
@@ -524,10 +599,18 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group" id="cogDataSourceGroup" style="display:none">
         <span class="field-label">Cognitive Data Source</span>
         <div class="radio-grid">
-          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</span></label>
-          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</span></label>
-          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression<br>/ observation only</span></label>
-          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Unknown — prior<br>outside evaluation</span></label>
+          <span class="r-opt-wrap">
+            <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery</span></label>
+            <button type="button" class="info-btn" aria-expanded="false" aria-controls="cdsInfo-comprehensive" data-info-toggle="cdsInfo-comprehensive"><span aria-hidden="true">ⓘ</span><span class="sr-only">Show example instruments for Comprehensive battery</span></button>
+            <div id="cdsInfo-comprehensive" class="info-popover" role="region" aria-label="Example instruments for Comprehensive battery" hidden><strong>IQ-tier:</strong> WISC, DAS, SB, WPPSI<br><strong>Developmental tier:</strong> Bayley-4, Mullen, Griffiths, DAYC-2</div>
+          </span>
+          <span class="r-opt-wrap">
+            <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener</span></label>
+            <button type="button" class="info-btn" aria-expanded="false" aria-controls="cdsInfo-screener" data-info-toggle="cdsInfo-screener"><span aria-hidden="true">ⓘ</span><span class="sr-only">Show example instruments for Brief screener</span></button>
+            <div id="cdsInfo-screener" class="info-popover" role="region" aria-label="Example instruments for Brief screener" hidden><strong>IQ-tier:</strong> KBIT-2R, RIAS-2, WASI-II<br><strong>Developmental tier:</strong> ASQ-3, SWYC, DAYC-2 Screener</div>
+          </span>
+          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression only</span></label>
+          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Prior outside evaluation</span></label>
         </div>
         <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
       </div>
@@ -538,9 +621,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt"><input type="radio" name="adaptProfile" value="severelyImpaired">Severely impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="moderatelyImpaired">Moderately impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="mildlyImpaired">Mildly impaired</label>
-          <label class="r-opt" title="Adaptive score in normal or low-average range but meaningfully below cognitive potential — common Level 1/2 ASD pattern"><input type="radio" name="adaptProfile" value="belowPotential">Below cognitive<br>potential</label>
-          <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Commensurate<br>w/ cognitive level</label>
-          <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Age-appropriate<br>/ WNL</label>
+          <label class="r-opt" title="Adaptive score in normal or low-average range but meaningfully below cognitive potential — common Level 1/2 ASD pattern"><input type="radio" name="adaptProfile" value="belowPotential">Impaired vs cognitive potential</label>
+          <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Aligned with cognitive level</label>
+          <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Within normal limits (WNL)</label>
         </div>
         <!-- Standardized-assessment attestation. When checked together with a formally-impaired
              adaptive selection AND a comprehensive cognitive battery, the bridge upgrades
@@ -552,10 +635,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              paired with mildly/moderately/severely-impaired adaptive — the exact
              differential zone where the BIF vs mild ID call lives (AACN 2020;
              Wexler 2023). Passive informational; auto-hides on predicate change.
-             Visual treatment shares the floor-effect-warning family but uses a
-             left-border accent to differentiate from purely-informational notes,
-             since this hint carries a clinical recommendation. -->
-        <div id="bifAdaptiveCrossCheck" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px;padding:6px 10px;border-left:3px solid #f59e0b;background:#fffaf0"></div>
+             PR-I C5: visual treatment strengthened to differentiate from purely-
+             informational notes (e.g., #screenerYoungWarning at line ~532) since this
+             hint carries a clinical recommendation. Uses a darker amber tint + ⚠ icon
+             prefix (via .bif-crosscheck::before) + font-weight 500. Colorblind-safe
+             via icon + text + border, not color alone. -->
+        <div id="bifAdaptiveCrossCheck" class="bif-crosscheck" style="display:none"></div>
       </div>
 
       <div class="field-group">
@@ -1218,6 +1303,20 @@ const S = {
   visitType:'',
   rtcInterval:'',
   specifiers:new Set(),
+  // PR-K + PR-L: COG_SPEC_EXCL keys (withID/withSuspectedID/withGDD/withSuspectedGDD/
+  // withBIF/withoutID/withoutGDD) the clinician has manually toggled. Bridge respects
+  // these — any key in this Set is left untouched by bridgeCogProfileToSpecifier's
+  // clear loop AND skips the auto-assert of currentClinicalPathway().specKey.
+  // RELEASE PATHS (three, ranked by frequency of use):
+  //   1. Uncheck a pinned specifier  → that key released from Set (PR-L ε,
+  //      specifier change handler ~line 5193)
+  //   2. Click "Re-sync with pathway" on the pill → entire Set cleared,
+  //      bridge re-fires (PR-L δ, resyncPathwayPin() function)
+  //   3. Change cogProfile to a different value → entire Set cleared (PR-K,
+  //      cogProfile change handler ~line 5100; "fresh clinical context" intent)
+  // Survives cogDataSource / adaptProfile / adaptiveStandardized changes — that's
+  // the protective behavior PR-K exists for.
+  specifiersManuallySet:new Set(),
   criteriaA:new Set(), criteriaB:new Set(),
   criteriaC:false, criteriaD:false, criteriaE:false,
   ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
@@ -1266,6 +1365,66 @@ const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaire
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
+// Cluster pathway summary — SINGLE SOURCE OF TRUTH for both the pathway pill (#pathwayPill)
+// AND the bridgeCogProfileToSpecifier() auto-bridge decision. Each return carries:
+//   - specKey: the specifier checkbox key the bridge should auto-check (null = no auto-bridge,
+//     used for BIF [intentionally never auto-bridged per Greenspan 2017] and 'unknown')
+//   - variant: CSS class for the pill (pp-confirmed / pp-suspected / pp-bif / pp-typical / '')
+//   - prefix: pill prefix label ('Pathway')
+//   - text:   pill body text
+// PR-J (clinical-council reopens D4): the bridge now re-fires on adaptProfile changes and
+// consumes specKey from this function, so the pill and the auto-bridged specifier checkbox
+// can never disagree. The original D4 concern (surprise specifier flip from far-away
+// control) is neutralized because the pill renders the resulting state in the same render
+// frame, making the change visible at the clinician's focus rather than hidden 200px below.
+function currentClinicalPathway(){
+  const cog = S.cogProfile;
+  if(!cog) return null;
+  const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
+  if(['id_mild','id_moderate','id_severe'].includes(cog)){
+    const sev = cog==='id_mild'?'Mild':cog==='id_moderate'?'Moderate':'Severe';
+    const confirmed = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
+    return confirmed
+      ? {specKey:'withID',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
+      : {specKey:'withSuspectedID', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
+  }
+  if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cog)){
+    const sev = cog==='gdd_mild'?'mild':cog==='gdd_moderate'?'moderate':cog==='gdd_severe'?'severe':'';
+    const label = sev ? `${sev.charAt(0).toUpperCase()+sev.slice(1)} Global Developmental Delay` : 'Global Developmental Delay (unspecified severity)';
+    const confirmed = cogSourceSupportsConfirmation();
+    return confirmed
+      ? {specKey:'withGDD',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${label}`}
+      : {specKey:'withSuspectedGDD', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${label} — awaiting comprehensive developmental battery`};
+  }
+  if(cog==='borderline'){
+    // BIF intentionally has specKey:null — withBIF is never auto-bridged (no withSuspectedBIF
+    // and no data-source confirmation pathway for BIF; bridging would send a "the tool thinks
+    // this fits" signal unsupported by literature, Greenspan 2017). Clinician checks withBIF
+    // manually via the gate at toggleBifSpecifierGate().
+    const allowed = bifSpecifierAllowed();
+    const qual = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation)'
+               : S.cogDataSource==='comprehensive' ? ' (current battery)'
+               : S.cogDataSource==='screener' ? ' (screener — preliminary)'
+               : S.cogDataSource==='clinical' ? ' (clinical impression)'
+               : '';
+    return allowed
+      ? {specKey:null, variant:'pp-bif', prefix:'Pathway', text:`Borderline Intellectual Functioning (R41.83)${qual}`}
+      : {specKey:null, variant:'pp-bif', prefix:'Pathway', text:'Borderline considered — pick a Cognitive Data Source to support the BIF call'};
+  }
+  if(['lowAverage','average','aboveAverage','superior','verySuperior'].includes(cog)){
+    const range = cog==='lowAverage'?'low-average':cog==='average'?'average':cog==='aboveAverage'?'high-average':cog==='superior'?'superior':'very superior / gifted';
+    // Young (toddler/preschool) → withoutGDD (DSM-5 ID criteria don't apply under age 5).
+    // Older → withoutID.
+    const specKey = young ? 'withoutGDD' : 'withoutID';
+    const labelKey = young ? 'GDD' : 'ID';
+    return {specKey, variant:'pp-typical', prefix:'Pathway', text:`Cognitive ${range} — without ${labelKey}`};
+  }
+  if(cog==='unknown'){
+    // Unknown → no specifier; clinician decides downstream after evaluation completes.
+    return {specKey:null, variant:'', prefix:'Pathway', text:'Cognitive status under evaluation — specifier deferred'};
+  }
+  return null;
+}
 const asdLevel23 = () => S.asdLevelSC>='2'||S.asdLevelRRB>='2';
 const hasPragmaticDeficit = () => S.langModifiers.has('pragmatic');
 const hasMorphoErrors = () => S.langModifiers.has('morphosyntactic');
@@ -4005,9 +4164,82 @@ function setPreviewMode(mode){
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 // keep docs/branching-logic.md §1.1 + §5 in sync (master render loop; tab visibility gates for ABA + IEP, fallback to note tab when active tab hides)
+// Render the top-of-cluster pathway pill. Called from render() on every state change.
+// Sets variant class for color + text. Hides when no pathway is computed (no cogProfile).
+// PR-K: appends a secondary line declaring any manually-pinned COG_SPEC_EXCL keys so the
+// pill→specifier divergence (when present) is visible at the cluster focal point.
+function renderPathwayPill(){
+  const el=document.getElementById('pathwayPill');
+  if(!el) return;
+  const p=currentClinicalPathway();
+  if(!p){el.style.display='none';el.textContent='';return;}
+  // Reset variant classes, then add the current one.
+  el.classList.remove('pp-confirmed','pp-suspected','pp-bif','pp-typical');
+  if(p.variant) el.classList.add(p.variant);
+  // PR-K: manual override secondary line. Shown only when the clinician has manually
+  // pinned a COG_SPEC_EXCL key that is ALSO currently checked (i.e., actively asserted in
+  // the chart). Pinned-but-unchecked keys (e.g., user unchecked withID then checked
+  // withSuspectedID — both are in S.specifiersManuallySet but only withSuspectedID is
+  // asserted) are kept in the Set for bridge-respect logic but filtered from this display
+  // since the clinician cares about WHAT the spec currently says vs. the pathway.
+  const manualActive = COG_SPEC_EXCL.filter(k =>
+    S.specifiersManuallySet.has(k) && S.specifiers.has(k));
+  const manualNote = manualActive.length
+    ? `<span class="pp-manual">Manual override: ${manualActive.join(', ')} pinned</span>`
+    : '';
+  // PR-L δ: "Re-sync with pathway" release button. Visible whenever ANY pin exists
+  // (including uncheck-pins not reflected in manualActive), since those still block the
+  // bridge from auto-asserting. Button calls resyncPathwayPin() which clears the Set and
+  // re-fires the bridge.
+  const resetBtn = S.specifiersManuallySet.size
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Clear manual overrides and re-apply the auto-recommended specifier. You can also release a single pin by unchecking it.">Re-sync with pathway</button>`
+    : '';
+  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
+  el.style.display='';
+}
+
+// PR-L δ: invoked by the pill's Re-sync button. Clears every manual specifier pin and
+// re-fires the auto-bridge so the pathway's recommended specifier becomes the asserted
+// spec. Complements the per-key uncheck-release (PR-L ε); this is the "release all at
+// once" escape hatch for cases where the clinician wants the auto-bridge fully back in
+// charge (e.g., the council scenario where new test data shifts the working diagnosis
+// after a prior manual pin was set).
+function resyncPathwayPin(){
+  S.specifiersManuallySet.clear();
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  render();
+}
+
+// PR-K: per-specifier "(manual)" caption. Called from render() alongside renderPathwayPill().
+// Adds/removes a small caption next to each COG_SPEC_EXCL checkbox label so a clinician
+// scrolling past the Specifiers section can spot which keys are pinned.
+function renderManualSpecCaptions(){
+  COG_SPEC_EXCL.forEach(k=>{
+    const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
+    if(!cb) return;
+    const lab=cb.closest('label');
+    if(!lab) return;
+    let cap=lab.querySelector('.spec-manual-caption');
+    // Only caption currently-asserted manual pins. A clinician who unchecked an auto-
+    // bridged key and didn't pin a replacement gets no visible caption — the unchecked
+    // state itself is the signal; "(manual)" on an empty checkbox would be confusing.
+    const shouldShow=S.specifiersManuallySet.has(k) && S.specifiers.has(k);
+    if(shouldShow && !cap){
+      cap=document.createElement('span');
+      cap.className='spec-manual-caption';
+      cap.textContent='(manual)';
+      lab.appendChild(cap);
+    } else if(!shouldShow && cap){
+      cap.remove();
+    }
+  });
+}
+
 function render(){
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
+  renderPathwayPill();
+  renderManualSpecCaptions();
 
   // ABA inclusion logic — show/hide params section and tab
   const abaIncluded=resolveOv('aba',ruleABA());
@@ -4143,22 +4375,26 @@ function toggleUnevenCog(){
 // unchanged — only the displayed instrument list swaps. cogSourceSupportsConfirmation
 // continues to treat any "comprehensive" or "priorExternal" selection as confirmable
 // regardless of which instrument list is visible.
+// Compact labels post-PR-I C3: instrument lists were moved from the visible label into
+// the title-attr tooltip per UI council Concern 3 D6 (density vs. discoverability tradeoff).
+// Tier-specific instrument enumeration still happens here — the swap is what distinguishes
+// IQ-tier (WISC etc.) from developmental-tier (Bayley etc.) for tooltip-on-hover.
 const ID_COGDATASOURCE_LABELS = {
-  comprehensive: 'Comprehensive battery<br>(WISC, DAS, SB, WPPSI)',
-  screener: 'Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)',
-  clinical: 'Clinical impression<br>/ observation only',
-  priorExternal: 'Unknown — prior<br>outside evaluation'
+  comprehensive: 'Comprehensive battery',
+  screener: 'Brief screener',
+  clinical: 'Clinical impression only',
+  priorExternal: 'Prior outside evaluation'
 };
 const GDD_COGDATASOURCE_LABELS = {
-  comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
-  // GDD-tier screener tier lists the developmental screening tools clinicians actually
-  // see in this age range (ASQ-3, SWYC, DAYC-2 Screener) plus KBIT-2R for age 4+ since
-  // KBIT-2R is normed 4+ and frequently encountered on preschoolers. KBIT-2R remains an
-  // IQ screener, not a developmental tool — the floor-effect warning (see
-  // toggleCogDataSourceVisibility) distinguishes the two concerns in its text.
-  screener: 'Brief screener<br>(ASQ-3, SWYC, DAYC-2 Screener; or KBIT-2R if age 4+)',
-  clinical: 'Clinical impression<br>/ observation only',
-  priorExternal: 'Unknown — prior<br>outside evaluation'
+  comprehensive: 'Comprehensive developmental battery',
+  // GDD-tier screener tier intentionally includes both developmental screening tools (ASQ-3,
+  // SWYC, DAYC-2 Screener) and KBIT-2R for age 4+; KBIT-2R remains an IQ screener, not a
+  // developmental tool — the floor-effect warning (see toggleCogDataSourceVisibility)
+  // distinguishes the two concerns in its text. Label kept compact; instruments live in
+  // the data-cds-key="screener" title-attr tooltip in the HTML.
+  screener: 'Brief screener',
+  clinical: 'Clinical impression only',
+  priorExternal: 'Prior outside evaluation'
 };
 function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
@@ -4544,45 +4780,45 @@ function bridgeCogProfileToSpecifier(cogVal){
   // cogProfile='borderline' AND a non-empty cogDataSource, so clearing the
   // source via deselect correctly drops withBIF via the gate logic below.
   const preserveBif = bifSpecifierAllowed() && S.specifiers.has('withBIF');
+  // PR-K: respect manual specifier overrides. Any COG_SPEC_EXCL key in
+  // S.specifiersManuallySet was deliberately toggled by the clinician and must NOT be
+  // cleared by this loop OR re-asserted below. The override is durable across
+  // cogDataSource / adaptProfile / adaptiveStandardized changes; it clears only when
+  // cogProfile changes (= fresh clinical context, hook at the cogProfile change handler).
+  const anyManualInGroup = COG_SPEC_EXCL.some(k => S.specifiersManuallySet.has(k));
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
-  // matching specifier. Clinician can still manually override after.
+  // matching specifier — UNLESS the clinician has manually pinned one.
   COG_SPEC_EXCL.forEach(k=>{
+    if(S.specifiersManuallySet.has(k)) return; // PR-K manual-pin guard
     S.specifiers.delete(k);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
     if(cb) cb.checked=false;
   });
-  let toCheck=null;
-  // ID confirmation requires the full predicate — DSM-5-TR ID criteria mandate
-  // BOTH IQ deficit AND adaptive deficit AND onset in developmental period.
-  // The tool enforces this via cogSourceSupportsConfirmation + adaptive-impaired
-  // + standardized-adaptive evidence.
-  //
-  // GDD (F88) confirmation is intentionally LESS strict. F88 is used when ID
-  // cannot be reliably assessed (typically under 5); adaptive deficits are
-  // typical but not strictly required by DSM-5-TR or AACAP. A comprehensive
-  // developmental battery (e.g., Bayley-4 which includes cognitive + adaptive
-  // subscales, or Mullen, Griffiths, DAYC-2) is sufficient on its own. The
-  // adaptive section continues to inform downstream prose but no longer gates
-  // the confirmed-vs-suspected GDD bridge. (PR-G R2.1; clinical-council reopens
-  // — revisits the PR-C-era assumption that ID and GDD share a predicate.)
-  const confirmableId  = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
-  const confirmableGdd = cogSourceSupportsConfirmation();
-  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmableId ? 'withID' : 'withSuspectedID';
-  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmableGdd ? 'withGDD' : 'withSuspectedGDD';
-  // BIF is intentionally NOT auto-bridged. There is no `withSuspectedBIF` and no data-source
-  // confirmation pathway for BIF; bridging would send a "the tool thinks this fits" signal
-  // unsupported by literature (Greenspan 2017). The clinician selects `borderline` here to
-  // record their assessment; the withBIF specifier (line ~673) must be checked manually.
-  // Do NOT re-add an `else if(cogVal==='borderline')` branch here.
-  else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)){
-    // For toddler/preschool, the parallel "without GDD" specifier is the conceptually-correct
-    // choice — DSM-5 ID criteria don't apply under age 5; GDD is the relevant developmental
-    // category. Older ages use withoutID.
-    const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
-    toCheck = young ? 'withoutGDD' : 'withoutID';
-  }
-  // cogVal==='unknown' → leave all unchecked; clinician decides
-  if(toCheck){
+  // PR-J β: the specifier-key derivation is delegated to currentClinicalPathway()
+  // (defined near line 1318) so the bridge and the pathway pill share a single source
+  // of truth. The predicate encodes:
+  //   - ID tiers   → confirmableId  (full DSM-5/AAIDD predicate: comprehensive source +
+  //                  formally-impaired adaptive + standardized adaptive evidence)
+  //   - GDD tiers  → confirmableGdd (PR-G R2.1: comprehensive developmental battery alone;
+  //                  adaptive is informative but not strictly required per DSM-5/AACAP)
+  //   - BIF        → specKey:null (intentionally never auto-bridged; Greenspan 2017)
+  //   - normal-range → withoutGDD (young) or withoutID (older), per the DSM-5 ID-under-5
+  //                  applicability rule
+  //   - unknown    → specKey:null (clinician decides)
+  // CAUTION: currentClinicalPathway() reads S.cogProfile (not the cogVal argument). When
+  // the bridge is called with cogVal !== S.cogProfile (e.g., during the change handler
+  // transition between old and new selection), S.cogProfile has already been updated by
+  // the caller (see the cogProfile change handler at ~line 5060 which sets S.cogProfile
+  // before calling bridgeCogProfileToSpecifier(inp.value)). The cogVal argument is
+  // retained for readability + age-cleanup teardown paths that pass '' to clear.
+  const pathway = currentClinicalPathway();
+  const toCheck = pathway?.specKey || null;
+  // PR-K: skip the auto-assert when the clinician has manually pinned any COG_SPEC_EXCL
+  // key. The pill secondary line (renderPathwayPill) surfaces the divergence so the
+  // clinician sees both the predicate's recommendation AND their override at the focal
+  // point. Without this guard, the auto-bridge would re-fight the manual pin every time
+  // an adjacent input fires the bridge.
+  if(toCheck && !anyManualInGroup){
     S.specifiers.add(toCheck);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${toCheck}"]`);
     if(cb) cb.checked=true;
@@ -4747,12 +4983,15 @@ function updateAgeBasedVisibility(){
     }
   }
   // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
-  // Must restore to 'contents' not '' — these wrapper divs use display:contents so their
-  // children flow as direct flex items inside .radio-grid; '' would break the grid layout
+  // Toggle subgroup visibility. The subgroup wrappers (cogProfileIdGroup, gddCogGroup,
+  // cogProfileBifWrap) now use the .subgroup CSS class (display:flex with flex-wrap) —
+  // restore to '' (empty string) when shown so the class's flex layout takes over.
+  // Prior history: these used display:contents to flow children directly into a single
+  // .radio-grid; the visible-subgroup redesign replaced that with boxed subgroups.
   const idCogGroup=document.getElementById('cogProfileIdGroup');
   if(idCogGroup){
     const hideIDCog=young&&S.ageGroup!=='';
-    idCogGroup.style.display=hideIDCog?'none':'contents';
+    idCogGroup.style.display=hideIDCog?'none':'';
     if(hideIDCog&&hasID()){
       S.cogProfile='';
       idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
@@ -4767,7 +5006,7 @@ function updateAgeBasedVisibility(){
   const bifCogGroup=document.getElementById('cogProfileBifWrap');
   if(bifCogGroup){
     const hideBifCog=young&&S.ageGroup!=='';
-    bifCogGroup.style.display=hideBifCog?'none':'contents';
+    bifCogGroup.style.display=hideBifCog?'none':'';
     if(hideBifCog&&S.cogProfile==='borderline'){
       S.cogProfile='';
       bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
@@ -4793,7 +5032,7 @@ function updateAgeBasedVisibility(){
   const gddCogGroup=document.getElementById('gddCogGroup');
   if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
-    gddCogGroup.style.display=hideGddCog?'none':'contents';
+    gddCogGroup.style.display=hideGddCog?'none':'';
     if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
       gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
@@ -4915,6 +5154,52 @@ document.addEventListener('DOMContentLoaded',()=>{
   // mutates S.cogProfile/S.cogDataSource without firing the bridge.
   toggleBifSpecifierGate();
   toggleBifAdaptiveCrossCheck();
+  // PR-K: ⓘ info-btn click delegation. Toggles aria-expanded + popover [hidden]; closes any
+  // sibling open popovers so only one shows at a time. Escape key closes the focused popover
+  // group and returns focus to its triggering button.
+  document.addEventListener('click',e=>{
+    const btn = e.target.closest('button.info-btn[data-info-toggle]');
+    if(btn){
+      const id = btn.getAttribute('data-info-toggle');
+      const pop = document.getElementById(id);
+      if(!pop) return;
+      const willOpen = btn.getAttribute('aria-expanded') !== 'true';
+      // Close all other open info popovers first (one-at-a-time discipline)
+      document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(otherBtn=>{
+        if(otherBtn !== btn){
+          otherBtn.setAttribute('aria-expanded','false');
+          const otherId = otherBtn.getAttribute('data-info-toggle');
+          const otherPop = otherId && document.getElementById(otherId);
+          if(otherPop) otherPop.hidden = true;
+        }
+      });
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      pop.hidden = !willOpen;
+      return;
+    }
+    // Click outside any open popover or its button closes the popover.
+    const inOpenPopover = e.target.closest('.info-popover');
+    if(inOpenPopover) return;
+    document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(openBtn=>{
+      openBtn.setAttribute('aria-expanded','false');
+      const id = openBtn.getAttribute('data-info-toggle');
+      const pop = id && document.getElementById(id);
+      if(pop) pop.hidden = true;
+    });
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key !== 'Escape') return;
+    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"]');
+    if(!openBtns.length) return;
+    openBtns.forEach(btn=>{
+      btn.setAttribute('aria-expanded','false');
+      const id = btn.getAttribute('data-info-toggle');
+      const pop = id && document.getElementById(id);
+      if(pop) pop.hidden = true;
+    });
+    // Return focus to the most-recently-opened button (the last one in DOM order if multiple).
+    openBtns[openBtns.length-1].focus();
+  });
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
@@ -4928,7 +5213,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
       else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile='';toggleBifAdaptiveCrossCheck();}
+      else if(nm==='adaptProfile'){S.adaptProfile='';bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}/* PR-K: mirror PR-J adaptProfile change-handler — deselect path must also re-fire bridge so pill+spec stay convergent */
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
       else if(nm==='asdLevelSC') S.asdLevelSC='';
@@ -4975,15 +5260,27 @@ document.addEventListener('DOMContentLoaded',()=>{
           S.cogDataSource='';
           document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
         }
+        // PR-K: cogProfile change = fresh clinical context. Clear any prior manual
+        // specifier pins so the new auto-bridge starts clean. Without this, a previously-
+        // pinned withSuspectedID would persist even after the clinician picked an entirely
+        // different cogProfile (e.g., switching from id_mild to average), trapping a
+        // stale override the clinician likely doesn't remember setting.
+        S.specifiersManuallySet.clear();
         S.cogProfile=inp.value;
         bridgeCogProfileToSpecifier(inp.value);
         toggleCogDataSourceVisibility();
       }
-      // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
-      // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
-      // (per council D4 — avoid surprise specifier flips from far-away controls).
+      // cogDataSource, adaptiveStandardized, AND adaptProfile all re-fire the bridge because
+      // all three are inputs to the suspected→confirmed upgrade decision (per the confirmableId
+      // predicate in currentClinicalPathway). PR-J reopens prior council D4 ("avoid surprise
+      // specifier flips from far-away controls") — the rationale for D4 was that an automatic
+      // flip in the specifier checkbox 200px below the clinician's focus would feel like the
+      // tool moving things behind their back. PR-I C2 introduced the pathway pill at the top
+      // of the cluster, which renders the bridge result in the same render frame. The flip is
+      // now visible at the focal point rather than hidden, neutralizing the D4 concern.
+      // [clinical-council reopens D4 — see docs/branching-logic.md §11 PR-J entry]
       else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;toggleBifAdaptiveCrossCheck();}
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}
       else if(nm==='dysmorphism') S.dysmorphism=inp.value;
       else if(nm==='regressionTiming') S.regressionTiming=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;
@@ -5058,6 +5355,28 @@ document.addEventListener('DOMContentLoaded',()=>{
           arfidMechanism:S.arfidMechanism,arfidImpact:S.arfidImpact,
           socialWorkReasons:S.socialWorkReasons};
         if(m[k]) inp.checked?m[k].add(v):m[k].delete(v);
+        // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
+        //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
+        //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND
+        //     re-fire the bridge so the pathway-recommended specifier takes over
+        //     immediately (PR-L ε). Without the bridge re-fire, the uncheck would
+        //     leave the spec section empty until the next adjacent input change.
+        //   - User unchecks a COG_SPEC_EXCL key that was NOT pinned → no-op on the
+        //     Set (delete on a missing key is silent); no bridge re-fire (the spec
+        //     stays unchecked as the user just asked).
+        // The mutex/clearing block below in this same handler uses programmatic
+        // cb.checked assignment which does NOT fire change, so only the actually-
+        // clicked specifier gets pinned/released. The Set is fully cleared on
+        // cogProfile change (PR-K) or "Re-sync with pathway" button (PR-L δ).
+        let pinReleased = false;
+        if(k==='specifiers' && COG_SPEC_EXCL.includes(v)){
+          if(inp.checked){
+            S.specifiersManuallySet.add(v);
+          } else if(S.specifiersManuallySet.has(v)){
+            S.specifiersManuallySet.delete(v);
+            pinReleased = true;
+          }
+        }
         if(k==='needsBehavior'&&['tantrums','noncompliance','property','vocalDisruption'].includes(v)){
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
           if(fr) fr.style.display=inp.checked?'':'none';
@@ -5197,6 +5516,11 @@ document.addEventListener('DOMContentLoaded',()=>{
             else{S.specifiers.delete('withCatatonia');if(specCb)specCb.checked=false;}
           }
         }
+        // PR-L ε continuation: if this change released a manual pin, re-fire the bridge
+        // so the pathway-recommended specifier takes over immediately. The bridge skips
+        // when other pins remain in the group (anyManualInGroup guard) so a partial release
+        // (e.g., uncheck one of two pinned keys) doesn't stomp the other.
+        if(pinReleased) bridgeCogProfileToSpecifier(S.cogProfile);
       }
       syncABATargetsFromNeeds();
       syncSchoolSvcFromNeeds();
