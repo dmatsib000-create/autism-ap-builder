@@ -157,6 +157,37 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .info-popover strong{color:var(--gray-800);font-weight:600}
 /* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* PR-N persistence: banner + modal styles.
+   The banner sits at the top of the page below the header and reports auto-save state.
+   The modal is used for restore-on-load passphrase prompts and clear-confirmation copy-to-Epic prompts.
+   Banner color signals state: gray=off, amber=on with saved data, green=fresh-this-session.
+   Modal is overlay + centered card; Escape and click-on-backdrop dismiss where appropriate. */
+.pers-banner{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12px;border-bottom:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-700)}
+.pers-banner.pers-on{background:#fef3c7;border-bottom-color:#fcd34d;color:#92400e}
+.pers-banner.pers-fresh{background:#d1fae5;border-bottom-color:#6ee7b7;color:#065f46}
+.pers-banner .pers-icon{font-size:14px;line-height:1}
+.pers-banner .pers-text{flex:1;line-height:1.4}
+.pers-banner .pers-text strong{font-weight:600}
+.pers-banner button{font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.85;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+.pers-banner button:hover{opacity:1;background:rgba(255,255,255,.5)}
+.pers-banner button:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
+.pers-modal-backdrop{position:fixed;inset:0;background:rgba(20,20,30,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.pers-modal{background:var(--bg-card);border-radius:var(--radius-md);box-shadow:0 20px 50px rgba(0,0,0,.3);max-width:480px;width:100%;padding:24px;font-size:13px;line-height:1.5}
+.pers-modal h2{margin:0 0 8px;font-size:16px;font-weight:600;color:var(--gray-800)}
+.pers-modal p{margin:0 0 14px;color:var(--gray-700)}
+.pers-modal .pers-hint{font-size:11px;color:var(--gray-500);font-style:italic;margin-top:-8px;margin-bottom:14px}
+.pers-modal label{display:block;margin-bottom:6px;font-weight:600;font-size:12px;color:var(--gray-700)}
+.pers-modal input[type=password],.pers-modal input[type=text]{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--border-default);border-radius:var(--radius-sm);font-family:inherit;box-sizing:border-box;margin-bottom:14px}
+.pers-modal input:focus{outline:none;border-color:var(--accent);box-shadow:var(--focus-ring)}
+.pers-modal .pers-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.pers-modal .pers-actions button{padding:7px 14px;font-size:12px;font-weight:600;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-700);transition:background var(--dur-fast) var(--ease)}
+.pers-modal .pers-actions button.pers-primary{background:var(--accent);color:white;border-color:var(--accent-hover)}
+.pers-modal .pers-actions button.pers-primary:hover{background:var(--accent-hover)}
+.pers-modal .pers-actions button.pers-danger{background:#dc2626;color:white;border-color:#b91c1c}
+.pers-modal .pers-actions button.pers-danger:hover{background:#b91c1c}
+.pers-modal .pers-actions button:hover{background:var(--gray-100)}
+.pers-modal .pers-actions button:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.pers-modal .pers-error{color:#b91c1c;font-size:12px;margin:-8px 0 12px;font-weight:500}
 .r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -435,7 +466,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <div class="sub">
       <span class="header-badge">Deterministic</span>
       <span class="header-badge">AI-free</span>
-      <span class="header-badge">No PHI stored</span>
+      <span class="header-badge" title="Form data is auto-saved encrypted to this browser only (per-session passphrase); never transmitted anywhere">Local encrypted save</span>
       <span class="header-badge">EHR-ready</span>
     </div>
   </div>
@@ -447,6 +478,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
   </div>
 </header>
+
+<!-- PR-N persistence banner — populated by renderPersistenceBanner() in render().
+     Default state: "Auto-save off — click Enable to encrypt this session". When enabled,
+     shows session age + Clear button. Color shifts: gray=off, amber=on with restored data,
+     green=fresh-this-session. The actual restore prompt and passphrase entry happen via
+     the .pers-modal-backdrop overlay summoned by the persistence module on demand. -->
+<div id="persBanner" class="pers-banner" style="display:none"></div>
 
 <div id="mobile-nav">
   <button class="mnav-btn mnav-active" id="mnav-input" onclick="showMobilePanel('input')">&#9998; Input Form</button>
@@ -1345,6 +1383,399 @@ const S = {
     psychiatry:'auto',gi:'auto',sleep_ref:'auto',audiology:'auto',qbtest:'auto',
     earlySteps:'auto',fdlrs:'auto',eeg:'auto',card:'auto'}
 };
+
+// ─── PERSISTENCE (PR-N) ──────────────────────────────────────────────────────
+// Per-browser encrypted auto-save with passphrase. Output of UI persistence council;
+// see docs/branching-logic.md §12 for the full council deliberation. This commit
+// implements Concerns A (auto-save trigger δ refined), B-default (encryption ε without
+// the WebAuthn opt-in), C (banner + Clear + copy-to-Epic soft modal), and E (time-bomb
+// soft prompt + hard delete). Concern D (export/import) and B-opt-in (WebAuthn "Remember
+// this device") and F (audit-logging documentation) are deferred to subsequent commits.
+//
+// HIPAA grounding (Truevault HIPAA Developer's Guide §04):
+//   - Encryption is "addressable" → implemented (Concern B)
+//   - Automatic Logoff is "addressable" → implemented as time-bomb (Concern E)
+//   - Disposal + Media Re-Use are "required" → Clear button + copy-to-Epic prompt (Concern C)
+//   - Workstation Security is "required" but handled by UF (out of tool scope)
+//   - Audit Controls are "required" — see §12 entry for the deployment-model carve-out
+//
+// Storage layout: localStorage['dbp-autism-ap-state-v1'] = JSON with:
+//   { ciphertext (b64), iv (b64), salt (b64), savedAt (ISO string) }
+// The savedAt timestamp is OUTSIDE the encrypted payload so we can show
+// "Restore session from [time]?" before the user enters the passphrase. The timestamp
+// alone is not PHI under HIPAA §164.514 (no identifier, no health information).
+
+const PERS_STORAGE_KEY = 'dbp-autism-ap-state-v1';
+const PERS_DEBOUNCE_MS = 500;            // Concern A: debounce window for non-critical saves
+const PERS_PBKDF2_ITERATIONS = 250000;   // OWASP 2023 minimum for PBKDF2-SHA256
+const PERS_STALE_PROMPT_HOURS = 4;       // Concern E: soft prompt threshold
+const PERS_STALE_DELETE_HOURS = 24;      // Concern E: hard delete threshold
+
+// In-memory key + state. Never persisted; gone on browser close.
+let _persKey = null;            // CryptoKey (AES-GCM 256) or null when persistence is off
+let _persEnabled = false;       // True after passphrase is set this session
+let _persSaveTimer = null;      // Debounce timer handle
+let _persLastSavedAt = null;    // ISO string of last successful save (for banner display)
+
+// SERIALIZATION — Sets are not JSON-native. Custom replacer/reviver round-trips them.
+function persReplacer(key, value){
+  if(value instanceof Set) return {__type:'Set', values:[...value]};
+  return value;
+}
+function persReviver(key, value){
+  if(value && typeof value === 'object' && value.__type === 'Set') return new Set(value.values);
+  return value;
+}
+
+// CRYPTO — PBKDF2 (passphrase → key) + AES-GCM (key → ciphertext). All via SubtleCrypto.
+async function persDeriveKey(passphrase, salt){
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt, iterations:PERS_PBKDF2_ITERATIONS, hash:'SHA-256'},
+    baseKey,
+    {name:'AES-GCM', length:256},
+    false, ['encrypt','decrypt']
+  );
+}
+function persToB64(buf){
+  // Uint8Array or ArrayBuffer → base64. Chunk to avoid call-stack overflow on large buffers.
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  let s = ''; for(let i=0; i<bytes.length; i+=0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i+0x8000));
+  return btoa(s);
+}
+function persFromB64(b64){
+  const s = atob(b64); const bytes = new Uint8Array(s.length);
+  for(let i=0; i<s.length; i++) bytes[i] = s.charCodeAt(i);
+  return bytes;
+}
+async function persEncryptState(){
+  if(!_persKey) return null;
+  const json = JSON.stringify(S, persReplacer);
+  const iv = crypto.getRandomValues(new Uint8Array(12)); // AES-GCM standard 96-bit IV
+  const enc = new TextEncoder();
+  const ciphertext = await crypto.subtle.encrypt({name:'AES-GCM', iv}, _persKey, enc.encode(json));
+  return {iv:persToB64(iv), ciphertext:persToB64(ciphertext)};
+}
+async function persDecryptState(passphrase, blob){
+  // Returns the parsed state object on success; throws on wrong passphrase / corruption.
+  const salt = persFromB64(blob.salt);
+  const iv = persFromB64(blob.iv);
+  const key = await persDeriveKey(passphrase, salt);
+  const plaintext = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, persFromB64(blob.ciphertext));
+  const dec = new TextDecoder();
+  const state = JSON.parse(dec.decode(plaintext), persReviver);
+  // Cache the derived key so subsequent saves use the same one.
+  _persKey = key;
+  return state;
+}
+
+// STORAGE WRAPPERS
+function persReadBlob(){
+  try{ const raw = localStorage.getItem(PERS_STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function persWriteBlob(blob){
+  try{ localStorage.setItem(PERS_STORAGE_KEY, JSON.stringify(blob)); return true; }
+  catch(e){ console.warn('Persistence write failed:', e); return false; }
+}
+function persClearBlob(){
+  try{ localStorage.removeItem(PERS_STORAGE_KEY); } catch(e){}
+}
+
+// AUTO-SAVE SCHEDULING — Concern A (δ refined)
+// Called from render() on every state change. Debounces to once per PERS_DEBOUNCE_MS.
+// Force-save (no debounce) is available via persForceSave() for critical events.
+function persScheduleSave(){
+  if(!_persEnabled || !_persKey) return;
+  if(_persSaveTimer) clearTimeout(_persSaveTimer);
+  _persSaveTimer = setTimeout(persPerformSave, PERS_DEBOUNCE_MS);
+}
+async function persForceSave(){
+  if(!_persEnabled || !_persKey) return;
+  if(_persSaveTimer){ clearTimeout(_persSaveTimer); _persSaveTimer = null; }
+  await persPerformSave();
+}
+async function persPerformSave(){
+  _persSaveTimer = null;
+  if(!_persEnabled || !_persKey) return;
+  try{
+    const encrypted = await persEncryptState();
+    if(!encrypted) return;
+    // Salt is re-used from the initial passphrase setup (cached on the blob).
+    const existing = persReadBlob();
+    if(!existing || !existing.salt){ return; } // Should not happen; persEnable() always writes the salt.
+    const blob = {
+      ciphertext: encrypted.ciphertext,
+      iv: encrypted.iv,
+      salt: existing.salt,
+      savedAt: new Date().toISOString()
+    };
+    if(persWriteBlob(blob)){
+      _persLastSavedAt = blob.savedAt;
+      renderPersistenceBanner();
+    }
+  } catch(e){ console.warn('Persistence save failed:', e); }
+}
+
+// SESSION ENABLE — first call after passphrase is set. Derives the key, writes an initial
+// empty blob (which establishes the salt for the session), and flips _persEnabled true.
+async function persEnable(passphrase){
+  if(!passphrase || passphrase.length < 1) throw new Error('Passphrase required');
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  _persKey = await persDeriveKey(passphrase, salt);
+  _persEnabled = true;
+  // Write initial blob immediately so the salt is committed before any subsequent save.
+  const encrypted = await persEncryptState();
+  const blob = {
+    ciphertext: encrypted.ciphertext,
+    iv: encrypted.iv,
+    salt: persToB64(salt),
+    savedAt: new Date().toISOString()
+  };
+  persWriteBlob(blob);
+  _persLastSavedAt = blob.savedAt;
+  renderPersistenceBanner();
+}
+
+// SESSION DISABLE — wipes in-memory key + localStorage. Used by clearAll and the explicit
+// "Disable auto-save" path. Does NOT wipe form state; that's the caller's responsibility.
+function persDisable(){
+  _persKey = null;
+  _persEnabled = false;
+  _persLastSavedAt = null;
+  persClearBlob();
+  renderPersistenceBanner();
+}
+
+// BANNER — Concern C. Shows current persistence state at the top of the page.
+// State machine: (no blob, not enabled) → off. (enabled this session) → fresh. (restored) → on.
+function renderPersistenceBanner(){
+  const el = document.getElementById('persBanner');
+  if(!el) return;
+  if(!_persEnabled){
+    el.style.display = '';
+    el.className = 'pers-banner';
+    el.innerHTML = '<span class="pers-icon" aria-hidden="true">🔓</span>'
+      + '<span class="pers-text">Auto-save is <strong>off</strong>. Work will be lost on refresh, tab close, or crash.</span>'
+      + '<button type="button" onclick="persPromptEnable()">Enable auto-save</button>';
+    return;
+  }
+  // Enabled: differentiate "fresh session, not yet restored" vs "restored from saved data".
+  const ageMin = _persLastSavedAt ? Math.round((Date.now() - new Date(_persLastSavedAt).getTime())/60000) : 0;
+  const ageText = ageMin < 1 ? 'just now' : ageMin === 1 ? '1 minute ago' : `${ageMin} minutes ago`;
+  el.style.display = '';
+  el.className = 'pers-banner pers-on';
+  el.innerHTML = '<span class="pers-icon" aria-hidden="true">🔒</span>'
+    + `<span class="pers-text">Auto-save <strong>on</strong> — encrypted, saved ${ageText}.</span>`
+    + '<button type="button" onclick="persPromptClear()">Clear &amp; disable</button>';
+}
+
+// MODAL HELPER — generic centered overlay; returns a Promise that resolves with the action.
+// content is an object: { title, body (HTML string), buttons: [{label, className, value}] }.
+// An input field is included automatically if content.input is truthy.
+function persShowModal(content){
+  return new Promise(resolve=>{
+    const backdrop = document.createElement('div');
+    backdrop.className = 'pers-modal-backdrop';
+    const inputHtml = content.input
+      ? `<label for="persModalInput">${content.input.label || 'Passphrase'}</label>`
+        + `<input id="persModalInput" type="${content.input.type || 'password'}" autocomplete="off" />`
+        + (content.input.hint ? `<div class="pers-hint">${content.input.hint}</div>` : '')
+      : '';
+    const errorHtml = '<div class="pers-error" id="persModalError" style="display:none"></div>';
+    const buttonsHtml = (content.buttons || []).map((b,i)=>
+      `<button type="button" data-pers-action="${i}" class="${b.className || ''}">${b.label}</button>`
+    ).join('');
+    backdrop.innerHTML = '<div class="pers-modal" role="dialog" aria-modal="true">'
+      + `<h2>${content.title}</h2>`
+      + (content.body ? `<p>${content.body}</p>` : '')
+      + inputHtml + errorHtml
+      + `<div class="pers-actions">${buttonsHtml}</div>`
+      + '</div>';
+    document.body.appendChild(backdrop);
+    const input = backdrop.querySelector('#persModalInput');
+    const errEl = backdrop.querySelector('#persModalError');
+    const finish = (value)=>{ document.body.removeChild(backdrop); resolve(value); };
+    backdrop.querySelectorAll('button[data-pers-action]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const idx = parseInt(btn.getAttribute('data-pers-action'),10);
+        const action = content.buttons[idx];
+        const inputValue = input ? input.value : null;
+        // If the action has a validator, run it first; show error and stay open on failure.
+        if(action.validate){
+          try{ const ok = await action.validate(inputValue); if(!ok) return; }
+          catch(e){ errEl.textContent = e.message || 'Error'; errEl.style.display = ''; return; }
+        }
+        finish({action:action.value, input:inputValue});
+      });
+    });
+    // Escape closes with a "dismiss" value (caller decides if that's OK).
+    backdrop.addEventListener('keydown', e=>{
+      if(e.key === 'Escape'){ finish({action:'dismiss'}); }
+      if(e.key === 'Enter' && input && document.activeElement === input){
+        const primary = backdrop.querySelector('.pers-primary'); if(primary) primary.click();
+      }
+    });
+    if(input) input.focus();
+  });
+}
+
+// PROMPT FLOWS — Concern B + Concern C
+async function persPromptEnable(){
+  const result = await persShowModal({
+    title: 'Enable encrypted auto-save',
+    body: 'Set a passphrase to encrypt the form state in your browser. Work will be saved continuously; on browser refresh or crash, you can restore by re-entering this passphrase. The passphrase is never stored anywhere — only you can decrypt the saved session.',
+    input: {label:'Passphrase', type:'password', hint:'Suggestion: a re-derivable convention like last 4 of MRN + visit date.'},
+    buttons: [
+      {label:'Skip', value:'skip'},
+      {label:'Enable', value:'enable', className:'pers-primary', validate: async (pw)=>{
+        if(!pw || pw.length < 4){ throw new Error('Passphrase must be at least 4 characters.'); }
+        return true;
+      }}
+    ]
+  });
+  if(result.action === 'enable'){
+    try{ await persEnable(result.input); }
+    catch(e){ console.warn('persEnable failed:', e); }
+  }
+}
+
+async function persPromptRestore(blob){
+  // Show a restore prompt when a saved blob exists at page load.
+  const savedAtTxt = blob.savedAt ? new Date(blob.savedAt).toLocaleString() : 'unknown time';
+  const result = await persShowModal({
+    title: 'Encrypted session found',
+    body: `An encrypted session from <strong>${savedAtTxt}</strong> is saved in this browser. Enter your passphrase to restore it, or start a fresh form (the saved data will be discarded).`,
+    input: {label:'Passphrase', type:'password'},
+    buttons: [
+      {label:'Start fresh (discard saved)', value:'discard', className:'pers-danger', validate: async ()=>{
+        // Second confirmation to prevent accidental discard.
+        return confirm('Discard the saved encrypted session? This cannot be undone.');
+      }},
+      {label:'Skip (no auto-save)', value:'skip'},
+      {label:'Restore', value:'restore', className:'pers-primary', validate: async (pw)=>{
+        if(!pw){ throw new Error('Passphrase required.'); }
+        try{
+          const state = await persDecryptState(pw, blob);
+          // Mutate S in place so any cached references survive.
+          for(const k of Object.keys(S)) delete S[k];
+          for(const k of Object.keys(state)) S[k] = state[k];
+          _persEnabled = true;
+          _persLastSavedAt = blob.savedAt;
+          return true;
+        } catch(e){
+          throw new Error('Wrong passphrase, or saved data is corrupted.');
+        }
+      }}
+    ]
+  });
+  if(result.action === 'discard'){ persDisable(); }
+  if(result.action === 'restore'){
+    // Sync DOM to restored state, then render.
+    persSyncDomFromState();
+    render();
+    renderPersistenceBanner();
+  }
+}
+
+async function persPromptClear(){
+  // Banner "Clear & disable" — wipes both the form and localStorage.
+  if(!confirm('Clear the form and disable auto-save? Use this between patients to prevent data leakage.')) return;
+  clearAll({confirmed:true});
+  persDisable();
+}
+
+// Soft copy-to-Epic modal — Concern C. Wraps note copy with "Done with this patient?"
+async function persPromptCopyClear(){
+  if(!_persEnabled) return true; // No persistence active, nothing to clear; allow copy.
+  const result = await persShowModal({
+    title: 'Note copied to clipboard',
+    body: 'If this is the end of the patient visit, clear the form now to prevent data from carrying over to the next patient.',
+    buttons: [
+      {label:'Keep form (continue editing)', value:'keep'},
+      {label:'Yes, clear now', value:'clear', className:'pers-primary'}
+    ]
+  });
+  if(result.action === 'clear'){
+    clearAll({confirmed:true});
+    persDisable();
+  }
+  return true;
+}
+
+// DOM SYNC — after restore, push S values back into the form so the user sees their session.
+// Mirrors the patterns used by clearAll() in reverse: every form control reflects its S source.
+function persSyncDomFromState(){
+  // Radios
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    const name = r.name; const val = r.value;
+    const stateVal = name && S[name] !== undefined ? S[name] : null;
+    const match = stateVal === val;
+    r.checked = match;
+    r.closest('.r-opt')?.classList.toggle('sel', match);
+  });
+  // Checkboxes with data-key (Set membership)
+  document.querySelectorAll('input[type=checkbox][data-key]').forEach(c=>{
+    const k = c.getAttribute('data-key'); const v = c.value;
+    const set = S[k];
+    if(set instanceof Set) c.checked = set.has(v);
+  });
+  // Standalone checkboxes by id (boolean scalars)
+  ['unevenCogCb','adaptiveStandardizedCb'].forEach(id=>{
+    const cb = document.getElementById(id);
+    if(!cb) return;
+    if(id === 'unevenCogCb') cb.checked = !!S.unevenCog;
+    if(id === 'adaptiveStandardizedCb') cb.checked = !!S.adaptiveStandardized;
+  });
+  // Textareas: only the ones the persistence module knows are S-backed.
+  const unevenField = document.getElementById('unevenCogField');
+  if(unevenField) unevenField.value = S.unevenCogDesc || '';
+  // Conditional containers controlled by unevenCog
+  const unevenWrap = document.getElementById('unevenCogWrap');
+  if(unevenWrap) unevenWrap.style.display = S.unevenCog ? 'block' : 'none';
+}
+
+// TIME-BOMB — Concern E. Called from the init flow before showing restore prompt.
+// Returns true if the blob is too old (deleted), false if the caller should proceed.
+function persCheckStaleness(blob){
+  if(!blob || !blob.savedAt) return false;
+  const ageHours = (Date.now() - new Date(blob.savedAt).getTime()) / 3600000;
+  if(ageHours > PERS_STALE_DELETE_HOURS){
+    persClearBlob();
+    return true; // Caller should NOT prompt to restore.
+  }
+  return false;
+}
+function persIsStale(blob){
+  if(!blob || !blob.savedAt) return false;
+  const ageHours = (Date.now() - new Date(blob.savedAt).getTime()) / 3600000;
+  return ageHours > PERS_STALE_PROMPT_HOURS;
+}
+
+// INIT — called once on DOMContentLoaded.
+async function persInit(){
+  const blob = persReadBlob();
+  if(persCheckStaleness(blob)){
+    renderPersistenceBanner(); // Banner shows "off" since we deleted the blob.
+    return;
+  }
+  if(blob){
+    await persPromptRestore(blob);
+  }
+  renderPersistenceBanner();
+}
+
+// CRITICAL-EVENT FORCE-SAVE HOOKS — Concern A's δ refinement.
+// beforeunload fires when tab is about to close; sync work in this handler may be throttled
+// by some browsers, but localStorage.setItem is generally allowed.
+window.addEventListener('beforeunload', ()=>{
+  if(_persEnabled && _persKey){
+    // Fire-and-forget; we can't await in beforeunload reliably.
+    persPerformSave();
+  }
+});
+// ─── end PERSISTENCE ─────────────────────────────────────────────────────────
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const hasADHD = () => S.comorbid.has('adhd_combined')||S.comorbid.has('adhd_inattentive')||S.comorbid.has('adhd_hyperactive')||S.comorbid.has('adhd_suspected');
@@ -4240,6 +4671,7 @@ function render(){
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
   renderManualSpecCaptions();
+  persScheduleSave(); // PR-N: debounced encrypted auto-save (no-op if persistence is off)
 
   // ABA inclusion logic — show/hide params section and tab
   const abaIncluded=resolveOv('aba',ruleABA());
@@ -4513,6 +4945,12 @@ async function copyNote(format,part){
   try{await navigator.clipboard.writeText(plain);}
   catch(e){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
   flashBtn('✓ Copied!');
+  // PR-N: critical-event force-save (Concern A δ refined) + soft modal (Concern C).
+  // Only fires on full-note copy ('all'); partial assessment/plan copies are mid-visit.
+  if(part==='all' && _persEnabled){
+    await persForceSave();
+    persPromptCopyClear();
+  }
 }
 function flashBtn(msg){
   const b=document.getElementById('copyRichBtn');if(!b)return;
@@ -4627,6 +5065,11 @@ function clearAll(opts){
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
   document.getElementById('criteriaStatus').innerHTML='';
+  // PR-N: Clear All also wipes the encrypted localStorage and disables auto-save.
+  // Without this, the next page load would prompt to restore an empty-form session,
+  // which is confusing UX. Clinician explicitly chose Clear All, so reset persistence too.
+  // Safe to call even when persistence is off (persDisable() is idempotent).
+  persDisable();
   // Reset behavFreq and hide its input rows
   Object.assign(S.behavFreq,{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''});
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
@@ -5146,6 +5589,11 @@ function syncSchoolSvcFromNeeds(){
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
+  // PR-N: persistence init. Reads any saved blob, runs time-bomb staleness check,
+  // and shows the restore prompt (with passphrase) when valid encrypted state exists.
+  // Always renders the banner at the end so the user sees current persistence state.
+  // Runs first because it may mutate S in place; downstream init then sees the restored state.
+  persInit();
   // Sync the withBIF gate to initial state. The HTML default `disabled` and
   // static note text happen to match the empty-cogProfile state, but routing
   // initial render through the gate function keeps the static HTML and the
