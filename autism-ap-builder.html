@@ -9,41 +9,55 @@
  * DESIGN TOKENS — single source of truth for color, space, type, motion
  * ========================================================================== */
 :root {
-  /* Brand & accent */
-  --blue:#1e50d2;--blue-light:#dbeafe;--blue-dark:#1438a8;
+  /* ===========================================================================
+   * DESIGN TOKENS — "Bedside Quiet"
+   * Paper, ink, and one signal color. Existing variable NAMES are preserved for
+   * JS compatibility (--blue, --gray-*, --accent etc.); their VALUES shift
+   * toward warm paper neutrals and a deep clinical teal-slate accent.
+   * ========================================================================== */
+  /* Accent — deep clinical teal-slate, not marketing blue. Used only for
+     active state, focus, and structural emphasis. Never for decoration. */
+  --blue:#1d4f5b;--blue-light:#dde9ec;--blue-dark:#143844;
   --accent:var(--blue);--accent-soft:var(--blue-light);--accent-hover:var(--blue-dark);
-  /* Neutral scale — warmed slightly toward clinical-paper neutral */
-  --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
-  --gray-300:#d2d2d8;--gray-400:#74747e;--gray-500:#6b6b75;  /* gray-400 darkened from #9b9ba3 to hit 4.62:1 on white (WCAG AA normal text >=4.5:1); leaves visual separation from gray-500 */
-  --gray-600:#4a4a55;--gray-700:#363640;--gray-800:#1f1f28;--gray-900:#111118;
-  /* Semantic colors */
-  --amber:#d97706;--amber-light:#fef3c7;
-  --red:#dc2626;--red-light:#fee2e2;
-  --green:#16a34a;--green-light:#dcfce7;
-  /* Type */
+  /* Neutral scale — warmed toward aged paper. */
+  --gray-50:#faf8f3;       /* lightest paper, inputs/subtle fills */
+  --gray-100:#f3f0e8;      /* canvas — what the form rests on */
+  --gray-200:#e6e2d6;      /* default hairline */
+  --gray-300:#cfcabb;
+  --gray-400:#74747e;      /* kept — 4.62:1 on white, WCAG AA */
+  --gray-500:#5d5d66;
+  --gray-600:#3f3f48;
+  --gray-700:#2a2a32;
+  --gray-800:#1a1a1f;      /* body ink — warm charcoal, not pure black */
+  --gray-900:#0e0e12;
+  /* Semantic — muted, not loud */
+  --amber:#a16207;--amber-light:#fdf6e3;       /* parchment gold for placeholders */
+  --red:#b91c1c;--red-light:#fce7e7;
+  --green:#15803d;--green-light:#dcefdb;
+  /* Type — system sans for chrome, Georgia for documents */
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --font-serif:Georgia,'Times New Roman',Charter,serif;
   /* Surfaces */
-  --surface:#eef1f6;
-  --bg-card:#ffffff;
+  --surface:#ede8da;       /* the desk — anchors the left panel */
+  --bg-card:#ffffff;       /* pure white reserved for clinical documents */
   --bg-elevated:#ffffff;
-  /* Borders (subtle / default / strong) */
-  --border-subtle:#edeef1;
+  /* Borders */
+  --border-subtle:#ece8de;
   --border-default:var(--gray-200);
   --border-strong:var(--gray-300);
-  /* Radii */
-  --radius-sm:4px;--radius:6px;--radius-md:8px;--radius-lg:12px;--radius-pill:999px;
-  /* Shadows — calm, layered */
-  --shadow-sm:0 1px 2px rgba(15,15,25,.04);
-  --shadow:0 1px 3px rgba(15,15,25,.06),0 1px 2px rgba(15,15,25,.04);
-  --shadow-md:0 2px 6px rgba(15,15,25,.07),0 1px 3px rgba(15,15,25,.04);
-  --shadow-lg:0 8px 24px rgba(15,15,25,.10),0 2px 6px rgba(15,15,25,.05);
+  /* Radii — tighter, less bouncy; instrument over toy */
+  --radius-sm:3px;--radius:5px;--radius-md:7px;--radius-lg:10px;--radius-pill:999px;
+  /* Shadows — flat instrument, no halo stacks */
+  --shadow-sm:0 1px 0 rgba(40,38,32,.05);
+  --shadow:0 1px 0 rgba(40,38,32,.06);
+  --shadow-md:0 1px 2px rgba(40,38,32,.06),0 1px 0 rgba(40,38,32,.04);
+  --shadow-lg:0 8px 24px rgba(40,38,32,.08),0 1px 0 rgba(40,38,32,.05);
   --shadow-card:var(--shadow);
-  /* Motion — durations & easing */
-  --dur-fast:100ms;--dur:150ms;--dur-slow:240ms;
+  /* Motion — swift and quiet */
+  --dur-fast:80ms;--dur:120ms;--dur-slow:200ms;
   --ease:cubic-bezier(.2,.7,.2,1);
-  /* Focus ring (used via outline) */
-  --focus-ring:0 0 0 2px var(--bg-card),0 0 0 4px color-mix(in srgb,var(--accent) 70%,transparent);
+  /* Focus ring — crisp 2px solid in accent. No glow, no blur. */
+  --focus-ring:0 0 0 2px var(--accent);
 }
 
 /* Respect user motion preference — globally disable transitions */
@@ -51,60 +65,70 @@
   *,*::before,*::after{transition:none!important;animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var(--surface);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
-/* Focus ring — high-contrast, keyboard-only, used on inputs and interactives */
+/* Focus ring — crisp 2px accent line, keyboard-only. No glow stack. */
 :where(button,input,select,textarea,a,label.r-opt,.mod-chip,.str-chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
-.app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
-.app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
-.app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
-.app-header h1{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
-.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.header-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.96);white-space:nowrap}
-.header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
+
+/* App header — paper-on-paper with a single accent hairline at the base.
+   The previous gradient + radial-light + top-shine treatment was AI-aesthetic
+   noise; "Bedside Quiet" calls for ink on warm paper. */
+.app-header{background:var(--gray-50);color:var(--gray-800);padding:14px 22px 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;border-bottom:1px solid var(--border-subtle);box-shadow:inset 0 -3px 0 0 var(--accent),0 1px 0 rgba(40,38,32,.04)}
+.app-header h1{font-size:15px;font-weight:600;letter-spacing:-.005em;line-height:1.25;color:var(--gray-900)}
+.app-header h1::first-letter{color:var(--accent)}
+.app-header .sub{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.header-badge{display:inline-flex;align-items:center;font-size:9.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:3px 9px;border-radius:var(--radius-pill);background:var(--gray-100);border:1px solid var(--border-subtle);color:var(--gray-600);white-space:nowrap}
+.header-sep{width:1px;height:14px;background:var(--border-strong);margin:0 4px}
 .header-actions{display:flex;gap:6px;align-items:center}
-.btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:12px;font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
-@media (hover:hover){.btn:hover{box-shadow:var(--shadow-sm)}.btn:active{transform:translateY(.5px)}}
-.btn-white{background:var(--bg-card);color:var(--accent-hover)}
-@media (hover:hover){.btn-white:hover{background:var(--accent-soft)}}
-.btn-outline{background:transparent;color:white;border:1px solid rgba(255,255,255,.5)}
-@media (hover:hover){.btn-outline:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.7)}}
-.btn-danger{background:transparent;color:#fca5a5;border:1px solid rgba(252,165,165,.4)}
-@media (hover:hover){.btn-danger:hover{background:rgba(255,0,0,.12);border-color:rgba(252,165,165,.7)}}
-.btn-blue{background:var(--accent);color:white}
-@media (hover:hover){.btn-blue:hover{background:var(--accent-hover)}}
-.btn-gray{background:var(--gray-200);color:var(--gray-700)}
-@media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
-.btn-green{background:#16a34a;color:white}
-@media (hover:hover){.btn-green:hover{background:#15803d}}
-.btn-epic{background:#6d28d9;color:white;border-color:#6d28d9}
-@media (hover:hover){.btn-epic:hover{background:#5b21b6}}
-.btn-sm{padding:3px 9px;font-size:11px}
+/* Buttons — flat, single-property hover. No lift, no glow. */
+.btn{padding:7px 14px;border-radius:var(--radius);border:1px solid transparent;cursor:pointer;font-size:12px;font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease);font-family:var(--font);letter-spacing:.005em;min-height:32px;line-height:1.2}
+.btn-white{background:var(--bg-card);color:var(--accent-hover);border-color:var(--border-strong)}
+@media (hover:hover){.btn-white:hover{background:var(--accent-soft);border-color:var(--accent)}}
+.btn-outline{background:transparent;color:var(--gray-700);border-color:var(--border-strong)}
+@media (hover:hover){.btn-outline:hover{background:var(--gray-50);border-color:var(--gray-400)}}
+.btn-danger{background:transparent;color:var(--red);border-color:color-mix(in srgb,var(--red) 35%,transparent)}
+@media (hover:hover){.btn-danger:hover{background:var(--red-light);border-color:var(--red)}}
+.btn-blue{background:var(--accent);color:white;border-color:var(--accent)}
+@media (hover:hover){.btn-blue:hover{background:var(--accent-hover);border-color:var(--accent-hover)}}
+.btn-gray{background:var(--gray-100);color:var(--gray-700);border-color:var(--border-default)}
+@media (hover:hover){.btn-gray:hover{background:var(--gray-200);border-color:var(--gray-300)}}
+.btn-green{background:var(--green);color:white;border-color:var(--green)}
+@media (hover:hover){.btn-green:hover{background:#0f6b32;border-color:#0f6b32}}
+.btn-epic{background:#5b3a8a;color:white;border-color:#5b3a8a}      /* Epic-purple, calmed */
+@media (hover:hover){.btn-epic:hover{background:#46296e;border-color:#46296e}}
+.btn-sm{padding:4px 10px;font-size:11px;min-height:28px}
 .main{display:grid;grid-template-columns:445px 1fr;flex:1;overflow:hidden}
-.left-panel{background:var(--surface);border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
-.right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
-.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.rp-header h2{font-size:13px;font-weight:600;color:var(--gray-700)}
+/* Left panel — the clipboard, slightly raised from the canvas */
+.left-panel{background:var(--gray-100);border-right:1px solid var(--border-default);overflow-y:auto;padding:14px 12px}
+/* Right panel — the desk surface, slightly warmer paper */
+.right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--surface)}
+.rp-header{padding:12px 22px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;background:var(--gray-50);flex-shrink:0;flex-wrap:wrap;gap:8px}
+.rp-header h2{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.08em}
 .rp-actions{display:flex;gap:5px;flex-wrap:wrap}
-.note-preview{flex:1;overflow-y:auto;padding:16px 20px}
-.note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:13px;line-height:1.8}
-.section{margin-bottom:10px;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-sm);transition:box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
-.section:focus-within{box-shadow:var(--shadow-md);border-color:var(--border-strong)}
-.sec-head{background:linear-gradient(180deg,var(--gray-50) 0%,#f1f2f5 100%);border-bottom:1px solid var(--border-subtle);padding:9px 12px;font-weight:700;font-size:11px;color:var(--gray-700);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;min-height:38px;transition:background var(--dur) var(--ease)}
-@media (hover:hover){.sec-head:hover{background:linear-gradient(180deg,var(--gray-100) 0%,#eaebee 100%)}}
-.sec-head > span:last-child{font-size:10px;color:var(--gray-500);transition:transform var(--dur) var(--ease);display:inline-block;line-height:1}
+.note-preview{flex:1;overflow-y:auto;padding:20px 24px}
+.note-empty{text-align:center;color:var(--gray-500);padding:80px 20px;font-size:13px;line-height:1.85;font-style:italic;font-family:var(--font-serif)}
+/* Section card — paper held against the clipboard */
+.section{margin-bottom:10px;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-sm);transition:border-color var(--dur) var(--ease)}
+.section:focus-within{border-color:var(--accent)}
+/* Section head — flat paper, signature hairline detail before the summary text.
+   SIGNATURE DETAIL: an 11px vertical 1px rule renders between the section
+   title and its summary via the .sec-sum::before pseudo. Acts as a quiet
+   typographic colon — the kind of move you'd find in a well-set chart room. */
+.sec-head{background:var(--gray-50);border-bottom:1px solid var(--border-subtle);padding:11px 14px;font-weight:600;font-size:10.5px;color:var(--gray-600);letter-spacing:.09em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;min-height:40px;transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+@media (hover:hover){.sec-head:hover{background:var(--gray-100);color:var(--gray-800)}}
+.sec-head > span:last-child{font-size:9px;color:var(--gray-400);transition:transform var(--dur) var(--ease);display:inline-block;line-height:1}
 .sec-head.collapsed > span:last-child{transform:rotate(-90deg)}
-.sec-body{padding:11px}
+.sec-body{padding:14px}
 .sec-body.hidden{display:none}
 .field-group{margin-bottom:10px}
 .field-group:last-child{margin-bottom:0}
-.field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
-.field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
+.field-label{font-size:10px;font-weight:600;color:var(--gray-500);margin-bottom:7px;display:block;text-transform:uppercase;letter-spacing:.1em}
+.field-sublabel{font-size:10px;font-weight:600;color:var(--gray-500);margin:8px 0 4px;display:block;letter-spacing:.06em;text-transform:uppercase}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
 #cogProfileIdGroup{display:contents}
-.r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
-@media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
-.r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
+.r-opt{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease),color var(--dur) var(--ease);background:var(--bg-card);line-height:1.3;color:var(--gray-700)}
+@media (hover:hover){.r-opt:hover{border-color:var(--gray-400);background:var(--gray-50)}}
+.r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:600;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
 .cb-row{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
@@ -114,10 +138,10 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .beh-freq-inp{width:100%;max-width:400px;font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
 .modifier-strip{display:flex;flex-wrap:wrap;gap:4px;padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
-.mod-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:11.5px;font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
-@media (hover:hover){.mod-chip:hover{border-color:var(--accent);background:var(--accent-soft)}}
-.mod-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
-.mod-chip.active::before{content:'✓ '}
+.mod-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-default);cursor:pointer;font-size:11.5px;font-weight:500;background:var(--bg-card);color:var(--gray-700);transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease),color var(--dur) var(--ease);user-select:none}
+@media (hover:hover){.mod-chip:hover{border-color:var(--gray-400);background:var(--gray-50)}}
+.mod-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:600;box-shadow:inset 0 0 0 1px var(--accent)}
+.mod-chip.active::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);margin-right:1px}
 .lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
@@ -129,9 +153,9 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .chip-grp-hd{font-size:9px;font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:11px;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
-@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:#166534}}
-.str-chip.used{border-color:var(--green);background:var(--green-light);color:#166534;font-weight:500}
+.str-chip{padding:5px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-default);cursor:pointer;font-size:11px;background:var(--bg-card);transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease),color var(--dur) var(--ease);user-select:none;color:var(--gray-700)}
+@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:#0f5a2b}}
+.str-chip.used{border-color:var(--green);background:var(--green-light);color:#0f5a2b;font-weight:600;box-shadow:inset 0 0 0 1px var(--green)}
 .strengths-area{width:100%;font-size:12px;font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
@@ -185,18 +209,21 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .sec-dot.dot-has{background:var(--green)}
 /* ── Evidence chips ─────────────────── */
 .ev-source-strip{display:flex;gap:3px;margin-bottom:4px}
-.ev-src-chip{padding:2px 9px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:10px;font-weight:500;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.ev-src-chip{padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:10px;font-weight:600;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur) var(--ease),color var(--dur) var(--ease);user-select:none;letter-spacing:.02em}
 @media (hover:hover){.ev-src-chip:hover{background:var(--accent);color:white}}
-.ev-src-chip:active{opacity:.75}
-.ev-obs-strip{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
-.ev-obs-chip{padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:10px;background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
-@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:#166534}}
-.ev-obs-chip:active{opacity:.7}
-.sec-sum{font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic;vertical-align:middle;max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev-src-chip:active{opacity:.85}
+.ev-obs-strip{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.ev-obs-chip{padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:10px;background:var(--gray-50);color:var(--gray-700);transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease),color var(--dur) var(--ease);user-select:none}
+@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:#0f5a2b}}
+.ev-obs-chip:active{opacity:.85}
+/* SIGNATURE DETAIL: 11px vertical hairline before the section summary, acting
+   as a quiet typographic colon between the section name and its summary text. */
+.sec-sum{font-size:10px;color:var(--gray-500);font-weight:400;text-transform:none;letter-spacing:0;margin-left:10px;font-style:italic;font-family:var(--font-serif);vertical-align:middle;max-width:220px;display:inline-flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative;padding-left:11px}
+.sec-sum::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:1px;height:11px;background:var(--border-strong)}
 /* ── Override pill grid ────────────── */
 .ov-pill-grid{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0}
-.ov-pill{padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:11px;border:1.5px solid;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);user-select:none;text-align:left;line-height:1.3;font-family:var(--font);background:var(--bg-card)}
-@media (hover:hover){.ov-pill:hover{filter:brightness(.96);box-shadow:var(--shadow-sm)}}
+.ov-pill{padding:8px 12px;border-radius:var(--radius);cursor:pointer;font-size:11px;border:1px solid;transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease);user-select:none;text-align:left;line-height:1.3;font-family:var(--font);background:var(--bg-card)}
+@media (hover:hover){.ov-pill:hover{filter:brightness(.97)}}
 .ov-pill-name{font-weight:600;display:block}
 .ov-pill-state{font-size:9.5px;display:block;margin-top:2px;opacity:.8}
 .ov-pill.auto-yes{border-color:var(--blue);background:var(--blue-light);color:var(--blue-dark)}
@@ -219,7 +246,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .cr-wrap{display:flex;align-items:center;gap:4px}
 .cr-wrap .cb-row{flex:1;margin:0}
 .plan-pill{display:none;cursor:pointer;font-size:10px;padding:1px 8px;border-radius:999px;user-select:none;white-space:nowrap;flex-shrink:0;border:1px solid;transition:all .12s;font-family:var(--font);line-height:1.6}
-.svc-auto-badge{font-size:9px;padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
+.svc-auto-badge{font-size:9px;padding:2px 7px;border-radius:var(--radius-pill);background:var(--accent-soft);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.06em;text-transform:uppercase}
 .plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
 .prior-test-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .outcome-sel{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
@@ -234,27 +261,34 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .rp-status-chips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .status-chip{display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
 .status-chip.visible{display:inline-flex;align-items:center;gap:3px}
-.chip-amber{background:var(--amber-light);color:#92400e;border-color:var(--amber)}
+.chip-amber{background:#fef0d2;color:#7c4a08;border-color:var(--amber)}
 .chip-gray{background:var(--gray-100);color:var(--gray-600);border-color:var(--gray-300)}
 /* ── Visit type highlight when unset ─── */
 .vt-unset .dx-banner-label-vt{color:var(--amber)!important}
 /* ── Sticky note actions bar ────────── */
-.note-sticky-bar{position:sticky;bottom:0;z-index:10;padding:7px 14px;border-top:1px solid var(--gray-200);display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;background:white;flex-shrink:0}  /* position:sticky as belt-and-suspenders; flex parent also pins it */
+/* Sticky copy bar — echoes the app-header treatment with the accent rule on top
+   instead of bottom; visual bookending of the output region. */
+.note-sticky-bar{position:sticky;bottom:0;z-index:10;padding:10px 22px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;background:var(--gray-50);flex-shrink:0;border-top:1px solid var(--border-subtle);box-shadow:inset 0 2px 0 0 var(--accent),0 -1px 0 rgba(40,38,32,.03)}
 /* ── Contextual dx-active highlight ─── */
 .dx-active{border-color:var(--amber)!important;box-shadow:0 0 0 2px var(--amber-light)!important}
 .dx-active .sec-head{background:var(--amber-light)!important}
 /* ── Diagnosis status banner ─────────── */
-.dx-banner{background:white;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;box-shadow:var(--shadow-card)}
-.dx-banner-label{font-size:10px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
-.dx-banner .radio-grid{gap:4px}
+/* Diagnosis status banner — paper card with a left-edge accent stripe instead
+   of a heavy 2px frame. Quieter; still anchors the form's top. */
+.dx-banner{background:var(--bg-card);border:1px solid var(--border-default);border-left:3px solid var(--accent);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px;flex-shrink:0;box-shadow:var(--shadow-sm)}
+.dx-banner-label{font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:block}
+.dx-banner .radio-grid{gap:5px}
 .dx-banner .r-opt{font-size:12px;font-weight:500}
-.dx-banner .r-opt.sel{background:var(--blue);color:white;border-color:var(--blue-dark)}
-.dx-banner-none{font-size:11px;color:var(--gray-400);font-style:italic;margin-top:4px}
+.dx-banner .r-opt.sel{background:var(--accent);color:white;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-hover)}
+.dx-banner-none{font-size:11px;color:var(--gray-500);font-style:italic;margin-top:6px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
-.preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
-.tab-btn{padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
-@media (hover:hover){.tab-btn:hover{color:var(--gray-800)}}
-.tab-btn.tab-active{background:var(--bg-card);color:var(--accent-hover);box-shadow:var(--shadow-sm);border-color:var(--border-subtle)}
+/* Output preview tabs — segmented control, paper-on-paper. Active tab carries
+   a 2px accent rule at top, echoing the app-header's accent line. */
+.preview-tabs{display:inline-flex;gap:0;padding:0;background:transparent;border:1px solid var(--border-default);border-radius:var(--radius);overflow:hidden}
+.tab-btn{padding:7px 16px;border-radius:0;border:none;border-right:1px solid var(--border-default);background:var(--gray-50);color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.06em;text-transform:uppercase;position:relative}
+.preview-tabs > .tab-btn:last-child{border-right:none}
+@media (hover:hover){.tab-btn:hover{background:var(--gray-100);color:var(--gray-800)}}
+.tab-btn.tab-active{background:var(--bg-card);color:var(--accent-hover);box-shadow:inset 0 2px 0 0 var(--accent)}
 /* ── ABA letter preview ─────────────── */
 .aba-doc{font-family:var(--font-serif);font-size:11.5pt;line-height:1.85;color:#1a1a2e;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:32px 36px;min-height:300px;max-width:720px;margin:0 auto;box-shadow:var(--shadow-md)}
 .aba-doc h3{font-size:13pt;font-weight:bold;text-align:center;margin-bottom:4px;letter-spacing:.02em}
@@ -267,9 +301,10 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-sig{margin-top:24px;border-top:1px solid var(--gray-300);padding-top:12px;font-size:10pt;color:var(--gray-600);line-height:2.2}
 .aba-doc .aba-ref{font-size:9.5pt;color:var(--gray-700);margin-bottom:6px;padding-left:18px;text-indent:-18px}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
-/* Placeholder highlighting for ABA + IEP letters — yellow tint + italic + dotted underline.
-   Italic and underline are non-color cues for colorblind safety. Keep .aba-ph and .iep-ph in sync. */
-.aba-ph,.iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic;border-bottom:1px dotted #92400e}
+/* Placeholder highlighting for ABA + IEP letters — parchment gold + italic +
+   dotted underline. Italic and underline are non-color cues for colorblind
+   safety. Warmer than the original yellow to match "Bedside Quiet" paper. */
+.aba-ph,.iep-ph{background:#fdf6e3;color:#7b5e1a;border-radius:3px;padding:0 3px;font-style:italic;border-bottom:1px dotted #b08a3e}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
@@ -290,11 +325,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
 /* ── Toast notifications (replaces alert) ────────────────────────────── */
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:380px}
-.toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:8px}
+.toast{background:var(--gray-900);color:#f3f0e8;padding:12px 16px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:10px;border-left:3px solid var(--accent)}
 .toast.toast-show{opacity:1;transform:translateY(0)}
-.toast.toast-ok{background:#166534;color:white}
-.toast.toast-warn{background:#92400e;color:white}
-.toast.toast-info{background:var(--gray-900);color:white}
+.toast.toast-ok{background:#0e4a26;color:#dcefdb;border-left-color:var(--green)}
+.toast.toast-warn{background:#5e3a0a;color:#fdf6e3;border-left-color:var(--amber)}
+.toast.toast-info{background:var(--gray-900);color:#f3f0e8;border-left-color:var(--accent)}
 .toast-icon{flex-shrink:0;font-size:14px;line-height:1.2}
 .toast-msg{flex:1;min-width:0}
 
@@ -4424,7 +4459,7 @@ function updateSectionHeaders(){
     if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector('span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
     dot.className='sec-dot'+(hasData?' dot-has':'');
     h.closest('.section')?.classList.toggle('has-content',!!hasData);
-    sum.textContent=summary?' — '+summary:'';
+    sum.textContent=summary||'';  // CSS hairline in .sec-sum::before replaces the em-dash separator
   };
   const agShort={toddler:'Toddler',preschool:'Preschool',schoolAge:'School-age',adolescent:'Adolescent',youngAdult:'Young adult'};
   const llShort={nonverbal:'Nonverbal',singleWord:'Single words',phrase:'2–3 words',simpleSentence:'Simple sentences',verbal:'Verbal',conversational:'Conversational',ageAppropriate:'Age-appropriate',unclearSLP:'Needs SLP eval'};
