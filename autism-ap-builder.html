@@ -123,6 +123,12 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
 .pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
 .pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
+/* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
+   (same area, purely informational) — this one carries a clinical recommendation, so it
+   gets darker amber border + tint, font-weight 500, and a ⚠ icon prefix. Inline display
+   is set by toggleBifAdaptiveCrossCheck(); the ::before fires when display becomes non-none. */
+.bif-crosscheck{font-size:13px;color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
+.bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:15px;color:#b45309;font-weight:700}
 .r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -514,6 +520,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              when no cogProfile is selected. Driven by currentClinicalPathway() so the
              pill text and the auto-bridged specifier checkbox share a single source of truth. -->
         <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
+        <!-- Uneven/splinter checkbox elevated above the subgroup-stack per PR-I C5 — surfaces
+             the modifier in the natural pre-selection scan order rather than being buried
+             below a 5-subgroup grid where it was easily missed. -->
+        <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
+        <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
+          <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
+        </div>
         <div class="subgroup-stack">
           <div class="subgroup" id="cogProfileIdGroup">
             <span class="subgroup-label">Intellectual disability</span>
@@ -545,10 +558,6 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown / under evaluation</label>
           </div>
         </div>
-        <label class="cb-row" style="margin-top:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
-        <div id="unevenCogWrap" style="display:none;margin:2px 0 0 26px">
-          <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
-        </div>
       </div>
 
       <!-- Cognitive Data Source — visible only when cogProfile is ID or GDD tier.
@@ -562,10 +571,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group" id="cogDataSourceGroup" style="display:none">
         <span class="field-label">Cognitive Data Source</span>
         <div class="radio-grid">
-          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery<br>(WISC, DAS, SB, WPPSI)</span></label>
-          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)</span></label>
-          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression<br>/ observation only</span></label>
-          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Unknown — prior<br>outside evaluation</span></label>
+          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway). Instruments: WISC, DAS, SB, WPPSI (IQ-tier) or Bayley-4, Mullen, Griffiths, DAYC-2 (developmental tier)."><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery</span></label>
+          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected. Instruments: KBIT-2R, RIAS-2, WASI-II (IQ-tier) or ASQ-3, SWYC, DAYC-2 Screener (developmental tier)."><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener</span></label>
+          <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression only</span></label>
+          <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Prior outside evaluation</span></label>
         </div>
         <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
       </div>
@@ -576,9 +585,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt"><input type="radio" name="adaptProfile" value="severelyImpaired">Severely impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="moderatelyImpaired">Moderately impaired</label>
           <label class="r-opt"><input type="radio" name="adaptProfile" value="mildlyImpaired">Mildly impaired</label>
-          <label class="r-opt" title="Adaptive score in normal or low-average range but meaningfully below cognitive potential — common Level 1/2 ASD pattern"><input type="radio" name="adaptProfile" value="belowPotential">Below cognitive<br>potential</label>
-          <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Commensurate<br>w/ cognitive level</label>
-          <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Age-appropriate<br>/ WNL</label>
+          <label class="r-opt" title="Adaptive score in normal or low-average range but meaningfully below cognitive potential — common Level 1/2 ASD pattern"><input type="radio" name="adaptProfile" value="belowPotential">Impaired vs cognitive potential</label>
+          <label class="r-opt"><input type="radio" name="adaptProfile" value="commensurate">Aligned with cognitive level</label>
+          <label class="r-opt"><input type="radio" name="adaptProfile" value="ageAppropriate">Within normal limits (WNL)</label>
         </div>
         <!-- Standardized-assessment attestation. When checked together with a formally-impaired
              adaptive selection AND a comprehensive cognitive battery, the bridge upgrades
@@ -590,10 +599,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              paired with mildly/moderately/severely-impaired adaptive — the exact
              differential zone where the BIF vs mild ID call lives (AACN 2020;
              Wexler 2023). Passive informational; auto-hides on predicate change.
-             Visual treatment shares the floor-effect-warning family but uses a
-             left-border accent to differentiate from purely-informational notes,
-             since this hint carries a clinical recommendation. -->
-        <div id="bifAdaptiveCrossCheck" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px;padding:6px 10px;border-left:3px solid #f59e0b;background:#fffaf0"></div>
+             PR-I C5: visual treatment strengthened to differentiate from purely-
+             informational notes (e.g., #screenerYoungWarning at line ~532) since this
+             hint carries a clinical recommendation. Uses a darker amber tint + ⚠ icon
+             prefix (via .bif-crosscheck::before) + font-weight 500. Colorblind-safe
+             via icon + text + border, not color alone. -->
+        <div id="bifAdaptiveCrossCheck" class="bif-crosscheck" style="display:none"></div>
       </div>
 
       <div class="field-group">
@@ -4241,22 +4252,26 @@ function toggleUnevenCog(){
 // unchanged — only the displayed instrument list swaps. cogSourceSupportsConfirmation
 // continues to treat any "comprehensive" or "priorExternal" selection as confirmable
 // regardless of which instrument list is visible.
+// Compact labels post-PR-I C3: instrument lists were moved from the visible label into
+// the title-attr tooltip per UI council Concern 3 D6 (density vs. discoverability tradeoff).
+// Tier-specific instrument enumeration still happens here — the swap is what distinguishes
+// IQ-tier (WISC etc.) from developmental-tier (Bayley etc.) for tooltip-on-hover.
 const ID_COGDATASOURCE_LABELS = {
-  comprehensive: 'Comprehensive battery<br>(WISC, DAS, SB, WPPSI)',
-  screener: 'Brief screener<br>(KBIT-2R, RIAS-2, WASI-II)',
-  clinical: 'Clinical impression<br>/ observation only',
-  priorExternal: 'Unknown — prior<br>outside evaluation'
+  comprehensive: 'Comprehensive battery',
+  screener: 'Brief screener',
+  clinical: 'Clinical impression only',
+  priorExternal: 'Prior outside evaluation'
 };
 const GDD_COGDATASOURCE_LABELS = {
-  comprehensive: 'Comprehensive developmental battery<br>(Bayley-4, Mullen, Griffiths, DAYC-2)',
-  // GDD-tier screener tier lists the developmental screening tools clinicians actually
-  // see in this age range (ASQ-3, SWYC, DAYC-2 Screener) plus KBIT-2R for age 4+ since
-  // KBIT-2R is normed 4+ and frequently encountered on preschoolers. KBIT-2R remains an
-  // IQ screener, not a developmental tool — the floor-effect warning (see
-  // toggleCogDataSourceVisibility) distinguishes the two concerns in its text.
-  screener: 'Brief screener<br>(ASQ-3, SWYC, DAYC-2 Screener; or KBIT-2R if age 4+)',
-  clinical: 'Clinical impression<br>/ observation only',
-  priorExternal: 'Unknown — prior<br>outside evaluation'
+  comprehensive: 'Comprehensive developmental battery',
+  // GDD-tier screener tier intentionally includes both developmental screening tools (ASQ-3,
+  // SWYC, DAYC-2 Screener) and KBIT-2R for age 4+; KBIT-2R remains an IQ screener, not a
+  // developmental tool — the floor-effect warning (see toggleCogDataSourceVisibility)
+  // distinguishes the two concerns in its text. Label kept compact; instruments live in
+  // the data-cds-key="screener" title-attr tooltip in the HTML.
+  screener: 'Brief screener',
+  clinical: 'Clinical impression only',
+  priorExternal: 'Prior outside evaluation'
 };
 function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
