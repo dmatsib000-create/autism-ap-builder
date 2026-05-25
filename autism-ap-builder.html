@@ -132,8 +132,8 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    clears S.specifiersManuallySet and re-fires the bridge so the pathway-recommended
    specifier takes over. Styled as an inline pill-family button so it reads as part
    of the pathway pill, not a foreign control. */
-.pathway-pill .pp-reset{display:inline-flex;align-items:center;gap:4px;margin-left:auto;padding:4px 12px;font-size:11.5px;font-weight:700;border-radius:12px;border:1.5px solid currentColor;background:rgba(255,255,255,.7);color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;transition:background var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease)}
-.pathway-pill .pp-reset:hover{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:10px;font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+.pathway-pill .pp-reset:hover{opacity:1;background:rgba(255,255,255,.5)}
 .pathway-pill .pp-reset:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
 .spec-manual-caption{font-size:10px;color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
 /* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
@@ -4285,7 +4285,7 @@ function renderPathwayPill(){
   // which clears the Set and re-fires the bridge — covers both cases since the
   // bridge re-asserts the recommended specifier when no pins block.
   const resetBtn = (S.specifiersManuallySet.size || pathwayDivergent)
-    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier (and clear any manual pins).">↻ Re-sync with pathway</button>`
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier (and clear any manual pins).">Re-sync with pathway</button>`
     : '';
   el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
   el.style.display='';
@@ -5710,17 +5710,27 @@ document.addEventListener('DOMContentLoaded',()=>{
         // pointing at a scalar field silently does nothing rather than crashing or coercing.
         const set = S[k];
         if(set instanceof Set) inp.checked ? set.add(v) : set.delete(v);
-        // Pin manual toggles of COG_SPEC_EXCL keys. Checking a key pins it;
-        // unchecking does NOT release the pin (intentional — the per-checkbox
-        // unpin path was removed in favor of the always-visible "Re-sync with
-        // pathway" affordance on the pathway pill, which is the single canonical
-        // way to restore the auto-bridge). Without this asymmetry, an accidental
-        // uncheck would silently flip the chart back to the algorithmic
-        // recommendation with no visible diff, defeating the override intent.
-        // The pin set still clears on cogProfile change (= fresh context) and
-        // on the pill's Re-sync button.
-        if(k==='specifiers' && COG_SPEC_EXCL.includes(v) && inp.checked){
-          S.specifiersManuallySet.add(v);
+        // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
+        //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
+        //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND
+        //     re-fire the bridge so the pathway-recommended specifier takes over
+        //     immediately (PR-L ε). Without the bridge re-fire, the uncheck would
+        //     leave the spec section empty until the next adjacent input change.
+        //   - User unchecks a COG_SPEC_EXCL key that was NOT pinned → no-op on the
+        //     Set (delete on a missing key is silent); no bridge re-fire (the spec
+        //     stays unchecked as the user just asked).
+        // The mutex/clearing block below in this same handler uses programmatic
+        // cb.checked assignment which does NOT fire change, so only the actually-
+        // clicked specifier gets pinned/released. The Set is fully cleared on
+        // cogProfile change (PR-K) or "Re-sync with pathway" button (PR-L δ).
+        let pinReleased = false;
+        if(k==='specifiers' && COG_SPEC_EXCL.includes(v)){
+          if(inp.checked){
+            S.specifiersManuallySet.add(v);
+          } else if(S.specifiersManuallySet.has(v)){
+            S.specifiersManuallySet.delete(v);
+            pinReleased = true;
+          }
         }
         if(k==='needsBehavior'&&['tantrums','noncompliance','property','vocalDisruption'].includes(v)){
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
@@ -5861,6 +5871,11 @@ document.addEventListener('DOMContentLoaded',()=>{
             else{S.specifiers.delete('withCatatonia');if(specCb)specCb.checked=false;}
           }
         }
+        // PR-L ε continuation: if this change released a manual pin, re-fire the bridge
+        // so the pathway-recommended specifier takes over immediately. The bridge skips
+        // when other pins remain in the group (anyManualInGroup guard) so a partial release
+        // (e.g., uncheck one of two pinned keys) doesn't stomp the other.
+        if(pinReleased) bridgeCogProfileToSpecifier(S.cogProfile);
       }
       syncABATargetsFromNeeds();
       syncSchoolSvcFromNeeds();
