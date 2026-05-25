@@ -25,6 +25,10 @@ claude_code/
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, and `docs/` are tracked in git and pushed to GitHub. Everything else is local.
 
+### Intake protocol for non-trivial requests
+
+For requests where the deliverable shape depends on choices Claude shouldn't make alone (architecture, scope boundary, format, picking between reasonable patterns), run the intake protocol at `docs/templates/intake-prompt.md` before building or recommending. Skip for single-line bug fixes, renames, copyedits, file reads, and anything where running the protocol takes longer than the task — announce the skip in one line. To disable: delete this section (and optionally remove the template file).
+
 ### Reference-doc maintenance (mandatory in-commit updates)
 
 Two living docs in `docs/` carry an "update in the same commit" rule:
