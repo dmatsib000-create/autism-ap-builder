@@ -142,6 +142,21 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    is set by toggleBifAdaptiveCrossCheck(); the ::before fires when display becomes non-none. */
 .bif-crosscheck{font-size:13px;color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
 .bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:15px;color:#b45309;font-weight:700}
+/* Keyboard-accessible disclosure for instrument-list info on Cog Data Source options (PR-K).
+   The .info-btn is a focusable ⓘ button placed next to a radio label; clicking or pressing
+   Enter/Space toggles aria-expanded and shows/hides the .info-popover. Keyboard reachable
+   (button element, Tab-focusable), screen-reader announced (aria-controls + aria-expanded +
+   role="region" + aria-label on the popover). Replaces the prior title-attr-only path which
+   was inaccessible to keyboard-only users and inconsistently surfaced by screen readers. */
+.r-opt-wrap{display:inline-flex;align-items:center;gap:3px;position:relative}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);font-size:12px;cursor:pointer;padding:0;line-height:1;font-family:inherit;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.info-btn:hover,.info-btn:focus-visible{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
+.info-btn[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+.info-popover{position:absolute;top:calc(100% + 4px);left:0;z-index:20;min-width:260px;max-width:380px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--gray-300);border-radius:var(--radius);box-shadow:var(--shadow-sm);font-size:12px;line-height:1.55;color:var(--gray-700);white-space:normal}
+.info-popover[hidden]{display:none}
+.info-popover strong{color:var(--gray-800);font-weight:600}
+/* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -584,8 +599,16 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group" id="cogDataSourceGroup" style="display:none">
         <span class="field-label">Cognitive Data Source</span>
         <div class="radio-grid">
-          <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway). Instruments: WISC, DAS, SB, WPPSI (IQ-tier) or Bayley-4, Mullen, Griffiths, DAYC-2 (developmental tier)."><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery</span></label>
-          <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected. Instruments: KBIT-2R, RIAS-2, WASI-II (IQ-tier) or ASQ-3, SWYC, DAYC-2 Screener (developmental tier)."><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener</span></label>
+          <span class="r-opt-wrap">
+            <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery</span></label>
+            <button type="button" class="info-btn" aria-expanded="false" aria-controls="cdsInfo-comprehensive" data-info-toggle="cdsInfo-comprehensive"><span aria-hidden="true">ⓘ</span><span class="sr-only">Show example instruments for Comprehensive battery</span></button>
+            <div id="cdsInfo-comprehensive" class="info-popover" role="region" aria-label="Example instruments for Comprehensive battery" hidden><strong>IQ-tier:</strong> WISC, DAS, SB, WPPSI<br><strong>Developmental tier:</strong> Bayley-4, Mullen, Griffiths, DAYC-2</div>
+          </span>
+          <span class="r-opt-wrap">
+            <label class="r-opt" data-cds-key="screener" title="Insufficient for formal ID/GDD diagnosis — keeps specifier as suspected"><input type="radio" name="cogDataSource" value="screener"><span class="label-text">Brief screener</span></label>
+            <button type="button" class="info-btn" aria-expanded="false" aria-controls="cdsInfo-screener" data-info-toggle="cdsInfo-screener"><span aria-hidden="true">ⓘ</span><span class="sr-only">Show example instruments for Brief screener</span></button>
+            <div id="cdsInfo-screener" class="info-popover" role="region" aria-label="Example instruments for Brief screener" hidden><strong>IQ-tier:</strong> KBIT-2R, RIAS-2, WASI-II<br><strong>Developmental tier:</strong> ASQ-3, SWYC, DAYC-2 Screener</div>
+          </span>
           <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression only</span></label>
           <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Prior outside evaluation</span></label>
         </div>
@@ -5131,6 +5154,52 @@ document.addEventListener('DOMContentLoaded',()=>{
   // mutates S.cogProfile/S.cogDataSource without firing the bridge.
   toggleBifSpecifierGate();
   toggleBifAdaptiveCrossCheck();
+  // PR-K: ⓘ info-btn click delegation. Toggles aria-expanded + popover [hidden]; closes any
+  // sibling open popovers so only one shows at a time. Escape key closes the focused popover
+  // group and returns focus to its triggering button.
+  document.addEventListener('click',e=>{
+    const btn = e.target.closest('button.info-btn[data-info-toggle]');
+    if(btn){
+      const id = btn.getAttribute('data-info-toggle');
+      const pop = document.getElementById(id);
+      if(!pop) return;
+      const willOpen = btn.getAttribute('aria-expanded') !== 'true';
+      // Close all other open info popovers first (one-at-a-time discipline)
+      document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(otherBtn=>{
+        if(otherBtn !== btn){
+          otherBtn.setAttribute('aria-expanded','false');
+          const otherId = otherBtn.getAttribute('data-info-toggle');
+          const otherPop = otherId && document.getElementById(otherId);
+          if(otherPop) otherPop.hidden = true;
+        }
+      });
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      pop.hidden = !willOpen;
+      return;
+    }
+    // Click outside any open popover or its button closes the popover.
+    const inOpenPopover = e.target.closest('.info-popover');
+    if(inOpenPopover) return;
+    document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(openBtn=>{
+      openBtn.setAttribute('aria-expanded','false');
+      const id = openBtn.getAttribute('data-info-toggle');
+      const pop = id && document.getElementById(id);
+      if(pop) pop.hidden = true;
+    });
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key !== 'Escape') return;
+    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"]');
+    if(!openBtns.length) return;
+    openBtns.forEach(btn=>{
+      btn.setAttribute('aria-expanded','false');
+      const id = btn.getAttribute('data-info-toggle');
+      const pop = id && document.getElementById(id);
+      if(pop) pop.hidden = true;
+    });
+    // Return focus to the most-recently-opened button (the last one in DOM order if multiple).
+    openBtns[openBtns.length-1].focus();
+  });
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
@@ -5144,7 +5213,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
       else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile='';toggleBifAdaptiveCrossCheck();}
+      else if(nm==='adaptProfile'){S.adaptProfile='';bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}/* PR-K: mirror PR-J adaptProfile change-handler — deselect path must also re-fire bridge so pill+spec stay convergent */
       else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
       else if(nm==='asdLevelSC') S.asdLevelSC='';
