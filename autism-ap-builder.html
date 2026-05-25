@@ -1382,9 +1382,6 @@ function setByPath(obj, path, val){
   }
   o[keys[keys.length-1]] = val;
 }
-function getByPath(obj, path){
-  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
-}
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const hasADHD = () => S.comorbid.has('adhd_combined')||S.comorbid.has('adhd_inattentive')||S.comorbid.has('adhd_hyperactive')||S.comorbid.has('adhd_suspected');
