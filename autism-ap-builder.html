@@ -3374,7 +3374,7 @@ function generateRichHTML(isPreview=false) {
     // the note (ADHD med tables, AAC, safety targets, accommodations) keep
     // falling through to the default <p> branch as they did pre-genetics.
     else if(inUL && /^      \S/.test(line)){
-      html+=`<li style="list-style:none;margin:1px 0 3px 18px;font-size:10.5pt;color:#374151">${linkify(line.trim())}</li>`;
+      html+=`<li style="list-style:none;margin:1px 0 3px 18px;color:#374151">${linkify(line.trim())}</li>`;
     }
     else if(/^       Evidence:/.test(line)){closeUL();html+=`<p style="margin:2px 0 5px 44px;font-style:italic;color:#4b5563;font-size:10pt">${e(line.trim())}</p>`;}
     else if(/^\s+\(([AB]\d)\) /.test(line)){closeUL();html+=`<p style="margin:3px 0 3px 14px;font-size:10.5pt">${e(line.trim())}</p>`;}
@@ -3383,6 +3383,14 @@ function generateRichHTML(isPreview=false) {
     else if(/^Co-occurring/.test(line)){closeUL();html+=`<p style="font-weight:bold;margin:8px 0 3px">${e(line)}</p>`;}
     else if(/^Note generated|^All content/.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#6b7280;font-style:italic;margin-top:10px">${e(line)}</p>`;}
     else if(line===''){closeUL();html+='<p style="margin:2px 0"> </p>';}
+    // Numbered bibliographic citations (4-space indent + DOI). Rendered at
+    // footer scale so a long reference list doesn't outweigh the body prose.
+    // 8.5pt (not 9.5pt) is intentional: the preview pane's .note-doc rule
+    // forces a 12px floor on everything that inherits, so anything ≥9pt
+    // ends up visually equal-to-or-larger than body bullets. 8.5pt lands
+    // under that floor in preview AND remains conventionally smaller than
+    // the 11pt body in pasted rich-HTML output.
+    else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:8.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
     else{closeUL();html+=`<p style="margin:3px 0">${linkify(line)}</p>`;}
   });
   closeUL();
