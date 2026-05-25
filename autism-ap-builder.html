@@ -5164,6 +5164,74 @@ function syncCommNeedsFromLangLevel(){
   else if(['singleWord','phrase','simpleSentence'].includes(S.langLevel)) addComm('expressive');
 }
 
+// ─── NAMED CHANGE HANDLERS ───────────────────────────────────────────────────
+// One function per "what happens when this field changes" question. Each assumes
+// the state write (S.X = newValue, OR S.X = '' on deselect) has already happened
+// at the call site; this function handles only the post-state side effects.
+//
+// Why extracted: makes the unit of clinical reasoning match the unit of code.
+// Greppable by name — debugging "the bridge fired but the gate didn't update"
+// becomes one named function read instead of finding the right branch inside a
+// 30-case switch. New side-effect fields gain a one-liner in each switch plus
+// one named handler in a known spot, instead of threading consistent logic
+// between two switches ~30 lines apart.
+//
+// Why not data-bind-after attributes: cogProfile's tier-transition guard needs
+// to compare OLD vs NEW cogProfile to decide whether to clear cogDataSource.
+// A post-write hook can't reach the old value — it's already been overwritten
+// by setByPath. cogProfile therefore stays inline in the change handler.
+//
+// Pre-existing asymmetries fixed as a side effect of unification:
+//   - langLevel deselect previously didn't call syncCommNeedsFromLangLevel
+//     (the sync returns early on empty langLevel, so the unification is a no-op
+//     behavior change but a real consistency win)
+//   - dxEvalPath change previously didn't call updateSectionHeaders
+//     (deselect did) — unification makes both paths refresh the headers
+
+function onLangLevelChange(){
+  syncCommNeedsFromLangLevel();
+}
+
+function onAgeGroupChange(){
+  updateAgeBasedVisibility();
+  // Re-fire bridge so the no-impairment specifier (withoutID vs withoutGDD)
+  // resynchronizes with the new age category. Without this, switching from
+  // schoolAge to preschool would leave withoutID stale (should be withoutGDD).
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleCogDataSourceVisibility();
+}
+
+function onCogDataSourceChange(){
+  // cogDataSource is a direct input to the confirmableId / confirmableGdd predicate
+  // in currentClinicalPathway; bridge re-fires so the specifier checkbox tracks the
+  // pill in the same render frame.
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleCogDataSourceVisibility();
+}
+
+function onAdaptProfileChange(){
+  // Same rationale as onCogDataSourceChange — adaptProfile feeds the suspected→
+  // confirmed upgrade decision. PR-J reopens prior council D4 (was: "avoid surprise
+  // specifier flips from far-away controls"); pathway pill now renders the bridge
+  // result at the cluster focal point in the same render frame, neutralizing the
+  // original concern. See branching-logic.md §11 PR-J entry.
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleBifAdaptiveCrossCheck();
+}
+
+function onDiagStatusChange(){
+  // The DSM-5 severity-level group is only meaningful when status='confirmed';
+  // hide it otherwise (and on deselect, where S.diagStatus === '').
+  document.getElementById('levelGroup').style.display = S.diagStatus === 'confirmed' ? '' : 'none';
+}
+
+function onDxEvalPathChange(){
+  // Section-header summary depends on dxEvalPath, so refresh on both change AND
+  // deselect. The change handler previously omitted this call (deselect had it) —
+  // the asymmetry was unintentional and is fixed by routing both through here.
+  updateSectionHeaders();
+}
+
 function syncSchoolSvcFromNeeds(){
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
@@ -5263,13 +5331,15 @@ document.addEventListener('DOMContentLoaded',()=>{
         render();
         return;
       }
-      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='langLevel') S.langLevel='';
+      // Six side-effect fields go through named handlers (defined near syncCommNeedsFromLangLevel).
+      // cogProfile stays inline because its tier-transition guard needs old-vs-new comparison.
+      if(nm==='ageGroup'){S.ageGroup='';onAgeGroupChange();}
+      else if(nm==='langLevel'){S.langLevel='';onLangLevelChange();}
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
-      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile='';bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}/* PR-K: mirror PR-J adaptProfile change-handler — deselect path must also re-fire bridge so pill+spec stay convergent */
-      else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
-      else if(nm==='dxEvalPath'){S.dxEvalPath='';updateSectionHeaders();}
+      else if(nm==='cogDataSource'){S.cogDataSource='';onCogDataSourceChange();}
+      else if(nm==='adaptProfile'){S.adaptProfile='';onAdaptProfileChange();}
+      else if(nm==='diagStatus'){S.diagStatus='';onDiagStatusChange();}
+      else if(nm==='dxEvalPath'){S.dxEvalPath='';onDxEvalPathChange();}
       render();
     });
 
@@ -5285,12 +5355,11 @@ document.addEventListener('DOMContentLoaded',()=>{
         render();
         return;
       }
-      // ageGroup change: also re-fire bridge so the no-impairment specifier (withoutID vs
-      // withoutGDD) resynchronizes with the new age category. Without this, switching from
-      // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
-      // leaves withoutGDD orphaned then deleted by updateAgeBasedVisibility with no replacement.
-      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
+      // Side-effect fields route through named handlers (defined near syncCommNeedsFromLangLevel).
+      // cogProfile stays inline because its tier-transition guard reads OLD S.cogProfile
+      // BEFORE the state write — a post-write hook can't reach the old value.
+      if(nm==='ageGroup'){S.ageGroup=inp.value;onAgeGroupChange();}
+      else if(nm==='langLevel'){S.langLevel=inp.value;onLangLevelChange();}
       else if(nm==='cogProfile'){
         // Tier-transition guard: classify by INSTRUMENT FAMILY, not by ICD tier.
         // ID and BIF both rest on IQ instruments (WISC/DAS/SB/WPPSI), so a within-
@@ -5318,19 +5387,13 @@ document.addEventListener('DOMContentLoaded',()=>{
         bridgeCogProfileToSpecifier(inp.value);
         toggleCogDataSourceVisibility();
       }
-      // cogDataSource, adaptiveStandardized, AND adaptProfile all re-fire the bridge because
-      // all three are inputs to the suspected→confirmed upgrade decision (per the confirmableId
-      // predicate in currentClinicalPathway). PR-J reopens prior council D4 ("avoid surprise
-      // specifier flips from far-away controls") — the rationale for D4 was that an automatic
-      // flip in the specifier checkbox 200px below the clinician's focus would feel like the
-      // tool moving things behind their back. PR-I C2 introduced the pathway pill at the top
-      // of the cluster, which renders the bridge result in the same render frame. The flip is
-      // now visible at the focal point rather than hidden, neutralizing the D4 concern.
-      // [clinical-council reopens D4 — see docs/branching-logic.md §11 PR-J entry]
-      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}
-      else if(nm==='diagStatus'){S.diagStatus=inp.value;document.getElementById('levelGroup').style.display=inp.value==='confirmed'?'':'none';}
-      else if(nm==='dxEvalPath') S.dxEvalPath=inp.value;
+      // (rationale for cogDataSource / adaptProfile bridge re-fire — and the D4 reversal it
+      // depends on — lives in the comment block on bridgeCogProfileToSpecifier and in
+      // branching-logic.md §11 PR-J entry. The handlers themselves are extracted above.)
+      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;onCogDataSourceChange();}
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;onAdaptProfileChange();}
+      else if(nm==='diagStatus'){S.diagStatus=inp.value;onDiagStatusChange();}
+      else if(nm==='dxEvalPath'){S.dxEvalPath=inp.value;onDxEvalPathChange();}
       // Note: 15 simple scalar branches removed — they now flow through the data-bind
       // path above (asdLevelSC, asdLevelRRB, dysmorphism, regressionTiming, pronouns,
       // schoolPlacement, schoolDoc, visitType, insuranceType, abaHours, depressionSafety,
