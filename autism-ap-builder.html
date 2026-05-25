@@ -266,6 +266,21 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-pill.auto-no{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500)}
 .ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:#166534}
 .ov-pill.ov-no{border-color:var(--gray-300);background:var(--gray-100);color:var(--gray-400);text-decoration:line-through}
+/* Grouped override tiles — replaces the prior flat .ov-pill-grid with three clinical clusters
+   (Core therapies, Medical & diagnostic, Florida resources). Each .ov-group wraps a header
+   and its own pill grid. SLP/OT/PT sit first-three in the Core group so they're always in
+   the top-left scan zone. Group header reuses the .comorbid-grp pattern visually. */
+.ov-group{margin-top:8px}
+.ov-group:first-child{margin-top:0}
+.ov-group-head{font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:4px 0 4px;display:block}
+/* Therapy-status rows — greyed out and click-blocked when the corresponding referral is
+   not currently included (auto-no AND not manually overridden to yes). Coupled to the
+   tiles above via updateTherapyStatusEnablement() in render(). The label stays visible
+   for affordance ("this option exists; activate the referral above to use it") while
+   pointer-events:none prevents accidental clicks on disabled options. */
+.therapy-status-row.inactive{opacity:.45}
+.therapy-status-row.inactive .r-opt{cursor:not-allowed;pointer-events:none;background:var(--gray-50);border-color:var(--gray-200);color:var(--gray-400)}
+.therapy-status-row.inactive .ts-label{color:var(--gray-400)}
 /* ── Note preview — document style ─── */
 .note-doc{font-family:var(--font);font-size:12px;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
@@ -1221,43 +1236,39 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
+      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
+      <div id="overridePanel"></div>
+      <hr class="divider">
       <div class="field-group">
         <span class="field-label">Current Private / Clinic Therapy Status</span>
-        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Change only if patient is <em>already</em> receiving this therapy. Affects note language (refer vs. continue/revise).</p>
+        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Modifies the prose for active referrals above. Rows for inactive referrals are greyed out — activate the corresponding tile first. Re-click a selected option to clear it without changing the referral itself.</p>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="" checked>New referral</label>
+          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="" checked>New referral</label>
+          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="" checked>New referral</label>
+          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="" checked>New referral</label>
+          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="increase">Increase intensity</label>
           </div>
         </div>
       </div>
-      <hr class="divider">
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects. Override individually if needed.</p>
-      <div id="overridePanel"></div>
     </div>
   </div>
 
@@ -4279,6 +4290,13 @@ function renderManualSpecCaptions(){
 }
 
 function render(){
+  // Adjust-Referrals coupling — both run unconditionally at the top so the various
+  // early-return paths below (no-input, ABA-preview, IEP-preview) still get the
+  // therapy-status state and visual enablement updated. syncTherapyStatusFromActivity
+  // clears orphaned status when its referral has become inactive; updateTherapyStatusEnablement
+  // toggles the .inactive class on each row based on current activity.
+  syncTherapyStatusFromActivity();
+  updateTherapyStatusEnablement();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -4365,9 +4383,52 @@ const OV_DEFS=[
   {key:'eeg',label:'EEG (order)',rule:ruleEEG},{key:'earlySteps',label:'Early Steps referral (FL)',rule:ruleEarlySteps},
   {key:'fdlrs',label:'FDLRS referral (FL)',rule:ruleFDLRS},{key:'card',label:'CARD information',rule:ruleCARD},
 ];
+// Clinical clusters for the override-pill grid. SLP, OT, PT, ABA are first-three-then-fourth
+// in 'core' so they land in the top-left scan zone. Medical/diagnostic referrals cluster
+// together below; Florida-specific resources sit at the bottom. Adding a new referral:
+// add to OV_DEFS for label+rule, then add the key to the appropriate group below.
+const OV_GROUPS=[
+  {title:'Core therapies', keys:['slp','ot','pt','aba','pcit','psychotherapy','socialSkills']},
+  {title:'Medical & diagnostic referrals', keys:['audiology','genetics','neurology','qbtest','psychiatry','gi','sleep_ref','eeg']},
+  {title:'Florida resources', keys:['earlySteps','fdlrs','card']},
+];
+// True when a referral is currently included in the output — either the auto rule says
+// include OR the clinician has manually overridden to 'yes'. Used to enable/disable the
+// therapy-status rows below (you can only modify a therapy's status if it's being referred).
+function isTherapyActive(key){
+  const def = OV_DEFS.find(d => d.key === key);
+  if(!def) return false;
+  return resolveOv(key, def.rule());
+}
+// Called at the top of render() — clears stale therapy-status when a referral has become
+// inactive (clinical input change, or clinician toggled the tile to Excluded). Without this,
+// deactivating SLP after picking 'continue' would leave 'continue' in S.therapyStatus.slp,
+// which therapyStatusLine would still emit as orphaned prose in the rendered note.
+function syncTherapyStatusFromActivity(){
+  ['slp','ot','aba','pt'].forEach(key => {
+    if(S.therapyStatus[key] && !isTherapyActive(key)){
+      S.therapyStatus[key] = '';
+      document.querySelectorAll(`input[name="therapyStatus_${key}"]`).forEach(r=>{
+        r.checked = false;
+        r.closest('.r-opt')?.classList.remove('sel');
+      });
+    }
+  });
+}
+// Called near the end of render() — toggles the .inactive class on each therapy-status row
+// based on its corresponding referral's current active state. Visual + pointer-events both
+// handled in CSS (.therapy-status-row.inactive).
+function updateTherapyStatusEnablement(){
+  document.querySelectorAll('.therapy-status-row[data-therapy-key]').forEach(row=>{
+    const key = row.getAttribute('data-therapy-key');
+    row.classList.toggle('inactive', !isTherapyActive(key));
+  });
+}
 function renderOverrides(){
   const p=document.getElementById('overridePanel');if(!p)return;
-  p.innerHTML='<div class="ov-pill-grid">'+OV_DEFS.map(d=>{
+  const pillFor = key => {
+    const d = OV_DEFS.find(x => x.key === key);
+    if(!d) return '';
     const r=d.rule(),ov=S.overrides[d.key],eff=resolveOv(d.key,r);
     let cls,lbl;
     if(ov==='yes'){cls='ov-yes';lbl='Override · Included';}
@@ -4376,8 +4437,12 @@ function renderOverrides(){
     const autoOutcome=r.include?'included':'excluded';
     const tip=`Click to cycle: Auto → Include → Exclude → Auto\nAuto rule currently: ${autoOutcome}`;
     return `<button class="ov-pill ${cls}" onclick="cycleOverride('${d.key}')" title="${tip}"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${lbl}</span></button>`;
-  }).join('')+'</div>';
+  };
+  p.innerHTML = OV_GROUPS.map(g =>
+    `<div class="ov-group"><span class="ov-group-head">${g.title}</span><div class="ov-pill-grid">${g.keys.map(pillFor).join('')}</div></div>`
+  ).join('');
 }
+
 let priorTestingExpanded=false;
 function togglePriorExpander(){
   priorTestingExpanded=!priorTestingExpanded;
@@ -5265,12 +5330,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   // mutates S.cogProfile/S.cogDataSource without firing the bridge.
   toggleBifSpecifierGate();
   toggleBifAdaptiveCrossCheck();
-  // Year-only prior-test dates: set the max attribute on every .prior-date-input to the
-  // current year at runtime. Hardcoding max="2026" worked at deployment but became a
-  // usability bug on Jan 1, 2027 (browsers reject 2027+ via the spinner and show a
-  // validation warning). Current-year reads from new Date().getFullYear() and is not PHI —
-  // HIPAA Safe Harbor §164.514(b)(2)(C) permits year granularity. Tagged in HTML with
-  // data-max-year-now; this loop is the single source of truth.
+  // Year-only prior-test dates: set the max attribute on every .prior-date-input
+  // to the current year at runtime. Hardcoding max="2026" works at deployment but
+  // becomes a usability bug on Jan 1, 2027 (browsers reject 2027+ via the spinner
+  // and show a validation warning). Current-year reads from new Date().getFullYear()
+  // and is not PHI — HIPAA Safe Harbor §164.514(b)(2)(C) permits year granularity.
+  // Tagged in HTML with data-max-year-now; this loop is the single source of truth.
   const currentYear = new Date().getFullYear();
   document.querySelectorAll('.prior-date-input[data-max-year-now]').forEach(el=>{
     el.setAttribute('max', String(currentYear));
