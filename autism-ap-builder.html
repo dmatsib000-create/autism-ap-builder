@@ -4268,15 +4268,24 @@ function renderPathwayPill(){
   // since the clinician cares about WHAT the spec currently says vs. the pathway.
   const manualActive = COG_SPEC_EXCL.filter(k =>
     S.specifiersManuallySet.has(k) && S.specifiers.has(k));
+  // Divergence-without-pin: bridgeCogProfileToSpecifier() adds the recommended
+  // key to S.specifiers but NOT to S.specifiersManuallySet. If the clinician
+  // unchecks that auto-bridged key, the uncheck-of-unpinned branch at the
+  // change handler is a no-op on the Set, so without this check the pill
+  // would show nothing — no manual note and no Re-sync affordance — even
+  // though the chart now diverges from the pathway recommendation.
+  const pathwayDivergent = !!p.specKey && !S.specifiers.has(p.specKey);
   const manualNote = manualActive.length
     ? `<span class="pp-manual">Manual override: ${manualActive.join(', ')} pinned</span>`
-    : '';
-  // PR-L δ: "Re-sync with pathway" release button. Visible whenever ANY pin exists
-  // (including uncheck-pins not reflected in manualActive), since those still block the
-  // bridge from auto-asserting. Button calls resyncPathwayPin() which clears the Set and
-  // re-fires the bridge.
-  const resetBtn = S.specifiersManuallySet.size
-    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Clear manual overrides and re-apply the auto-recommended specifier. You can also release a single pin by unchecking it.">Re-sync with pathway</button>`
+    : pathwayDivergent
+      ? `<span class="pp-manual">Pathway-recommended specifier (${p.specKey}) not asserted</span>`
+      : '';
+  // Re-sync visible whenever any pin exists OR the pathway recommends a
+  // specifier that isn't currently asserted. Button calls resyncPathwayPin()
+  // which clears the Set and re-fires the bridge — covers both cases since the
+  // bridge re-asserts the recommended specifier when no pins block.
+  const resetBtn = (S.specifiersManuallySet.size || pathwayDivergent)
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Re-apply the auto-recommended specifier (and clear any manual pins).">Re-sync with pathway</button>`
     : '';
   el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
   el.style.display='';
