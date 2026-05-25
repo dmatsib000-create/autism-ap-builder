@@ -117,12 +117,25 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
    Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
    color signal AND a text label, so colorblind-safe. */
-.pathway-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600)}
+.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;border-radius:14px;padding:4px 12px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
 .pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
 .pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:#92400e}
 .pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
 .pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
 .pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
+/* PR-K: manual override surfacing. When the clinician has pinned a COG_SPEC_EXCL key,
+   the pill grows a second line declaring the override; each pinned specifier checkbox
+   in the Specifiers section also gets a "(manual)" caption. Both signals are required so
+   the divergence is visible at the cluster focal point AND at the specifier itself. */
+.pathway-pill .pp-manual{display:block;width:100%;margin-top:3px;font-size:10.5px;font-weight:500;opacity:.85;font-style:italic;letter-spacing:.01em}
+/* PR-L δ: explicit release affordance — visible only when manual pins exist. Clicking
+   clears S.specifiersManuallySet and re-fires the bridge so the pathway-recommended
+   specifier takes over. Styled as an inline pill-family button so it reads as part
+   of the pathway pill, not a foreign control. */
+.pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:10px;font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+.pathway-pill .pp-reset:hover{opacity:1;background:rgba(255,255,255,.5)}
+.pathway-pill .pp-reset:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
+.spec-manual-caption{font-size:10px;color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
 /* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
    (same area, purely informational) — this one carries a clinical recommendation, so it
    gets darker amber border + tint, font-weight 500, and a ⚠ icon prefix. Inline display
@@ -1267,6 +1280,20 @@ const S = {
   visitType:'',
   rtcInterval:'',
   specifiers:new Set(),
+  // PR-K + PR-L: COG_SPEC_EXCL keys (withID/withSuspectedID/withGDD/withSuspectedGDD/
+  // withBIF/withoutID/withoutGDD) the clinician has manually toggled. Bridge respects
+  // these — any key in this Set is left untouched by bridgeCogProfileToSpecifier's
+  // clear loop AND skips the auto-assert of currentClinicalPathway().specKey.
+  // RELEASE PATHS (three, ranked by frequency of use):
+  //   1. Uncheck a pinned specifier  → that key released from Set (PR-L ε,
+  //      specifier change handler ~line 5193)
+  //   2. Click "Re-sync with pathway" on the pill → entire Set cleared,
+  //      bridge re-fires (PR-L δ, resyncPathwayPin() function)
+  //   3. Change cogProfile to a different value → entire Set cleared (PR-K,
+  //      cogProfile change handler ~line 5100; "fresh clinical context" intent)
+  // Survives cogDataSource / adaptProfile / adaptiveStandardized changes — that's
+  // the protective behavior PR-K exists for.
+  specifiersManuallySet:new Set(),
   criteriaA:new Set(), criteriaB:new Set(),
   criteriaC:false, criteriaD:false, criteriaE:false,
   ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
@@ -4116,6 +4143,8 @@ function setPreviewMode(mode){
 // keep docs/branching-logic.md §1.1 + §5 in sync (master render loop; tab visibility gates for ABA + IEP, fallback to note tab when active tab hides)
 // Render the top-of-cluster pathway pill. Called from render() on every state change.
 // Sets variant class for color + text. Hides when no pathway is computed (no cogProfile).
+// PR-K: appends a secondary line declaring any manually-pinned COG_SPEC_EXCL keys so the
+// pill→specifier divergence (when present) is visible at the cluster focal point.
 function renderPathwayPill(){
   const el=document.getElementById('pathwayPill');
   if(!el) return;
@@ -4124,14 +4153,70 @@ function renderPathwayPill(){
   // Reset variant classes, then add the current one.
   el.classList.remove('pp-confirmed','pp-suspected','pp-bif','pp-typical');
   if(p.variant) el.classList.add(p.variant);
-  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>`;
+  // PR-K: manual override secondary line. Shown only when the clinician has manually
+  // pinned a COG_SPEC_EXCL key that is ALSO currently checked (i.e., actively asserted in
+  // the chart). Pinned-but-unchecked keys (e.g., user unchecked withID then checked
+  // withSuspectedID — both are in S.specifiersManuallySet but only withSuspectedID is
+  // asserted) are kept in the Set for bridge-respect logic but filtered from this display
+  // since the clinician cares about WHAT the spec currently says vs. the pathway.
+  const manualActive = COG_SPEC_EXCL.filter(k =>
+    S.specifiersManuallySet.has(k) && S.specifiers.has(k));
+  const manualNote = manualActive.length
+    ? `<span class="pp-manual">Manual override: ${manualActive.join(', ')} pinned</span>`
+    : '';
+  // PR-L δ: "Re-sync with pathway" release button. Visible whenever ANY pin exists
+  // (including uncheck-pins not reflected in manualActive), since those still block the
+  // bridge from auto-asserting. Button calls resyncPathwayPin() which clears the Set and
+  // re-fires the bridge.
+  const resetBtn = S.specifiersManuallySet.size
+    ? `<button type="button" class="pp-reset" onclick="resyncPathwayPin()" title="Clear manual overrides and re-apply the auto-recommended specifier. You can also release a single pin by unchecking it.">Re-sync with pathway</button>`
+    : '';
+  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>${manualNote}${resetBtn}`;
   el.style.display='';
+}
+
+// PR-L δ: invoked by the pill's Re-sync button. Clears every manual specifier pin and
+// re-fires the auto-bridge so the pathway's recommended specifier becomes the asserted
+// spec. Complements the per-key uncheck-release (PR-L ε); this is the "release all at
+// once" escape hatch for cases where the clinician wants the auto-bridge fully back in
+// charge (e.g., the council scenario where new test data shifts the working diagnosis
+// after a prior manual pin was set).
+function resyncPathwayPin(){
+  S.specifiersManuallySet.clear();
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  render();
+}
+
+// PR-K: per-specifier "(manual)" caption. Called from render() alongside renderPathwayPill().
+// Adds/removes a small caption next to each COG_SPEC_EXCL checkbox label so a clinician
+// scrolling past the Specifiers section can spot which keys are pinned.
+function renderManualSpecCaptions(){
+  COG_SPEC_EXCL.forEach(k=>{
+    const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
+    if(!cb) return;
+    const lab=cb.closest('label');
+    if(!lab) return;
+    let cap=lab.querySelector('.spec-manual-caption');
+    // Only caption currently-asserted manual pins. A clinician who unchecked an auto-
+    // bridged key and didn't pin a replacement gets no visible caption — the unchecked
+    // state itself is the signal; "(manual)" on an empty checkbox would be confusing.
+    const shouldShow=S.specifiersManuallySet.has(k) && S.specifiers.has(k);
+    if(shouldShow && !cap){
+      cap=document.createElement('span');
+      cap.className='spec-manual-caption';
+      cap.textContent='(manual)';
+      lab.appendChild(cap);
+    } else if(!shouldShow && cap){
+      cap.remove();
+    }
+  });
 }
 
 function render(){
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
+  renderManualSpecCaptions();
 
   // ABA inclusion logic — show/hide params section and tab
   const abaIncluded=resolveOv('aba',ruleABA());
@@ -4672,9 +4757,16 @@ function bridgeCogProfileToSpecifier(cogVal){
   // cogProfile='borderline' AND a non-empty cogDataSource, so clearing the
   // source via deselect correctly drops withBIF via the gate logic below.
   const preserveBif = bifSpecifierAllowed() && S.specifiers.has('withBIF');
+  // PR-K: respect manual specifier overrides. Any COG_SPEC_EXCL key in
+  // S.specifiersManuallySet was deliberately toggled by the clinician and must NOT be
+  // cleared by this loop OR re-asserted below. The override is durable across
+  // cogDataSource / adaptProfile / adaptiveStandardized changes; it clears only when
+  // cogProfile changes (= fresh clinical context, hook at the cogProfile change handler).
+  const anyManualInGroup = COG_SPEC_EXCL.some(k => S.specifiersManuallySet.has(k));
   // Clear the mutually-exclusive ID/GDD/BIF/without group, then pre-check the
-  // matching specifier. Clinician can still manually override after.
+  // matching specifier — UNLESS the clinician has manually pinned one.
   COG_SPEC_EXCL.forEach(k=>{
+    if(S.specifiersManuallySet.has(k)) return; // PR-K manual-pin guard
     S.specifiers.delete(k);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
     if(cb) cb.checked=false;
@@ -4698,7 +4790,12 @@ function bridgeCogProfileToSpecifier(cogVal){
   // retained for readability + age-cleanup teardown paths that pass '' to clear.
   const pathway = currentClinicalPathway();
   const toCheck = pathway?.specKey || null;
-  if(toCheck){
+  // PR-K: skip the auto-assert when the clinician has manually pinned any COG_SPEC_EXCL
+  // key. The pill secondary line (renderPathwayPill) surfaces the divergence so the
+  // clinician sees both the predicate's recommendation AND their override at the focal
+  // point. Without this guard, the auto-bridge would re-fight the manual pin every time
+  // an adjacent input fires the bridge.
+  if(toCheck && !anyManualInGroup){
     S.specifiers.add(toCheck);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${toCheck}"]`);
     if(cb) cb.checked=true;
@@ -5094,6 +5191,12 @@ document.addEventListener('DOMContentLoaded',()=>{
           S.cogDataSource='';
           document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
         }
+        // PR-K: cogProfile change = fresh clinical context. Clear any prior manual
+        // specifier pins so the new auto-bridge starts clean. Without this, a previously-
+        // pinned withSuspectedID would persist even after the clinician picked an entirely
+        // different cogProfile (e.g., switching from id_mild to average), trapping a
+        // stale override the clinician likely doesn't remember setting.
+        S.specifiersManuallySet.clear();
         S.cogProfile=inp.value;
         bridgeCogProfileToSpecifier(inp.value);
         toggleCogDataSourceVisibility();
@@ -5183,6 +5286,28 @@ document.addEventListener('DOMContentLoaded',()=>{
           arfidMechanism:S.arfidMechanism,arfidImpact:S.arfidImpact,
           socialWorkReasons:S.socialWorkReasons};
         if(m[k]) inp.checked?m[k].add(v):m[k].delete(v);
+        // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
+        //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
+        //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND
+        //     re-fire the bridge so the pathway-recommended specifier takes over
+        //     immediately (PR-L ε). Without the bridge re-fire, the uncheck would
+        //     leave the spec section empty until the next adjacent input change.
+        //   - User unchecks a COG_SPEC_EXCL key that was NOT pinned → no-op on the
+        //     Set (delete on a missing key is silent); no bridge re-fire (the spec
+        //     stays unchecked as the user just asked).
+        // The mutex/clearing block below in this same handler uses programmatic
+        // cb.checked assignment which does NOT fire change, so only the actually-
+        // clicked specifier gets pinned/released. The Set is fully cleared on
+        // cogProfile change (PR-K) or "Re-sync with pathway" button (PR-L δ).
+        let pinReleased = false;
+        if(k==='specifiers' && COG_SPEC_EXCL.includes(v)){
+          if(inp.checked){
+            S.specifiersManuallySet.add(v);
+          } else if(S.specifiersManuallySet.has(v)){
+            S.specifiersManuallySet.delete(v);
+            pinReleased = true;
+          }
+        }
         if(k==='needsBehavior'&&['tantrums','noncompliance','property','vocalDisruption'].includes(v)){
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
           if(fr) fr.style.display=inp.checked?'':'none';
@@ -5322,6 +5447,11 @@ document.addEventListener('DOMContentLoaded',()=>{
             else{S.specifiers.delete('withCatatonia');if(specCb)specCb.checked=false;}
           }
         }
+        // PR-L ε continuation: if this change released a manual pin, re-fire the bridge
+        // so the pathway-recommended specifier takes over immediately. The bridge skips
+        // when other pins remain in the group (anyManualInGroup guard) so a partial release
+        // (e.g., uncheck one of two pinned keys) doesn't stomp the other.
+        if(pinReleased) bridgeCogProfileToSpecifier(S.cogProfile);
       }
       syncABATargetsFromNeeds();
       syncSchoolSvcFromNeeds();
