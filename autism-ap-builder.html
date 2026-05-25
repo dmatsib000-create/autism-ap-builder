@@ -296,7 +296,11 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-sw-popover-body label{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
 .ov-sw-popover-body input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 /* ── Note preview — document style ─── */
-.note-doc{font-family:var(--font);font-size:12px;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
+/* font-size:11pt matches generateRichHTML(false)'s inline paste wrapper
+   so the preview pane and the clipboard rich HTML render at the same
+   scale. Changing this value drifts the preview away from what Epic/Word
+   actually shows the clinician. */
+.note-doc{font-family:var(--font);font-size:11pt;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
 /* ── DSM-5 ring indicators ─────────── */
 .dsm-rings{display:flex;gap:14px;align-items:center;margin:6px 0 4px;flex-wrap:wrap}
@@ -2695,7 +2699,7 @@ function generateNote() {
       if(S.focalNeuroFindings) clauses.push('evaluation/management of focal neurological findings');
       if(S.comorbid.has('epilepsy')) clauses.push('evaluation/management of epilepsy/seizure disorder (may require EEG, neuroimaging, and/or antiepileptic medication management)');
       if(S.developmentalRegression){
-        if(S.regressionTiming === 'ongoing') clauses.push('urgent evaluation of active developmental regression — consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral');
+        if(S.regressionTiming === 'ongoing') clauses.push('urgent evaluation of active developmental regression: consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup; coordinate with clinical genetics referral');
         else if(S.regressionTiming === 'distant') clauses.push('routine evaluation given history of developmental regression in early childhood, currently stable trajectory; etiologic workup coordinated with clinical genetics; expedited evaluation not required unless trajectory changes');
         else clauses.push('expedited evaluation for developmental regression of uncertain timing; clarify trajectory and consider EEG/MRI per neurologist judgment');
       }
@@ -3383,6 +3387,11 @@ function generateRichHTML(isPreview=false) {
     else if(/^Co-occurring/.test(line)){closeUL();html+=`<p style="font-weight:bold;margin:8px 0 3px">${e(line)}</p>`;}
     else if(/^Note generated|^All content/.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#6b7280;font-style:italic;margin-top:10px">${e(line)}</p>`;}
     else if(line===''){closeUL();html+='<p style="margin:2px 0"> </p>';}
+    // Numbered bibliographic citations (4-space indent + DOI). Rendered at
+    // footer scale so a long reference list doesn't outweigh the body prose.
+    // 9.5pt matches the ABA letter's .aba-ref convention so references
+    // render at the same scale across all three output documents.
+    else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
     else{closeUL();html+=`<p style="margin:3px 0">${linkify(line)}</p>`;}
   });
   closeUL();
