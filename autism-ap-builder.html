@@ -101,7 +101,28 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
 .field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
-#cogProfileIdGroup{display:contents}
+/* Subgroup layout for clinically-clustered radio options (e.g. Cognitive Profile's
+   ID/GDD/BIF/normal-range/other tiers). Each .subgroup is a flex-wrap row within a
+   vertical .subgroup-stack; .subgroup-label sits across the full row. Replaces the
+   prior display:contents pinning that flattened these into a single grid. The
+   subgroup wrapper IDs (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are
+   preserved so the age-cleanup logic in updateAgeBasedVisibility() still resolves;
+   those handlers toggle style.display between 'none' and '' (empty string) so this
+   class's flex layout takes over when visible. */
+.subgroup-stack{display:flex;flex-direction:column;gap:6px}
+.subgroup{display:flex;flex-wrap:wrap;gap:3px;padding:6px 0 2px;border-top:1px solid var(--border-default)}
+.subgroup:first-child{border-top:none;padding-top:0}
+.subgroup-label{flex-basis:100%;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+/* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
+   Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
+   Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
+   color signal AND a text label, so colorblind-safe. */
+.pathway-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600)}
+.pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
+.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
+.pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
 .r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -487,25 +508,42 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
       <div class="field-group">
         <span class="field-label">Cognitive Profile</span>
-        <div class="radio-grid">
-          <div id="cogProfileIdGroup" style="display:contents">
+        <!-- Clinical pathway pill — auto-updated by renderPathwayPill() in render().
+             Displays the downstream specifier the current cog/adaptive selections imply
+             (e.g., "Pathway: Suspected GDD — awaiting comprehensive battery"). Hidden
+             when no cogProfile is selected. Driven by currentClinicalPathway() so the
+             pill text and the auto-bridged specifier checkbox share a single source of truth. -->
+        <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
+        <div class="subgroup-stack">
+          <div class="subgroup" id="cogProfileIdGroup">
+            <span class="subgroup-label">Intellectual disability</span>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
           </div>
-          <div id="gddCogGroup" style="display:contents">
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">GDD —<br>unspecified</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">GDD —<br>mild delays</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">GDD —<br>moderate delays</label>
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">GDD —<br>severe delays</label>
+          <div class="subgroup" id="gddCogGroup">
+            <span class="subgroup-label">Global developmental delay</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">Mild delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">Moderate delays</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">Severe delays</label>
           </div>
-          <div id="cogProfileBifWrap" style="display:contents"><label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline<br>intellectual<br>functioning (BIF)</label></div>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average<br>(110–119)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior<br>(120–129)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior /<br>gifted (130+)</label>
-          <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown /<br>under evaluation</label>
+          <div class="subgroup" id="cogProfileBifWrap">
+            <span class="subgroup-label">Sub-threshold</span>
+            <label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline intellectual functioning (BIF)</label>
+          </div>
+          <div class="subgroup">
+            <span class="subgroup-label">Normal range</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average (110–119)</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior (120–129)</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior / gifted (130+)</label>
+          </div>
+          <div class="subgroup">
+            <span class="subgroup-label">Evaluation status</span>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown / under evaluation</label>
+          </div>
         </div>
         <label class="cb-row" style="margin-top:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
         <div id="unevenCogWrap" style="display:none;margin:2px 0 0 26px">
@@ -1266,6 +1304,51 @@ const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaire
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
+// Cluster pathway summary — single source of truth shared by the pathway pill (#pathwayPill)
+// AND any future consumer that needs a label-free read of the implied downstream specifier.
+// Mirrors bridgeCogProfileToSpecifier()'s decision tree (confirmableId / confirmableGdd /
+// bifSpecifierAllowed) so the pill text never contradicts the auto-bridged specifier label.
+// Returns null when no cogProfile is selected (pill stays hidden).
+function currentClinicalPathway(){
+  const cog = S.cogProfile;
+  if(!cog) return null;
+  const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
+  if(['id_mild','id_moderate','id_severe'].includes(cog)){
+    const sev = cog==='id_mild'?'Mild':cog==='id_moderate'?'Moderate':'Severe';
+    const confirmed = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
+    return confirmed
+      ? {variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
+      : {variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
+  }
+  if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cog)){
+    const sev = cog==='gdd_mild'?'mild':cog==='gdd_moderate'?'moderate':cog==='gdd_severe'?'severe':'';
+    const label = sev ? `${sev.charAt(0).toUpperCase()+sev.slice(1)} Global Developmental Delay` : 'Global Developmental Delay (unspecified severity)';
+    const confirmed = cogSourceSupportsConfirmation();
+    return confirmed
+      ? {variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${label}`}
+      : {variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${label} — awaiting comprehensive developmental battery`};
+  }
+  if(cog==='borderline'){
+    const allowed = bifSpecifierAllowed();
+    const qual = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation)'
+               : S.cogDataSource==='comprehensive' ? ' (current battery)'
+               : S.cogDataSource==='screener' ? ' (screener — preliminary)'
+               : S.cogDataSource==='clinical' ? ' (clinical impression)'
+               : '';
+    return allowed
+      ? {variant:'pp-bif', prefix:'Pathway', text:`Borderline Intellectual Functioning (R41.83)${qual}`}
+      : {variant:'pp-bif', prefix:'Pathway', text:'Borderline considered — pick a Cognitive Data Source to support the BIF call'};
+  }
+  if(['lowAverage','average','aboveAverage','superior','verySuperior'].includes(cog)){
+    const range = cog==='lowAverage'?'low-average':cog==='average'?'average':cog==='aboveAverage'?'high-average':cog==='superior'?'superior':'very superior / gifted';
+    const labelKey = young ? 'GDD' : 'ID';
+    return {variant:'pp-typical', prefix:'Pathway', text:`Cognitive ${range} — without ${labelKey}`};
+  }
+  if(cog==='unknown'){
+    return {variant:'', prefix:'Pathway', text:'Cognitive status under evaluation — specifier deferred'};
+  }
+  return null;
+}
 const asdLevel23 = () => S.asdLevelSC>='2'||S.asdLevelRRB>='2';
 const hasPragmaticDeficit = () => S.langModifiers.has('pragmatic');
 const hasMorphoErrors = () => S.langModifiers.has('morphosyntactic');
@@ -4005,9 +4088,24 @@ function setPreviewMode(mode){
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 // keep docs/branching-logic.md §1.1 + §5 in sync (master render loop; tab visibility gates for ABA + IEP, fallback to note tab when active tab hides)
+// Render the top-of-cluster pathway pill. Called from render() on every state change.
+// Sets variant class for color + text. Hides when no pathway is computed (no cogProfile).
+function renderPathwayPill(){
+  const el=document.getElementById('pathwayPill');
+  if(!el) return;
+  const p=currentClinicalPathway();
+  if(!p){el.style.display='none';el.textContent='';return;}
+  // Reset variant classes, then add the current one.
+  el.classList.remove('pp-confirmed','pp-suspected','pp-bif','pp-typical');
+  if(p.variant) el.classList.add(p.variant);
+  el.innerHTML = `<span class="pp-prefix">${p.prefix}</span><span>${p.text}</span>`;
+  el.style.display='';
+}
+
 function render(){
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
+  renderPathwayPill();
 
   // ABA inclusion logic — show/hide params section and tab
   const abaIncluded=resolveOv('aba',ruleABA());
@@ -4747,12 +4845,15 @@ function updateAgeBasedVisibility(){
     }
   }
   // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
-  // Must restore to 'contents' not '' — these wrapper divs use display:contents so their
-  // children flow as direct flex items inside .radio-grid; '' would break the grid layout
+  // Toggle subgroup visibility. The subgroup wrappers (cogProfileIdGroup, gddCogGroup,
+  // cogProfileBifWrap) now use the .subgroup CSS class (display:flex with flex-wrap) —
+  // restore to '' (empty string) when shown so the class's flex layout takes over.
+  // Prior history: these used display:contents to flow children directly into a single
+  // .radio-grid; the visible-subgroup redesign replaced that with boxed subgroups.
   const idCogGroup=document.getElementById('cogProfileIdGroup');
   if(idCogGroup){
     const hideIDCog=young&&S.ageGroup!=='';
-    idCogGroup.style.display=hideIDCog?'none':'contents';
+    idCogGroup.style.display=hideIDCog?'none':'';
     if(hideIDCog&&hasID()){
       S.cogProfile='';
       idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
@@ -4767,7 +4868,7 @@ function updateAgeBasedVisibility(){
   const bifCogGroup=document.getElementById('cogProfileBifWrap');
   if(bifCogGroup){
     const hideBifCog=young&&S.ageGroup!=='';
-    bifCogGroup.style.display=hideBifCog?'none':'contents';
+    bifCogGroup.style.display=hideBifCog?'none':'';
     if(hideBifCog&&S.cogProfile==='borderline'){
       S.cogProfile='';
       bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
@@ -4793,7 +4894,7 @@ function updateAgeBasedVisibility(){
   const gddCogGroup=document.getElementById('gddCogGroup');
   if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
-    gddCogGroup.style.display=hideGddCog?'none':'contents';
+    gddCogGroup.style.display=hideGddCog?'none':'';
     if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
       gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
