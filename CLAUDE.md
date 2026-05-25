@@ -25,6 +25,10 @@ claude_code/
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, and `docs/` are tracked in git and pushed to GitHub. Everything else is local.
 
+### Intake protocol for non-trivial requests
+
+For requests where the deliverable shape depends on choices Claude shouldn't make alone (architecture, scope boundary, format, picking between reasonable patterns), run the intake protocol at `docs/templates/intake-prompt.md` before building or recommending. Skip for single-line bug fixes, renames, copyedits, file reads, and anything where running the protocol takes longer than the task — announce the skip in one line. To disable: delete this section (and optionally remove the template file).
+
 ### Reference-doc maintenance (mandatory in-commit updates)
 
 Two living docs in `docs/` carry an "update in the same commit" rule:
@@ -84,6 +88,7 @@ Skip comments for self-explanatory code, changelog-style notes ("added X to fix 
 
 ### Critical constraints
 
+- **Complete absence of PHI by design.** The tool accepts NO identifying patient data. No name, no DOB, no MRN, no address, no school name, no parent names, no evaluator name, no physician name, no specific dates of evaluation or test administration (year only). Age is bucketed into developmental categories (toddler / preschool / school-age / adolescent / adult), not entered as a specific age. Insurance is bucketed into category (Commercial / Medicaid / TRICARE-ChampVA), not insurer name. **Every free-text field carries a `.phi-hint` reminding the clinician to type "the child" or `[NAME]` and no identifiers.** Generated letters use pronouns or bracketed placeholders (`[DATE]`, `[NAME]`, etc.) that the clinician fills in Epic post-paste. When adding a new field, the first question is "does this carry PHI" — if yes, find a categorical or placeholder alternative, or reject the field. Re-identification risk via combination of categorical fields is the residual; documented in branching-logic.md.
 - **Smart/curly quotes (U+2016 `'`, U+2017 `'`) must never appear in JS string literals.** They cause "Invalid or unexpected token" syntax errors and silently break the entire script with no console output. If editing triggers this (e.g., from auto-correct), run a PowerShell replace: `$content -replace [char]8216,"'" -replace [char]8217,"'"`.
 - `syncABATargetsFromNeeds()` is intentionally add-only (documented by comment). Do not add removal logic.
 - The `─` (U+2500) and `═` (U+2550) box-drawing characters in JS string literals are intentional section dividers in note output — do not replace them with ASCII.

@@ -170,6 +170,7 @@ For a concrete example of this template in use — including the per-asymmetry t
 - **Pre-committed distribution.** Knowing roughly what % of ratings should land in each bucket catches anchoring (too pessimistic / too optimistic) before it ships.
 - **Conditional sub-councils.** Don't spend implementation-council tokens on questions that resolve "no change needed" upstream.
 - **`clinical-council reopens` tag.** Any recommendation that revisits a prior merged decision should be flagged explicitly in the commit, so future you can audit which decisions have been re-litigated and why.
+- **REVERSAL marker on the superseded entry.** Whenever a council reverses a prior decision documented in `docs/branching-logic.md`, append a marker directly under the superseded entry's heading: `> **REVERSED YYYY-MM-DD** — see entry "[Title]" for the current decision. Reason: [one sentence].` This is the backward-pointer companion to the `clinical-council reopens` tag — together they make the audit trail navigable from either end, so a reader who lands on the superseded entry learns immediately that it's no longer in force. See branching-logic.md "How to read this doc" for the full convention.
 - **One-pass execution.** Pause-for-clarifying-questions kills momentum and produces less honest councils than a single pass with residuals flagged at the end.
 
 ## Patterns to avoid

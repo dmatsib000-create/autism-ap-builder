@@ -142,6 +142,14 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    is set by toggleBifAdaptiveCrossCheck(); the ::before fires when display becomes non-none. */
 .bif-crosscheck{font-size:13px;color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
 .bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:15px;color:#b45309;font-weight:700}
+/* PHI-free entry hint. Reminds the clinician at point-of-entry that the tool's
+   design contract excludes patient identifying data. Subdued brick color signals
+   "rule of the road" without being alarming. Placed once per free-text cluster,
+   not under every field, to avoid visual noise. Inline <code> styles a small
+   bracketed-placeholder hint like [NAME] so clinicians have a visible alternative. */
+.phi-hint{font-size:10.5px;color:#7f1d1d;font-style:italic;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
+.phi-hint::before{content:"🔒 ";font-style:normal;opacity:.75;margin-right:1px}
+.phi-hint code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;font-size:10px;background:rgba(127,29,29,.07);padding:0 4px;border-radius:2px;border:1px solid rgba(127,29,29,.16);color:#7f1d1d;letter-spacing:0}
 /* Keyboard-accessible disclosure for instrument-list info on Cog Data Source options (PR-K).
    The .info-btn is a focusable ⓘ button placed next to a radio label; clicking or pressing
    Enter/Space toggles aria-expanded and shows/hides the .info-popover. Keyboard reachable
@@ -258,6 +266,35 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-pill.auto-no{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500)}
 .ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:#166534}
 .ov-pill.ov-no{border-color:var(--gray-300);background:var(--gray-100);color:var(--gray-400);text-decoration:line-through}
+/* Grouped override tiles — replaces the prior flat .ov-pill-grid with three clinical clusters
+   (Core therapies, Medical & diagnostic, Florida resources). Each .ov-group wraps a header
+   and its own pill grid. SLP/OT/PT sit first-three in the Core group so they're always in
+   the top-left scan zone. Group header reuses the .comorbid-grp pattern visually. */
+.ov-group{margin-top:8px}
+.ov-group:first-child{margin-top:0}
+.ov-group-head{font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:4px 0 4px;display:block}
+/* Therapy-status rows — greyed out and click-blocked when the corresponding referral is
+   not currently included (auto-no AND not manually overridden to yes). Coupled to the
+   tiles above via updateTherapyStatusEnablement() in render(). The label stays visible
+   for affordance ("this option exists; activate the referral above to use it") while
+   pointer-events:none prevents accidental clicks on disabled options. */
+.therapy-status-row.inactive{opacity:.45}
+.therapy-status-row.inactive .r-opt{cursor:not-allowed;pointer-events:none;background:var(--gray-50);border-color:var(--gray-200);color:var(--gray-400)}
+.therapy-status-row.inactive .ts-label{color:var(--gray-400)}
+/* Social Work tile (clinician-judgment referral, not auto-rule-driven). Looks like a
+   regular .ov-pill but click-toggles a bool and pairs with a small ⓘ button that opens
+   a popover containing the 6 reasons checkboxes. The wrap is a flex container that the
+   parent .ov-pill-grid treats as a single flex item. The popover reuses the .info-popover
+   pattern from PR-M (positioned absolute below the wrap).  */
+.ov-sw-wrap{position:relative;display:inline-flex;align-items:stretch;gap:0}
+.ov-sw-wrap .ov-pill{border-top-right-radius:0;border-bottom-right-radius:0;border-right:none;flex:1}
+.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:#166534;cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
+.ov-sw-reasons-btn:hover{filter:brightness(.96)}
+.ov-sw-reasons-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.ov-sw-reasons-btn[aria-expanded="true"]{background:#bbf7d0}
+.ov-sw-popover-body{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
+.ov-sw-popover-body input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 /* ── Note preview — document style ─── */
 .note-doc{font-family:var(--font);font-size:12px;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
@@ -277,10 +314,22 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .svc-auto-badge{font-size:9px;padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
 .plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
 .prior-test-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.outcome-sel{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
+.outcome-sel{font-size:13px;padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
+.outcome-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+/* When the row's checkbox is checked but the outcome is empty, the dropdown
+   is the gating control for chart emission — without an outcome value, every
+   downstream emission path silently no-ops. Amber treatment makes the unmet
+   predicate impossible to read past. Matches the --amber/--amber-light token
+   pair used elsewhere for warning surfaces (bif-crosscheck, abaLevelWarn). */
+.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:#92400e;font-weight:600;box-shadow:0 0 0 2px #fde68a}
 .sub-options{margin:2px 0 4px 22px;padding:5px 8px;background:var(--gray-50);border-radius:4px;border-left:2px solid var(--blue-light)}
 .sub-options .sub-label{font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
-.prior-date-input{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);width:76px;}
+/* PHI-tightening: year-only date input. HIPAA Safe Harbor §164.514(b)(2)(C) permits
+   year granularity but not finer for dates directly related to an individual.
+   width:54px sized for a 4-digit year; -webkit-appearance:none strips the spinner
+   on Chromium since the keyboard +/- is more useful in clinical workflow. */
+.prior-date-input{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);width:54px;-moz-appearance:textfield}
+.prior-date-input::-webkit-outer-spin-button,.prior-date-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .prior-mod-sel{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
 .plan-pill.pill-off{display:inline-flex;background:var(--gray-100);color:var(--gray-400);border-color:var(--gray-300)}
 .cr-wrap.cr-suspected{margin-top:5px;padding-top:5px;border-top:1px dashed var(--gray-200)}
@@ -468,9 +517,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <div id="visitTypeRow" style="margin-top:7px">
       <span class="dx-banner-label dx-banner-label-vt">Visit Type <span style="font-size:9px;font-weight:400;opacity:.7">(affects note opening)</span></span>
       <div class="radio-grid">
-        <label class="r-opt"><input type="radio" name="visitType" value="initial">Initial evaluation</label>
-        <label class="r-opt"><input type="radio" name="visitType" value="reeval">Re-evaluation</label>
-        <label class="r-opt"><input type="radio" name="visitType" value="followup">Follow-up</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="initial">Initial evaluation</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="reeval">Re-evaluation</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="followup">Follow-up</label>
       </div>
     </div>
   </div>
@@ -494,10 +543,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Pronouns</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="pronouns" value="he">He / Him</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="she">She / Her</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="they">They / Them</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="">Not specified</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="he">He / Him</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="she">She / Her</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="they">They / Them</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="">Not specified</label>
         </div>
         <div class="pronoun-hint">Used in note narrative. Leave unspecified to use "the child / the individual."</div>
       </div>
@@ -554,6 +603,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
         <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
           <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="subgroup-stack">
           <div class="subgroup" id="cogProfileIdGroup">
@@ -669,6 +719,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <span class="str-chip" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
         </div>
         <textarea class="strengths-area" id="strengthsField" placeholder="Click chips above or type freely..." rows="2"></textarea>
+        <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
       </div>
 
     </div>
@@ -714,17 +765,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div id="priorTestList" style="display:none">
         <div class="field-hint" style="margin:3px 0 5px">Results documented separately — select outcome per instrument</div>
         <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2st"> CARS-2 ST</label><select class="outcome-sel" data-outcome-key="cars2st"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2st" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2hf"> CARS-2 HF</label><select class="outcome-sel" data-outcome-key="cars2hf"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2hf" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="ados2"> ADOS-2</label><select class="outcome-sel" data-outcome-key="ados2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><select class="prior-mod-sel" id="ados2ModuleSel"><option value="">— module —</option><option value="Module T">Module T (toddler)</option><option value="Module 1">Module 1 (preverbal/min. verbal)</option><option value="Module 2">Module 2 (phrase speech)</option><option value="Module 3">Module 3 (fluent speech)</option><option value="Module 4">Module 4 (fluent, older)</option></select><input class="prior-date-input" data-date-key="ados2" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="adir"> ADI-R</label><select class="outcome-sel" data-outcome-key="adir"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="adir" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="asdpeds" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="midgas" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="srs2"> SRS-2 (Social Responsiveness Scale, 2nd ed.)</label><select class="outcome-sel" data-outcome-key="srs2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (T ≥ 60, clinically significant)</option><option value="equivocal">Equivocal (T 55–59, mild-moderate range)</option><option value="notConsistent">Not consistent with ASD (T &lt; 55, average range)</option></select><input class="prior-date-input" data-date-key="srs2" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label><select class="outcome-sel" data-outcome-key="gars3"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (AQ ≥ 70, very likely)</option><option value="equivocal">Equivocal (AQ 55–69, possibly)</option><option value="notConsistent">Not consistent with ASD (AQ &lt; 55, unlikely)</option></select><input class="prior-date-input" data-date-key="gars3" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="vineland3"> Vineland-3</label><select class="outcome-sel" data-outcome-key="vineland3"><option value="">— outcome —</option><option value="consistent">Significantly impaired (consistent with ASD adaptive profile)</option><option value="equivocal">Mildly impaired</option><option value="notConsistent">Age-appropriate / within normal limits</option></select><input class="prior-date-input" data-date-key="vineland3" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="basc3"> BASC-3</label><select class="outcome-sel" data-outcome-key="basc3"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ASD/ADHD/anxiety profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="basc3" type="text" placeholder="date admin."></div>
-          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="conners4"> Conners 4</label><select class="outcome-sel" data-outcome-key="conners4"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ADHD/behavioral profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="conners4" type="text" placeholder="date admin."></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2st"> CARS-2 ST</label><select class="outcome-sel" data-outcome-key="cars2st"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2st" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2hf"> CARS-2 HF</label><select class="outcome-sel" data-outcome-key="cars2hf"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2hf" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="ados2"> ADOS-2</label><select class="outcome-sel" data-outcome-key="ados2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><select class="prior-mod-sel" id="ados2ModuleSel"><option value="">— module —</option><option value="Module T">Module T (toddler)</option><option value="Module 1">Module 1 (preverbal/min. verbal)</option><option value="Module 2">Module 2 (phrase speech)</option><option value="Module 3">Module 3 (fluent speech)</option><option value="Module 4">Module 4 (fluent, older)</option></select><input class="prior-date-input" data-date-key="ados2" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="adir"> ADI-R</label><select class="outcome-sel" data-outcome-key="adir"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="adir" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="asdpeds"> ASD-PEDS</label><select class="outcome-sel" data-outcome-key="asdpeds"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="asdpeds" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="midgas"> MIGDAS-2</label><select class="outcome-sel" data-outcome-key="midgas"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="midgas" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="srs2"> SRS-2 (Social Responsiveness Scale, 2nd ed.)</label><select class="outcome-sel" data-outcome-key="srs2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (T ≥ 60, clinically significant)</option><option value="equivocal">Equivocal (T 55–59, mild-moderate range)</option><option value="notConsistent">Not consistent with ASD (T &lt; 55, average range)</option></select><input class="prior-date-input" data-date-key="srs2" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label><select class="outcome-sel" data-outcome-key="gars3"><option value="">— outcome —</option><option value="consistent">Consistent with ASD (AQ ≥ 70, very likely)</option><option value="equivocal">Equivocal (AQ 55–69, possibly)</option><option value="notConsistent">Not consistent with ASD (AQ &lt; 55, unlikely)</option></select><input class="prior-date-input" data-date-key="gars3" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="vineland3"> Vineland-3</label><select class="outcome-sel" data-outcome-key="vineland3"><option value="">— outcome —</option><option value="consistent">Significantly impaired (consistent with ASD adaptive profile)</option><option value="equivocal">Mildly impaired</option><option value="notConsistent">Age-appropriate / within normal limits</option></select><input class="prior-date-input" data-date-key="vineland3" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="basc3"> BASC-3</label><select class="outcome-sel" data-outcome-key="basc3"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ASD/ADHD/anxiety profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="basc3" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
+          <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="conners4"> Conners 4</label><select class="outcome-sel" data-outcome-key="conners4"><option value="">— outcome —</option><option value="consistent">Clinically significant elevations (consistent with ADHD/behavioral profile)</option><option value="equivocal">At-risk elevations</option><option value="notConsistent">Within normal limits</option></select><input class="prior-date-input" data-date-key="conners4" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
         </div>
         </div><!-- /priorTestList -->
       </div>
@@ -741,20 +792,22 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="field-group">
           <span class="field-label">Severity — Social Communication</span>
           <div class="radio-grid">
-            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" value="1">Level 1</label>
-            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" value="2">Level 2</label>
-            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" value="3">Level 3</label>
+            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="1">Level 1</label>
+            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="2">Level 2</label>
+            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationSCField" class="strengths-area" placeholder="Justification for SC level (optional) — e.g., requires adult prompting for all social initiations; responses to peers consistently atypical..." style="min-height:36px;margin-top:5px"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="field-group">
           <span class="field-label">Severity — Restricted / Repetitive Behaviors</span>
           <div class="radio-grid">
-            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" value="1">Level 1</label>
-            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" value="2">Level 2</label>
-            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" value="3">Level 3</label>
+            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="1">Level 1</label>
+            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="2">Level 2</label>
+            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationRRBField" class="strengths-area" placeholder="Justification for RRB level (optional) — e.g., severe distress with any deviation from routine; stereotypies constant and disruptive across settings..." style="min-height:36px;margin-top:5px"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="field-group">
           <span class="field-label">Specifiers</span>
@@ -785,6 +838,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button class="btn btn-blue btn-sm" onclick="dsmCheckAll()">Check all criteria</button>
         <button class="btn btn-gray btn-sm" onclick="dsmClearAll()">Clear all criteria</button>
       </div>
+      <span class="phi-hint">All evidence textareas below are PHI-free zones — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
       <div class="field-group">
         <span class="field-label">Criterion A — Social Communication (all 3 required)</span>
         <div class="cb-list">
@@ -868,6 +922,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Behavior / Interfering</span>
+        <span class="phi-hint">Frequency/description inputs below are PHI-free zones — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         <div class="cb-list">
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="aggression"> Aggression toward others</label>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="sib"> Self-injurious behavior (SIB)</label>
@@ -935,18 +990,18 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <div class="comorbid-grp">Genetics-relevant exam findings</div>
           <div class="field-hint" style="margin:2px 0 4px;font-size:11px;color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
           <div class="radio-grid" style="margin:4px 0">
-            <label class="r-opt"><input type="radio" name="dysmorphism" value=""> No concern</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" value="suspected"> Suspected dysmorphology</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
           </div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="congenitalAnomalies"> Congenital anomalies on physical examination</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="developmentalRegression"> Documented developmental regression → genetics + neurology referral</label>
           <div id="regressionTimingRow" class="sub-options" style="display:none">
             <span class="sub-label">Regression timing</span>
             <div class="radio-grid" style="margin:2px 0 4px">
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="unsure"> Timing unclear from records</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
             </div>
             <div class="field-hint" style="margin:0 0 4px;font-size:11px;color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
           </div>
@@ -982,8 +1037,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div id="depressionSafetyRow" class="sub-options" style="display:none">
           <span class="sub-label">Safety screening result</span>
           <div class="radio-grid">
-            <label class="r-opt"><input type="radio" name="depressionSafety" value="negative"> Negative</label>
-            <label class="r-opt"><input type="radio" name="depressionSafety" value="positive"> Positive</label>
+            <label class="r-opt"><input type="radio" name="depressionSafety" data-bind="depressionSafety" value="negative"> Negative</label>
+            <label class="r-opt"><input type="radio" name="depressionSafety" data-bind="depressionSafety" value="positive"> Positive</label>
           </div>
         </div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
@@ -1045,24 +1100,24 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Current Placement</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="notYet">Not yet<br>in school</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="daycare">Daycare /<br>childcare</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEd">General ed</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEdSupport">Gen ed with support</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="selfContained">Self-contained / special ed</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="therapDay">Therapeutic day school</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="privateNoIEP">Private school<br>(no IEP)</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="privateWithIEP">Private school<br>(with district IEP svcs)</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="home">Homeschool</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="notYet">Not yet<br>in school</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="daycare">Daycare /<br>childcare</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="genEd">General ed</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="genEdSupport">Gen ed with support</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="selfContained">Self-contained / special ed</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="therapDay">Therapeutic day school</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="privateNoIEP">Private school<br>(no IEP)</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="privateWithIEP">Private school<br>(with district IEP svcs)</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="home">Homeschool</label>
         </div>
       </div>
       <div class="field-group">
         <span class="field-label">IDEA / 504 Document</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="iep">IEP in place</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="iep_needed">IEP evaluation needed</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="504">504 Plan</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="neither">Neither / N/A</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="iep">IEP in place</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="iep_needed">IEP evaluation needed</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="504">504 Plan</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="neither">Neither / N/A</label>
         </div>
       </div>
       <div class="field-group">
@@ -1137,22 +1192,22 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Insurance / Payer Type</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="insuranceType" value="commercial">Commercial /<br>Private</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="medicaid">Medicaid /<br>CHIP</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="tricare">TRICARE</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="champva">ChampVA</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="selfpay">Self-pay /<br>Uninsured</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="commercial">Commercial /<br>Private</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="medicaid">Medicaid /<br>CHIP</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="tricare">TRICARE</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="champva">ChampVA</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="selfpay">Self-pay /<br>Uninsured</label>
         </div>
       </div>
 
       <div class="field-group">
         <span class="field-label">Requested ABA Intensity</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="abaHours" value="10">10 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="15">15 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="20">20 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="25">25 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="30plus">30+ hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="10">10 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="15">15 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="20">20 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="25">25 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="30plus">30+ hr/wk</label>
         </div>
       </div>
 
@@ -1202,43 +1257,39 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
+      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
+      <div id="overridePanel"></div>
+      <hr class="divider">
       <div class="field-group">
         <span class="field-label">Current Private / Clinic Therapy Status</span>
-        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Change only if patient is <em>already</em> receiving this therapy. Affects note language (refer vs. continue/revise).</p>
+        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Modifies the prose for active referrals above. Rows for inactive referrals are greyed out — activate the corresponding tile first. Re-click a selected option to clear it without changing the referral itself.</p>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="increase">Increase intensity</label>
+          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="increase">Increase intensity</label>
+          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="increase">Increase intensity</label>
+          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="increase">Increase intensity</label>
           </div>
-          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="increase">Increase intensity</label>
+          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="increase">Increase intensity</label>
           </div>
         </div>
       </div>
-      <hr class="divider">
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects. Override individually if needed.</p>
-      <div id="overridePanel"></div>
     </div>
   </div>
 
@@ -1345,6 +1396,24 @@ const S = {
     psychiatry:'auto',gi:'auto',sleep_ref:'auto',audiology:'auto',qbtest:'auto',
     earlySteps:'auto',fdlrs:'auto',eeg:'auto',card:'auto'}
 };
+
+// ─── PATH HELPERS (data-bind support) ────────────────────────────────────────
+// Walk a dotted path like "therapyStatus.slp" against S — used by the data-bind
+// declarative-binding layer so radios can express their state mutation via an HTML
+// attribute (data-bind="therapyStatus.slp") instead of needing an entry in the
+// giant if/else chain in the radio change handler. Inspired by the 2test parallel-
+// project pattern; see scratch/parallel-session/2test.html for full canonical
+// implementation. Phase 1+2 scope: scalar fields only. Set-membership (P3) and
+// side-effect fields (P4) keep their existing handlers.
+function setByPath(obj, path, val){
+  const keys = path.split('.');
+  let o = obj;
+  for(let i=0; i<keys.length-1; i++){
+    if(typeof o[keys[i]] !== 'object' || o[keys[i]] === null) o[keys[i]] = {};
+    o = o[keys[i]];
+  }
+  o[keys[keys.length-1]] = val;
+}
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const hasADHD = () => S.comorbid.has('adhd_combined')||S.comorbid.has('adhd_inattentive')||S.comorbid.has('adhd_hyperactive')||S.comorbid.has('adhd_suspected');
@@ -3326,7 +3395,13 @@ function generateRichHTML(isPreview=false) {
 function _abaContent(){
   // v3() is module-scope (defined just after getPron); see V3_MAP for the verb list.
   const p=getPron();
-  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  // PHI-tightening: letter date was previously auto-inserted as today's date, which is a
+  // date directly related to the patient encounter (HIPAA §164.514(b)(2)(C) — PHI more
+  // specific than year). Replaced with a bracketed placeholder; the clinician fills in
+  // the actual date in Epic post-paste. Aligns with the "complete absence of PHI by
+  // design" principle in CLAUDE.md. To revert to auto-today, replace with:
+  //   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const today='[DATE]';
   const youngChild=S.ageGroup==='toddler'||S.ageGroup==='preschool';
   const isMilitary=S.insuranceType==='tricare'||S.insuranceType==='champva';
 
@@ -4236,6 +4311,14 @@ function renderManualSpecCaptions(){
 }
 
 function render(){
+  // Adjust-Referrals coupling — both run unconditionally at the top so the various
+  // early-return paths below (no-input, ABA-preview, IEP-preview) still get the
+  // therapy-status state and visual enablement updated. syncTherapyStatusFromActivity
+  // clears orphaned status when its referral has become inactive; updateTherapyStatusEnablement
+  // toggles the .inactive class on each row based on current activity.
+  syncTherapyStatusFromActivity();
+  updateTherapyStatusEnablement();
+  updatePriorTestOutcomeRequired();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -4321,10 +4404,75 @@ const OV_DEFS=[
   {key:'gi',label:'GI referral',rule:ruleGI},{key:'sleep_ref',label:'Sleep study referral (diagnostic PSG)',rule:ruleSleepRef},
   {key:'eeg',label:'EEG (order)',rule:ruleEEG},{key:'earlySteps',label:'Early Steps referral (FL)',rule:ruleEarlySteps},
   {key:'fdlrs',label:'FDLRS referral (FL)',rule:ruleFDLRS},{key:'card',label:'CARD information',rule:ruleCARD},
+  // Social Work is special — no auto-rule (clinician judgment is the gate). The "rule"
+  // returns S.socialWork so resolveOv treats it like any auto-driven referral; the tile
+  // is rendered with toggle semantics in renderOverrides() rather than cycle. Reasons
+  // sub-options live in §8 and are mirrored via a popover on the tile.
+  {key:'socialWork',label:'Social work referral',rule:()=>({include:S.socialWork,reasons:[]})},
 ];
+// Clinical clusters for the override-pill grid. SLP, OT, PT, ABA are first-three-then-fourth
+// in 'core' so they land in the top-left scan zone. Medical/diagnostic referrals cluster
+// together below; Florida-specific resources sit at the bottom. Adding a new referral:
+// add to OV_DEFS for label+rule, then add the key to the appropriate group below.
+// 'Clinician-judgment referrals' is for tiles where the clinician's decision IS the gate
+// (no auto-rule produces a useful prediction). Social work currently the only member.
+const OV_GROUPS=[
+  {title:'Core therapies', keys:['slp','ot','pt','aba','pcit','psychotherapy','socialSkills']},
+  {title:'Medical & diagnostic referrals', keys:['audiology','genetics','neurology','qbtest','psychiatry','gi','sleep_ref','eeg']},
+  {title:'Florida resources', keys:['earlySteps','fdlrs','card']},
+  {title:'Clinician-judgment referrals', keys:['socialWork']},
+];
+// True when a referral is currently included in the output — either the auto rule says
+// include OR the clinician has manually overridden to 'yes'. Used to enable/disable the
+// therapy-status rows below (you can only modify a therapy's status if it's being referred).
+function isTherapyActive(key){
+  const def = OV_DEFS.find(d => d.key === key);
+  if(!def) return false;
+  return resolveOv(key, def.rule());
+}
+// Called at the top of render() — clears stale therapy-status when a referral has become
+// inactive (clinical input change, or clinician toggled the tile to Excluded). Without this,
+// deactivating SLP after picking 'continue' would leave 'continue' in S.therapyStatus.slp,
+// which therapyStatusLine would still emit as orphaned prose in the rendered note.
+function syncTherapyStatusFromActivity(){
+  ['slp','ot','aba','pt'].forEach(key => {
+    if(S.therapyStatus[key] && !isTherapyActive(key)){
+      S.therapyStatus[key] = '';
+      document.querySelectorAll(`input[name="therapyStatus_${key}"]`).forEach(r=>{
+        r.checked = false;
+        r.closest('.r-opt')?.classList.remove('sel');
+      });
+    }
+  });
+}
+// Called near the end of render() — toggles the .inactive class on each therapy-status row
+// based on its corresponding referral's current active state. Visual + pointer-events both
+// handled in CSS (.therapy-status-row.inactive).
+function updateTherapyStatusEnablement(){
+  document.querySelectorAll('.therapy-status-row[data-therapy-key]').forEach(row=>{
+    const key = row.getAttribute('data-therapy-key');
+    row.classList.toggle('inactive', !isTherapyActive(key));
+  });
+}
+// Labels for socialWorkReasons sub-options. Single source of truth — also consumed by
+// the prose generator at line ~2698 (kept in sync manually; if you add a reason here,
+// add it to the prose map AND to the §8 HTML checkboxes).
+const SW_REASON_LABELS = {
+  apd_waiver: 'APD/Medicaid waiver application assistance',
+  financial: 'Financial resource counseling',
+  caregiver_support: 'Caregiver support and mental health',
+  community_nav: 'Community resource navigation',
+  family_support: 'Family support coordination',
+  family_safety: 'Family safety concerns'
+};
+
 function renderOverrides(){
   const p=document.getElementById('overridePanel');if(!p)return;
-  p.innerHTML='<div class="ov-pill-grid">'+OV_DEFS.map(d=>{
+  // Standard tile renderer for the 18 auto-rule-driven referrals.
+  const pillFor = key => {
+    const d = OV_DEFS.find(x => x.key === key);
+    if(!d) return '';
+    if(key === 'socialWork') return socialWorkTileHTML(d);
     const r=d.rule(),ov=S.overrides[d.key],eff=resolveOv(d.key,r);
     let cls,lbl;
     if(ov==='yes'){cls='ov-yes';lbl='Override · Included';}
@@ -4333,7 +4481,113 @@ function renderOverrides(){
     const autoOutcome=r.include?'included':'excluded';
     const tip=`Click to cycle: Auto → Include → Exclude → Auto\nAuto rule currently: ${autoOutcome}`;
     return `<button class="ov-pill ${cls}" onclick="cycleOverride('${d.key}')" title="${tip}"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${lbl}</span></button>`;
-  }).join('')+'</div>';
+  };
+  p.innerHTML = OV_GROUPS.map(g =>
+    `<div class="ov-group"><span class="ov-group-head">${g.title}</span><div class="ov-pill-grid">${g.keys.map(pillFor).join('')}</div></div>`
+  ).join('');
+}
+
+// Special tile for Social Work — toggle semantics + reasons popover. Visually matches the
+// other tiles but click toggles S.socialWork directly (no auto/yes/no cycle, since there's
+// no auto-rule to defer to). When active, an inline ⓘ-style button opens a popover with
+// the 6 reasons checkboxes; popover state is rendered fresh from S.socialWorkReasons on
+// each open (no DOM sync drift). §8 checkbox changes sync back via the next render() pass.
+function socialWorkTileHTML(d){
+  const active = !!S.socialWork;
+  const cls = active ? 'ov-yes' : 'auto-no';
+  const count = S.socialWorkReasons.size;
+  const stateLine = active
+    ? `Active${count ? ' · ' + count + ' reason' + (count>1?'s':'') : ' · click ⋯ to add reasons'}`
+    : 'Not active · clinician judgment';
+  const tip = active
+    ? 'Click to deactivate. Click the ⋯ button to edit reasons.'
+    : 'Click to activate social work referral.';
+  const tile = `<button class="ov-pill ${cls}" onclick="toggleSocialWorkTile()" title="${tip}"><span class="ov-pill-name">${d.label}</span><span class="ov-pill-state">${stateLine}</span></button>`;
+  const reasonsBtn = active
+    ? `<button type="button" class="ov-sw-reasons-btn" aria-expanded="false" aria-controls="socialWorkPopover" data-info-toggle="socialWorkPopover" onclick="event.stopPropagation();openSocialWorkPopover()" title="Edit social work reasons">⋯</button>`
+    : '';
+  const popover = active
+    ? `<div id="socialWorkPopover" class="info-popover" role="region" aria-label="Social work reasons" hidden></div>`
+    : '';
+  return `<div class="ov-sw-wrap">${tile}${reasonsBtn}${popover}</div>`;
+}
+
+// Toggle handler for the Social Work tile. Mutates S.socialWork, mirrors to the §8
+// checkbox + reasons-row visibility, and clears reasons on deactivation. Auto-opens
+// the popover on activation so the clinician is invited to specify reasons immediately.
+function toggleSocialWorkTile(){
+  const newActive = !S.socialWork;
+  S.socialWork = newActive;
+  // Mirror to §8 main checkbox
+  const swCb = document.querySelector('input[data-key="single"][value="socialWork"]');
+  if(swCb) swCb.checked = newActive;
+  // Mirror to §8 reasons row visibility
+  const swr = document.getElementById('socialWorkReasonsRow');
+  if(swr) swr.style.display = newActive ? '' : 'none';
+  if(!newActive){
+    // Deactivation clears reasons + their §8 checkboxes
+    S.socialWorkReasons.clear();
+    document.querySelectorAll('input[data-key="socialWorkReasons"]').forEach(c => c.checked = false);
+  }
+  render();
+  // render() early-returns on fresh load (!hasInput) without calling renderOverrides;
+  // explicit call here guarantees the tile reflects the new state regardless of path.
+  renderOverrides();
+  if(newActive){
+    // Auto-open the popover so reasons can be set right away. setTimeout 0 lets the
+    // browser commit the renderOverrides DOM mutation before openSocialWorkPopover
+    // tries to find the popover element it just rendered.
+    setTimeout(openSocialWorkPopover, 0);
+  }
+}
+
+// Render the popover body fresh from S.socialWorkReasons and surface it. Checkbox change
+// handlers inside the popover update both S AND the corresponding §8 sub-checkboxes so
+// the two displays stay synchronized.
+function openSocialWorkPopover(){
+  const pop = document.getElementById('socialWorkPopover');
+  const btn = document.querySelector('.ov-sw-reasons-btn[data-info-toggle="socialWorkPopover"]');
+  if(!pop || !btn) return;
+  // Close any other open info popovers first (one-at-a-time discipline, mirrors PR-M)
+  document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]').forEach(other => {
+    if(other !== btn){
+      other.setAttribute('aria-expanded','false');
+      const otherId = other.getAttribute('data-info-toggle');
+      const otherPop = otherId && document.getElementById(otherId);
+      if(otherPop) otherPop.hidden = true;
+    }
+  });
+  // Render checkboxes from S
+  pop.innerHTML = '<div class="ov-sw-popover-body">'
+    + Object.entries(SW_REASON_LABELS).map(([val, label]) => {
+        const checked = S.socialWorkReasons.has(val) ? ' checked' : '';
+        return `<label><input type="checkbox" data-sw-reason="${val}"${checked}> ${label}</label>`;
+      }).join('')
+    + '</div>';
+  // Wire change handlers — sync to S AND to the §8 sub-checkboxes.
+  // Update the tile's state line surgically (NOT via renderOverrides) — full re-render
+  // would tear down this popover mid-interaction.
+  pop.querySelectorAll('input[data-sw-reason]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const val = inp.dataset.swReason;
+      if(inp.checked) S.socialWorkReasons.add(val);
+      else S.socialWorkReasons.delete(val);
+      // Mirror to §8 sub-checkbox
+      const mirror = document.querySelector(`input[data-key="socialWorkReasons"][value="${val}"]`);
+      if(mirror) mirror.checked = inp.checked;
+      // Surgical update of the tile's "N reasons" state line; preserves this popover.
+      const stateEl = document.querySelector('.ov-sw-wrap .ov-pill-state');
+      if(stateEl){
+        const count = S.socialWorkReasons.size;
+        stateEl.textContent = count
+          ? `Active · ${count} reason${count > 1 ? 's' : ''}`
+          : 'Active · click ⋯ to add reasons';
+      }
+      render(); // updates downstream note prose
+    });
+  });
+  btn.setAttribute('aria-expanded', 'true');
+  pop.hidden = false;
 }
 let priorTestingExpanded=false;
 function togglePriorExpander(){
@@ -4343,6 +4597,19 @@ function togglePriorExpander(){
 function updatePriorExpander(){
   if(S.priorTesting.size>0) priorTestingExpanded=true;
   _applyPriorExpander();
+}
+// Marks rows where the clinician has selected an instrument but hasn't picked
+// an outcome — the predicate that gates every chart emission for that instrument
+// (assessment paragraph, ABA letter cite, IEP letter cite, hasFormalAdaptiveConsistent).
+// Without this signal the row looks complete but emits nothing, which is the
+// failure mode David hit 2026-05-25.
+function updatePriorTestOutcomeRequired(){
+  document.querySelectorAll('.prior-test-row').forEach(row=>{
+    const cb=row.querySelector('input[type=checkbox][data-key="priorTesting"]');
+    const sel=row.querySelector('select.outcome-sel');
+    const needsOutcome=!!(cb && sel && cb.checked && !sel.value);
+    row.classList.toggle('outcome-required', needsOutcome);
+  });
 }
 function _applyPriorExpander(){
   const list=document.getElementById('priorTestList');
@@ -5118,6 +5385,74 @@ function syncCommNeedsFromLangLevel(){
   else if(['singleWord','phrase','simpleSentence'].includes(S.langLevel)) addComm('expressive');
 }
 
+// ─── NAMED CHANGE HANDLERS ───────────────────────────────────────────────────
+// One function per "what happens when this field changes" question. Each assumes
+// the state write (S.X = newValue, OR S.X = '' on deselect) has already happened
+// at the call site; this function handles only the post-state side effects.
+//
+// Why extracted: makes the unit of clinical reasoning match the unit of code.
+// Greppable by name — debugging "the bridge fired but the gate didn't update"
+// becomes one named function read instead of finding the right branch inside a
+// 30-case switch. New side-effect fields gain a one-liner in each switch plus
+// one named handler in a known spot, instead of threading consistent logic
+// between two switches ~30 lines apart.
+//
+// Why not data-bind-after attributes: cogProfile's tier-transition guard needs
+// to compare OLD vs NEW cogProfile to decide whether to clear cogDataSource.
+// A post-write hook can't reach the old value — it's already been overwritten
+// by setByPath. cogProfile therefore stays inline in the change handler.
+//
+// Pre-existing asymmetries fixed as a side effect of unification:
+//   - langLevel deselect previously didn't call syncCommNeedsFromLangLevel
+//     (the sync returns early on empty langLevel, so the unification is a no-op
+//     behavior change but a real consistency win)
+//   - dxEvalPath change previously didn't call updateSectionHeaders
+//     (deselect did) — unification makes both paths refresh the headers
+
+function onLangLevelChange(){
+  syncCommNeedsFromLangLevel();
+}
+
+function onAgeGroupChange(){
+  updateAgeBasedVisibility();
+  // Re-fire bridge so the no-impairment specifier (withoutID vs withoutGDD)
+  // resynchronizes with the new age category. Without this, switching from
+  // schoolAge to preschool would leave withoutID stale (should be withoutGDD).
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleCogDataSourceVisibility();
+}
+
+function onCogDataSourceChange(){
+  // cogDataSource is a direct input to the confirmableId / confirmableGdd predicate
+  // in currentClinicalPathway; bridge re-fires so the specifier checkbox tracks the
+  // pill in the same render frame.
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleCogDataSourceVisibility();
+}
+
+function onAdaptProfileChange(){
+  // Same rationale as onCogDataSourceChange — adaptProfile feeds the suspected→
+  // confirmed upgrade decision. PR-J reopens prior council D4 (was: "avoid surprise
+  // specifier flips from far-away controls"); pathway pill now renders the bridge
+  // result at the cluster focal point in the same render frame, neutralizing the
+  // original concern. See branching-logic.md §11 PR-J entry.
+  bridgeCogProfileToSpecifier(S.cogProfile);
+  toggleBifAdaptiveCrossCheck();
+}
+
+function onDiagStatusChange(){
+  // The DSM-5 severity-level group is only meaningful when status='confirmed';
+  // hide it otherwise (and on deselect, where S.diagStatus === '').
+  document.getElementById('levelGroup').style.display = S.diagStatus === 'confirmed' ? '' : 'none';
+}
+
+function onDxEvalPathChange(){
+  // Section-header summary depends on dxEvalPath, so refresh on both change AND
+  // deselect. The change handler previously omitted this call (deselect had it) —
+  // the asymmetry was unintentional and is fixed by routing both through here.
+  updateSectionHeaders();
+}
+
 function syncSchoolSvcFromNeeds(){
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
@@ -5154,6 +5489,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   // mutates S.cogProfile/S.cogDataSource without firing the bridge.
   toggleBifSpecifierGate();
   toggleBifAdaptiveCrossCheck();
+  // Year-only prior-test dates: set the max attribute on every .prior-date-input
+  // to the current year at runtime. Hardcoding max="2026" works at deployment but
+  // becomes a usability bug on Jan 1, 2027 (browsers reject 2027+ via the spinner
+  // and show a validation warning). Current-year reads from new Date().getFullYear()
+  // and is not PHI — HIPAA Safe Harbor §164.514(b)(2)(C) permits year granularity.
+  // Tagged in HTML with data-max-year-now; this loop is the single source of truth.
+  const currentYear = new Date().getFullYear();
+  document.querySelectorAll('.prior-date-input[data-max-year-now]').forEach(el=>{
+    el.setAttribute('max', String(currentYear));
+  });
   // PR-K: ⓘ info-btn click delegation. Toggles aria-expanded + popover [hidden]; closes any
   // sibling open popovers so only one shows at a time. Escape key closes the focused popover
   // group and returns focus to its triggering button.
@@ -5178,9 +5523,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       return;
     }
     // Click outside any open popover or its button closes the popover.
+    // Extended in social-work-tile work to also catch .ov-sw-reasons-btn triggers
+    // (same .info-popover surface, different trigger selector).
     const inOpenPopover = e.target.closest('.info-popover');
     if(inOpenPopover) return;
-    document.querySelectorAll('button.info-btn[aria-expanded="true"]').forEach(openBtn=>{
+    document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]').forEach(openBtn=>{
       openBtn.setAttribute('aria-expanded','false');
       const id = openBtn.getAttribute('data-info-toggle');
       const pop = id && document.getElementById(id);
@@ -5189,7 +5536,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   document.addEventListener('keydown',e=>{
     if(e.key !== 'Escape') return;
-    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"]');
+    const openBtns = document.querySelectorAll('button.info-btn[aria-expanded="true"], button.ov-sw-reasons-btn[aria-expanded="true"]');
     if(!openBtns.length) return;
     openBtns.forEach(btn=>{
       btn.setAttribute('aria-expanded','false');
@@ -5203,46 +5550,56 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('input[type=radio]').forEach(inp=>{
     // Browsers don't fire 'change' when re-clicking an already-checked radio.
     // mousedown captures pre-click state; click handler uses it to detect and handle deselect.
+    // Listen on BOTH the input and the wrapping label: when the user clicks the label's
+    // text/button area (which is the entire visible target for .r-opt — there's no exposed
+    // radio circle), mousedown fires on the label, not on the label-forwarded input. Without
+    // the label listener, _wasChecked stays undefined and the re-click deselect path never
+    // triggers for any data-bind radio.
     inp.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
+    const lbl=inp.closest('label');
+    if(lbl) lbl.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
     inp.addEventListener('click',()=>{
       if(!inp._wasChecked) return; // normal selection — change handler takes over
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;
-      if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='langLevel') S.langLevel='';
+      // data-bind: if a radio declares its state path via data-bind="path.to.field",
+      // the deselect (re-click) path clears that field generically. Fields with side
+      // effects beyond a state write keep their explicit branch below.
+      if(inp.dataset.bind){
+        setByPath(S, inp.dataset.bind, '');
+        render();
+        return;
+      }
+      // Six side-effect fields go through named handlers (defined near syncCommNeedsFromLangLevel).
+      // cogProfile stays inline because its tier-transition guard needs old-vs-new comparison.
+      if(nm==='ageGroup'){S.ageGroup='';onAgeGroupChange();}
+      else if(nm==='langLevel'){S.langLevel='';onLangLevelChange();}
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
-      else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile='';bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}/* PR-K: mirror PR-J adaptProfile change-handler — deselect path must also re-fire bridge so pill+spec stay convergent */
-      else if(nm==='pronouns') S.pronouns='';
-      else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
-      else if(nm==='asdLevelSC') S.asdLevelSC='';
-      else if(nm==='asdLevelRRB') S.asdLevelRRB='';
-      else if(nm==='schoolPlacement') S.schoolPlacement='';
-      else if(nm==='schoolDoc') S.schoolDoc='';
-      else if(nm==='dxEvalPath'){S.dxEvalPath='';updateSectionHeaders();}
-      else if(nm==='visitType') S.visitType='';
-      else if(nm==='insuranceType') S.insuranceType='';
-      else if(nm==='abaHours') S.abaHours='';
-      else if(nm==='depressionSafety') S.depressionSafety='';
-      else if(nm==='therapyStatus_slp') S.therapyStatus.slp='';
-      else if(nm==='therapyStatus_ot') S.therapyStatus.ot='';
-      else if(nm==='therapyStatus_aba') S.therapyStatus.aba='';
-      else if(nm==='therapyStatus_pt') S.therapyStatus.pt='';
-      else if(nm==='dysmorphism') S.dysmorphism='';
-      else if(nm==='regressionTiming') S.regressionTiming='';
+      else if(nm==='cogDataSource'){S.cogDataSource='';onCogDataSourceChange();}
+      else if(nm==='adaptProfile'){S.adaptProfile='';onAdaptProfileChange();}
+      else if(nm==='diagStatus'){S.diagStatus='';onDiagStatusChange();}
+      else if(nm==='dxEvalPath'){S.dxEvalPath='';onDxEvalPathChange();}
       render();
     });
 
     inp.addEventListener('change',()=>{
       const nm=inp.name;
       document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
-      // ageGroup change: also re-fire bridge so the no-impairment specifier (withoutID vs
-      // withoutGDD) resynchronizes with the new age category. Without this, switching from
-      // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
-      // leaves withoutGDD orphaned then deleted by updateAgeBasedVisibility with no replacement.
-      if(nm==='ageGroup'){S.ageGroup=inp.value;updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='langLevel'){S.langLevel=inp.value;syncCommNeedsFromLangLevel();}
+      // data-bind: declarative scalar write. Fields with side effects (bridge, visibility
+      // toggles, syncs) keep their explicit branch below and do NOT carry data-bind.
+      if(inp.dataset.bind){
+        setByPath(S, inp.dataset.bind, inp.value);
+        syncABATargetsFromNeeds();
+        syncSchoolSvcFromNeeds();
+        render();
+        return;
+      }
+      // Side-effect fields route through named handlers (defined near syncCommNeedsFromLangLevel).
+      // cogProfile stays inline because its tier-transition guard reads OLD S.cogProfile
+      // BEFORE the state write — a post-write hook can't reach the old value.
+      if(nm==='ageGroup'){S.ageGroup=inp.value;onAgeGroupChange();}
+      else if(nm==='langLevel'){S.langLevel=inp.value;onLangLevelChange();}
       else if(nm==='cogProfile'){
         // Tier-transition guard: classify by INSTRUMENT FAMILY, not by ICD tier.
         // ID and BIF both rest on IQ instruments (WISC/DAS/SB/WPPSI), so a within-
@@ -5270,34 +5627,17 @@ document.addEventListener('DOMContentLoaded',()=>{
         bridgeCogProfileToSpecifier(inp.value);
         toggleCogDataSourceVisibility();
       }
-      // cogDataSource, adaptiveStandardized, AND adaptProfile all re-fire the bridge because
-      // all three are inputs to the suspected→confirmed upgrade decision (per the confirmableId
-      // predicate in currentClinicalPathway). PR-J reopens prior council D4 ("avoid surprise
-      // specifier flips from far-away controls") — the rationale for D4 was that an automatic
-      // flip in the specifier checkbox 200px below the clinician's focus would feel like the
-      // tool moving things behind their back. PR-I C2 introduced the pathway pill at the top
-      // of the cluster, which renders the bridge result in the same render frame. The flip is
-      // now visible at the focal point rather than hidden, neutralizing the D4 concern.
-      // [clinical-council reopens D4 — see docs/branching-logic.md §11 PR-J entry]
-      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}
-      else if(nm==='dysmorphism') S.dysmorphism=inp.value;
-      else if(nm==='regressionTiming') S.regressionTiming=inp.value;
-      else if(nm==='pronouns') S.pronouns=inp.value;
-      else if(nm==='diagStatus'){S.diagStatus=inp.value;document.getElementById('levelGroup').style.display=inp.value==='confirmed'?'':'none';}
-      else if(nm==='asdLevelSC'){S.asdLevelSC=inp.value;}
-      else if(nm==='asdLevelRRB'){S.asdLevelRRB=inp.value;}
-      else if(nm==='schoolPlacement') S.schoolPlacement=inp.value;
-      else if(nm==='schoolDoc') S.schoolDoc=inp.value;
-      else if(nm==='dxEvalPath') S.dxEvalPath=inp.value;
-      else if(nm==='visitType') S.visitType=inp.value;
-      else if(nm==='insuranceType') S.insuranceType=inp.value;
-      else if(nm==='abaHours') S.abaHours=inp.value;
-      else if(nm==='depressionSafety') S.depressionSafety=inp.value;
-      else if(nm==='therapyStatus_slp') S.therapyStatus.slp=inp.value;
-      else if(nm==='therapyStatus_ot') S.therapyStatus.ot=inp.value;
-      else if(nm==='therapyStatus_aba') S.therapyStatus.aba=inp.value;
-      else if(nm==='therapyStatus_pt') S.therapyStatus.pt=inp.value;
+      // (rationale for cogDataSource / adaptProfile bridge re-fire — and the D4 reversal it
+      // depends on — lives in the comment block on bridgeCogProfileToSpecifier and in
+      // branching-logic.md §11 PR-J entry. The handlers themselves are extracted above.)
+      else if(nm==='cogDataSource'){S.cogDataSource=inp.value;onCogDataSourceChange();}
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;onAdaptProfileChange();}
+      else if(nm==='diagStatus'){S.diagStatus=inp.value;onDiagStatusChange();}
+      else if(nm==='dxEvalPath'){S.dxEvalPath=inp.value;onDxEvalPathChange();}
+      // Note: 15 simple scalar branches removed — they now flow through the data-bind
+      // path above (asdLevelSC, asdLevelRRB, dysmorphism, regressionTiming, pronouns,
+      // schoolPlacement, schoolDoc, visitType, insuranceType, abaHours, depressionSafety,
+      // therapyStatus.slp/ot/aba/pt). See data-bind="..." attributes on those inputs.
       syncABATargetsFromNeeds();
       syncSchoolSvcFromNeeds();
       render();
@@ -5345,16 +5685,13 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
         }
       } else {
-        const m={specifiers:S.specifiers,criteriaA:S.criteriaA,criteriaB:S.criteriaB,
-          needsComm:S.needsComm,needsAdaptive:S.needsAdaptive,needsBehavior:S.needsBehavior,
-          needsSocial:S.needsSocial,needsSensory:S.needsSensory,
-          needsMotor:S.needsMotor,comorbid:S.comorbid,schoolSvc:S.schoolSvc,safety:S.safety,ag:S.ag,
-          teacherMaterials:S.teacherMaterials,abaSetting:S.abaSetting,abaTargets:S.abaTargets,
-          priorTesting:S.priorTesting,
-          sleepFactors:S.sleepFactors,pfdDomains:S.pfdDomains,
-          arfidMechanism:S.arfidMechanism,arfidImpact:S.arfidImpact,
-          socialWorkReasons:S.socialWorkReasons};
-        if(m[k]) inp.checked?m[k].add(v):m[k].delete(v);
+        // P3 cleanup: dynamic Set lookup. Looks up S[k] and only dispatches add/delete if
+        // it's actually a Set instance. Replaces the prior hardcoded `m={specifiers:S.specifiers,
+        // criteriaA:S.criteriaA, ...}` map of 22 entries that had to be updated every time a
+        // new Set field was added to S. The instanceof check fails closed — a stray data-key
+        // pointing at a scalar field silently does nothing rather than crashing or coercing.
+        const set = S[k];
+        if(set instanceof Set) inp.checked ? set.add(v) : set.delete(v);
         // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
         //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
         //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND
