@@ -1315,11 +1315,18 @@ const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaire
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
-// Cluster pathway summary — single source of truth shared by the pathway pill (#pathwayPill)
-// AND any future consumer that needs a label-free read of the implied downstream specifier.
-// Mirrors bridgeCogProfileToSpecifier()'s decision tree (confirmableId / confirmableGdd /
-// bifSpecifierAllowed) so the pill text never contradicts the auto-bridged specifier label.
-// Returns null when no cogProfile is selected (pill stays hidden).
+// Cluster pathway summary — SINGLE SOURCE OF TRUTH for both the pathway pill (#pathwayPill)
+// AND the bridgeCogProfileToSpecifier() auto-bridge decision. Each return carries:
+//   - specKey: the specifier checkbox key the bridge should auto-check (null = no auto-bridge,
+//     used for BIF [intentionally never auto-bridged per Greenspan 2017] and 'unknown')
+//   - variant: CSS class for the pill (pp-confirmed / pp-suspected / pp-bif / pp-typical / '')
+//   - prefix: pill prefix label ('Pathway')
+//   - text:   pill body text
+// PR-J (clinical-council reopens D4): the bridge now re-fires on adaptProfile changes and
+// consumes specKey from this function, so the pill and the auto-bridged specifier checkbox
+// can never disagree. The original D4 concern (surprise specifier flip from far-away
+// control) is neutralized because the pill renders the resulting state in the same render
+// frame, making the change visible at the clinician's focus rather than hidden 200px below.
 function currentClinicalPathway(){
   const cog = S.cogProfile;
   if(!cog) return null;
@@ -1328,18 +1335,22 @@ function currentClinicalPathway(){
     const sev = cog==='id_mild'?'Mild':cog==='id_moderate'?'Moderate':'Severe';
     const confirmed = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
     return confirmed
-      ? {variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
-      : {variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
+      ? {specKey:'withID',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
+      : {specKey:'withSuspectedID', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
   }
   if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cog)){
     const sev = cog==='gdd_mild'?'mild':cog==='gdd_moderate'?'moderate':cog==='gdd_severe'?'severe':'';
     const label = sev ? `${sev.charAt(0).toUpperCase()+sev.slice(1)} Global Developmental Delay` : 'Global Developmental Delay (unspecified severity)';
     const confirmed = cogSourceSupportsConfirmation();
     return confirmed
-      ? {variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${label}`}
-      : {variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${label} — awaiting comprehensive developmental battery`};
+      ? {specKey:'withGDD',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${label}`}
+      : {specKey:'withSuspectedGDD', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${label} — awaiting comprehensive developmental battery`};
   }
   if(cog==='borderline'){
+    // BIF intentionally has specKey:null — withBIF is never auto-bridged (no withSuspectedBIF
+    // and no data-source confirmation pathway for BIF; bridging would send a "the tool thinks
+    // this fits" signal unsupported by literature, Greenspan 2017). Clinician checks withBIF
+    // manually via the gate at toggleBifSpecifierGate().
     const allowed = bifSpecifierAllowed();
     const qual = S.cogDataSource==='priorExternal' ? ' (per prior outside evaluation)'
                : S.cogDataSource==='comprehensive' ? ' (current battery)'
@@ -1347,16 +1358,20 @@ function currentClinicalPathway(){
                : S.cogDataSource==='clinical' ? ' (clinical impression)'
                : '';
     return allowed
-      ? {variant:'pp-bif', prefix:'Pathway', text:`Borderline Intellectual Functioning (R41.83)${qual}`}
-      : {variant:'pp-bif', prefix:'Pathway', text:'Borderline considered — pick a Cognitive Data Source to support the BIF call'};
+      ? {specKey:null, variant:'pp-bif', prefix:'Pathway', text:`Borderline Intellectual Functioning (R41.83)${qual}`}
+      : {specKey:null, variant:'pp-bif', prefix:'Pathway', text:'Borderline considered — pick a Cognitive Data Source to support the BIF call'};
   }
   if(['lowAverage','average','aboveAverage','superior','verySuperior'].includes(cog)){
     const range = cog==='lowAverage'?'low-average':cog==='average'?'average':cog==='aboveAverage'?'high-average':cog==='superior'?'superior':'very superior / gifted';
+    // Young (toddler/preschool) → withoutGDD (DSM-5 ID criteria don't apply under age 5).
+    // Older → withoutID.
+    const specKey = young ? 'withoutGDD' : 'withoutID';
     const labelKey = young ? 'GDD' : 'ID';
-    return {variant:'pp-typical', prefix:'Pathway', text:`Cognitive ${range} — without ${labelKey}`};
+    return {specKey, variant:'pp-typical', prefix:'Pathway', text:`Cognitive ${range} — without ${labelKey}`};
   }
   if(cog==='unknown'){
-    return {variant:'', prefix:'Pathway', text:'Cognitive status under evaluation — specifier deferred'};
+    // Unknown → no specifier; clinician decides downstream after evaluation completes.
+    return {specKey:null, variant:'', prefix:'Pathway', text:'Cognitive status under evaluation — specifier deferred'};
   }
   return null;
 }
@@ -4664,37 +4679,25 @@ function bridgeCogProfileToSpecifier(cogVal){
     const cb=document.querySelector(`input[data-key="specifiers"][value="${k}"]`);
     if(cb) cb.checked=false;
   });
-  let toCheck=null;
-  // ID confirmation requires the full predicate — DSM-5-TR ID criteria mandate
-  // BOTH IQ deficit AND adaptive deficit AND onset in developmental period.
-  // The tool enforces this via cogSourceSupportsConfirmation + adaptive-impaired
-  // + standardized-adaptive evidence.
-  //
-  // GDD (F88) confirmation is intentionally LESS strict. F88 is used when ID
-  // cannot be reliably assessed (typically under 5); adaptive deficits are
-  // typical but not strictly required by DSM-5-TR or AACAP. A comprehensive
-  // developmental battery (e.g., Bayley-4 which includes cognitive + adaptive
-  // subscales, or Mullen, Griffiths, DAYC-2) is sufficient on its own. The
-  // adaptive section continues to inform downstream prose but no longer gates
-  // the confirmed-vs-suspected GDD bridge. (PR-G R2.1; clinical-council reopens
-  // — revisits the PR-C-era assumption that ID and GDD share a predicate.)
-  const confirmableId  = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
-  const confirmableGdd = cogSourceSupportsConfirmation();
-  if(['id_mild','id_moderate','id_severe'].includes(cogVal)) toCheck = confirmableId ? 'withID' : 'withSuspectedID';
-  else if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cogVal)) toCheck = confirmableGdd ? 'withGDD' : 'withSuspectedGDD';
-  // BIF is intentionally NOT auto-bridged. There is no `withSuspectedBIF` and no data-source
-  // confirmation pathway for BIF; bridging would send a "the tool thinks this fits" signal
-  // unsupported by literature (Greenspan 2017). The clinician selects `borderline` here to
-  // record their assessment; the withBIF specifier (line ~673) must be checked manually.
-  // Do NOT re-add an `else if(cogVal==='borderline')` branch here.
-  else if(['average','aboveAverage','superior','verySuperior','lowAverage'].includes(cogVal)){
-    // For toddler/preschool, the parallel "without GDD" specifier is the conceptually-correct
-    // choice — DSM-5 ID criteria don't apply under age 5; GDD is the relevant developmental
-    // category. Older ages use withoutID.
-    const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
-    toCheck = young ? 'withoutGDD' : 'withoutID';
-  }
-  // cogVal==='unknown' → leave all unchecked; clinician decides
+  // PR-J β: the specifier-key derivation is delegated to currentClinicalPathway()
+  // (defined near line 1318) so the bridge and the pathway pill share a single source
+  // of truth. The predicate encodes:
+  //   - ID tiers   → confirmableId  (full DSM-5/AAIDD predicate: comprehensive source +
+  //                  formally-impaired adaptive + standardized adaptive evidence)
+  //   - GDD tiers  → confirmableGdd (PR-G R2.1: comprehensive developmental battery alone;
+  //                  adaptive is informative but not strictly required per DSM-5/AACAP)
+  //   - BIF        → specKey:null (intentionally never auto-bridged; Greenspan 2017)
+  //   - normal-range → withoutGDD (young) or withoutID (older), per the DSM-5 ID-under-5
+  //                  applicability rule
+  //   - unknown    → specKey:null (clinician decides)
+  // CAUTION: currentClinicalPathway() reads S.cogProfile (not the cogVal argument). When
+  // the bridge is called with cogVal !== S.cogProfile (e.g., during the change handler
+  // transition between old and new selection), S.cogProfile has already been updated by
+  // the caller (see the cogProfile change handler at ~line 5060 which sets S.cogProfile
+  // before calling bridgeCogProfileToSpecifier(inp.value)). The cogVal argument is
+  // retained for readability + age-cleanup teardown paths that pass '' to clear.
+  const pathway = currentClinicalPathway();
+  const toCheck = pathway?.specKey || null;
   if(toCheck){
     S.specifiers.add(toCheck);
     const cb=document.querySelector(`input[data-key="specifiers"][value="${toCheck}"]`);
@@ -5095,11 +5098,17 @@ document.addEventListener('DOMContentLoaded',()=>{
         bridgeCogProfileToSpecifier(inp.value);
         toggleCogDataSourceVisibility();
       }
-      // cogDataSource and adaptiveStandardized re-fire the bridge because they are direct inputs
-      // to the suspected→confirmed upgrade decision; pre-existing adaptProfile does NOT re-fire
-      // (per council D4 — avoid surprise specifier flips from far-away controls).
+      // cogDataSource, adaptiveStandardized, AND adaptProfile all re-fire the bridge because
+      // all three are inputs to the suspected→confirmed upgrade decision (per the confirmableId
+      // predicate in currentClinicalPathway). PR-J reopens prior council D4 ("avoid surprise
+      // specifier flips from far-away controls") — the rationale for D4 was that an automatic
+      // flip in the specifier checkbox 200px below the clinician's focus would feel like the
+      // tool moving things behind their back. PR-I C2 introduced the pathway pill at the top
+      // of the cluster, which renders the bridge result in the same render frame. The flip is
+      // now visible at the focal point rather than hidden, neutralizing the D4 concern.
+      // [clinical-council reopens D4 — see docs/branching-logic.md §11 PR-J entry]
       else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
-      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;toggleBifAdaptiveCrossCheck();}
+      else if(nm==='adaptProfile'){S.adaptProfile=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}
       else if(nm==='dysmorphism') S.dysmorphism=inp.value;
       else if(nm==='regressionTiming') S.regressionTiming=inp.value;
       else if(nm==='pronouns') S.pronouns=inp.value;
