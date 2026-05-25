@@ -481,9 +481,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <div id="visitTypeRow" style="margin-top:7px">
       <span class="dx-banner-label dx-banner-label-vt">Visit Type <span style="font-size:9px;font-weight:400;opacity:.7">(affects note opening)</span></span>
       <div class="radio-grid">
-        <label class="r-opt"><input type="radio" name="visitType" value="initial">Initial evaluation</label>
-        <label class="r-opt"><input type="radio" name="visitType" value="reeval">Re-evaluation</label>
-        <label class="r-opt"><input type="radio" name="visitType" value="followup">Follow-up</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="initial">Initial evaluation</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="reeval">Re-evaluation</label>
+        <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="followup">Follow-up</label>
       </div>
     </div>
   </div>
@@ -507,10 +507,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Pronouns</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="pronouns" value="he">He / Him</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="she">She / Her</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="they">They / Them</label>
-          <label class="r-opt"><input type="radio" name="pronouns" value="">Not specified</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="he">He / Him</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="she">She / Her</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="they">They / Them</label>
+          <label class="r-opt"><input type="radio" name="pronouns" data-bind="pronouns" value="">Not specified</label>
         </div>
         <div class="pronoun-hint">Used in note narrative. Leave unspecified to use "the child / the individual."</div>
       </div>
@@ -756,9 +756,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="field-group">
           <span class="field-label">Severity — Social Communication</span>
           <div class="radio-grid">
-            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" value="1">Level 1</label>
-            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" value="2">Level 2</label>
-            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" value="3">Level 3</label>
+            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="1">Level 1</label>
+            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="2">Level 2</label>
+            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationSCField" class="strengths-area" placeholder="Justification for SC level (optional) — e.g., requires adult prompting for all social initiations; responses to peers consistently atypical..." style="min-height:36px;margin-top:5px"></textarea>
           <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -766,9 +766,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="field-group">
           <span class="field-label">Severity — Restricted / Repetitive Behaviors</span>
           <div class="radio-grid">
-            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" value="1">Level 1</label>
-            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" value="2">Level 2</label>
-            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" value="3">Level 3</label>
+            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="1">Level 1</label>
+            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="2">Level 2</label>
+            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationRRBField" class="strengths-area" placeholder="Justification for RRB level (optional) — e.g., severe distress with any deviation from routine; stereotypies constant and disruptive across settings..." style="min-height:36px;margin-top:5px"></textarea>
           <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -954,18 +954,18 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <div class="comorbid-grp">Genetics-relevant exam findings</div>
           <div class="field-hint" style="margin:2px 0 4px;font-size:11px;color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
           <div class="radio-grid" style="margin:4px 0">
-            <label class="r-opt"><input type="radio" name="dysmorphism" value=""> No concern</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" value="suspected"> Suspected dysmorphology</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
+            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
           </div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="congenitalAnomalies"> Congenital anomalies on physical examination</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="developmentalRegression"> Documented developmental regression → genetics + neurology referral</label>
           <div id="regressionTimingRow" class="sub-options" style="display:none">
             <span class="sub-label">Regression timing</span>
             <div class="radio-grid" style="margin:2px 0 4px">
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" value="unsure"> Timing unclear from records</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
+              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
             </div>
             <div class="field-hint" style="margin:0 0 4px;font-size:11px;color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
           </div>
@@ -1001,8 +1001,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div id="depressionSafetyRow" class="sub-options" style="display:none">
           <span class="sub-label">Safety screening result</span>
           <div class="radio-grid">
-            <label class="r-opt"><input type="radio" name="depressionSafety" value="negative"> Negative</label>
-            <label class="r-opt"><input type="radio" name="depressionSafety" value="positive"> Positive</label>
+            <label class="r-opt"><input type="radio" name="depressionSafety" data-bind="depressionSafety" value="negative"> Negative</label>
+            <label class="r-opt"><input type="radio" name="depressionSafety" data-bind="depressionSafety" value="positive"> Positive</label>
           </div>
         </div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
@@ -1064,24 +1064,24 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Current Placement</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="notYet">Not yet<br>in school</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="daycare">Daycare /<br>childcare</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEd">General ed</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="genEdSupport">Gen ed with support</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="selfContained">Self-contained / special ed</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="therapDay">Therapeutic day school</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="privateNoIEP">Private school<br>(no IEP)</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="privateWithIEP">Private school<br>(with district IEP svcs)</label>
-          <label class="r-opt"><input type="radio" name="schoolPlacement" value="home">Homeschool</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="notYet">Not yet<br>in school</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="daycare">Daycare /<br>childcare</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="genEd">General ed</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="genEdSupport">Gen ed with support</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="selfContained">Self-contained / special ed</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="therapDay">Therapeutic day school</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="privateNoIEP">Private school<br>(no IEP)</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="privateWithIEP">Private school<br>(with district IEP svcs)</label>
+          <label class="r-opt"><input type="radio" name="schoolPlacement" data-bind="schoolPlacement" value="home">Homeschool</label>
         </div>
       </div>
       <div class="field-group">
         <span class="field-label">IDEA / 504 Document</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="iep">IEP in place</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="iep_needed">IEP evaluation needed</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="504">504 Plan</label>
-          <label class="r-opt"><input type="radio" name="schoolDoc" value="neither">Neither / N/A</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="iep">IEP in place</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="iep_needed">IEP evaluation needed</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="504">504 Plan</label>
+          <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="neither">Neither / N/A</label>
         </div>
       </div>
       <div class="field-group">
@@ -1156,22 +1156,22 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Insurance / Payer Type</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="insuranceType" value="commercial">Commercial /<br>Private</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="medicaid">Medicaid /<br>CHIP</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="tricare">TRICARE</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="champva">ChampVA</label>
-          <label class="r-opt"><input type="radio" name="insuranceType" value="selfpay">Self-pay /<br>Uninsured</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="commercial">Commercial /<br>Private</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="medicaid">Medicaid /<br>CHIP</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="tricare">TRICARE</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="champva">ChampVA</label>
+          <label class="r-opt"><input type="radio" name="insuranceType" data-bind="insuranceType" value="selfpay">Self-pay /<br>Uninsured</label>
         </div>
       </div>
 
       <div class="field-group">
         <span class="field-label">Requested ABA Intensity</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="abaHours" value="10">10 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="15">15 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="20">20 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="25">25 hr/wk</label>
-          <label class="r-opt"><input type="radio" name="abaHours" value="30plus">30+ hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="10">10 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="15">15 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="20">20 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="25">25 hr/wk</label>
+          <label class="r-opt"><input type="radio" name="abaHours" data-bind="abaHours" value="30plus">30+ hr/wk</label>
         </div>
       </div>
 
@@ -1227,31 +1227,31 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div style="display:flex;flex-direction:column;gap:5px">
           <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_slp" value="increase">Increase intensity</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="increase">Increase intensity</label>
           </div>
           <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_ot" value="increase">Increase intensity</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="increase">Increase intensity</label>
           </div>
           <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_aba" value="increase">Increase intensity</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="increase">Increase intensity</label>
           </div>
           <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="" checked>New referral</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="continue">Continue</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="revise">Goals need revision</label>
-            <label class="r-opt"><input type="radio" name="therapyStatus_pt" value="increase">Increase intensity</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="" checked>New referral</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="continue">Continue</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="revise">Goals need revision</label>
+            <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="increase">Increase intensity</label>
           </div>
         </div>
       </div>
@@ -1364,6 +1364,27 @@ const S = {
     psychiatry:'auto',gi:'auto',sleep_ref:'auto',audiology:'auto',qbtest:'auto',
     earlySteps:'auto',fdlrs:'auto',eeg:'auto',card:'auto'}
 };
+
+// ─── PATH HELPERS (data-bind support) ────────────────────────────────────────
+// Walk a dotted path like "therapyStatus.slp" against S — used by the data-bind
+// declarative-binding layer so radios can express their state mutation via an HTML
+// attribute (data-bind="therapyStatus.slp") instead of needing an entry in the
+// giant if/else chain in the radio change handler. Inspired by the 2test parallel-
+// project pattern; see scratch/parallel-session/2test.html for full canonical
+// implementation. Phase 1+2 scope: scalar fields only. Set-membership (P3) and
+// side-effect fields (P4) keep their existing handlers.
+function setByPath(obj, path, val){
+  const keys = path.split('.');
+  let o = obj;
+  for(let i=0; i<keys.length-1; i++){
+    if(typeof o[keys[i]] !== 'object' || o[keys[i]] === null) o[keys[i]] = {};
+    o = o[keys[i]];
+  }
+  o[keys[keys.length-1]] = val;
+}
+function getByPath(obj, path){
+  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const hasADHD = () => S.comorbid.has('adhd_combined')||S.comorbid.has('adhd_inattentive')||S.comorbid.has('adhd_hyperactive')||S.comorbid.has('adhd_suspected');
@@ -5234,34 +5255,36 @@ document.addEventListener('DOMContentLoaded',()=>{
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('sel');
       const nm=inp.name;
+      // data-bind: if a radio declares its state path via data-bind="path.to.field",
+      // the deselect (re-click) path clears that field generically. Fields with side
+      // effects beyond a state write keep their explicit branch below.
+      if(inp.dataset.bind){
+        setByPath(S, inp.dataset.bind, '');
+        render();
+        return;
+      }
       if(nm==='ageGroup'){S.ageGroup='';updateAgeBasedVisibility();bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='langLevel') S.langLevel='';
       else if(nm==='cogProfile'){S.cogProfile='';bridgeCogProfileToSpecifier('');toggleCogDataSourceVisibility();}
       else if(nm==='cogDataSource'){S.cogDataSource='';bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='adaptProfile'){S.adaptProfile='';bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}/* PR-K: mirror PR-J adaptProfile change-handler — deselect path must also re-fire bridge so pill+spec stay convergent */
-      else if(nm==='pronouns') S.pronouns='';
       else if(nm==='diagStatus'){S.diagStatus='';document.getElementById('levelGroup').style.display='none';}
-      else if(nm==='asdLevelSC') S.asdLevelSC='';
-      else if(nm==='asdLevelRRB') S.asdLevelRRB='';
-      else if(nm==='schoolPlacement') S.schoolPlacement='';
-      else if(nm==='schoolDoc') S.schoolDoc='';
       else if(nm==='dxEvalPath'){S.dxEvalPath='';updateSectionHeaders();}
-      else if(nm==='visitType') S.visitType='';
-      else if(nm==='insuranceType') S.insuranceType='';
-      else if(nm==='abaHours') S.abaHours='';
-      else if(nm==='depressionSafety') S.depressionSafety='';
-      else if(nm==='therapyStatus_slp') S.therapyStatus.slp='';
-      else if(nm==='therapyStatus_ot') S.therapyStatus.ot='';
-      else if(nm==='therapyStatus_aba') S.therapyStatus.aba='';
-      else if(nm==='therapyStatus_pt') S.therapyStatus.pt='';
-      else if(nm==='dysmorphism') S.dysmorphism='';
-      else if(nm==='regressionTiming') S.regressionTiming='';
       render();
     });
 
     inp.addEventListener('change',()=>{
       const nm=inp.name;
       document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
+      // data-bind: declarative scalar write. Fields with side effects (bridge, visibility
+      // toggles, syncs) keep their explicit branch below and do NOT carry data-bind.
+      if(inp.dataset.bind){
+        setByPath(S, inp.dataset.bind, inp.value);
+        syncABATargetsFromNeeds();
+        syncSchoolSvcFromNeeds();
+        render();
+        return;
+      }
       // ageGroup change: also re-fire bridge so the no-impairment specifier (withoutID vs
       // withoutGDD) resynchronizes with the new age category. Without this, switching from
       // schoolAge to preschool leaves withoutID stale (should be withoutGDD), and the inverse
@@ -5306,23 +5329,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       // [clinical-council reopens D4 — see docs/branching-logic.md §11 PR-J entry]
       else if(nm==='cogDataSource'){S.cogDataSource=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleCogDataSourceVisibility();}
       else if(nm==='adaptProfile'){S.adaptProfile=inp.value;bridgeCogProfileToSpecifier(S.cogProfile);toggleBifAdaptiveCrossCheck();}
-      else if(nm==='dysmorphism') S.dysmorphism=inp.value;
-      else if(nm==='regressionTiming') S.regressionTiming=inp.value;
-      else if(nm==='pronouns') S.pronouns=inp.value;
       else if(nm==='diagStatus'){S.diagStatus=inp.value;document.getElementById('levelGroup').style.display=inp.value==='confirmed'?'':'none';}
-      else if(nm==='asdLevelSC'){S.asdLevelSC=inp.value;}
-      else if(nm==='asdLevelRRB'){S.asdLevelRRB=inp.value;}
-      else if(nm==='schoolPlacement') S.schoolPlacement=inp.value;
-      else if(nm==='schoolDoc') S.schoolDoc=inp.value;
       else if(nm==='dxEvalPath') S.dxEvalPath=inp.value;
-      else if(nm==='visitType') S.visitType=inp.value;
-      else if(nm==='insuranceType') S.insuranceType=inp.value;
-      else if(nm==='abaHours') S.abaHours=inp.value;
-      else if(nm==='depressionSafety') S.depressionSafety=inp.value;
-      else if(nm==='therapyStatus_slp') S.therapyStatus.slp=inp.value;
-      else if(nm==='therapyStatus_ot') S.therapyStatus.ot=inp.value;
-      else if(nm==='therapyStatus_aba') S.therapyStatus.aba=inp.value;
-      else if(nm==='therapyStatus_pt') S.therapyStatus.pt=inp.value;
+      // Note: 15 simple scalar branches removed — they now flow through the data-bind
+      // path above (asdLevelSC, asdLevelRRB, dysmorphism, regressionTiming, pronouns,
+      // schoolPlacement, schoolDoc, visitType, insuranceType, abaHours, depressionSafety,
+      // therapyStatus.slp/ot/aba/pt). See data-bind="..." attributes on those inputs.
       syncABATargetsFromNeeds();
       syncSchoolSvcFromNeeds();
       render();
