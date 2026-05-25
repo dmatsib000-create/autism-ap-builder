@@ -5382,16 +5382,13 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
         }
       } else {
-        const m={specifiers:S.specifiers,criteriaA:S.criteriaA,criteriaB:S.criteriaB,
-          needsComm:S.needsComm,needsAdaptive:S.needsAdaptive,needsBehavior:S.needsBehavior,
-          needsSocial:S.needsSocial,needsSensory:S.needsSensory,
-          needsMotor:S.needsMotor,comorbid:S.comorbid,schoolSvc:S.schoolSvc,safety:S.safety,ag:S.ag,
-          teacherMaterials:S.teacherMaterials,abaSetting:S.abaSetting,abaTargets:S.abaTargets,
-          priorTesting:S.priorTesting,
-          sleepFactors:S.sleepFactors,pfdDomains:S.pfdDomains,
-          arfidMechanism:S.arfidMechanism,arfidImpact:S.arfidImpact,
-          socialWorkReasons:S.socialWorkReasons};
-        if(m[k]) inp.checked?m[k].add(v):m[k].delete(v);
+        // P3 cleanup: dynamic Set lookup. Looks up S[k] and only dispatches add/delete if
+        // it's actually a Set instance. Replaces the prior hardcoded `m={specifiers:S.specifiers,
+        // criteriaA:S.criteriaA, ...}` map of 22 entries that had to be updated every time a
+        // new Set field was added to S. The instanceof check fails closed — a stray data-key
+        // pointing at a scalar field silently does nothing rather than crashing or coercing.
+        const set = S[k];
+        if(set instanceof Set) inp.checked ? set.add(v) : set.delete(v);
         // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
         //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
         //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND
