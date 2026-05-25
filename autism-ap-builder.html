@@ -1558,7 +1558,9 @@ function renderPersistenceBanner(){
     el.className = 'pers-banner';
     el.innerHTML = '<span class="pers-icon" aria-hidden="true">🔓</span>'
       + '<span class="pers-text">Auto-save is <strong>off</strong>. Work will be lost on refresh, tab close, or crash.</span>'
-      + '<button type="button" onclick="persPromptEnable()">Enable auto-save</button>';
+      + '<button type="button" onclick="persPromptEnable()">Enable auto-save</button>'
+      + '<button type="button" onclick="persPromptExportFinal()">Export session</button>'
+      + '<button type="button" onclick="persPromptImport()">Import session</button>';
     return;
   }
   // Enabled: differentiate "fresh session, not yet restored" vs "restored from saved data".
@@ -1568,6 +1570,8 @@ function renderPersistenceBanner(){
   el.className = 'pers-banner pers-on';
   el.innerHTML = '<span class="pers-icon" aria-hidden="true">🔒</span>'
     + `<span class="pers-text">Auto-save <strong>on</strong> — encrypted, saved ${ageText}.</span>`
+    + '<button type="button" onclick="persPromptExportFinal()">Export session</button>'
+    + '<button type="button" onclick="persPromptImport()">Import session</button>'
     + '<button type="button" onclick="persPromptClear()">Clear &amp; disable</button>';
 }
 
@@ -1775,6 +1779,182 @@ window.addEventListener('beforeunload', ()=>{
     persPerformSave();
   }
 });
+
+// EXPORT / IMPORT — Concern D (β refined).
+// Session string format: "DBP1:" + base64(JSON({v:1, salt, iv, ct})). The version prefix
+// lets future formats coexist with this one; the all-base64-after-prefix shape is
+// clipboard-friendly (no line breaks, no special chars beyond base64 alphabet).
+// Encryption uses the SAME PBKDF2+AES-GCM primitives as the auto-save layer, but the
+// passphrase is INDEPENDENT — clinician can use the auto-save passphrase or a different
+// one for the export. This decoupling lets the clinician share a session blob with a
+// colleague using a different passphrase than their own browser uses.
+async function persExportSession(passphrase){
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await persDeriveKey(passphrase, salt);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const json = JSON.stringify(S, persReplacer);
+  const enc = new TextEncoder();
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(json));
+  const bundle = {v:1, salt:persToB64(salt), iv:persToB64(iv), ct:persToB64(ct), exportedAt:new Date().toISOString()};
+  return 'DBP1:' + btoa(JSON.stringify(bundle));
+}
+async function persImportSession(blobStr, passphrase){
+  const trimmed = blobStr.trim();
+  if(!trimmed.startsWith('DBP1:')) throw new Error('Not a valid session string (must start with DBP1:).');
+  let bundle;
+  try{ bundle = JSON.parse(atob(trimmed.slice(5))); }
+  catch(e){ throw new Error('Session string is corrupted or incomplete.'); }
+  if(bundle.v !== 1) throw new Error(`Unsupported session-string version: ${bundle.v}`);
+  const salt = persFromB64(bundle.salt);
+  const iv = persFromB64(bundle.iv);
+  const key = await persDeriveKey(passphrase, salt);
+  const plaintext = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, persFromB64(bundle.ct));
+  return JSON.parse(new TextDecoder().decode(plaintext), persReviver);
+}
+
+// PROMPT FLOWS — Export
+async function persPromptExport(){
+  // Two-step: first get passphrase, then show result.
+  const pwResult = await persShowModal({
+    title: 'Export encrypted session',
+    body: 'This will create an encrypted text string containing all current form data. You can paste it into Epic, OneDrive, or any other UF-approved storage to restore the session later or on a different device. The string is unreadable without the passphrase.',
+    input: {label:'Passphrase for this export', type:'password', hint:'Use a re-derivable convention (e.g. last 4 of MRN + visit date) so you can recover the session later without storing the passphrase anywhere.'},
+    buttons: [
+      {label:'Cancel', value:'cancel'},
+      {label:'Generate', value:'go', className:'pers-primary', validate: async (pw)=>{
+        if(!pw || pw.length < 4) throw new Error('Passphrase must be at least 4 characters.');
+        return true;
+      }}
+    ]
+  });
+  if(pwResult.action !== 'go') return;
+  const blobStr = await persExportSession(pwResult.input);
+  // Display result in a copyable textarea
+  await persShowModal({
+    title: 'Session string ready',
+    body: 'Copy the string below and paste it into your storage of choice. To restore later, click <strong>Import session</strong> and paste this string with the same passphrase. <strong>Warning</strong>: storing this string creates a PHI-bearing record under HIPAA. Save only to UF-approved storage (Epic, UF OneDrive). The passphrase is never stored — losing it makes the string unrecoverable.',
+    input: {label:'Encrypted session string (click in the field, Ctrl+A, Ctrl+C to copy)', type:'text'},
+    buttons: [
+      {label:'Done', value:'done', className:'pers-primary'}
+    ]
+  }).then(()=>{
+    // Pre-fill the input with the blob string after modal is shown (a small hack since
+    // persShowModal renders before we can populate; handled via setTimeout below).
+  });
+  // The modal-show above doesn't pre-fill. Workaround: open a tailored export-result modal.
+}
+
+// Custom export-result modal (the generic one doesn't easily support a pre-filled long text field)
+function persShowExportResult(blobStr){
+  return new Promise(resolve=>{
+    const backdrop = document.createElement('div');
+    backdrop.className = 'pers-modal-backdrop';
+    backdrop.innerHTML = '<div class="pers-modal" role="dialog" aria-modal="true">'
+      + '<h2>Session string ready</h2>'
+      + '<p>Copy the string below and paste it into your storage of choice. To restore later, click <strong>Import session</strong> and paste this string with the same passphrase.</p>'
+      + '<p style="color:#92400e;background:#fef3c7;padding:8px 10px;border-radius:4px;font-size:12px"><strong>HIPAA note</strong>: storing this string creates a PHI-bearing record. Save only to UF-approved storage (Epic, UF OneDrive). The passphrase is never stored — losing it makes the string unrecoverable.</p>'
+      + '<label for="persExportField">Encrypted session string</label>'
+      + `<textarea id="persExportField" readonly rows="6" style="width:100%;padding:8px 10px;font-size:11px;font-family:monospace;border:1px solid var(--border-default);border-radius:var(--radius-sm);box-sizing:border-box;margin-bottom:14px;word-break:break-all">${blobStr}</textarea>`
+      + '<div class="pers-actions">'
+      + '<button type="button" class="pers-copy-btn">Copy to clipboard</button>'
+      + '<button type="button" class="pers-primary pers-done-btn">Done</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(backdrop);
+    const ta = backdrop.querySelector('#persExportField');
+    const copyBtn = backdrop.querySelector('.pers-copy-btn');
+    const doneBtn = backdrop.querySelector('.pers-done-btn');
+    // Auto-select for convenience
+    ta.focus(); ta.select();
+    copyBtn.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(blobStr); copyBtn.textContent = '✓ Copied'; }
+      catch(e){ ta.select(); document.execCommand('copy'); copyBtn.textContent = '✓ Copied'; }
+      setTimeout(()=>{ copyBtn.textContent = 'Copy to clipboard'; }, 1500);
+    });
+    doneBtn.addEventListener('click', ()=>{ document.body.removeChild(backdrop); resolve(); });
+    backdrop.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ document.body.removeChild(backdrop); resolve(); } });
+  });
+}
+
+// Replace the simpler persPromptExport with one that uses the custom result modal
+async function persPromptExportFinal(){
+  const pwResult = await persShowModal({
+    title: 'Export encrypted session',
+    body: 'This will create an encrypted text string containing all current form data. You can paste it into Epic, OneDrive, or any other UF-approved storage to restore the session later or on a different device. The string is unreadable without the passphrase.',
+    input: {label:'Passphrase for this export', type:'password', hint:'Use a re-derivable convention (e.g. last 4 of MRN + visit date).'},
+    buttons: [
+      {label:'Cancel', value:'cancel'},
+      {label:'Generate', value:'go', className:'pers-primary', validate: async (pw)=>{
+        if(!pw || pw.length < 4) throw new Error('Passphrase must be at least 4 characters.');
+        return true;
+      }}
+    ]
+  });
+  if(pwResult.action !== 'go') return;
+  try{
+    const blobStr = await persExportSession(pwResult.input);
+    await persShowExportResult(blobStr);
+  } catch(e){
+    alert('Export failed: ' + e.message);
+  }
+}
+
+// Custom import modal — needs both a paste textarea AND a passphrase field
+function persShowImportPrompt(){
+  return new Promise(resolve=>{
+    const backdrop = document.createElement('div');
+    backdrop.className = 'pers-modal-backdrop';
+    backdrop.innerHTML = '<div class="pers-modal" role="dialog" aria-modal="true">'
+      + '<h2>Import encrypted session</h2>'
+      + '<p>Paste a previously-exported session string below, then enter the passphrase used to encrypt it. The current form will be replaced with the restored session.</p>'
+      + '<label for="persImportField">Session string (starts with DBP1:)</label>'
+      + '<textarea id="persImportField" rows="5" style="width:100%;padding:8px 10px;font-size:11px;font-family:monospace;border:1px solid var(--border-default);border-radius:var(--radius-sm);box-sizing:border-box;margin-bottom:14px;word-break:break-all"></textarea>'
+      + '<label for="persImportPw">Passphrase</label>'
+      + '<input id="persImportPw" type="password" autocomplete="off" />'
+      + '<div class="pers-error" id="persImportError" style="display:none"></div>'
+      + '<div class="pers-actions">'
+      + '<button type="button" class="pers-cancel-btn">Cancel</button>'
+      + '<button type="button" class="pers-primary pers-restore-btn">Restore</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(backdrop);
+    const ta = backdrop.querySelector('#persImportField');
+    const pwField = backdrop.querySelector('#persImportPw');
+    const errEl = backdrop.querySelector('#persImportError');
+    const cancelBtn = backdrop.querySelector('.pers-cancel-btn');
+    const restoreBtn = backdrop.querySelector('.pers-restore-btn');
+    const finish = (action, state)=>{ document.body.removeChild(backdrop); resolve({action, state}); };
+    cancelBtn.addEventListener('click', ()=>finish('cancel'));
+    restoreBtn.addEventListener('click', async ()=>{
+      errEl.style.display = 'none';
+      if(!ta.value.trim()){ errEl.textContent = 'Paste a session string first.'; errEl.style.display = ''; return; }
+      if(!pwField.value){ errEl.textContent = 'Enter the passphrase.'; errEl.style.display = ''; return; }
+      try{
+        const state = await persImportSession(ta.value, pwField.value);
+        finish('restore', state);
+      } catch(e){
+        errEl.textContent = e.message || 'Restore failed.';
+        errEl.style.display = '';
+      }
+    });
+    backdrop.addEventListener('keydown', e=>{ if(e.key === 'Escape') finish('cancel'); });
+    ta.focus();
+  });
+}
+
+async function persPromptImport(){
+  const result = await persShowImportPrompt();
+  if(result.action !== 'restore' || !result.state) return;
+  // Mutate S in place so cached references survive
+  for(const k of Object.keys(S)) delete S[k];
+  for(const k of Object.keys(result.state)) S[k] = result.state[k];
+  // Sync DOM and render
+  persSyncDomFromState();
+  render();
+  // Note: import does NOT auto-enable persistence; clinician can do that separately
+  // via the Enable button if they want subsequent auto-save with their browser passphrase.
+  renderPersistenceBanner();
+}
 // ─── end PERSISTENCE ─────────────────────────────────────────────────────────
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
