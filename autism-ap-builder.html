@@ -100,19 +100,53 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .field-group:last-child{margin-bottom:0}
 .field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
 .field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
+/* Subordinate label for nested clinical-modifier groups (e.g. Cognitive Data
+   Source under Cognitive Profile). Demoted from .field-label via font-weight
+   + letter-spacing only — color held at --gray-600 so 8.4:1 AA contrast on
+   white stays preserved. Do NOT swap in .field-sublabel here; .field-sublabel
+   uses --gray-400 which fails AA at 10.5px (3.7:1) — flagged as spawn-task. */
+.field-nested-label{font-size:11px;font-weight:500;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px;display:block}
+/* Wrapper for a nested clinical-modifier field-group. Encodes the parent-child
+   relationship via three orthogonal cues: indent (14px from container left),
+   thin left border (2px gray-200 connector to the parent field above), and
+   the typography demotion via the inner .field-nested-label. Conditionally-
+   hidden nested groups (e.g. #cogDataSourceGroup) still toggle style.display
+   between 'none' and '' — this class's layout takes over when visible. */
+.field-nested{margin:12px 0 0 14px;padding-left:10px;border-left:3px solid var(--gray-200,#e5e7eb)}
+/* Restore peer-rhythm transition after a nested-modifier wrapper. Fires
+   when a .field-group is preceded by a peer .field-group that ENDS with a
+   .field-nested wrapper — i.e., the immediately-prior peer has a nested
+   modifier dangling at the bottom. Without this, the nested block abuts
+   the next peer (Adaptive Behavior abutting nested Cognitive Data Source)
+   directly and the visual "back to peer level" cue is muddled. The :has()
+   form is required because the nested wrapper lives inside its parent
+   peer, not as a sibling of the next peer. */
+.field-group:has(> .field-nested:last-child) + .field-group{margin-top:16px}
+/* Cluster wrapper for the cognitive + adaptive diagnostic-evidence group.
+   Positions the pathway pill (focal-point summary) at the top so it scopes
+   the whole cluster — not just Cognitive Profile. Sticky positioning keeps
+   the pill in view while the clinician interacts with sections below it on
+   narrow screens where the cluster spans multiple viewport heights. */
+.cog-cluster{position:relative}
+.cog-cluster > .pathway-pill{position:sticky;top:8px;z-index:5;margin-bottom:8px}
 .radio-grid{display:flex;flex-wrap:wrap;gap:3px}
-/* Subgroup layout for clinically-clustered radio options (e.g. Cognitive Profile's
-   ID/GDD/BIF/normal-range/other tiers). Each .subgroup is a flex-wrap row within a
-   vertical .subgroup-stack; .subgroup-label sits across the full row. Replaces the
-   prior display:contents pinning that flattened these into a single grid. The
-   subgroup wrapper IDs (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are
-   preserved so the age-cleanup logic in updateAgeBasedVisibility() still resolves;
-   those handlers toggle style.display between 'none' and '' (empty string) so this
-   class's flex layout takes over when visible. */
-.subgroup-stack{display:flex;flex-direction:column;gap:6px}
-.subgroup{display:flex;flex-wrap:wrap;gap:3px;padding:6px 0 2px;border-top:1px solid var(--border-default)}
-.subgroup:first-child{border-top:none;padding-top:0}
-.subgroup-label{flex-basis:100%;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+/* ε.3 chip-strip layout for severity-ordered radio clusters (Cognitive Profile).
+   A single horizontal flex-wrap row of tier-wrappers replaces the prior boxed
+   .subgroup-stack with per-tier labels. Chips within a tier hug each other
+   (3px gap); tier-wrappers sit further apart (12px gap) and wrap as units, so
+   a tier never splits across visual rows at form-panel widths ≥~720px.
+   Honest residual: below that width (screens narrower than ~1366px) the
+   Normal range tier (5 chips, ~615px wide) exceeds the container and wraps
+   internally — graceful degradation, no clipping. Tier-wrapper IDs
+   (cogProfileIdGroup, gddCogGroup, cogProfileBifWrap) are preserved so
+   updateAgeBasedVisibility() still resolves; those handlers toggle
+   style.display between 'none' and '' (empty string) so .chip-tier's
+   display:flex takes over when visible. The .unknown-tier modifier right-
+   floats the Unknown chip to the row's far edge as a visual escape from the
+   severity continuum. */
+.chip-strip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.chip-tier{display:flex;flex-wrap:wrap;gap:3px}
+.chip-tier.unknown-tier{margin-left:auto}
 /* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
    Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
    Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
@@ -593,65 +627,81 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
       </div>
 
+      <!-- Cog/adaptive cluster: pathway pill at top scopes the whole trio
+           (Cognitive Profile + nested Cognitive Data Source + Adaptive Behavior).
+           Pill is sticky so it stays in view while clinician scrolls through
+           the cluster on narrow form-panel widths. ARIA role groups the three
+           field-groups as a single navigable region for screen readers. -->
+      <div class="cog-cluster" role="group" aria-label="Cognitive and adaptive assessment">
+      <!-- Clinical pathway pill — auto-updated by renderPathwayPill() in render().
+           Displays the downstream specifier the current cog/adaptive selections imply
+           (e.g., "Pathway: Suspected GDD — awaiting comprehensive battery"). Hidden
+           when no cogProfile is selected. Driven by currentClinicalPathway() so the
+           pill text and the auto-bridged specifier checkbox share a single source
+           of truth. Position moved from inside Cognitive Profile to the cluster
+           root so its semantic scope (all 3 sections' combined state) matches its
+           visual scope. -->
+      <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
+
       <div class="field-group">
         <span class="field-label">Cognitive Profile</span>
-        <!-- Clinical pathway pill — auto-updated by renderPathwayPill() in render().
-             Displays the downstream specifier the current cog/adaptive selections imply
-             (e.g., "Pathway: Suspected GDD — awaiting comprehensive battery"). Hidden
-             when no cogProfile is selected. Driven by currentClinicalPathway() so the
-             pill text and the auto-bridged specifier checkbox share a single source of truth. -->
-        <div class="pathway-pill" id="pathwayPill" style="display:none"></div>
-        <!-- Uneven/splinter checkbox elevated above the subgroup-stack per PR-I C5 — surfaces
+        <!-- Uneven/splinter checkbox elevated above the chip-strip per PR-I C5 — surfaces
              the modifier in the natural pre-selection scan order rather than being buried
-             below a 5-subgroup grid where it was easily missed. -->
+             below a multi-tier grid where it was easily missed. -->
         <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
         <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
           <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
           <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
-        <div class="subgroup-stack">
-          <div class="subgroup" id="cogProfileIdGroup">
-            <span class="subgroup-label">Intellectual disability</span>
+        <div class="chip-strip">
+          <div class="chip-tier" id="cogProfileIdGroup">
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_severe">Severe ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_moderate">Moderate ID</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
           </div>
-          <div class="subgroup" id="gddCogGroup">
-            <span class="subgroup-label">Global developmental delay</span>
+          <div class="chip-tier" id="gddCogGroup">
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">Mild delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">Moderate delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">Severe delays</label>
           </div>
-          <div class="subgroup" id="cogProfileBifWrap">
-            <span class="subgroup-label">Sub-threshold</span>
+          <div class="chip-tier" id="cogProfileBifWrap">
             <label class="r-opt" title="Sub-threshold for intellectual disability; clinical-attention category (R41.83). Does not meet DSM-5-TR criteria for ID. Hidden for toddler/preschool — BIF requires IQ testing, which is not reliable under age 5."><input type="radio" name="cogProfile" value="borderline">Borderline intellectual functioning (BIF)</label>
           </div>
-          <div class="subgroup">
-            <span class="subgroup-label">Normal range</span>
+          <div class="chip-tier">
             <label class="r-opt"><input type="radio" name="cogProfile" value="lowAverage">Low average</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="average">Average</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="aboveAverage">High average (110–119)</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="superior">Superior (120–129)</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="verySuperior">Very superior / gifted (130+)</label>
           </div>
-          <div class="subgroup">
-            <span class="subgroup-label">Evaluation status</span>
+          <div class="chip-tier unknown-tier">
             <label class="r-opt"><input type="radio" name="cogProfile" value="unknown">Unknown / under evaluation</label>
           </div>
         </div>
-      </div>
 
-      <!-- Cognitive Data Source — visible only when cogProfile is ID or GDD tier.
-           Drives the bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
-           Brief screener (KBIT-2R etc.) and clinical impression do NOT support confirmation
-           per DSM-5/AAIDD; comprehensive battery and prior outside evaluation do.
-           Label text inside .label-text is swapped at runtime by toggleCogDataSourceVisibility
-           based on whether the active cogProfile is in the ID tier or the GDD tier — ID-tier
-           shows IQ instruments (WISC etc.); GDD-tier shows developmental instruments
-           (Bayley, Mullen, Griffiths, DAYC-2). -->
-      <div class="field-group" id="cogDataSourceGroup" style="display:none">
-        <span class="field-label">Cognitive Data Source</span>
+      <!-- Cognitive Data Source — nested as a subordinate evidence-provenance
+           modifier under Cognitive Profile (council 2026-05-25, β ratified at
+           96.25% combined). The chips themselves remain load-bearing — they
+           drive bridgeCogProfileToSpecifier's suspected→confirmed upgrade per
+           cogSourceSupportsConfirmation() at :1440 — but the visual hierarchy
+           now reflects that this is HOW the cognitive answer was derived, not
+           a peer finding alongside it. The forcing-function for omission lives
+           in the pathway pill ("Suspected ... awaiting comprehensive battery"
+           at currentClinicalPathway :1462/:1470), which is sticky at the
+           cluster root and visible during data-source selection.
+           Visible only when cogProfile is ID or GDD tier — toggled by
+           toggleCogDataSourceVisibility which uses getElementById and is
+           DOM-position-independent.
+           Brief screener (KBIT-2R etc.) and clinical impression do NOT
+           support confirmation per DSM-5/AAIDD; comprehensive battery and
+           prior outside evaluation do. Label text inside .label-text is
+           swapped at runtime by toggleCogDataSourceVisibility based on
+           whether the active cogProfile is in the ID tier or the GDD tier —
+           ID-tier shows IQ instruments (WISC etc.); GDD-tier shows
+           developmental instruments (Bayley, Mullen, Griffiths, DAYC-2). -->
+      <div class="field-nested" id="cogDataSourceGroup" style="display:none">
+        <span class="field-nested-label">Cognitive Data Source</span>
         <div class="radio-grid">
           <span class="r-opt-wrap">
             <label class="r-opt" data-cds-key="comprehensive" title="Supports formal ID/GDD diagnosis (confirmed pathway)"><input type="radio" name="cogDataSource" value="comprehensive"><span class="label-text">Comprehensive battery</span></label>
@@ -667,7 +717,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Prior outside evaluation</span></label>
         </div>
         <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
-      </div>
+      </div><!-- /#cogDataSourceGroup (nested under Cognitive Profile) -->
+      </div><!-- /.field-group Cognitive Profile -->
 
       <div class="field-group">
         <span class="field-label">Adaptive Behavior</span>
@@ -695,7 +746,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
              prefix (via .bif-crosscheck::before) + font-weight 500. Colorblind-safe
              via icon + text + border, not color alone. -->
         <div id="bifAdaptiveCrossCheck" class="bif-crosscheck" style="display:none"></div>
-      </div>
+      </div><!-- /.field-group Adaptive Behavior -->
+      </div><!-- /.cog-cluster -->
 
       <div class="field-group">
         <span class="field-label">Identified Strengths</span>
@@ -5285,11 +5337,11 @@ function updateAgeBasedVisibility(){
     }
   }
   // ID cogProfile options — not valid for toddler/preschool (DSM-5: ID requires age ≥5 for reliable testing; use GDD)
-  // Toggle subgroup visibility. The subgroup wrappers (cogProfileIdGroup, gddCogGroup,
-  // cogProfileBifWrap) now use the .subgroup CSS class (display:flex with flex-wrap) —
+  // Toggle tier-wrapper visibility. The wrappers (cogProfileIdGroup, gddCogGroup,
+  // cogProfileBifWrap) use the .chip-tier CSS class (display:flex with flex-wrap) —
   // restore to '' (empty string) when shown so the class's flex layout takes over.
-  // Prior history: these used display:contents to flow children directly into a single
-  // .radio-grid; the visible-subgroup redesign replaced that with boxed subgroups.
+  // Prior history: ε.3 chip-strip replaced the boxed .subgroup-stack with per-tier
+  // labels; before that, display:contents flattened these into a single .radio-grid.
   const idCogGroup=document.getElementById('cogProfileIdGroup');
   if(idCogGroup){
     const hideIDCog=young&&S.ageGroup!=='';
