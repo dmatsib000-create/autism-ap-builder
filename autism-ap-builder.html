@@ -112,7 +112,16 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    the typography demotion via the inner .field-nested-label. Conditionally-
    hidden nested groups (e.g. #cogDataSourceGroup) still toggle style.display
    between 'none' and '' — this class's layout takes over when visible. */
-.field-nested{margin:12px 0 0 14px;padding-left:10px;border-left:2px solid var(--gray-200,#e5e7eb)}
+.field-nested{margin:12px 0 0 14px;padding-left:10px;border-left:3px solid var(--gray-200,#e5e7eb)}
+/* Restore peer-rhythm transition after a nested-modifier wrapper. Fires
+   when a .field-group is preceded by a peer .field-group that ENDS with a
+   .field-nested wrapper — i.e., the immediately-prior peer has a nested
+   modifier dangling at the bottom. Without this, the nested block abuts
+   the next peer (Adaptive Behavior abutting nested Cognitive Data Source)
+   directly and the visual "back to peer level" cue is muddled. The :has()
+   form is required because the nested wrapper lives inside its parent
+   peer, not as a sibling of the next peer. */
+.field-group:has(> .field-nested:last-child) + .field-group{margin-top:16px}
 /* Cluster wrapper for the cognitive + adaptive diagnostic-evidence group.
    Positions the pathway pill (focal-point summary) at the top so it scopes
    the whole cluster — not just Cognitive Profile. Sticky positioning keeps
