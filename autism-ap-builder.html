@@ -27,6 +27,24 @@
   /* Type */
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --font-serif:Georgia,'Times New Roman',Charter,serif;
+  /* Spacing scale — for padding/margin/gap. Density-tuned to existing literals;
+     8 dominant even values cover ~90% of CSS-rule spacing. Odd values (3, 5, 7,
+     9, 11) intentionally remain as literals — they're often deliberate
+     clinical-density tuning rather than rhythm errors. THIS COMMIT SWEEPS ONLY
+     `gap:`; compound multi-value padding/margin and single-direction margin/
+     padding remain as literals because paste-bound JS templates
+     (generateRichHTML, _abaContent, _iepLetterContent) carry many of the
+     identical patterns and Epic/Word can't resolve CSS variables — those need
+     scoped per-rule edits to migrate safely. Use these tokens for new code. */
+  --space-1:4px;
+  --space-2:6px;
+  --space-3:8px;
+  --space-4:10px;
+  --space-5:12px;
+  --space-6:14px;
+  --space-7:16px;
+  --space-8:20px;
+  --space-9:24px;
   /* Type scale (screen) — px units, used for in-app form/UI surfaces.
      Half-px units (9.5/10.5/11.5) are intentional: clinical surfaces use them
      for visual demotion without losing legibility — bumping the token shifts
@@ -78,10 +96,10 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
 .app-header h1{font-size:var(--text-15);font-weight:700;letter-spacing:-.02em;line-height:1.25}
-.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap}
 .header-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.88);white-space:nowrap}
 .header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
-.header-actions{display:flex;gap:6px;align-items:center}
+.header-actions{display:flex;gap:var(--space-2);align-items:center}
 .btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:var(--text-12);font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
 @media (hover:hover){.btn:hover{box-shadow:var(--shadow-sm)}.btn:active{transform:translateY(.5px)}}
 .btn-white{background:var(--bg-card);color:var(--accent-hover)}
@@ -102,7 +120,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .main{display:grid;grid-template-columns:445px 1fr;flex:1;overflow:hidden}
 .left-panel{background:var(--surface);border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
 .right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
-.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:var(--space-2);box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .rp-header h2{font-size:var(--text-13);font-weight:600;color:var(--gray-700)}
 .rp-actions{display:flex;gap:5px;flex-wrap:wrap}
 .note-preview{flex:1;overflow-y:auto;padding:16px 20px}
@@ -163,14 +181,14 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    display:flex takes over when visible. The .unknown-tier modifier right-
    floats the Unknown chip to the row's far edge as a visual escape from the
    severity continuum. */
-.chip-strip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.chip-strip{display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:flex-start}
 .chip-tier{display:flex;flex-wrap:wrap;gap:3px}
 .chip-tier.unknown-tier{margin-left:auto}
 /* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
    Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
    Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
    color signal AND a text label, so colorblind-safe. */
-.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;border-radius:14px;padding:4px 12px;font-size:var(--text-11);font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
+.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);border-radius:14px;padding:4px 12px;font-size:var(--text-11);font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
 .pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
 .pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:var(--amber-dark)}
 .pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
@@ -218,33 +236,33 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .info-popover strong{color:var(--gray-800);font-weight:600}
 /* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
+.r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
-.cb-row{display:flex;align-items:flex-start;gap:6px;font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
+.cb-row{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
 @media (hover:hover){.cb-row:hover{background:var(--gray-100)}}
 .cb-row input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 .beh-freq-row{margin:2px 0 4px 24px}
 .beh-freq-inp{width:100%;max-width:400px;font-size:var(--text-11);padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
-.modifier-strip{display:flex;flex-wrap:wrap;gap:4px;padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
-.mod-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:var(--text-11-5);font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.modifier-strip{display:flex;flex-wrap:wrap;gap:var(--space-1);padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
+.mod-chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:var(--text-11-5);font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
 @media (hover:hover){.mod-chip:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .mod-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
 .mod-chip.active::before{content:'✓ '}
 .lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
-.lang-qual-inner{display:flex;align-items:center;gap:10px}
+.lang-qual-inner{display:flex;align-items:center;gap:var(--space-4)}
 .lang-qual-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:var(--text-12);color:#16a34a;flex-shrink:0;transition:all .15s;background:white}
 .lang-qual-card:has(input:checked) .lang-qual-icon{background:#16a34a;border-color:#16a34a;color:white}
 .lang-qual-label{font-size:var(--text-12);font-weight:600;color:#15803d;line-height:1.3}
 .lang-qual-hint{font-size:var(--text-10-5);color:#4d7c0f;margin-top:2px;line-height:1.35;font-weight:400}
 .chip-grp-hd{font-size:var(--text-9);font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
-.strength-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.strength-chips{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:6px}
 .str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:var(--text-11);background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
 @media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}}
 .str-chip.used{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500}
@@ -272,9 +290,9 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .tog-sl::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:white;border-radius:50%;transition:transform .2s}
 input:checked+.tog-sl{background:var(--blue)}
 input:checked+.tog-sl::after{transform:translateX(14px)}
-.toggle-row{display:flex;align-items:center;gap:8px;font-size:var(--text-12);cursor:pointer;padding:3px 0}
+.toggle-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-12);cursor:pointer;padding:3px 0}
 .ov-sel{font-size:var(--text-11);padding:2px 5px;border:1px solid var(--gray-300);border-radius:3px;color:var(--gray-600);margin-left:auto;background:white;cursor:pointer}
-.ov-row{display:flex;align-items:center;gap:6px;font-size:var(--text-12);padding:3px 6px;border-radius:3px}
+.ov-row{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-12);padding:3px 6px;border-radius:3px}
 .ov-row:hover{background:var(--gray-50)}
 .ov-label{flex:1;line-height:1.4}
 .ov-auto{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--blue-light);color:var(--blue-dark);font-weight:500}
@@ -282,14 +300,14 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-no{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
 .divider{border:none;border-top:1px solid var(--gray-200);margin:8px 0}
 /* ── 2-column checkbox grid for dense sub-domains ── */
-.cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:8px;row-gap:3px;align-items:start}
+.cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-3);row-gap:3px;align-items:start}
 .cb-list.col2>div{grid-column:1/-1}
 /* ── Comorbid group separators ── */
 .comorbid-grp{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
 /* ── Section completion left-border ── */
 .section.has-content{border-left:3px solid var(--green)}
 /* ── Prior-testing expander ── */
-.expander-btn{background:none;border:none;cursor:pointer;font-size:var(--text-12);font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:4px;font-family:var(--font)}
+.expander-btn{background:none;border:none;cursor:pointer;font-size:var(--text-12);font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:var(--space-1);font-family:var(--font)}
 .expander-btn:hover{color:var(--blue)}
 .expander-count{font-size:var(--text-10);font-weight:500;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue);border-radius:999px;padding:1px 7px;margin-left:2px}
 .pronoun-hint{font-size:var(--text-10-5);color:var(--gray-400);margin-top:3px;font-style:italic}
@@ -345,8 +363,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-sw-reasons-btn:hover{filter:brightness(.96)}
 .ov-sw-reasons-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .ov-sw-reasons-btn[aria-expanded="true"]{background:#bbf7d0}
-.ov-sw-popover-body{display:flex;flex-direction:column;gap:4px;margin-top:4px}
-.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:6px;font-size:var(--text-12);cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
+.ov-sw-popover-body{display:flex;flex-direction:column;gap:var(--space-1);margin-top:4px}
+.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
 .ov-sw-popover-body input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 /* ── Note preview — document style ─── */
 /* font-size:11pt matches generateRichHTML(false)'s inline paste wrapper
@@ -356,21 +374,21 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .note-doc{font-family:var(--font);font-size:11pt;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
 /* ── DSM-5 ring indicators ─────────── */
-.dsm-rings{display:flex;gap:14px;align-items:center;margin:6px 0 4px;flex-wrap:wrap}
+.dsm-rings{display:flex;gap:var(--space-6);align-items:center;margin:6px 0 4px;flex-wrap:wrap}
 .dsm-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
 .dsm-ring{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .dsm-ring-inner{width:34px;height:34px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-10);font-weight:700;color:var(--gray-700)}
 .dsm-ring-label{font-size:var(--text-9-5);color:var(--gray-600);font-weight:600;text-align:center}
-.dsm-cde-wrap{display:flex;gap:4px;align-items:center;margin-left:4px}
+.dsm-cde-wrap{display:flex;gap:var(--space-1);align-items:center;margin-left:4px}
 .dsm-cde-chip{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:var(--text-9);font-weight:700;color:var(--gray-400);flex-shrink:0;transition:all .2s}
 .dsm-cde-chip.cde-met{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 /* ── Per-comorbidity plan pill ───────── */
-.cr-wrap{display:flex;align-items:center;gap:4px}
+.cr-wrap{display:flex;align-items:center;gap:var(--space-1)}
 .cr-wrap .cb-row{flex:1;margin:0}
 .plan-pill{display:none;cursor:pointer;font-size:var(--text-10);padding:1px 8px;border-radius:999px;user-select:none;white-space:nowrap;flex-shrink:0;border:1px solid;transition:all .12s;font-family:var(--font);line-height:1.6}
 .svc-auto-badge{font-size:var(--text-9);padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
 .plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
-.prior-test-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.prior-test-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
 .outcome-sel{font-size:var(--text-13);padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
 .outcome-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 /* When the row's checkbox is checked but the outcome is empty, the dropdown
@@ -407,7 +425,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* ── Diagnosis status banner ─────────── */
 .dx-banner{background:white;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;box-shadow:var(--shadow-card)}
 .dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
-.dx-banner .radio-grid{gap:4px}
+.dx-banner .radio-grid{gap:var(--space-1)}
 .dx-banner .r-opt{font-size:var(--text-12);font-weight:500}
 .dx-banner .r-opt.sel{background:var(--blue);color:white;border-color:var(--blue-dark)}
 .dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
@@ -448,8 +466,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
 
 /* ── Toast notifications (replaces alert) ────────────────────────────── */
-.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:380px}
-.toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:8px}
+.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:var(--space-3);pointer-events:none;max-width:380px}
+.toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:var(--space-3)}
 .toast.toast-show{opacity:1;transform:translateY(0)}
 .toast.toast-ok{background:var(--green-dark);color:white}
 .toast.toast-warn{background:var(--amber-dark);color:white}
@@ -458,7 +476,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 .toast-msg{flex:1;min-width:0}
 
 /* ── Inline confirm (replaces confirm() for Clear All) ────────────────── */
-.confirm-inline{display:inline-flex;align-items:center;gap:6px}
+.confirm-inline{display:inline-flex;align-items:center;gap:var(--space-2)}
 .confirm-inline .confirm-prompt{font-size:var(--text-11);color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
 .confirm-inline .btn{padding:4px 10px;font-size:var(--text-11)}
 
@@ -476,7 +494,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .app-header{flex-wrap:wrap;padding:8px 12px}
   .app-header h1{font-size:var(--text-13)}
   .header-badge{font-size:7px;padding:1px 5px}
-  .header-actions{width:100%;justify-content:flex-end;gap:4px}
+  .header-actions{width:100%;justify-content:flex-end;gap:var(--space-1)}
   /* Touch target minimums */
   .cb-row{min-height:44px;padding:7px 6px}
   .cb-row input[type=checkbox]{width:18px;height:18px}
@@ -498,9 +516,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .sec-body.hidden{display:block;max-height:0;padding-top:0;padding-bottom:0}
   /* Sec-dot remains a no-toggle tap target on the sticky header. */
   .sec-dot{cursor:pointer;width:10px;height:10px;padding:2px;box-sizing:content-box}
-  .rp-header{padding:8px 12px;gap:4px}
+  .rp-header{padding:8px 12px;gap:var(--space-1)}
   /* Pill tabs collapse to 3-col grid, static border (no animated indicator) */
-  .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:4px}
+  .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:var(--space-1)}
   .tab-btn{padding:9px 8px;font-size:var(--text-12);border-radius:var(--radius);border:1px solid var(--border-default);min-height:40px;background:var(--bg-card)}
   .tab-btn.tab-active{background:var(--accent-soft);color:var(--accent-hover);border-color:var(--accent);box-shadow:none}
   /* Strip the paper card on mobile — no nesting */
@@ -823,7 +841,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
       <div class="field-group">
         <span class="field-label">Evaluation Path</span>
-        <div class="radio-grid" style="flex-direction:column;gap:4px">
+        <div class="radio-grid" style="flex-direction:column;gap:var(--space-1)">
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="devOnly">&nbsp;Developmental profile only — DP-4 (+ KBIT-2R if age ≥ 4)</label>
           <label id="certainYoungRow" class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainYoung">&nbsp;Fairly certain, age &lt; 5 — CARS-2 with MD (1 hr)</label>
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainOlder">&nbsp;Fairly certain, age ≥ 5 — DP-4 + KBIT-2R → CARS-2</label>
@@ -839,7 +857,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button id="priorTestToggleBtn" class="expander-btn" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
         <div id="priorTestList" style="display:none">
         <div class="field-hint" style="margin:3px 0 5px">Results documented separately — select outcome per instrument</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;flex-direction:column;gap:var(--space-1)">
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2st"> CARS-2 ST</label><select class="outcome-sel" data-outcome-key="cars2st"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2st" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2hf"> CARS-2 HF</label><select class="outcome-sel" data-outcome-key="cars2hf"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2hf" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="ados2"> ADOS-2</label><select class="outcome-sel" data-outcome-key="ados2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><select class="prior-mod-sel" id="ados2ModuleSel"><option value="">— module —</option><option value="Module T">Module T (toddler)</option><option value="Module 1">Module 1 (preverbal/min. verbal)</option><option value="Module 2">Module 2 (phrase speech)</option><option value="Module 3">Module 3 (fluent speech)</option><option value="Module 4">Module 4 (fluent, older)</option></select><input class="prior-date-input" data-date-key="ados2" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
@@ -1339,25 +1357,25 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <span class="field-label">Current Private / Clinic Therapy Status</span>
         <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:6px">Modifies the prose for active referrals above. Rows for inactive referrals are greyed out — activate the corresponding tile first. Re-click a selected option to clear it without changing the referral itself.</p>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
             <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
             <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
             <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
             <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="revise">Goals need revision</label>
@@ -1372,14 +1390,14 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
 <div class="right-panel">
   <div class="rp-header">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
       <h2>&#128196; Live Note Preview</h2>
       <div class="rp-status-chips">
         <span class="status-chip chip-amber" id="override-badge-rp"></span>
         <span class="status-chip chip-gray" id="evpath-chip-rp"></span>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
       <div class="preview-tabs">
         <button class="tab-btn tab-active" id="tabNote" onclick="setPreviewMode('note')">A&amp;P Note</button>
         <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" style="display:none">&#9733; ABA Letter</button>
