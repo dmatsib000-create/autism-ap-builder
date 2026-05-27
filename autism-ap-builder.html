@@ -16,10 +16,14 @@
   --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
   --gray-300:#d2d2d8;--gray-400:#9b9ba3;--gray-500:#6b6b75;
   --gray-600:#4a4a55;--gray-700:#363640;--gray-800:#1f1f28;--gray-900:#111118;
-  /* Semantic colors */
-  --amber:#d97706;--amber-light:#fef3c7;
-  --red:#dc2626;--red-light:#fee2e2;
-  --green:#16a34a;--green-light:#dcfce7;
+  /* Semantic colors — *-dark are the deep variants used for text-on-light-tint surfaces
+     (badges, toast, pathway-pill suspected/typical, etc.) and meet WCAG AA against their
+     light counterparts. Hardcoded hex still appears in JS-generated paste output
+     (generateRichHTML, _abaContent, _iepLetterContent inline styles) because Epic/Word
+     cannot resolve CSS variables — keep those literals when editing. */
+  --amber:#d97706;--amber-light:#fef3c7;--amber-dark:#92400e;
+  --red:#dc2626;--red-light:#fee2e2;--red-dark:#991b1b;
+  --green:#16a34a;--green-light:#dcfce7;--green-dark:#166534;
   /* Type */
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --font-serif:Georgia,'Times New Roman',Charter,serif;
@@ -153,7 +157,7 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    color signal AND a text label, so colorblind-safe. */
 .pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;border-radius:14px;padding:4px 12px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
 .pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
-.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:var(--amber-dark)}
 .pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
 .pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
 .pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
@@ -227,8 +231,8 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
 .str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:11px;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
-@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:#166534}}
-.str-chip.used{border-color:var(--green);background:var(--green-light);color:#166534;font-weight:500}
+@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}}
+.str-chip.used{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500}
 .strengths-area{width:100%;font-size:12px;font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
@@ -237,10 +241,10 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .evidence-area:focus{outline:none;border-color:var(--blue);background:white}
 .evidence-area::placeholder{color:var(--gray-400);font-style:italic}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10.5px;font-weight:600;margin-top:5px}
-.badge.ok{background:var(--green-light);color:#166534}
-.badge.err{background:var(--red-light);color:#991b1b}
-.note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#991b1b;line-height:1.5}
-.note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#166534}
+.badge.ok{background:var(--green-light);color:var(--green-dark)}
+.badge.err{background:var(--red-light);color:var(--red-dark)}
+.note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:var(--red-dark);line-height:1.5}
+.note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:var(--green-dark)}
 .note-content{font-family:'Courier New',Courier,monospace;font-size:12px;line-height:1.75;white-space:pre-wrap;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px 22px;min-height:300px;box-shadow:var(--shadow-sm);max-width:900px;margin:0 auto}
 .dsm-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}
 .dsm-tbl th{background:var(--blue);color:white;padding:5px 9px;text-align:left;font-size:11px}
@@ -259,7 +263,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-row:hover{background:var(--gray-50)}
 .ov-label{flex:1;line-height:1.4}
 .ov-auto{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--blue-light);color:var(--blue-dark);font-weight:500}
-.ov-yes{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--green-light);color:#166534;font-weight:500}
+.ov-yes{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--green-light);color:var(--green-dark);font-weight:500}
 .ov-no{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
 .divider{border:none;border-top:1px solid var(--gray-200);margin:8px 0}
 /* ── 2-column checkbox grid for dense sub-domains ── */
@@ -287,7 +291,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ev-src-chip:active{opacity:.75}
 .ev-obs-strip{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
 .ev-obs-chip{padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:10px;background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
-@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:#166534}}
+@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:var(--green-dark)}}
 .ev-obs-chip:active{opacity:.7}
 .sec-sum{font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic;vertical-align:middle;max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Override pill grid ────────────── */
@@ -298,7 +302,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .ov-pill-state{font-size:9.5px;display:block;margin-top:2px;opacity:.8}
 .ov-pill.auto-yes{border-color:var(--blue);background:var(--blue-light);color:var(--blue-dark)}
 .ov-pill.auto-no{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500)}
-.ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:#166534}
+.ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 .ov-pill.ov-no{border-color:var(--gray-300);background:var(--gray-100);color:var(--gray-400);text-decoration:line-through}
 /* Grouped override tiles — replaces the prior flat .ov-pill-grid with three clinical clusters
    (Core therapies, Medical & diagnostic, Florida resources). Each .ov-group wraps a header
@@ -322,7 +326,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    pattern from PR-M (positioned absolute below the wrap).  */
 .ov-sw-wrap{position:relative;display:inline-flex;align-items:stretch;gap:0}
 .ov-sw-wrap .ov-pill{border-top-right-radius:0;border-bottom-right-radius:0;border-right:none;flex:1}
-.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:#166534;cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
+.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:var(--green-dark);cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
 .ov-sw-reasons-btn:hover{filter:brightness(.96)}
 .ov-sw-reasons-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .ov-sw-reasons-btn[aria-expanded="true"]{background:#bbf7d0}
@@ -344,7 +348,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dsm-ring-label{font-size:9.5px;color:var(--gray-600);font-weight:600;text-align:center}
 .dsm-cde-wrap{display:flex;gap:4px;align-items:center;margin-left:4px}
 .dsm-cde-chip{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gray-400);flex-shrink:0;transition:all .2s}
-.dsm-cde-chip.cde-met{border-color:var(--green);background:var(--green-light);color:#166534}
+.dsm-cde-chip.cde-met{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 /* ── Per-comorbidity plan pill ───────── */
 .cr-wrap{display:flex;align-items:center;gap:4px}
 .cr-wrap .cb-row{flex:1;margin:0}
@@ -359,7 +363,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    downstream emission path silently no-ops. Amber treatment makes the unmet
    predicate impossible to read past. Matches the --amber/--amber-light token
    pair used elsewhere for warning surfaces (bif-crosscheck, abaLevelWarn). */
-.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:#92400e;font-weight:600;box-shadow:0 0 0 2px #fde68a}
+.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);font-weight:600;box-shadow:0 0 0 2px #fde68a}
 .sub-options{margin:2px 0 4px 22px;padding:5px 8px;background:var(--gray-50);border-radius:4px;border-left:2px solid var(--blue-light)}
 .sub-options .sub-label{font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
 /* PHI-tightening: year-only date input. HIPAA Safe Harbor §164.514(b)(2)(C) permits
@@ -376,7 +380,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .rp-status-chips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .status-chip{display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
 .status-chip.visible{display:inline-flex;align-items:center;gap:3px}
-.chip-amber{background:var(--amber-light);color:#92400e;border-color:var(--amber)}
+.chip-amber{background:var(--amber-light);color:var(--amber-dark);border-color:var(--amber)}
 .chip-gray{background:var(--gray-100);color:var(--gray-600);border-color:var(--gray-300)}
 /* ── Visit type highlight when unset ─── */
 .vt-unset .dx-banner-label-vt{color:var(--amber)!important}
@@ -409,7 +413,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-sig{margin-top:24px;border-top:1px solid var(--gray-300);padding-top:12px;font-size:10pt;color:var(--gray-600);line-height:2.2}
 .aba-doc .aba-ref{font-size:9.5pt;color:var(--gray-700);margin-bottom:6px;padding-left:18px;text-indent:-18px}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
-.iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic}
+.iep-ph{background:#fef9c3;color:var(--amber-dark);border-radius:3px;padding:0 2px;font-style:italic}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
@@ -432,8 +436,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:380px}
 .toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:8px}
 .toast.toast-show{opacity:1;transform:translateY(0)}
-.toast.toast-ok{background:#166534;color:white}
-.toast.toast-warn{background:#92400e;color:white}
+.toast.toast-ok{background:var(--green-dark);color:white}
+.toast.toast-warn{background:var(--amber-dark);color:white}
 .toast.toast-info{background:var(--gray-900);color:white}
 .toast-icon{flex-shrink:0;font-size:14px;line-height:1.2}
 .toast-msg{flex:1;min-width:0}
@@ -785,7 +789,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div id="dxWorkupSection" class="section">
     <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
     <div class="sec-body">
-      <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:11px;color:#166534">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
+      <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:11px;color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <p style="font-size:11px;color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
 
       <div class="field-group">
@@ -842,7 +846,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
     <div class="sec-body">
-      <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:11px;color:#92400e">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
+      <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:11px;color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
       <div id="levelGroup" style="display:none">
         <div class="field-group">
@@ -1311,7 +1315,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
+    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
       <div id="overridePanel"></div>
@@ -1383,8 +1387,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-green btn-sm" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
-    <span id="abaLevelWarn" style="display:none;font-size:11px;font-weight:600;color:#92400e;background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
-    <span id="abaThinWarn" style="display:none;font-size:11px;font-weight:600;color:#991b1b;background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
+    <span id="abaLevelWarn" style="display:none;font-size:11px;font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
+    <span id="abaThinWarn" style="display:none;font-size:11px;font-weight:600;color:var(--red-dark);background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
     <span id="abaCatatoniaWarn" style="display:none;font-size:11px;font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
     <button class="btn btn-gray btn-sm" onclick="copyABALetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
