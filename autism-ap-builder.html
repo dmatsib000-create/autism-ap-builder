@@ -16,13 +16,50 @@
   --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
   --gray-300:#d2d2d8;--gray-400:#9b9ba3;--gray-500:#6b6b75;
   --gray-600:#4a4a55;--gray-700:#363640;--gray-800:#1f1f28;--gray-900:#111118;
-  /* Semantic colors */
-  --amber:#d97706;--amber-light:#fef3c7;
-  --red:#dc2626;--red-light:#fee2e2;
-  --green:#16a34a;--green-light:#dcfce7;
+  /* Semantic colors — *-dark are the deep variants used for text-on-light-tint surfaces
+     (badges, toast, pathway-pill suspected/typical, etc.) and meet WCAG AA against their
+     light counterparts. Hardcoded hex still appears in JS-generated paste output
+     (generateRichHTML, _abaContent, _iepLetterContent inline styles) because Epic/Word
+     cannot resolve CSS variables — keep those literals when editing. */
+  --amber:#d97706;--amber-light:#fef3c7;--amber-dark:#92400e;
+  --red:#dc2626;--red-light:#fee2e2;--red-dark:#991b1b;
+  --green:#16a34a;--green-light:#dcfce7;--green-dark:#166534;
   /* Type */
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --font-serif:Georgia,'Times New Roman',Charter,serif;
+  /* Spacing scale — for padding/margin/gap. Density-tuned to existing literals;
+     8 dominant even values cover ~90% of CSS-rule spacing. Odd values (3, 5, 7,
+     9, 11) intentionally remain as literals — they're often deliberate
+     clinical-density tuning rather than rhythm errors. THIS COMMIT SWEEPS ONLY
+     `gap:`; compound multi-value padding/margin and single-direction margin/
+     padding remain as literals because paste-bound JS templates
+     (generateRichHTML, _abaContent, _iepLetterContent) carry many of the
+     identical patterns and Epic/Word can't resolve CSS variables — those need
+     scoped per-rule edits to migrate safely. Use these tokens for new code. */
+  --space-1:4px;
+  --space-2:6px;
+  --space-3:8px;
+  --space-4:10px;
+  --space-5:12px;
+  --space-6:14px;
+  --space-7:16px;
+  --space-8:20px;
+  --space-9:24px;
+  /* Type scale (screen) — px units, used for in-app form/UI surfaces.
+     Half-px units (9.5/10.5/11.5) are intentional: clinical surfaces use them
+     for visual demotion without losing legibility — bumping the token shifts
+     every consumer site at once. Rare one-offs (7px header-badge-mobile,
+     8px header-badge, 12.5px toast, 14px toast-icon / ov-sw-reasons-btn,
+     15px h1 / bif-crosscheck-icon) intentionally left as literals; promote
+     them to tokens only if they reach ≥3 use sites. Document surfaces
+     (note-doc, aba-doc, generated paste output) use pt units instead of px
+     and stay paired with JS-template literals — keep pt edits in lockstep. */
+  --text-9:9px;--text-9-5:9.5px;
+  --text-10:10px;--text-10-5:10.5px;
+  --text-11:11px;--text-11-5:11.5px;
+  --text-12:12px;
+  --text-13:13px;
+  --text-15:15px;
   /* Surfaces */
   --surface:#eef1f6;
   --bg-card:#ffffff;
@@ -51,19 +88,19 @@
   *,*::before,*::after{transition:none!important;animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* Focus ring — high-contrast, keyboard-only, used on inputs and interactives */
 :where(button,input,select,textarea,a,label.r-opt,.mod-chip,.str-chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
 .app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
 .app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
-.app-header h1{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
-.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.app-header h1{font-size:var(--text-15);font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.app-header .sub{margin-top:5px;display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap}
 .header-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.88);white-space:nowrap}
 .header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
-.header-actions{display:flex;gap:6px;align-items:center}
-.btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:12px;font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
+.header-actions{display:flex;gap:var(--space-2);align-items:center}
+.btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:var(--text-12);font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
 @media (hover:hover){.btn:hover{box-shadow:var(--shadow-sm)}.btn:active{transform:translateY(.5px)}}
 .btn-white{background:var(--bg-card);color:var(--accent-hover)}
 @media (hover:hover){.btn-white:hover{background:var(--accent-soft)}}
@@ -79,33 +116,33 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 @media (hover:hover){.btn-green:hover{background:#15803d}}
 .btn-epic{background:#6d28d9;color:white;border-color:#6d28d9}
 @media (hover:hover){.btn-epic:hover{background:#5b21b6}}
-.btn-sm{padding:3px 9px;font-size:11px}
+.btn-sm{padding:3px 9px;font-size:var(--text-11)}
 .main{display:grid;grid-template-columns:445px 1fr;flex:1;overflow:hidden}
 .left-panel{background:var(--surface);border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
 .right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
-.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.rp-header h2{font-size:13px;font-weight:600;color:var(--gray-700)}
+.rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:var(--space-2);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rp-header h2{font-size:var(--text-13);font-weight:600;color:var(--gray-700)}
 .rp-actions{display:flex;gap:5px;flex-wrap:wrap}
 .note-preview{flex:1;overflow-y:auto;padding:16px 20px}
-.note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:13px;line-height:1.8}
+.note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:var(--text-13);line-height:1.8}
 .section{margin-bottom:10px;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-sm);transition:box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
 .section:focus-within{box-shadow:var(--shadow-md);border-color:var(--border-strong)}
-.sec-head{background:linear-gradient(180deg,var(--gray-50) 0%,#f1f2f5 100%);border-bottom:1px solid var(--border-subtle);padding:9px 12px;font-weight:700;font-size:11px;color:var(--gray-700);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;min-height:38px;transition:background var(--dur) var(--ease)}
+.sec-head{background:linear-gradient(180deg,var(--gray-50) 0%,#f1f2f5 100%);border-bottom:1px solid var(--border-subtle);padding:9px 12px;font-weight:700;font-size:var(--text-11);color:var(--gray-700);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;min-height:38px;transition:background var(--dur) var(--ease)}
 @media (hover:hover){.sec-head:hover{background:linear-gradient(180deg,var(--gray-100) 0%,#eaebee 100%)}}
-.sec-head > span:last-child{font-size:10px;color:var(--gray-500);transition:transform var(--dur) var(--ease);display:inline-block;line-height:1}
+.sec-head > span:last-child{font-size:var(--text-10);color:var(--gray-500);transition:transform var(--dur) var(--ease);display:inline-block;line-height:1}
 .sec-head.collapsed > span:last-child{transform:rotate(-90deg)}
 .sec-body{padding:11px}
 .sec-body.hidden{display:none}
 .field-group{margin-bottom:10px}
 .field-group:last-child{margin-bottom:0}
-.field-label{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
-.field-sublabel{font-size:10.5px;font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
+.field-label{font-size:var(--text-11);font-weight:700;color:var(--gray-600);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.02em}
+.field-sublabel{font-size:var(--text-10-5);font-weight:600;color:var(--gray-400);margin:6px 0 4px;display:block;letter-spacing:.02em}
 /* Subordinate label for nested clinical-modifier groups (e.g. Cognitive Data
    Source under Cognitive Profile). Demoted from .field-label via font-weight
    + letter-spacing only — color held at --gray-600 so 8.4:1 AA contrast on
    white stays preserved. Do NOT swap in .field-sublabel here; .field-sublabel
    uses --gray-400 which fails AA at 10.5px (3.7:1) — flagged as spawn-task. */
-.field-nested-label{font-size:11px;font-weight:500;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px;display:block}
+.field-nested-label{font-size:var(--text-11);font-weight:500;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px;display:block}
 /* Wrapper for a nested clinical-modifier field-group. Encodes the parent-child
    relationship via three orthogonal cues: indent (14px from container left),
    thin left border (2px gray-200 connector to the parent field above), and
@@ -144,46 +181,46 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    display:flex takes over when visible. The .unknown-tier modifier right-
    floats the Unknown chip to the row's far edge as a visual escape from the
    severity continuum. */
-.chip-strip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.chip-strip{display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:flex-start}
 .chip-tier{display:flex;flex-wrap:wrap;gap:3px}
 .chip-tier.unknown-tier{margin-left:auto}
 /* Clinical pathway pill — top-of-cluster summary of the implied downstream specifier.
    Driven by currentClinicalPathway(); rendered via renderPathwayPill() on every render().
    Semantic variant classes (.pp-confirmed, .pp-suspected, .pp-bif, .pp-typical) carry the
    color signal AND a text label, so colorblind-safe. */
-.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;border-radius:14px;padding:4px 12px;font-size:11px;font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
+.pathway-pill{display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);border-radius:14px;padding:4px 12px;font-size:var(--text-11);font-weight:600;line-height:1.3;margin-bottom:8px;border:1px solid var(--border-default);background:var(--gray-100);color:var(--gray-600);max-width:100%}
 .pathway-pill.pp-confirmed{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
-.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.pathway-pill.pp-suspected{background:#fef3c7;border-color:#fcd34d;color:var(--amber-dark)}
 .pathway-pill.pp-bif{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
 .pathway-pill.pp-typical{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
-.pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.06em;opacity:.85}
+.pathway-pill .pp-prefix{font-weight:700;text-transform:uppercase;font-size:var(--text-9);letter-spacing:.06em;opacity:.85}
 /* PR-K: manual override surfacing. When the clinician has pinned a COG_SPEC_EXCL key,
    the pill grows a second line declaring the override; each pinned specifier checkbox
    in the Specifiers section also gets a "(manual)" caption. Both signals are required so
    the divergence is visible at the cluster focal point AND at the specifier itself. */
-.pathway-pill .pp-manual{display:block;width:100%;margin-top:3px;font-size:10.5px;font-weight:500;opacity:.85;font-style:italic;letter-spacing:.01em}
+.pathway-pill .pp-manual{display:block;width:100%;margin-top:3px;font-size:var(--text-10-5);font-weight:500;opacity:.85;font-style:italic;letter-spacing:.01em}
 /* PR-L δ: explicit release affordance — visible only when manual pins exist. Clicking
    clears S.specifiersManuallySet and re-fires the bridge so the pathway-recommended
    specifier takes over. Styled as an inline pill-family button so it reads as part
    of the pathway pill, not a foreign control. */
-.pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:10px;font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+.pathway-pill .pp-reset{display:inline-flex;align-items:center;margin-left:auto;padding:2px 8px;font-size:var(--text-10);font-weight:600;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-family:inherit;line-height:1.3;opacity:.75;transition:opacity var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
 .pathway-pill .pp-reset:hover{opacity:1;background:rgba(255,255,255,.5)}
 .pathway-pill .pp-reset:focus-visible{outline:none;box-shadow:var(--focus-ring);opacity:1}
-.spec-manual-caption{font-size:10px;color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
+.spec-manual-caption{font-size:var(--text-10);color:var(--gray-500);font-style:italic;margin-left:6px;font-weight:400}
 /* BIF + impaired-adaptive cross-check hint. Visually distinct from #screenerYoungWarning
    (same area, purely informational) — this one carries a clinical recommendation, so it
    gets darker amber border + tint, font-weight 500, and a ⚠ icon prefix. Inline display
    is set by toggleBifAdaptiveCrossCheck(); the ::before fires when display becomes non-none. */
-.bif-crosscheck{font-size:13px;color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
-.bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:15px;color:#b45309;font-weight:700}
+.bif-crosscheck{font-size:var(--text-13);color:#78350f;font-weight:500;line-height:1.4;margin-top:6px;padding:7px 10px 7px 32px;border-left:4px solid #d97706;background:#fef3c7;border-radius:0 4px 4px 0;position:relative}
+.bif-crosscheck::before{content:"⚠";position:absolute;left:10px;top:6px;font-size:var(--text-15);color:#b45309;font-weight:700}
 /* PHI-free entry hint. Reminds the clinician at point-of-entry that the tool's
    design contract excludes patient identifying data. Subdued brick color signals
    "rule of the road" without being alarming. Placed once per free-text cluster,
    not under every field, to avoid visual noise. Inline <code> styles a small
    bracketed-placeholder hint like [NAME] so clinicians have a visible alternative. */
-.phi-hint{font-size:10.5px;color:#7f1d1d;font-style:italic;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
+.phi-hint{font-size:var(--text-10-5);color:#7f1d1d;font-style:italic;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
 .phi-hint::before{content:"🔒 ";font-style:normal;opacity:.75;margin-right:1px}
-.phi-hint code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;font-size:10px;background:rgba(127,29,29,.07);padding:0 4px;border-radius:2px;border:1px solid rgba(127,29,29,.16);color:#7f1d1d;letter-spacing:0}
+.phi-hint code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;font-size:var(--text-10);background:rgba(127,29,29,.07);padding:0 4px;border-radius:2px;border:1px solid rgba(127,29,29,.16);color:#7f1d1d;letter-spacing:0}
 /* Keyboard-accessible disclosure for instrument-list info on Cog Data Source options (PR-K).
    The .info-btn is a focusable ⓘ button placed next to a radio label; clicking or pressing
    Enter/Space toggles aria-expanded and shows/hides the .info-popover. Keyboard reachable
@@ -191,59 +228,59 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
    role="region" + aria-label on the popover). Replaces the prior title-attr-only path which
    was inaccessible to keyboard-only users and inconsistently surfaced by screen readers. */
 .r-opt-wrap{display:inline-flex;align-items:center;gap:3px;position:relative}
-.info-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);font-size:12px;cursor:pointer;padding:0;line-height:1;font-family:inherit;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);font-size:var(--text-12);cursor:pointer;padding:0;line-height:1;font-family:inherit;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
 .info-btn:hover,.info-btn:focus-visible{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
 .info-btn[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
-.info-popover{position:absolute;top:calc(100% + 4px);left:0;z-index:20;min-width:260px;max-width:380px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--gray-300);border-radius:var(--radius);box-shadow:var(--shadow-sm);font-size:12px;line-height:1.55;color:var(--gray-700);white-space:normal}
+.info-popover{position:absolute;top:calc(100% + 4px);left:0;z-index:20;min-width:260px;max-width:380px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--gray-300);border-radius:var(--radius);box-shadow:var(--shadow-sm);font-size:var(--text-12);line-height:1.55;color:var(--gray-700);white-space:normal}
 .info-popover[hidden]{display:none}
 .info-popover strong{color:var(--gray-800);font-weight:600}
 /* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.r-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:12px;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
+.r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
-.cb-row{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
+.cb-row{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
 @media (hover:hover){.cb-row:hover{background:var(--gray-100)}}
 .cb-row input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 .beh-freq-row{margin:2px 0 4px 24px}
-.beh-freq-inp{width:100%;max-width:400px;font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
+.beh-freq-inp{width:100%;max-width:400px;font-size:var(--text-11);padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
-.modifier-strip{display:flex;flex-wrap:wrap;gap:4px;padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
-.mod-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:11.5px;font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.modifier-strip{display:flex;flex-wrap:wrap;gap:var(--space-1);padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
+.mod-chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:var(--text-11-5);font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
 @media (hover:hover){.mod-chip:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .mod-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
 .mod-chip.active::before{content:'✓ '}
 .lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
-.lang-qual-inner{display:flex;align-items:center;gap:10px}
-.lang-qual-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:12px;color:#16a34a;flex-shrink:0;transition:all .15s;background:white}
+.lang-qual-inner{display:flex;align-items:center;gap:var(--space-4)}
+.lang-qual-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:var(--text-12);color:#16a34a;flex-shrink:0;transition:all .15s;background:white}
 .lang-qual-card:has(input:checked) .lang-qual-icon{background:#16a34a;border-color:#16a34a;color:white}
-.lang-qual-label{font-size:12px;font-weight:600;color:#15803d;line-height:1.3}
-.lang-qual-hint{font-size:10.5px;color:#4d7c0f;margin-top:2px;line-height:1.35;font-weight:400}
-.chip-grp-hd{font-size:9px;font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
+.lang-qual-label{font-size:var(--text-12);font-weight:600;color:#15803d;line-height:1.3}
+.lang-qual-hint{font-size:var(--text-10-5);color:#4d7c0f;margin-top:2px;line-height:1.35;font-weight:400}
+.chip-grp-hd{font-size:var(--text-9);font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
-.strength-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:11px;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
-@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:#166534}}
-.str-chip.used{border-color:var(--green);background:var(--green-light);color:#166534;font-weight:500}
-.strengths-area{width:100%;font-size:12px;font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
+.strength-chips{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:6px}
+.str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:var(--text-11);background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
+@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}}
+.str-chip.used{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500}
+.strengths-area{width:100%;font-size:var(--text-12);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
 .evidence-wrap{margin:3px 0 3px 28px}
-.evidence-area{width:100%;font-size:11px;font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:5px 7px;resize:vertical;min-height:40px;background:var(--gray-50);line-height:1.5}
+.evidence-area{width:100%;font-size:var(--text-11);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:5px 7px;resize:vertical;min-height:40px;background:var(--gray-50);line-height:1.5}
 .evidence-area:focus{outline:none;border-color:var(--blue);background:white}
 .evidence-area::placeholder{color:var(--gray-400);font-style:italic}
-.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10.5px;font-weight:600;margin-top:5px}
-.badge.ok{background:var(--green-light);color:#166534}
-.badge.err{background:var(--red-light);color:#991b1b}
-.note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#991b1b;line-height:1.5}
-.note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#166534}
-.note-content{font-family:'Courier New',Courier,monospace;font-size:12px;line-height:1.75;white-space:pre-wrap;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px 22px;min-height:300px;box-shadow:var(--shadow-sm);max-width:900px;margin:0 auto}
-.dsm-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}
-.dsm-tbl th{background:var(--blue);color:white;padding:5px 9px;text-align:left;font-size:11px}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:var(--text-10-5);font-weight:600;margin-top:5px}
+.badge.ok{background:var(--green-light);color:var(--green-dark)}
+.badge.err{background:var(--red-light);color:var(--red-dark)}
+.note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--red-dark);line-height:1.5}
+.note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--green-dark)}
+.note-content{font-family:'Courier New',Courier,monospace;font-size:var(--text-12);line-height:1.75;white-space:pre-wrap;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px 22px;min-height:300px;box-shadow:var(--shadow-sm);max-width:900px;margin:0 auto}
+.dsm-tbl{width:100%;border-collapse:collapse;font-size:var(--text-11-5);margin-top:10px}
+.dsm-tbl th{background:var(--blue);color:white;padding:5px 9px;text-align:left;font-size:var(--text-11)}
 .dsm-tbl td{padding:5px 9px;border-bottom:1px solid var(--gray-200);vertical-align:top;line-height:1.45}
 .dsm-tbl tr:nth-child(even) td{background:var(--gray-50)}
 .met{color:var(--green);font-weight:700}.notmet{color:var(--red);font-weight:700}
@@ -253,27 +290,27 @@ body{font-family:var(--font);font-size:13px;color:var(--gray-800);background:var
 .tog-sl::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:white;border-radius:50%;transition:transform .2s}
 input:checked+.tog-sl{background:var(--blue)}
 input:checked+.tog-sl::after{transform:translateX(14px)}
-.toggle-row{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;padding:3px 0}
-.ov-sel{font-size:11px;padding:2px 5px;border:1px solid var(--gray-300);border-radius:3px;color:var(--gray-600);margin-left:auto;background:white;cursor:pointer}
-.ov-row{display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 6px;border-radius:3px}
+.toggle-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-12);cursor:pointer;padding:3px 0}
+.ov-sel{font-size:var(--text-11);padding:2px 5px;border:1px solid var(--gray-300);border-radius:3px;color:var(--gray-600);margin-left:auto;background:white;cursor:pointer}
+.ov-row{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-12);padding:3px 6px;border-radius:3px}
 .ov-row:hover{background:var(--gray-50)}
 .ov-label{flex:1;line-height:1.4}
-.ov-auto{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--blue-light);color:var(--blue-dark);font-weight:500}
-.ov-yes{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--green-light);color:#166534;font-weight:500}
-.ov-no{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
+.ov-auto{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--blue-light);color:var(--blue-dark);font-weight:500}
+.ov-yes{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--green-light);color:var(--green-dark);font-weight:500}
+.ov-no{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
 .divider{border:none;border-top:1px solid var(--gray-200);margin:8px 0}
 /* ── 2-column checkbox grid for dense sub-domains ── */
-.cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:8px;row-gap:3px;align-items:start}
+.cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-3);row-gap:3px;align-items:start}
 .cb-list.col2>div{grid-column:1/-1}
 /* ── Comorbid group separators ── */
-.comorbid-grp{font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
+.comorbid-grp{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
 /* ── Section completion left-border ── */
 .section.has-content{border-left:3px solid var(--green)}
 /* ── Prior-testing expander ── */
-.expander-btn{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:4px;font-family:var(--font)}
+.expander-btn{background:none;border:none;cursor:pointer;font-size:var(--text-12);font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:var(--space-1);font-family:var(--font)}
 .expander-btn:hover{color:var(--blue)}
-.expander-count{font-size:10px;font-weight:500;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue);border-radius:999px;padding:1px 7px;margin-left:2px}
-.pronoun-hint{font-size:10.5px;color:var(--gray-400);margin-top:3px;font-style:italic}
+.expander-count{font-size:var(--text-10);font-weight:500;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue);border-radius:999px;padding:1px 7px;margin-left:2px}
+.pronoun-hint{font-size:var(--text-10-5);color:var(--gray-400);margin-top:3px;font-style:italic}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
@@ -282,23 +319,23 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .sec-dot.dot-has{background:var(--green)}
 /* ── Evidence chips ─────────────────── */
 .ev-source-strip{display:flex;gap:3px;margin-bottom:4px}
-.ev-src-chip{padding:2px 9px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:10px;font-weight:500;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.ev-src-chip{padding:2px 9px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:var(--text-10);font-weight:500;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
 @media (hover:hover){.ev-src-chip:hover{background:var(--accent);color:white}}
 .ev-src-chip:active{opacity:.75}
 .ev-obs-strip{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
-.ev-obs-chip{padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:10px;background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
-@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:#166534}}
+.ev-obs-chip{padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-10);background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+@media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:var(--green-dark)}}
 .ev-obs-chip:active{opacity:.7}
-.sec-sum{font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic;vertical-align:middle;max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-sum{font-size:var(--text-10);color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic;vertical-align:middle;max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Override pill grid ────────────── */
 .ov-pill-grid{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0}
-.ov-pill{padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:11px;border:1.5px solid;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);user-select:none;text-align:left;line-height:1.3;font-family:var(--font);background:var(--bg-card)}
+.ov-pill{padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:var(--text-11);border:1.5px solid;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);user-select:none;text-align:left;line-height:1.3;font-family:var(--font);background:var(--bg-card)}
 @media (hover:hover){.ov-pill:hover{filter:brightness(.96);box-shadow:var(--shadow-sm)}}
 .ov-pill-name{font-weight:600;display:block}
-.ov-pill-state{font-size:9.5px;display:block;margin-top:2px;opacity:.8}
+.ov-pill-state{font-size:var(--text-9-5);display:block;margin-top:2px;opacity:.8}
 .ov-pill.auto-yes{border-color:var(--blue);background:var(--blue-light);color:var(--blue-dark)}
 .ov-pill.auto-no{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500)}
-.ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:#166534}
+.ov-pill.ov-yes{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 .ov-pill.ov-no{border-color:var(--gray-300);background:var(--gray-100);color:var(--gray-400);text-decoration:line-through}
 /* Grouped override tiles — replaces the prior flat .ov-pill-grid with three clinical clusters
    (Core therapies, Medical & diagnostic, Florida resources). Each .ov-group wraps a header
@@ -306,7 +343,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    the top-left scan zone. Group header reuses the .comorbid-grp pattern visually. */
 .ov-group{margin-top:8px}
 .ov-group:first-child{margin-top:0}
-.ov-group-head{font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:4px 0 4px;display:block}
+.ov-group-head{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:4px 0 4px;display:block}
 /* Therapy-status rows — greyed out and click-blocked when the corresponding referral is
    not currently included (auto-no AND not manually overridden to yes). Coupled to the
    tiles above via updateTherapyStatusEnablement() in render(). The label stays visible
@@ -322,12 +359,12 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    pattern from PR-M (positioned absolute below the wrap).  */
 .ov-sw-wrap{position:relative;display:inline-flex;align-items:stretch;gap:0}
 .ov-sw-wrap .ov-pill{border-top-right-radius:0;border-bottom-right-radius:0;border-right:none;flex:1}
-.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:#166534;cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
+.ov-sw-reasons-btn{padding:0 10px;border:1.5px solid var(--green);background:var(--green-light);color:var(--green-dark);cursor:pointer;font-size:14px;line-height:1;border-top-right-radius:var(--radius);border-bottom-right-radius:var(--radius);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:30px;font-weight:600}
 .ov-sw-reasons-btn:hover{filter:brightness(.96)}
 .ov-sw-reasons-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .ov-sw-reasons-btn[aria-expanded="true"]{background:#bbf7d0}
-.ov-sw-popover-body{display:flex;flex-direction:column;gap:4px;margin-top:4px}
-.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
+.ov-sw-popover-body{display:flex;flex-direction:column;gap:var(--space-1);margin-top:4px}
+.ov-sw-popover-body label{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:3px 0;line-height:1.4;color:var(--gray-800)}
 .ov-sw-popover-body input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 /* ── Note preview — document style ─── */
 /* font-size:11pt matches generateRichHTML(false)'s inline paste wrapper
@@ -337,46 +374,46 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .note-doc{font-family:var(--font);font-size:11pt;line-height:1.8;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:22px 28px;min-height:300px;box-shadow:var(--shadow-md);max-width:900px;margin:0 auto}
 .note-doc a{color:var(--blue);text-decoration:none}.note-doc a:hover{text-decoration:underline}
 /* ── DSM-5 ring indicators ─────────── */
-.dsm-rings{display:flex;gap:14px;align-items:center;margin:6px 0 4px;flex-wrap:wrap}
+.dsm-rings{display:flex;gap:var(--space-6);align-items:center;margin:6px 0 4px;flex-wrap:wrap}
 .dsm-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
 .dsm-ring{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.dsm-ring-inner{width:34px;height:34px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gray-700)}
-.dsm-ring-label{font-size:9.5px;color:var(--gray-600);font-weight:600;text-align:center}
-.dsm-cde-wrap{display:flex;gap:4px;align-items:center;margin-left:4px}
-.dsm-cde-chip{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gray-400);flex-shrink:0;transition:all .2s}
-.dsm-cde-chip.cde-met{border-color:var(--green);background:var(--green-light);color:#166534}
+.dsm-ring-inner{width:34px;height:34px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-10);font-weight:700;color:var(--gray-700)}
+.dsm-ring-label{font-size:var(--text-9-5);color:var(--gray-600);font-weight:600;text-align:center}
+.dsm-cde-wrap{display:flex;gap:var(--space-1);align-items:center;margin-left:4px}
+.dsm-cde-chip{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:var(--text-9);font-weight:700;color:var(--gray-400);flex-shrink:0;transition:all .2s}
+.dsm-cde-chip.cde-met{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 /* ── Per-comorbidity plan pill ───────── */
-.cr-wrap{display:flex;align-items:center;gap:4px}
+.cr-wrap{display:flex;align-items:center;gap:var(--space-1)}
 .cr-wrap .cb-row{flex:1;margin:0}
-.plan-pill{display:none;cursor:pointer;font-size:10px;padding:1px 8px;border-radius:999px;user-select:none;white-space:nowrap;flex-shrink:0;border:1px solid;transition:all .12s;font-family:var(--font);line-height:1.6}
-.svc-auto-badge{font-size:9px;padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
+.plan-pill{display:none;cursor:pointer;font-size:var(--text-10);padding:1px 8px;border-radius:999px;user-select:none;white-space:nowrap;flex-shrink:0;border:1px solid;transition:all .12s;font-family:var(--font);line-height:1.6}
+.svc-auto-badge{font-size:var(--text-9);padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
 .plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
-.prior-test-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.outcome-sel{font-size:13px;padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
+.prior-test-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
+.outcome-sel{font-size:var(--text-13);padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
 .outcome-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 /* When the row's checkbox is checked but the outcome is empty, the dropdown
    is the gating control for chart emission — without an outcome value, every
    downstream emission path silently no-ops. Amber treatment makes the unmet
    predicate impossible to read past. Matches the --amber/--amber-light token
    pair used elsewhere for warning surfaces (bif-crosscheck, abaLevelWarn). */
-.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:#92400e;font-weight:600;box-shadow:0 0 0 2px #fde68a}
+.prior-test-row.outcome-required .outcome-sel{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);font-weight:600;box-shadow:0 0 0 2px #fde68a}
 .sub-options{margin:2px 0 4px 22px;padding:5px 8px;background:var(--gray-50);border-radius:4px;border-left:2px solid var(--blue-light)}
-.sub-options .sub-label{font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
+.sub-options .sub-label{font-size:var(--text-10);font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
 /* PHI-tightening: year-only date input. HIPAA Safe Harbor §164.514(b)(2)(C) permits
    year granularity but not finer for dates directly related to an individual.
    width:54px sized for a 4-digit year; -webkit-appearance:none strips the spinner
    on Chromium since the keyboard +/- is more useful in clinical workflow. */
-.prior-date-input{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);width:54px;-moz-appearance:textfield}
+.prior-date-input{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);width:54px;-moz-appearance:textfield}
 .prior-date-input::-webkit-outer-spin-button,.prior-date-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.prior-mod-sel{font-size:10px;padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
+.prior-mod-sel{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
 .plan-pill.pill-off{display:inline-flex;background:var(--gray-100);color:var(--gray-400);border-color:var(--gray-300)}
 .cr-wrap.cr-suspected{margin-top:5px;padding-top:5px;border-top:1px dashed var(--gray-200)}
 .cr-wrap.cr-suspected .cb-row{color:var(--gray-500);font-style:italic}
 /* ── Override / status badges in header ─ */
 .rp-status-chips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.status-chip{display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
+.status-chip{display:none;font-size:var(--text-10);font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
 .status-chip.visible{display:inline-flex;align-items:center;gap:3px}
-.chip-amber{background:var(--amber-light);color:#92400e;border-color:var(--amber)}
+.chip-amber{background:var(--amber-light);color:var(--amber-dark);border-color:var(--amber)}
 .chip-gray{background:var(--gray-100);color:var(--gray-600);border-color:var(--gray-300)}
 /* ── Visit type highlight when unset ─── */
 .vt-unset .dx-banner-label-vt{color:var(--amber)!important}
@@ -387,14 +424,14 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-active .sec-head{background:var(--amber-light)!important}
 /* ── Diagnosis status banner ─────────── */
 .dx-banner{background:white;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;box-shadow:var(--shadow-card)}
-.dx-banner-label{font-size:10px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
-.dx-banner .radio-grid{gap:4px}
-.dx-banner .r-opt{font-size:12px;font-weight:500}
+.dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
+.dx-banner .radio-grid{gap:var(--space-1)}
+.dx-banner .r-opt{font-size:var(--text-12);font-weight:500}
 .dx-banner .r-opt.sel{background:var(--blue);color:white;border-color:var(--blue-dark)}
-.dx-banner-none{font-size:11px;color:var(--gray-400);font-style:italic;margin-top:4px}
+.dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
-.tab-btn{padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
+.tab-btn{padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
 @media (hover:hover){.tab-btn:hover{color:var(--gray-800)}}
 .tab-btn.tab-active{background:var(--bg-card);color:var(--accent-hover);box-shadow:var(--shadow-sm);border-color:var(--border-subtle)}
 /* ── ABA letter preview ─────────────── */
@@ -409,39 +446,39 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-sig{margin-top:24px;border-top:1px solid var(--gray-300);padding-top:12px;font-size:10pt;color:var(--gray-600);line-height:2.2}
 .aba-doc .aba-ref{font-size:9.5pt;color:var(--gray-700);margin-bottom:6px;padding-left:18px;text-indent:-18px}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
-.iep-ph{background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic}
+.iep-ph{background:#fef9c3;color:var(--amber-dark);border-radius:3px;padding:0 2px;font-style:italic}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
-.mnav-btn{flex:1;padding:10px 8px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--gray-500);border-bottom:3px solid transparent;font-family:var(--font);transition:color .15s,border-color .15s;letter-spacing:.01em}
+.mnav-btn{flex:1;padding:10px 8px;font-size:var(--text-13);font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--gray-500);border-bottom:3px solid transparent;font-family:var(--font);transition:color .15s,border-color .15s;letter-spacing:.01em}
 .mnav-btn.mnav-active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
 /* ── Paper-card wrapper for output preview (desktop only) ───────────── */
 .note-paper{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:4px;margin:0 auto;max-width:900px}
 .note-paper > .note-doc,.note-paper > .note-content,.note-paper > .aba-doc{border:none;box-shadow:none;border-radius:var(--radius-md);margin:0}
 
 /* ── Reviewer's-eye toggle (strips placeholder highlighting) ─────────── */
-.rev-eye-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--radius);border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);cursor:pointer;font-size:11px;font-weight:500;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.rev-eye-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--radius);border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:500;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
 @media (hover:hover){.rev-eye-btn:hover{background:var(--gray-50);color:var(--gray-800)}}
 .rev-eye-btn.is-on{background:var(--accent-soft);color:var(--accent-hover);border-color:var(--accent)}
 .rev-eye-btn svg{width:14px;height:14px;flex-shrink:0}
-.rev-eye-btn .rev-eye-label{font-size:11px}
+.rev-eye-btn .rev-eye-label{font-size:var(--text-11)}
 /* When reviewer's-eye is on, mute placeholder highlights */
 body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
 
 /* ── Toast notifications (replaces alert) ────────────────────────────── */
-.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:380px}
-.toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:8px}
+.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:var(--space-3);pointer-events:none;max-width:380px}
+.toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:var(--space-3)}
 .toast.toast-show{opacity:1;transform:translateY(0)}
-.toast.toast-ok{background:#166534;color:white}
-.toast.toast-warn{background:#92400e;color:white}
+.toast.toast-ok{background:var(--green-dark);color:white}
+.toast.toast-warn{background:var(--amber-dark);color:white}
 .toast.toast-info{background:var(--gray-900);color:white}
 .toast-icon{flex-shrink:0;font-size:14px;line-height:1.2}
 .toast-msg{flex:1;min-width:0}
 
 /* ── Inline confirm (replaces confirm() for Clear All) ────────────────── */
-.confirm-inline{display:inline-flex;align-items:center;gap:6px}
-.confirm-inline .confirm-prompt{font-size:11px;color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
-.confirm-inline .btn{padding:4px 10px;font-size:11px}
+.confirm-inline{display:inline-flex;align-items:center;gap:var(--space-2)}
+.confirm-inline .confirm-prompt{font-size:var(--text-11);color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
+.confirm-inline .btn{padding:4px 10px;font-size:var(--text-11)}
 
 /* ── Mobile responsive — keyboard, touch targets, no horizontal scroll ─ */
 @media(max-width:768px){
@@ -455,15 +492,15 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .note-content{min-height:50vh}
   #mobile-nav{display:flex}
   .app-header{flex-wrap:wrap;padding:8px 12px}
-  .app-header h1{font-size:13px}
+  .app-header h1{font-size:var(--text-13)}
   .header-badge{font-size:7px;padding:1px 5px}
-  .header-actions{width:100%;justify-content:flex-end;gap:4px}
+  .header-actions{width:100%;justify-content:flex-end;gap:var(--space-1)}
   /* Touch target minimums */
   .cb-row{min-height:44px;padding:7px 6px}
   .cb-row input[type=checkbox]{width:18px;height:18px}
-  .mod-chip{padding:10px 14px;font-size:13px;min-height:44px}
+  .mod-chip{padding:10px 14px;font-size:var(--text-13);min-height:44px}
   .r-opt{min-height:44px;padding:9px 6px}
-  .sec-head{padding:13px 14px;font-size:12px;min-height:48px}
+  .sec-head{padding:13px 14px;font-size:var(--text-12);min-height:48px}
   /* Sticky section headers on mobile — sit under #mobile-nav (top:0,z:50).
      Wayfinding cue when scrolling long Section 4. Opt-out via data-test-mode.
      .section uses overflow:hidden for rounded-corner clipping; that clips
@@ -479,10 +516,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .sec-body.hidden{display:block;max-height:0;padding-top:0;padding-bottom:0}
   /* Sec-dot remains a no-toggle tap target on the sticky header. */
   .sec-dot{cursor:pointer;width:10px;height:10px;padding:2px;box-sizing:content-box}
-  .rp-header{padding:8px 12px;gap:4px}
+  .rp-header{padding:8px 12px;gap:var(--space-1)}
   /* Pill tabs collapse to 3-col grid, static border (no animated indicator) */
-  .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:4px}
-  .tab-btn{padding:9px 8px;font-size:12px;border-radius:var(--radius);border:1px solid var(--border-default);min-height:40px;background:var(--bg-card)}
+  .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:var(--space-1)}
+  .tab-btn{padding:9px 8px;font-size:var(--text-12);border-radius:var(--radius);border:1px solid var(--border-default);min-height:40px;background:var(--bg-card)}
   .tab-btn.tab-active{background:var(--accent-soft);color:var(--accent-hover);border-color:var(--accent);box-shadow:none}
   /* Strip the paper card on mobile — no nesting */
   .note-paper{border:none;box-shadow:none;border-radius:0;padding:0;max-width:100%}
@@ -493,7 +530,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .confirm-inline{flex-wrap:wrap;justify-content:flex-end}
   /* Toast: top-anchored, full width minus padding */
   .toast-container{top:8px;left:8px;right:8px;max-width:none}
-  .toast{font-size:13px}
+  .toast{font-size:var(--text-13)}
 }
 
 /* ── Print — clean printable note ──────────────────────────────────── */
@@ -553,7 +590,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
     <div class="dx-banner-none" id="dxBannerHint">Select a status to organize the note below.</div>
     <div id="visitTypeRow" style="margin-top:7px">
-      <span class="dx-banner-label dx-banner-label-vt">Visit Type <span style="font-size:9px;font-weight:400;opacity:.7">(affects note opening)</span></span>
+      <span class="dx-banner-label dx-banner-label-vt">Visit Type <span style="font-size:var(--text-9);font-weight:400;opacity:.7">(affects note opening)</span></span>
       <div class="radio-grid">
         <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="initial">Initial evaluation</label>
         <label class="r-opt"><input type="radio" name="visitType" data-bind="visitType" value="reeval">Re-evaluation</label>
@@ -570,11 +607,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Age Group</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="ageGroup" value="toddler">Toddler<br><small style="font-size:10px;color:#9ca3af">(12–35 mo)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="preschool">Preschool<br><small style="font-size:10px;color:#9ca3af">(3–5 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="schoolAge">School-age<br><small style="font-size:10px;color:#9ca3af">(6–11 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="adolescent">Adolescent<br><small style="font-size:10px;color:#9ca3af">(12–17 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="youngAdult">Young adult<br><small style="font-size:10px;color:#9ca3af">(18+ y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="toddler">Toddler<br><small style="font-size:var(--text-10);color:#9ca3af">(12–35 mo)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="preschool">Preschool<br><small style="font-size:var(--text-10);color:#9ca3af">(3–5 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="schoolAge">School-age<br><small style="font-size:var(--text-10);color:#9ca3af">(6–11 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="adolescent">Adolescent<br><small style="font-size:var(--text-10);color:#9ca3af">(12–17 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="youngAdult">Young adult<br><small style="font-size:var(--text-10);color:#9ca3af">(18+ y)</small></label>
         </div>
       </div>
 
@@ -716,7 +753,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt" data-cds-key="clinical" title="No standardized cognitive testing available at this visit"><input type="radio" name="cogDataSource" value="clinical"><span class="label-text">Clinical impression only</span></label>
           <label class="r-opt" data-cds-key="priorExternal" title="Prior outside evaluation established diagnosis; supporting records not available for review at this visit"><input type="radio" name="cogDataSource" value="priorExternal"><span class="label-text">Prior outside evaluation</span></label>
         </div>
-        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:13px;color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
+        <div id="screenerYoungWarning" style="display:none;font-style:italic;font-size:var(--text-13);color:#666;margin-top:6px">Note: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that can produce an objective developmental quotient (DQ). Brief IQ screeners specifically (e.g., KBIT-2R) have documented floor effects in children under 5.</div>
       </div><!-- /#cogDataSourceGroup (nested under Cognitive Profile) -->
       </div><!-- /.field-group Cognitive Profile -->
 
@@ -785,8 +822,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div id="dxWorkupSection" class="section">
     <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
     <div class="sec-body">
-      <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:11px;color:#166534">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
+      <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
+      <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
 
       <div class="field-group">
         <span class="field-label">Teacher / External Informant Materials to Request</span>
@@ -798,13 +835,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="scq_current"> SCQ Current (Social Communication Questionnaire)</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="assq"> ASSQ (Autism Spectrum Screening Questionnaire)</label>
-          <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="other_teacher"> Other: <input type="text" id="teacherMaterialOtherField" placeholder="specify..." style="margin-left:6px;font-size:11px;border:1px solid var(--gray-300);border-radius:3px;padding:2px 5px;width:160px;font-family:var(--font)"></label>
+          <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="other_teacher"> Other: <input type="text" id="teacherMaterialOtherField" placeholder="specify..." style="margin-left:6px;font-size:var(--text-11);border:1px solid var(--gray-300);border-radius:3px;padding:2px 5px;width:160px;font-family:var(--font)"></label>
         </div>
       </div>
 
       <div class="field-group">
         <span class="field-label">Evaluation Path</span>
-        <div class="radio-grid" style="flex-direction:column;gap:4px">
+        <div class="radio-grid" style="flex-direction:column;gap:var(--space-1)">
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="devOnly">&nbsp;Developmental profile only — DP-4 (+ KBIT-2R if age ≥ 4)</label>
           <label id="certainYoungRow" class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainYoung">&nbsp;Fairly certain, age &lt; 5 — CARS-2 with MD (1 hr)</label>
           <label class="r-opt" style="width:100%;justify-content:flex-start"><input type="radio" name="dxEvalPath" value="certainOlder">&nbsp;Fairly certain, age ≥ 5 — DP-4 + KBIT-2R → CARS-2</label>
@@ -820,7 +857,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button id="priorTestToggleBtn" class="expander-btn" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
         <div id="priorTestList" style="display:none">
         <div class="field-hint" style="margin:3px 0 5px">Results documented separately — select outcome per instrument</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;flex-direction:column;gap:var(--space-1)">
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2st"> CARS-2 ST</label><select class="outcome-sel" data-outcome-key="cars2st"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2st" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="cars2hf"> CARS-2 HF</label><select class="outcome-sel" data-outcome-key="cars2hf"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><input class="prior-date-input" data-date-key="cars2hf" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
           <div class="prior-test-row"><label class="cb-row"><input type="checkbox" data-key="priorTesting" value="ados2"> ADOS-2</label><select class="outcome-sel" data-outcome-key="ados2"><option value="">— outcome —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select><select class="prior-mod-sel" id="ados2ModuleSel"><option value="">— module —</option><option value="Module T">Module T (toddler)</option><option value="Module 1">Module 1 (preverbal/min. verbal)</option><option value="Module 2">Module 2 (phrase speech)</option><option value="Module 3">Module 3 (fluent speech)</option><option value="Module 4">Module 4 (fluent, older)</option></select><input class="prior-date-input" data-date-key="ados2" type="number" min="1990" max=""  data-max-year-now step="1" inputmode="numeric" placeholder="year"></div>
@@ -842,7 +879,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
     <div class="sec-body">
-      <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:11px;color:#92400e">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
+      <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
       <div id="levelGroup" style="display:none">
         <div class="field-group">
@@ -877,7 +914,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
               <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
             </div>
-            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:11px;font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
+            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:var(--text-11);font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
             <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
@@ -1044,7 +1081,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
           <div class="comorbid-grp">Genetics-relevant exam findings</div>
-          <div class="field-hint" style="margin:2px 0 4px;font-size:11px;color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
+          <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
           <div class="radio-grid" style="margin:4px 0">
             <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
             <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
@@ -1059,7 +1096,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
               <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
               <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
             </div>
-            <div class="field-hint" style="margin:0 0 4px;font-size:11px;color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
+            <div class="field-hint" style="margin:0 0 4px;font-size:var(--text-11);color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
           </div>
           <div class="comorbid-grp">Support Services</div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
@@ -1081,7 +1118,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)">5 &mdash; Comorbid Conditions <span>&#9660;</span></div>
     <div class="sec-body">
-      <p style="font-size:11px;color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
+      <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
         <div class="comorbid-grp" style="margin-top:2px">Psychiatric / Behavioral Health</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_combined"> ADHD, Combined presentation</label><span class="plan-pill" data-cv="adhd_combined">Include plan</span></div>
@@ -1099,7 +1136,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><span class="plan-pill" data-cv="trauma">Include plan</span></div>
-        <div id="traumaIepGateRow" class="sub-options" style="display:none"><label class="cb-row" style="font-size:11px;color:var(--gray-600)"><input type="checkbox" id="traumaIncludeInIEP"> Include in IEP letter <span style="color:var(--gray-400);font-style:italic">(off by default; verify family has consented to share with school)</span></label></div>
+        <div id="traumaIepGateRow" class="sub-options" style="display:none"><label class="cb-row" style="font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" id="traumaIncludeInIEP"> Include in IEP letter <span style="color:var(--gray-400);font-style:italic">(off by default; verify family has consented to share with school)</span></label></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia"> Catatonia — features present at this visit (F06.1)</label><span class="plan-pill" data-cv="catatonia">Include plan</span></div>
         <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia_history"> Catatonia — prior episode (recovered or partial; F06.1 by history)</label><span class="plan-pill" data-cv="catatonia_history">Include plan</span></div>
 
@@ -1234,7 +1271,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <hr class="divider" style="margin-top:10px">
       <div class="field-group" style="margin-top:8px">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
-        <input type="text" id="rtcIntervalField" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:12px;font-family:var(--font);border:1px solid var(--gray-200);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
+        <input type="text" id="rtcIntervalField" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:var(--text-12);font-family:var(--font);border:1px solid var(--gray-200);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
       </div>
     </div>
   </div>
@@ -1243,7 +1280,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div id="abaParamsSection" class="section" style="display:none;border-color:#2563eb">
     <div class="sec-head" style="background:#dbeafe;color:#1d4ed8" onclick="toggleSec(this,event)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
     <div class="sec-body">
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:10px">These fields generate a standalone insurance-facing Letter of Medical Necessity. Use the <strong>ABA Letter</strong> tab in the preview to review and copy.</p>
+      <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">These fields generate a standalone insurance-facing Letter of Medical Necessity. Use the <strong>ABA Letter</strong> tab in the preview to review and copy.</p>
 
       <div class="field-group">
         <span class="field-label">Insurance / Payer Type</span>
@@ -1306,40 +1343,40 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <!-- Review & Adjust divider -->
   <div style="position:relative;margin:10px 0 6px">
     <hr style="border:none;border-top:2px dashed var(--gray-300);margin:0">
-    <span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 10px;font-size:10px;color:var(--gray-400);font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">Review &amp; Adjust</span>
+    <span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 10px;font-size:var(--text-10);color:var(--gray-400);font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">Review &amp; Adjust</span>
   </div>
 
   <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:#92400e" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
+    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
     <div class="sec-body">
-      <p style="font-size:11px;color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
+      <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
       <div id="overridePanel"></div>
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Current Private / Clinic Therapy Status</span>
-        <p style="font-size:11px;color:var(--gray-600);margin-bottom:6px">Modifies the prose for active referrals above. Rows for inactive referrals are greyed out — activate the corresponding tile first. Re-click a selected option to clear it without changing the referral itself.</p>
+        <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:6px">Modifies the prose for active referrals above. Rows for inactive referrals are greyed out — activate the corresponding tile first. Re-click a selected option to clear it without changing the referral itself.</p>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
+          <div class="therapy-status-row" data-therapy-key="slp" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
+            <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">SLP:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_slp" data-bind="therapyStatus.slp" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
+          <div class="therapy-status-row" data-therapy-key="ot" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
+            <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">OT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_ot" data-bind="therapyStatus.ot" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
+          <div class="therapy-status-row" data-therapy-key="aba" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
+            <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">ABA:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_aba" data-bind="therapyStatus.aba" value="increase">Increase intensity</label>
           </div>
-          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-            <span class="ts-label" style="font-size:11px;font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
+          <div class="therapy-status-row" data-therapy-key="pt" style="display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap">
+            <span class="ts-label" style="font-size:var(--text-11);font-weight:600;color:var(--gray-600);min-width:30px">PT:</span>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="continue">Continue</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="revise">Goals need revision</label>
             <label class="r-opt"><input type="radio" name="therapyStatus_pt" data-bind="therapyStatus.pt" value="increase">Increase intensity</label>
@@ -1353,14 +1390,14 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
 <div class="right-panel">
   <div class="rp-header">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
       <h2>&#128196; Live Note Preview</h2>
       <div class="rp-status-chips">
         <span class="status-chip chip-amber" id="override-badge-rp"></span>
         <span class="status-chip chip-gray" id="evpath-chip-rp"></span>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
       <div class="preview-tabs">
         <button class="tab-btn tab-active" id="tabNote" onclick="setPreviewMode('note')">A&amp;P Note</button>
         <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" style="display:none">&#9733; ABA Letter</button>
@@ -1383,9 +1420,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-green btn-sm" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
-    <span id="abaLevelWarn" style="display:none;font-size:11px;font-weight:600;color:#92400e;background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
-    <span id="abaThinWarn" style="display:none;font-size:11px;font-weight:600;color:#991b1b;background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
-    <span id="abaCatatoniaWarn" style="display:none;font-size:11px;font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
+    <span id="abaLevelWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
+    <span id="abaThinWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--red-dark);background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
+    <span id="abaCatatoniaWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
     <button class="btn btn-gray btn-sm" onclick="copyABALetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Copy with *** cursor stops for Epic SmartText paste">Copy for Epic (***)</button>
@@ -1771,7 +1808,7 @@ function updateOverallLevelBadge(){
   if(!lv){el.innerHTML='';return;}
   const bg={'1':'var(--amber)','2':'var(--red)','3':'#7c3aed'};
   const names={'1':'Requires Support','2':'Requires Substantial Support','3':'Requires Very Substantial Support'};
-  el.innerHTML=`<div style="margin-top:7px;padding:4px 10px;background:${bg[lv]};color:white;border-radius:4px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600">&#9654; Overall: Level ${lv} — ${names[lv]}</div>`;
+  el.innerHTML=`<div style="margin-top:7px;padding:4px 10px;background:${bg[lv]};color:white;border-radius:4px;display:inline-flex;align-items:center;gap:5px;font-size:var(--text-11);font-weight:600">&#9654; Overall: Level ${lv} — ${names[lv]}</div>`;
 }
 // GDD severity rendering: F88 has no severity sub-coding in ICD-10, so the prose
 // adjective ("mild" / "moderate" / "severe") is the only place where the severity
@@ -4013,6 +4050,9 @@ function generateIEPLetterHTML(){
 
   let h='';
   if(S.comorbid.has('trauma')&&S.traumaIncludeInIEP){
+    /* Literal font-size:12px preserved (not --text-12 token) because this string
+       is appended to `h` for IEP letter paste output, and Epic/Word cannot resolve
+       CSS variables in pasted HTML. Same rationale as the #92400e color literal. */
     h+=`<div style="background:#fef3c7;border-left:4px solid #d97706;padding:10px 14px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#92400e;line-height:1.5">⚠️ This letter includes trauma context. Confirm the family has consented to share this with the school district before sending.</div>`;
   }
   h+=`<div class="aba-doc">`;
