@@ -1886,14 +1886,92 @@ const CRIT_B={b1:'Stereotyped or repetitive motor movements, use of objects, or 
 
 // ─── EVIDENCE CHIP DATA ───────────────────────────────────────────────────────
 const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',record:'Record review'};
+// Each criterion maps to {base:[...universal high-yield...], <ageGroup>:[...age-specific...]}.
+// Age keys match S.ageGroup (toddler/preschool/schoolAge/adolescent/youngAdult). The chip
+// strip shows base + current-age chips only (and a min-verbal cluster); updateEvChips() toggles visibility on render.
+// Curated for high statistical yield per band, deliberately not exhaustive. The older-age A-criteria
+// chips capture the verbal/masking presentation that the toddler-weighted base set under-represents.
 const EV_CHIPS={
-  a1:['No orienting to name','Absent joint attention','Reduced social smile','Does not initiate interactions','Does not respond to social bids','Limited sharing of interests/affect','Limited emotional reciprocity'],
-  a2:['Reduced eye contact','Absent declarative pointing','Absent showing/giving objects','Limited gaze-gesture coordination','Absent social facial expression','Does not use gestures communicatively'],
-  a3:['No interest in peers','Prefers solitary activity','No parallel play','Absent pretend/symbolic play','Does not adjust behavior to social context','Difficulty with cooperative play','No age-appropriate peer friendships'],
-  b1:['Hand flapping','Rocking or spinning self','Toe walking','Lining or arranging objects','Immediate echolalia','Delayed echolalia','Scripted/idiosyncratic speech','Unusual repetitive object use'],
-  b2:['Extreme distress with transitions','Needs advance warning for transitions','Insists on same routes/sequences','Insists on same clothing or outfit','Same foods exclusively (rigidity, not texture)','Rigid mealtime or bedtime rituals','Meltdowns with unexpected change','Inflexible rule adherence'],
-  b3:['Preoccupation with specific topics','Conversation dominated by one topic','Memorizes extensive facts about topic of interest','Unusually intense focus on specific objects','Restricted range of interests','Interest significantly interferes with daily activities'],
-  b4:['Covers ears to ordinary sounds','Tactile hypersensitivity (clothing tags/textures/touch)','Indifferent to pain or temperature','Seeks deep pressure/proprioceptive input','Seeks vestibular input (spinning/swinging)','Fascinated by lights/spinning/visual patterns','Food texture selectivity (sensory-driven)','Unusual visual inspection of objects','Mouthing of non-food objects']
+  a1:{
+    base:['Reduced sharing of interests or affect','Limited social-emotional reciprocity','Does not initiate social interaction'],
+    toddler:['No orienting to name','Absent joint attention','Reduced social smile','Does not bring or show objects to share'],
+    preschool:['Limited back-and-forth in play','Does not respond to social bids','One-sided interaction style'],
+    schoolAge:[{t:'One-sided conversation',lang:'verbal'},{t:'Difficulty with reciprocal conversation',lang:'verbal'},'Reduced sharing of emotions','Limited interest in others\' experiences'],
+    adolescent:[{t:'Conversation tends toward monologue',lang:'verbal'},'Reciprocity is effortful or scripted',{t:'Misreads conversational cues',lang:'verbal'},'Reduced spontaneous sharing'],
+    youngAdult:[{t:'Reciprocal exchange requires conscious effort',lang:'verbal'},'Initiates socially only in structured contexts',{t:'Difficulty sustaining mutual conversation',lang:'verbal'}],
+    // Preverbal/AAC cluster: shown only when min-verbal (nonverbal or single words) AND
+    // school-age or older, replacing the conversational chips suppressed above. Gated to
+    // older ages because toddler/preschool chips are already preverbal (see updateEvChips).
+    minVerbal:['Does not direct vocalizations or gestures to others','Limited preverbal turn-taking','Does not show or share to engage others']
+  },
+  a2:{
+    base:['Reduced or atypical eye contact','Poorly integrated verbal and nonverbal communication','Limited use of communicative gestures'],
+    toddler:['Absent declarative pointing','Does not show or give objects','Limited gaze-gesture coordination','Limited social facial expression'],
+    preschool:['Reduced coordination of eye contact and gesture','Flat or reduced facial expression'],
+    schoolAge:[{t:'Atypical eye contact in conversation',lang:'verbal'},'Limited range of facial expression',{t:'Gestures not integrated with speech',lang:'verbal'}],
+    adolescent:['Eye contact effortful or "performed"','Reduced expressive body language','Difficulty reading others\' nonverbal cues'],
+    youngAdult:['Monitored or atypical eye contact','Restricted facial and gestural expressiveness','Misses nonverbal social signals'],
+    minVerbal:['Leads adult by the hand instead of pointing','Communicates mainly to request, not to share','Limited use of AAC or symbolic gestures']
+  },
+  a3:{
+    base:['Difficulty making or keeping friends','Does not adjust behavior to social context'],
+    toddler:['Little interest in peers','No parallel play','Prefers solitary play'],
+    preschool:['Absent pretend or symbolic play','Limited cooperative play','Little interest in peers'],
+    schoolAge:['Few or no reciprocal friendships','Difficulty with group-play rules','Prefers to play alone','Difficulty with imaginative or cooperative play'],
+    adolescent:['Friendships superficial or activity-based','Difficulty navigating peer-group dynamics','Socially isolated or bullied','Difficulty grasping unspoken social expectations'],
+    youngAdult:['Few sustained peer relationships','Difficulty with workplace or social-context norms','Relationships limited to shared-interest settings']
+  },
+  b1:{
+    base:['Hand flapping','Repetitive or unusual object use','Echolalia (immediate or delayed)','Scripted or idiosyncratic speech'],
+    toddler:['Lining or arranging objects','Spinning or rocking self','Toe walking','Repetitive manipulation of object parts'],
+    preschool:['Lining or ordering objects','Motor stereotypies when excited'],
+    schoolAge:['Stereotypies when excited or stressed','Repetitive vocalizations'],
+    adolescent:['Subtle or suppressed stereotypies','Repetitive speech or phrases','Stereotypies emerge with stress or excitement'],
+    youngAdult:['Stereotypies suppressed in public, present privately','Repetitive speech patterns']
+  },
+  b2:{
+    base:['Distress with unexpected change','Insistence on routines or rituals','Rigid, inflexible thinking'],
+    toddler:['Extreme distress with transitions','Rigid bedtime or mealtime rituals','Same foods only (rigidity, not texture)'],
+    preschool:['Difficulty with transitions','Greeting or play rituals','Insists on sameness in environment'],
+    schoolAge:['Needs advance warning for change','Insists on same routes or sequences','Distress with schedule changes'],
+    adolescent:['Rigid adherence to self-imposed rules','Distress when plans change','Inflexible problem-solving'],
+    youngAdult:['Strong need for predictability','Difficulty with novel or ambiguous situations','Rigid rule-following']
+  },
+  b3:{
+    base:['Restricted range of interests','Interest interferes with other activities'],
+    toddler:['Preoccupation with parts of objects','Attachment to an unusual object','Intense focus on specific objects'],
+    preschool:['Strong attachment to specific objects','Narrow, repetitive play themes'],
+    schoolAge:['Preoccupation with a specific topic','Memorizes extensive facts on interest','Conversation dominated by one topic'],
+    adolescent:['Highly circumscribed special interest','Interest dominates free time and conversation','Encyclopedic knowledge of a niche topic'],
+    youngAdult:['Intense, narrowly focused interests','Interests structure daily life','Difficulty disengaging from preferred topic']
+  },
+  b4:{
+    base:['Auditory hypersensitivity (covers ears)','Tactile sensitivity (textures, tags, touch)','Indifference to pain or temperature','Seeks deep pressure or proprioceptive input','Visual fascination (lights, spinning, patterns)'],
+    toddler:['Mouthing of non-food objects','Unusual visual inspection of objects','Seeks vestibular input (spinning, swinging)'],
+    preschool:['Food texture selectivity (sensory-driven)','Distress with grooming (hair, nails, teeth)'],
+    schoolAge:['Sensory overload in busy environments','Strong food texture or smell aversions','Seeks movement or vestibular input'],
+    adolescent:['Overwhelmed in loud or crowded settings','Specific clothing or fabric intolerances','Sensory-driven dietary restriction'],
+    youngAdult:['Overwhelmed by crowded or noisy environments','Persistent clothing or fabric intolerances','Sensory-based food restriction']
+  },
+  c:{
+    base:['Symptoms present in early childhood','Parent reports concerns since infancy'],
+    toddler:['Concerns from the first year of life','Early language or social delay noted'],
+    preschool:['Concerns since toddlerhood','Early delay documented in records'],
+    schoolAge:['Early-childhood concerns per parent recall','Delays noted in early records','Skill loss or plateau in toddlerhood'],
+    adolescent:['Retrospective history of early social differences','Early report cards or records note social difficulty','Symptoms present but masked since childhood'],
+    youngAdult:['Longstanding social differences since childhood','Early difficulties recalled by family','Symptoms masked or compensated until later']
+  },
+  d:{
+    base:['Impairment across multiple settings'],
+    toddler:['Cannot participate in childcare without support','Significant disruption to family routines','Requires 1:1 support'],
+    preschool:['Cannot participate in preschool without support','Requires adult support for daily routines'],
+    schoolAge:['Academic functioning impaired despite ability','Requires school accommodations or support','Peer relationships significantly impaired'],
+    adolescent:['Independence impaired relative to age','Difficulty meeting school or social demands','Requires substantial support for daily functioning'],
+    youngAdult:['Vocational or independent-living functioning impaired','Requires support for employment or daily living','Significant social-occupational impairment']
+  },
+  e:{
+    base:['Social-communication deficits exceed developmental level','Qualitative social differences beyond ID alone','Social impairment out of proportion to cognition']
+  }
 };
 
 // ─── CLINICAL SUMMARY GENERATOR ──────────────────────────────────────────────
@@ -4437,6 +4515,24 @@ function renderManualSpecCaptions(){
   });
 }
 
+// Toggle DSM evidence chips by two axes (chips are built once at init):
+//  - Age: 'base' always shows; an age-keyed chip shows only when it matches S.ageGroup;
+//    the 'minVerbal' group shows only when min-verbal AND school-age or older. It is gated
+//    to older ages because its job is to replace the conversational chips that get suppressed
+//    at schoolAge+; toddler/preschool chips are already preverbal, so the cluster would only
+//    duplicate them there.
+//  - Language: a chip tagged lang:'verbal' (conversation-dependent) is hidden when min-verbal.
+function updateEvChips(){
+  const ag=S.ageGroup, mv=isMinVerbal();
+  const olderAge=ag==='schoolAge'||ag==='adolescent'||ag==='youngAdult';
+  document.querySelectorAll('.ev-obs-chip').forEach(chip=>{
+    const a=chip.dataset.age, lang=chip.dataset.lang||'';
+    const ageOK=a==='base'||a===ag||(a==='minVerbal'&&mv&&olderAge);
+    const langOK=lang!=='verbal'||!mv;
+    chip.style.display=(ageOK&&langOK)?'':'none';
+  });
+}
+
 function render(){
   // Adjust-Referrals coupling — both run unconditionally at the top so the various
   // early-return paths below (no-input, ABA-preview, IEP-preview) still get the
@@ -4446,6 +4542,7 @@ function render(){
   syncTherapyStatusFromActivity();
   updateTherapyStatusEnablement();
   updatePriorTestOutcomeRequired();
+  updateEvChips();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -6004,7 +6101,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const traumaGateCb=document.getElementById('traumaIncludeInIEP');
   if(traumaGateCb) traumaGateCb.addEventListener('change',()=>{S.traumaIncludeInIEP=traumaGateCb.checked;render();});
 
-  ['a1','a2','a3','b1','b2','b3','b4'].forEach(k=>{
+  ['a1','a2','a3','b1','b2','b3','b4','c','d','e'].forEach(k=>{
     const ta=document.getElementById('ev_'+k);
     if(!ta) return;
     ta.addEventListener('input',()=>{S.ev[k]=ta.value;render();});
@@ -6027,24 +6124,35 @@ document.addEventListener('DOMContentLoaded',()=>{
       srcStrip.appendChild(chip);
     });
 
-    // Observation chips
+    // Observation chips — built once across all age bands; each tagged with data-age
+    // ('base' shows always, an age key shows only when S.ageGroup matches).
+    // updateEvChips() (called from render) toggles visibility.
     const obsStrip=document.createElement('div');
     obsStrip.className='ev-obs-strip';
-    (EV_CHIPS[k]||[]).forEach(text=>{
-      const chip=document.createElement('span');
-      chip.className='ev-obs-chip';chip.textContent=text;
-      chip.addEventListener('click',()=>{
-        ta.value=ta.value.trim()?(ta.value.trim()+'; '+text):text;
-        S.ev[k]=ta.value;render();
+    const def=EV_CHIPS[k]||{};
+    const groups=Array.isArray(def)?{base:def}:def;
+    Object.entries(groups).forEach(([ageKey,arr])=>{
+      (arr||[]).forEach(entry=>{
+        // An entry is either a plain string or {t,lang}. lang='verbal' chips are hidden
+        // when the patient is min-verbal (see updateEvChips); the 'minVerbal' ageKey group
+        // is the reverse, shown only when min-verbal and school-age or older.
+        const text=typeof entry==='string'?entry:entry.t;
+        const chip=document.createElement('span');
+        chip.className='ev-obs-chip';chip.textContent=text;
+        chip.dataset.age=ageKey;
+        if(typeof entry!=='string'&&entry.lang) chip.dataset.lang=entry.lang;
+        chip.addEventListener('click',()=>{
+          ta.value=ta.value.trim()?(ta.value.trim()+'; '+text):text;
+          S.ev[k]=ta.value;render();
+        });
+        obsStrip.appendChild(chip);
       });
-      obsStrip.appendChild(chip);
     });
 
     wrap.insertBefore(srcStrip,ta);
     wrap.insertBefore(obsStrip,ta);
   });
-
-  ['c','d','e'].forEach(k=>{const ta=document.getElementById('ev_'+k);if(ta)ta.addEventListener('input',()=>{S.ev[k]=ta.value;render();});});
+  updateEvChips(); // set initial chip visibility for the default age + language level
   document.querySelectorAll('.beh-freq-inp').forEach(inp=>{
     inp.addEventListener('input',()=>{S.behavFreq[inp.dataset.freqkey]=inp.value.trim();render();});
   });
