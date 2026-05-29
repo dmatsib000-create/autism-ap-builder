@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `8f05033`
+> **Last verified against commit:** `1e44b43`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -460,6 +460,37 @@ The `diagStatus` field is the master gate for whether the app is documenting a d
 
 - ASD severity levels (§3) are orthogonal to criteria — a patient can be Level 3 with 2/3 A and 2/4 B (which would block "complete," but the levels themselves are independent)
 - The override system (§7) does not bypass criteria — even with all overrides on `'yes'`, an incomplete `validateCriteria()` still fires the warning banner
+
+### 4.7 Evidence chips (age- and language-adaptive)
+
+Under each criterion's evidence textarea sits a strip of clickable chips (`.ev-obs-chip`). Clicking one appends its text to that criterion's textarea and writes back to `S.ev[k]`. They are a data-entry convenience, not state-changing in any other way.
+
+The chip catalog is `EV_CHIPS`, keyed `a1, a2, a3, b1, b2, b3, b4, c, d, e`. Each key holds an object of age-group buckets:
+
+```javascript
+a1:{
+  base:[ ... ],          // always shown for this criterion
+  toddler:[ ... ],
+  preschool:[ ... ],
+  schoolAge:[ ... ],
+  adolescent:[ ... ],
+  youngAdult:[ ... ],
+  minVerbal:[ ... ]       // optional; preverbal phrasings for older patients
+}
+```
+
+**Build once, toggle on render.** All chips are created once at `DOMContentLoaded`, each tagged `data-age` (the bucket name) and optionally `data-lang="verbal"`. Visibility is recomputed by `updateEvChips()`, which `render()` calls unconditionally near the top. The build loop also calls `updateEvChips()` immediately after creating the chips so the initial (default-age) filter is applied before any render.
+
+**The two filter axes** (`updateEvChips()`):
+
+| Axis | Rule | Purpose |
+|---|---|---|
+| Age | show if `data-age` is `base`, equals `S.ageGroup`, or is `minVerbal` *and* `isMinVerbal()` *and* age is schoolAge/adolescent/youngAdult | match phrasing to developmental stage |
+| Language | show unless `data-lang === 'verbal'` *and* `isMinVerbal()` | suppress conversation/speech-presupposing chips for nonverbal/single-word patients |
+
+A chip is visible only when **both** axes pass. The `lang:'verbal'` tag is applied to chips whose wording assumes spoken conversation (e.g. A1 "One-sided conversation", A2 "Atypical eye contact in conversation", "Gestures not integrated with speech"). The `minVerbal` bucket is the deliberate counterpart: it carries preverbal phrasings shown *only* for older min-verbal patients, where the suppressed conversational chips would otherwise leave a gap. The suppression (`lang:'verbal'`) and the replacement (`minVerbal` bucket) are gated to the same age range so they stay aligned.
+
+A chip entry is either a plain string or `{t:'text', lang:'verbal'}`. The build loop handles both: `const text = typeof entry==='string' ? entry : entry.t`.
 
 ---
 
