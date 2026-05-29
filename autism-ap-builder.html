@@ -1893,8 +1893,8 @@ const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',rec
 // chips capture the verbal/masking presentation that the toddler-weighted base set under-represents.
 const EV_CHIPS={
   a1:{
-    base:['Reduced sharing of interests or affect','Limited social-emotional reciprocity','Does not initiate social interaction'],
-    toddler:['No orienting to name','Absent joint attention','Reduced social smile','Does not bring or show objects to share'],
+    base:['Reduced sharing of interests or affect','Limited give-and-take in interaction','Rarely initiates social interaction'],
+    toddler:['Reduced or inconsistent orienting to name','Reduced joint attention','Reduced social smile','Does not bring or show objects to share'],
     preschool:['Limited back-and-forth in play','Does not respond to social bids','One-sided interaction style'],
     schoolAge:[{t:'One-sided conversation',lang:'verbal'},{t:'Difficulty with reciprocal conversation',lang:'verbal'},'Reduced sharing of emotions','Limited interest in others\' experiences'],
     adolescent:[{t:'Conversation tends toward monologue',lang:'verbal'},'Reciprocity is effortful or scripted',{t:'Misreads conversational cues',lang:'verbal'},'Reduced spontaneous sharing'],
@@ -1906,7 +1906,7 @@ const EV_CHIPS={
   },
   a2:{
     base:['Reduced or atypical eye contact','Poorly integrated verbal and nonverbal communication','Limited use of communicative gestures'],
-    toddler:['Absent declarative pointing','Does not show or give objects','Limited gaze-gesture coordination','Limited social facial expression'],
+    toddler:['Reduced or absent declarative pointing','Does not show or give objects','Limited gaze-gesture coordination','Limited social facial expression'],
     preschool:['Reduced coordination of eye contact and gesture','Flat or reduced facial expression'],
     schoolAge:[{t:'Atypical eye contact in conversation',lang:'verbal'},'Limited range of facial expression',{t:'Gestures not integrated with speech',lang:'verbal'}],
     adolescent:['Eye contact effortful or "performed"','Reduced expressive body language','Difficulty reading others\' nonverbal cues'],
@@ -1923,9 +1923,9 @@ const EV_CHIPS={
   },
   b1:{
     base:['Hand flapping','Repetitive or unusual object use','Echolalia (immediate or delayed)','Scripted or idiosyncratic speech'],
-    toddler:['Lining or arranging objects','Spinning or rocking self','Toe walking','Repetitive manipulation of object parts'],
+    toddler:['Lining or arranging objects','Spinning or rocking self','Repetitive manipulation of object parts'],
     preschool:['Lining or ordering objects','Motor stereotypies when excited'],
-    schoolAge:['Stereotypies when excited or stressed','Repetitive vocalizations'],
+    schoolAge:['Stereotypies when excited or stressed','Repetitive vocalizations','Persistent toe walking'],
     adolescent:['Subtle or suppressed stereotypies','Repetitive speech or phrases','Stereotypies emerge with stress or excitement'],
     youngAdult:['Stereotypies suppressed in public, present privately','Repetitive speech patterns']
   },
@@ -1965,12 +1965,16 @@ const EV_CHIPS={
     base:['Impairment across multiple settings'],
     toddler:['Cannot participate in childcare without support','Significant disruption to family routines','Requires 1:1 support'],
     preschool:['Cannot participate in preschool without support','Requires adult support for daily routines'],
-    schoolAge:['Academic functioning impaired despite ability','Requires school accommodations or support','Peer relationships significantly impaired'],
+    schoolAge:['Academic performance impaired relative to potential','Functioning impaired across academic and self-care domains','Requires school accommodations or support','Peer relationships significantly impaired'],
     adolescent:['Independence impaired relative to age','Difficulty meeting school or social demands','Requires substantial support for daily functioning'],
     youngAdult:['Vocational or independent-living functioning impaired','Requires support for employment or daily living','Significant social-occupational impairment']
   },
   e:{
-    base:['Social-communication deficits exceed developmental level','Qualitative social differences beyond ID alone','Social impairment out of proportion to cognition']
+    base:['Social reciprocity weaker than nonverbal cognitive skills','Relates to objects more readily than to people despite cognitive ability','Social difficulty out of proportion to nonverbal problem-solving'],
+    // minVerbal (shown when min-verbal AND school-age or older): anchored to nonverbal ability,
+    // not language, so it does not conflate communication level with cognition (the confound
+    // Criterion E exists to resolve).
+    minVerbal:['Social relatedness limited beyond what nonverbal ability explains']
   }
 };
 
