@@ -550,6 +550,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   @page{margin:.75in}
 }
 .print-only{display:none}
+/* Quick-start preset bar — in-visit archetype scaffolding (prototype).
+   Sits above the diagnosis banner as the "start here" affordance. */
+.preset-bar{margin:0 0 12px;padding:10px 12px;border:1px solid var(--gray-300,#d1d5db);border-radius:var(--radius);background:var(--gray-50,#f9fafb)}
+.preset-bar-label{font-size:var(--text-11);font-weight:600;color:var(--gray-700,#374151);margin-bottom:7px}
+.preset-bar-label span{font-weight:400;color:var(--gray-500,#6b7280)}
+.preset-bar-btns{display:flex;flex-wrap:wrap;gap:var(--space-2,6px)}
+/* Self-contained light-background styling — NOT .btn-outline, which is white-on-dark
+   for the header bar and would be invisible here. */
+.preset-btn{font-size:var(--text-11);padding:5px 9px;white-space:nowrap;background:var(--bg-card,#fff);color:var(--gray-700,#374151);border:1px solid var(--gray-300,#d1d5db)}
+@media (hover:hover){.preset-btn:hover{border-color:var(--accent,#2563eb);color:var(--accent-hover,#1d4ed8);background:var(--accent-soft,#eff6ff)}}
+.preset-btn.preset-mod{border-style:dashed;font-style:italic;color:var(--gray-500,#6b7280)}
 </style>
 </head>
 <body>
@@ -579,6 +590,24 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
 <div class="main">
 <div class="left-panel">
+
+  <!-- Quick-start archetype presets (in-visit scaffolding, PROTOTYPE). Each button
+       drives the real form controls via applyPreset() so all branching/bridges fire
+       exactly as if clicked by hand. Presets set the SCAFFOLD (age, language, common
+       needs) and deliberately leave the diagnostic determination — DSM-5 criteria and
+       both severity levels (asdLevelSC/asdLevelRRB) — UNSET for the clinician to affirm. -->
+  <div class="preset-bar" id="presetBar">
+    <div class="preset-bar-label">Quick start <span>&mdash; one click scaffolds a common case; diagnosis &amp; severity stay blank for you to set.</span></div>
+    <div class="preset-bar-btns">
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p1')">Toddler eval — workup pending</button>
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p2')">Preschool — emerging language</button>
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p3')">School-age — verbal, lower support</button>
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p4')">School-age — higher support</button>
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p5')">Adolescent — later-identified</button>
+      <button class="btn preset-btn" type="button" onclick="applyPreset('p6')">Adolescent/YA — ID + transition</button>
+      <button class="btn preset-btn preset-mod" type="button" onclick="applyPreset('adhd',{reset:false})" title="Layers co-occurring ADHD onto the current selections without clearing the form">+ ADHD</button>
+    </div>
+  </div>
 
   <!-- Diagnosis Status Banner -->
   <div class="dx-banner">
@@ -1506,6 +1535,118 @@ function setByPath(obj, path, val){
     o = o[keys[i]];
   }
   o[keys[keys.length-1]] = val;
+}
+
+// ─── ARCHETYPE PRESETS (in-visit quick-start scaffolding) ────────────────────
+// Each preset drives the REAL form controls via applyPreset() — it clicks
+// radios/checkboxes/chips so every existing change-handler side effect fires
+// (cog→specifier bridge, langLevel→needsComm sync, syncABATargetsFromNeeds,
+// syncSchoolSvcFromNeeds, .sel classes, render). It does NOT assign S directly, so a
+// preset can never drift from the hand-click code path.
+//
+// THE SIX + ONE were ratified by the design council (FOR ≥95% on the cross-preset
+// invariant), grounded in national autism epidemiology for a majority-Medicaid
+// specialty clinic. See branching-logic.md §11.17 + references.md §7 for the full
+// report and the grounding citation.
+//
+// CROSS-PRESET INVARIANT — every preset leaves the diagnostic DETERMINATION untouched:
+//   diagStatus, asdLevelSC, asdLevelRRB, criteriaA/B, criteriaC/D/E, ev.* are NEVER set.
+// The clinician makes every diagnosis-determining call affirmatively, every time.
+// Do not "helpfully" pre-check any of those here.
+//
+// COGNITIVE RULE (Fork A): only the two early-workup presets (p1/p2) set
+// cog='unknown' — an explicit NON-assertion that drives the "awaiting comprehensive
+// battery" pathway. No preset ever sets a specific cognitive tier (average, id_mild,
+// …); higher-support presets leave cog blank rather than presume ID.
+//
+// AUTO-DERIVED, so NOT set here: therapy referrals (resolveOv/rule*), school services
+// (syncSchoolSvcFromNeeds), and most ABA targets (syncABATargetsFromNeeds, add-only).
+// We set findings; recommendations fall out. therapyStatus is also left blank — it
+// asserts the child is ALREADY in therapy, which is a finding, not a scaffold.
+// insuranceType='medicaid' is the population default (Fork residual; 1-click to change).
+//
+// Fields: radios [name,value] · checks [data-key,value] · mods [langModifier key].
+const PRESETS = {
+  // P1 — Toddler eval, language delay, workup pending
+  p1:{label:'Toddler eval — workup pending',
+      radios:[['visitType','initial'],['ageGroup','toddler'],['langLevel','singleWord'],['cogProfile','unknown'],['insuranceType','medicaid']],
+      checks:[['needsComm','expressive'],['needsComm','receptive'],['needsSocial','play'],['needsSocial','reciprocity'],
+              ['abaTargets','functional_comm'],['abaTargets','joint_attention'],['abaTargets','imitation']]},
+  // P2 — Preschool ASD, emerging language
+  p2:{label:'Preschool — emerging language',
+      radios:[['visitType','initial'],['ageGroup','preschool'],['langLevel','phrase'],['cogProfile','unknown'],['insuranceType','medicaid']],
+      checks:[['needsComm','expressive'],['needsComm','receptive'],['needsSocial','play'],['needsSocial','peer'],
+              ['abaTargets','functional_comm'],['abaTargets','joint_attention'],['abaTargets','play']]},
+  // P3 — School-age, verbal, lower support
+  p3:{label:'School-age — verbal, lower support',
+      radios:[['visitType','initial'],['ageGroup','schoolAge'],['langLevel','conversational'],['insuranceType','medicaid']],
+      mods:['pragmatic'],
+      checks:[['needsSocial','peer'],['needsSocial','reciprocity'],['needsSocial','conversation']]},
+  // P4 — School-age, higher support (cog left BLANK — do not presume ID)
+  p4:{label:'School-age — higher support',
+      radios:[['visitType','initial'],['ageGroup','schoolAge'],['langLevel','singleWord'],['insuranceType','medicaid']],
+      checks:[['needsComm','expressive'],['needsComm','receptive'],['needsAdaptive','toileting'],['needsAdaptive','dressing'],['needsAdaptive','hygiene'],
+              ['abaTargets','functional_comm'],['abaTargets','self_help'],['abaTargets','safety_skills']]},
+  // P5 — Adolescent, later-identified, verbal
+  p5:{label:'Adolescent — later-identified',
+      radios:[['visitType','initial'],['ageGroup','adolescent'],['langLevel','conversational'],['insuranceType','medicaid']],
+      checks:[['needsSocial','peer'],['needsSocial','reciprocity'],['needsSocial','perspective'],
+              ['comorbid','anxiety'],['comorbid','depression']]},
+  // P6 — Adolescent/young-adult, ID, transition (cog left BLANK; menstrual_care omitted
+  // from default — it presumes sex; clinician adds it per patient)
+  p6:{label:'Adolescent/YA — ID + transition',
+      radios:[['visitType','initial'],['ageGroup','adolescent'],['langLevel','phrase'],['insuranceType','medicaid']],
+      checks:[['needsAdaptive','dressing'],['needsAdaptive','hygiene'],['needsAdaptive','commIndependence'],['needsAdaptive','commSafety'],
+              ['abaTargets','self_help'],['abaTargets','safety_skills']]},
+};
+
+// Composable modifier (Fork B): +ADHD layers onto whatever base preset is active
+// (does NOT reset). ADHD co-occurs at 40–60% across every age band, so the council
+// chose one composable toggle over N standalone ADHD×age presets.
+const MODIFIERS = {
+  adhd:{label:'+ ADHD',
+      checks:[['comorbid','adhd_combined']]},
+};
+
+// Light dirty-check so applyPreset can warn before clobbering in-progress work.
+function formHasInput(){
+  return !!(S.diagStatus||S.ageGroup||S.langLevel||S.cogProfile||S.criteriaA.size||S.criteriaB.size
+    ||S.needsComm.size||S.needsBehavior.size||S.needsSocial.size||S.needsAdaptive.size||S.comorbid.size);
+}
+
+// applyPreset — drive the real controls. reset:true (default) clears the form first
+// (archetype buttons); reset:false overlays without clearing (modifier buttons).
+// keep docs/branching-logic.md §11.17 in sync
+function applyPreset(key,opts){
+  const reset = !opts || opts.reset !== false;
+  const p = (reset ? PRESETS : MODIFIERS)[key];
+  if(!p) return;
+  if(reset && formHasInput()
+     && !confirm('Replace the current form with the "'+p.label+'" template? This clears existing selections.')) return;
+  if(reset) clearAll({confirmed:true});
+  // Radios first — ageGroup/langLevel side-effect handlers may auto-populate needs.
+  // The !checked guard below then SKIPS anything those syncs already turned on, so we
+  // never accidentally .click() an auto-added box back OFF.
+  (p.radios||[]).forEach(([name,val])=>{
+    const r=document.querySelector(`input[name="${name}"][value="${val}"]`);
+    if(r && !r.checked) r.click();
+  });
+  // langModifier chips are .mod-chip divs with onclick=toggleMod(key); guard on S
+  // (toggleMod manages the Set + active class) so re-application can't toggle one off.
+  // WARY: do NOT add 'echolalic' to any preset's mods — toggleMod('echolalic') auto-
+  // checks DSM criterion B1 (see toggleMod ~:4968), which would violate the cross-preset
+  // invariant that presets never set criteria. Only side-effect-free langModifiers belong here.
+  (p.mods||[]).forEach(key=>{
+    if(!S.langModifiers.has(key)){
+      const el=document.getElementById('mod_'+key);
+      if(el) el.click();
+    }
+  });
+  (p.checks||[]).forEach(([k,val])=>{
+    const c=document.querySelector(`input[data-key="${k}"][value="${val}"]`);
+    if(c && !c.checked) c.click();
+  });
+  render();
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
