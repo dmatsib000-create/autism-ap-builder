@@ -20,6 +20,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§4 Service coverage & insurance](#4-service-coverage--insurance)
 - [§5 Comorbidity & medication](#5-comorbidity--medication)
 - [§6 DSM-5 / ICD-10 source documents](#6-dsm-5--icd-10-source-documents)
+- [§7 Epidemiology & population prevalence](#7-epidemiology--population-prevalence)
 
 ---
 
@@ -188,6 +189,18 @@ National Center for Health Statistics. **International Classification of Disease
 - **Used for:** all ICD-10-CM codes appearing in the A&P note (F84.0, F70/F71/F72, F88, R41.83, F90.0/.1/.2, F41.9, F32.9, F42.9, G40.909, K59.00, R63.32/.31/.30, F50.82, G47.9, Z03.89).
 - **Supports the claim:** Code assignments throughout the tool. F88 has no severity sub-coding in ICD-10-CM — the rationale for `[mehler-2016]`-style prose adjectives at output.
 - **Verified:**
+
+---
+
+## 7. Epidemiology & population prevalence
+
+### `[cdc-addm-2022]` — CDC ADDM Network ASD prevalence (2022 surveillance year)
+
+Shaw KA, Williams S, Patrick ME, et al. **Prevalence and Early Identification of Autism Spectrum Disorder Among Children Aged 4 and 8 Years — Autism and Developmental Disabilities Monitoring Network, 16 Sites, United States, 2022.** *MMWR Surveill Summ.* 2025;74(SS-2):1–22. doi:10.15585/mmwr.ss7402a1
+
+- **Used for:** archetype-preset design rationale — branching-logic.md §11.17 (council provenance). **Not surfaced in any patient-facing output** (no A&P/ABA/IEP reference line); it grounds a design decision only.
+- **Supports the claim:** ASD prevalence ~1 in 31 among 8-year-olds; co-occurring intellectual disability ~37–40% (IQ ≤70), borderline ~24%, ~3–4:1 male:female. Combined with the Medicaid-population skew toward higher support needs and later diagnosis, this grounds the council's weighting of the six archetype presets toward higher-support and language-delayed early-eval cases rather than the "verbal, no-ID, Level 1" stereotype. Co-occurring ADHD (~40–60%) and minimally-verbal (~25–30%) figures cited alongside it in the council are from the broader ASD-comorbidity literature, not this single source.
+- **Verified:** DM 2026-05-29
 
 ---
 

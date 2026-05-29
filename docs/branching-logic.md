@@ -1359,6 +1359,20 @@ The qualifiers are intentionally additive (concatenation, not text-replacement) 
 
 **Maintainer note**: when adding a new spec-label consumer, route it through `applySpecLabelTransforms()` rather than calling the SPEC_LABELS lookup directly. When adding a new transform, register it inside `applySpecLabelTransforms()` rather than wrapping the consumers individually — consumer-level wrapping is what the original audit found to be unmaintainable.
 
+### 11.17 Archetype presets — in-visit quick-start scaffolding (council 2026-05-29)
+
+A "Quick start" bar at the top of `.left-panel` offers six one-click archetype presets plus a composable `+ADHD` modifier, to cut in-visit entry cost (the maintainer's stated pain was "too slow to enter live" during a visit). The engine — `PRESETS`, `MODIFIERS`, `formHasInput()`, `applyPreset()` — is defined just after `setByPath()` ([autism-ap-builder.html](../autism-ap-builder.html)).
+
+**Mechanism.** `applyPreset(key, opts)` does **not** assign `S` directly. It `.click()`s the real form controls (radios by `name`+`value`, set-membership checkboxes by `data-key`+`value`, langModifier chips by `mod_<key>` id), so every existing change-handler side effect fires — the cog→specifier bridge, `syncCommNeedsFromLangLevel`, `syncABATargetsFromNeeds`, `syncSchoolSvcFromNeeds`, the `.sel` classes, and `render()`. This is deliberate: a preset can never diverge from the hand-click code path, because it *is* the hand-click code path. Each click is guarded (`!checked` for inputs, `!S.langModifiers.has()` for chips) so it can't toggle an auto-populated selection back off. `reset:true` (default; archetype buttons) calls `clearAll({confirmed:true})` first, gated by a `formHasInput()` confirm; `reset:false` (the modifier button) overlays without clearing.
+
+**Cross-preset invariant (council FOR ≥95%, the load-bearing rule).** No preset sets the diagnostic determination: `diagStatus`, `asdLevelSC`, `asdLevelRRB`, `criteriaA`/`criteriaB`, `criteriaC`/`D`/`E`, and `ev.*` are never touched. The clinician affirms every diagnosis-determining call, every time. Only the two early-workup presets (`p1`/`p2`) set `cogProfile='unknown'` — an explicit *non*-assertion that drives the "awaiting comprehensive battery" pathway (verified: leaves `S.specifiers` and `S.specifiersManuallySet` empty — no auto-pin). No preset sets a specific cognitive tier; higher-support presets (`p4`/`p6`) leave `cogProfile` blank rather than presume ID.
+
+**What presets set vs. derive.** Presets set *findings* only — age, language baseline, need clusters, common ABA targets, and `insuranceType='medicaid'` (the population default). Therapy referrals (via `resolveOv`/`rule*`, §7), school services (`syncSchoolSvcFromNeeds`), and additional ABA targets (`syncABATargetsFromNeeds`, add-only, §9.2) auto-derive from those findings. `therapyStatus` is left blank — it asserts the child is *already in* therapy, which is a finding, not a scaffold. Pre-staged `abaTargets` set while the ABA params section is hidden (no `diagStatus`) survive and display correctly once the clinician affirms a confirmed diagnosis (verified end-to-end).
+
+**Council provenance.** The six-plus-one set was ratified grounded in national autism epidemiology for a majority-Medicaid specialty clinic (references.md §7 `[cdc-addm-2022]`): co-occurring ID ~37–40%, ADHD ~40–60%, ~25–30% minimally verbal. The load-bearing consequence: the "verbal, no-ID, Level 1" stereotype is *not* the plurality here, so higher-support and language-delayed early-eval archetypes carry more weight than in a commercial-insurance clinic. Fork A resolved the cognitive rule (`unknown` for `p1`/`p2`, blank elsewhere; DBP↔PSY intentional-disagreement pair, FOR 94%). Fork B chose `+ADHD` as a composable modifier over N standalone ADHD×age presets (FOR 93%). Two archetypes were pruned: a "deferred/inconclusive" preset (→ recommendation that the default *empty* state itself read "evaluation in progress") and an "established follow-up" preset (→ a separate follow-up/med-check mode, `spawn_task` candidate — different note shape, out of scope for an eval-A&P builder).
+
+**Maintainer note**: do **not** add `'echolalic'` to any preset's `mods` array — `toggleMod('echolalic')` auto-checks DSM criterion B1 (§4.4), which would silently violate the cross-preset invariant. Only side-effect-free langModifiers belong in `mods`; the code carries a `WARY:` marker at the `mods` loop. Retuning a preset is pure data in the `PRESETS` map, but re-confirm it sets no diagnosis-determining field. The archetype labels/contents are tunable to the real clinic case-mix; the *membership* is council-ratified, but the *ordering* of buttons should follow observed frequency.
+
 ---
 
 ## 12. Maintenance protocol
@@ -1375,6 +1389,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - Adding/removing/renaming any property on `S`
 - Adding/removing any HTML control that mutates a `Set` on `S`
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
+- `PRESETS` / `MODIFIERS` / `applyPreset()` / `formHasInput()` — the archetype-preset engine (§11.17). Adding, removing, or retuning a preset, or changing how `applyPreset` drives controls, requires re-confirming the cross-preset invariant and updating §11.17.
 
 If you're not sure whether your change qualifies, check [§1.2](#12-the-s-object--property-reference) — if your change touches anything listed there, update this doc.
 

@@ -1,0 +1,7 @@
+# Claude Code per-project tooling config (launch.json, settings, etc.) — machine-local
+.claude/
+
+# Local-only projects and artifacts, per CLAUDE.md repo layout — never pushed
+clinicalnotes/
+backups/
+scratch/
