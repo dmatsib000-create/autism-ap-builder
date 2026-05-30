@@ -34,6 +34,11 @@ export default {
 
     // Behavior + social needs make ABA auto-include under ruleABA — so the
     // 'no' override below is what removes it, proving the suppress path.
+    // Verified: with overrides reset to 'auto', ABA IS present and psychotherapy
+    // is ABSENT in this exact state — so the golden's "ABA absent / psychotherapy
+    // present" genuinely reflects the overrides, not the rules. If a rule change
+    // ever makes ABA auto-exclude (or psychotherapy auto-include) here, this
+    // fixture stops testing the override and the comment above is the tripwire.
     S.needsBehavior.add('rigidity');
     S.needsBehavior.add('noncompliance');
     S.needsSocial.add('reciprocity');
