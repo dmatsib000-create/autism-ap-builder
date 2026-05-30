@@ -60,7 +60,7 @@ if (langStr) {
 Run this against the source file:
 
 ```
-src: C:\Users\davem\OneDrive\Documents\Claude programming\autism-ap-builder.html
+src: C:\Users\davem\OneDrive\Documents\claude_code\autism-ap-builder.html
 ```
 
 **Step 1 — Identify in-scope prose generators.**

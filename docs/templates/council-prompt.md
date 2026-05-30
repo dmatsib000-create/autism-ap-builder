@@ -271,7 +271,7 @@ validity sub-council finds the predicate is over-strict"), run a
 
 ## Worked example
 
-For a concrete example of this template in use — including the per-asymmetry table, the tree-of-thought option branching, calibration self-check, and conditional implementation sub-council — see the commit message and `docs/branching-logic.md` §11.14 / §11.15 entries from PR-G.
+For a concrete example of this template in use — including the per-asymmetry table, the tree-of-thought option branching, calibration self-check, and conditional implementation sub-council — see the **PR-G commit message** (`git log`, search for the ID vs GDD predicate split). The `docs/branching-logic.md` §11.14 / §11.15 entries record only the resulting current-state invariants, not the deliberation that produced them — by design, since §11 is a fragile-areas inventory, not a changelog.
 
 ## Patterns worth keeping
 

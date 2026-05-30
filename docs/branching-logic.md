@@ -1178,159 +1178,67 @@ When state changes re-trigger auto-recommendations, services in `schoolSvcManual
 
 ## 11. Known fragile areas
 
-This section inventories every `// WARY:` comment in the source, plus other structurally fragile code paths surfaced during the source scan. A `// WARY:` marker means the maintainer believes the code works but is built on an approach they don't fully trust — read the comment carefully before modifying.
+This section inventories every `// WARY:` comment in the source, plus other structurally fragile code paths. A `// WARY:` marker means the maintainer believes the code works but is built on an approach they don't fully trust — read the comment carefully before modifying.
 
 To enumerate `// WARY:` comments at any time: `grep -n "WARY:" autism-ap-builder.html`.
 
+**Scope of this section.** §11 documents the *current* fragile state plus the maintainer guardrails ("do not 'fix' this by doing X") that protect each one. It is deliberately **not** a changelog: which PR introduced or revised a guard, the council vote behind it, and any reversal history live in git commit messages, not here. When a guardrail changes, edit the invariant in place and let the commit record why.
+
 ### 11.1 `v3()` silent fallback (`autism-ap-builder.html:1305`)
 
-Already documented in detail in [§8.4](#84-wary-silent-fallback-risk-in-v3). Summary: missing verbs in `V3_MAP` produce ungrammatical output for `pronouns: 'they'` patients with no UI signal, only a `console.warn` clinicians never see.
+Detailed in [§8.4](#84-wary-silent-fallback-risk-in-v3). Summary: verbs missing from `V3_MAP` produce ungrammatical output for `pronouns: 'they'` patients with no UI signal — only a `console.warn` clinicians never see.
 
 ### 11.2 `syncABATargetsFromNeeds()` add-only contract (`autism-ap-builder.html:4537`)
 
-Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). The function is add-only by design (do not add removal logic), with the documented exception for rigidity-via-B2. The CLAUDE.md file's "Critical constraints" section reinforces this with: *"Do not add removal logic."*
-
-The fragility: a future maintainer who sees the function add a target on every render might "fix" the perceived bug by adding removal, breaking clinician trust in their own curation. The inline comment exists specifically to head off that change.
+Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). Add-only by design, with the one documented exception for rigidity-via-B2. CLAUDE.md reinforces: *"Do not add removal logic."* The fragility: a maintainer who sees a target re-added on every render might "fix" the perceived bug by adding removal, breaking clinician curation. The inline comment exists to head off that change.
 
 ### 11.3 Safety-flag asymmetry (§7.7 open question 2)
 
-`ruleABA`'s safety trigger and `_abaContent`'s urgency-clause flags are computed from different state combinations. Both produce reasonable output, but they could disagree — a patient could trip the ABA rule's safety needs while the letter's urgency clause stays silent, or vice versa. Worth investigating as a council pass before any refactor of safety handling.
+`ruleABA`'s safety trigger and `_abaContent`'s urgency-clause flags are computed from different state combinations. Both produce reasonable output, but they could disagree — a patient could trip the ABA rule's safety needs while the letter's urgency clause stays silent, or vice versa. Worth a council pass before any refactor of safety handling.
 
 ### 11.4 `rulePsychiatry` "severe behavior" undefined (§7.7 open question 1)
 
-The condition includes "severe behavior + age school+" but "severe" is implied from `needsBehavior` / `safety` rather than a flagged threshold. Future audit needed to make explicit.
+The condition includes "severe behavior + age school+" but "severe" is inferred from `needsBehavior` / `safety` rather than a flagged threshold. Future audit needed to make it explicit.
 
 ### 11.5 Reasons-array string contract (§7.7 open question 3)
 
-`rule*().reasons[]` strings are concatenated comma-joined into letter prose. No format contract exists — a contributor pushing a sentence-cased string with trailing punctuation will produce malformed letter output. No automated check.
+`rule*().reasons[]` strings are comma-joined into letter prose with no format contract — a contributor pushing a sentence-cased string with trailing punctuation will produce malformed letter output. No automated check.
 
-### 11.6 Floor-effect warning for screener + young (`autism-ap-builder.html` `toggleCogDataSourceVisibility`)
+### 11.6 Floor-effect warning for screener + young (`toggleCogDataSourceVisibility`)
 
-When `S.cogDataSource === 'screener'` AND `S.ageGroup ∈ {toddler, preschool}`, a passive italic note appears below the cogDataSource group. The note text covers two distinct concerns honestly — the GDD-tier screener label includes both developmental screeners (ASQ-3, SWYC, DAYC-2 Screener) and an IQ screener (KBIT-2R if age 4+), and each instrument family has different psychometric limitations:
+When `S.cogDataSource === 'screener'` AND `S.ageGroup ∈ {toddler, preschool}`, a passive italic note appears below the cogDataSource group. It covers two distinct concerns honestly, because the GDD-tier screener label spans both developmental screeners (ASQ-3, SWYC, DAYC-2 Screener) and an IQ screener (KBIT-2R if age 4+):
 
-1. **Preliminary-nature concern (applies to all screeners)**: brief screening results at this age are best treated as preliminary pending formal developmental assessment with an instrument that yields an objective developmental quotient (DQ).
-2. **Floor-effect concern (specific to IQ screeners)**: brief IQ screeners (specifically KBIT-2R) have documented floor effects in children under 5 (Pitts & Mervis 2016, KBIT-2 in Williams syndrome).
+1. **Preliminary-nature (all screeners)**: brief screening results at this age are best treated as preliminary pending formal developmental assessment yielding an objective developmental quotient (DQ).
+2. **Floor-effect (IQ screeners specifically)**: brief IQ screeners (KBIT-2R) have documented floor effects under age 5 (`[pitts-mervis-2016]`).
 
-The warning is informational only — it does not block the selection, change downstream gating, or alter the bridge logic. Clinically, a 4-year-old screener result indicating borderline-or-below cannot reliably distinguish BIF from mild ID/GDD per the AACAP Practice Parameter; the clinically-correct documentation is the GDD-suspected pathway, which the tool already supports.
+Informational only — it does not block the selection or alter the bridge. Clinically, a young screener result cannot reliably distinguish BIF from mild ID/GDD (`[aacap-id-practice-parameter]`); the correct documentation is the GDD-suspected pathway, which the tool supports.
 
-**Maintainer note**: the warning is rendered by `toggleCogDataSourceVisibility()` based on the conjunction of `S.cogDataSource` and `S.ageGroup`. Any new entry path that mutates either of those fields must call `toggleCogDataSourceVisibility()` for the warning to track correctly. Currently called from cogProfile / cogDataSource / ageGroup change handlers (both select and deselect paths).
+**Maintainer note**: the warning is rendered by `toggleCogDataSourceVisibility()` from the conjunction of `S.cogDataSource` and `S.ageGroup`. Any new entry path that mutates either field must call it for the warning to track. Currently called from the cogProfile / cogDataSource / ageGroup change handlers (both select and deselect paths).
 
 ### 11.7 BIF asymmetry — intentional design (`autism-ap-builder.html:4407`)
 
-The `bridgeCogProfileToSpecifier()` function auto-bridges ID-tier cogProfile selections to `withID`/`withSuspectedID` and GDD-tier selections to `withGDD`/`withSuspectedGDD` — but does **not** auto-bridge `borderline` to `withBIF`. There is also no `withSuspectedBIF` specifier. Both asymmetries are intentional.
+`bridgeCogProfileToSpecifier()` auto-bridges ID-tier selections to `withID`/`withSuspectedID` and GDD-tier to `withGDD`/`withSuspectedGDD`, but does **not** auto-bridge `borderline` to `withBIF`, and there is no `withSuspectedBIF` specifier. Both asymmetries are intentional.
 
-**Rationale**: BIF (R41.83) is a DSM-5-TR clinical-attention category, not a developmental-disability diagnosis. It has only one endpoint (`withBIF`) and no data-source-driven confirmation gate, so the auto-bridge would send a "the tool thinks this fits" signal unsupported by literature (Greenspan 2017, *Current Opinion in Psychiatry*). The clinician selects `borderline` to record their assessment of cognitive profile; the `withBIF` specifier checkbox must be checked manually as a deliberate documentation choice. Compounding this with a "suspected BIF" variant would weaken an already-contested category.
+**Rationale**: BIF (R41.83) is a DSM-5-TR clinical-attention category, not a developmental-disability diagnosis. An auto-bridge would assert a contested call the literature does not support (`[greenspan-2017]`). The clinician selects `borderline` to record cognitive profile; `withBIF` must be checked manually as a deliberate documentation choice. A "suspected BIF" variant would weaken an already-contested category.
 
-**Maintainer note**: do not "fix" this asymmetry by adding `else if(cogVal==='borderline') toCheck='withBIF';` to the bridge or by introducing a `withSuspectedBIF` specifier. The inline comment at line 4407 reinforces this. Coupled to the BIF age-gate (hide for toddler/preschool, line 4505 area) — together they ensure BIF is only documentable for older patients and only as a deliberate clinician choice.
+**Load-bearing invariants** (each protects against a specific silent-failure mode):
 
-**Note on cogDataSource visibility (added in PR-D)**: `borderline` *does* now expose the cogDataSource selector — the visibility check in `toggleCogDataSourceVisibility` includes `isBif`. The clinician records which instrument grounded the BIF call (BIF inherits the ID-tier IQ-instrument labels because BIF is an IQ-defined construct). This does **not** change the no-auto-bridge rule — `withBIF` is still a deliberate manual selection. The source data only flows downstream via the spec-label qualifier (see §11.12).
+- **withBIF gate.** `bifSpecifierAllowed()` returns `S.cogProfile==='borderline' && !!S.cogDataSource` — a single predicate referenced by `toggleBifSpecifierGate()`, the bridge's `preserveBif` guard, and `withBifSourceQualifier`, so the consumers cannot drift. It enforces what the auto-bridge enforces for other tiers: a data source must be on file before the diagnosis is asserted. The gate manages row visibility (shown whenever cogProfile is borderline — a looser condition than the allow-predicate, so the contextual hint can walk the clinician through the remaining source step), checkbox enable/disable (follows `bifSpecifierAllowed()`), and state cleanup (removes a stale `withBIF` when the gate closes). A fail-closed handler reverts a `withBIF` `change` that slips past the disabled attribute.
+- **preserveBif guard.** `bridgeCogProfileToSpecifier()` clears every key in `COG_SPEC_EXCL` at entry. Without a guard, every bridge re-fire (cogDataSource change, adaptiveStandardized toggle, ageGroup change with cogProfile still borderline) would silently uncheck a manually-set `withBIF`, because the no-auto-bridge branch re-adds nothing. The fix: capture `preserveBif = cogVal==='borderline' && S.specifiers.has('withBIF')` at entry and re-add `withBIF` after the clear, gated by `bifSpecifierAllowed()`. Switching cogProfile *away from* borderline correctly drops `withBIF`.
+- **Tier-transition guard.** The cogProfile change handler classifies by **instrument family** (`iq` vs `dev`), not ICD tier: `borderline` groups with `id_*` (`iq` — WISC/DAS/SB/WPPSI); `gdd_*` is `dev` (Bayley-4/Mullen/Griffiths/DAYC-2). The stale-cogDataSource guard fires on `iq↔dev` crossings only (including `BIF↔GDD`) and stays quiet on within-family moves like `id_mild→borderline`. Without this, switching `gdd_mild` (comprehensive = Bayley-4) to `borderline` would silently relabel the persisted selection as comprehensive = WISC-V.
+- **Teardown symmetry.** `updateAgeBasedVisibility` has three cogProfile-teardown branches (idCogGroup, gddCogGroup, bifCogGroup); all three must call `clearIdGddEvidenceFlags()` after clearing `S.cogProfile`. Omitting the call lets stale `cogDataSource` / `adaptiveStandardized` flags silently auto-confirm the *next* selected cogProfile. Mirror this when adding any future teardown branch.
 
-**withBIF preservation invariant (added in PR-E)**: `bridgeCogProfileToSpecifier` clears every key in `COG_SPEC_EXCL` at the top of its body. Without a preservation guard, every bridge re-fire (cogDataSource change, adaptiveStandardized toggle, ageGroup change with cogProfile still 'borderline') would silently uncheck a manually-set `withBIF`, because the intentional no-auto-bridge branch for borderline means nothing is re-added. The fix: at function entry, capture `preserveBif = cogVal==='borderline' && S.specifiers.has('withBIF')`; after the clear-and-conditionally-add, if `preserveBif` is true, re-add `withBIF`. The guard fires only when the clinician's stated cogProfile is still borderline; switching cogProfile *away from* borderline correctly drops `withBIF` (still within the COG_SPEC_EXCL clear, no preserve trigger).
+**Source variants.** BIF prose has four output variants, all routed through `applySpecLabelTransforms()` → `withBifSourceQualifier` (§11.12): bare for `comprehensive` and `priorExternal` (priorExternal additionally appends a "per prior outside evaluation; supporting records not available for direct review" attribution — see §11.15), a "brief screening only" qualifier for `screener`, and a "clinical impression only" qualifier for `clinical`. No path produces bare BIF with no source on file.
 
-**Tier-transition guard semantics (refined in PR-E)**: the cogProfile change handler's stale-cogDataSource guard now classifies by **instrument family** (`iq` vs `dev`) rather than by ICD tier. `borderline` groups with `id_*` as the `iq` family (both use WISC/DAS/SB/WPPSI); `gdd_*` is the `dev` family (Bayley-4/Mullen/Griffiths/DAYC-2). The guard fires on `iq↔dev` crossings (which includes the previously-silent `BIF↔GDD` transitions) and stays quiet on within-family moves like `id_mild→borderline`. Without this refinement, switching from `gdd_mild` (with `cogDataSource='comprehensive'` = Bayley-4 recorded) to `borderline` silently relabeled the persisted selection as `comprehensive` = WISC-V.
-
-**Teardown symmetry invariant (closed in PR-E)**: `updateAgeBasedVisibility` has three cogProfile-teardown branches (idCogGroup, gddCogGroup, bifCogGroup). All three must call `clearIdGddEvidenceFlags()` after clearing `S.cogProfile`. The function's own comment at the definition of `clearIdGddEvidenceFlags` warns that omitting this call lets stale `cogDataSource` and `adaptiveStandardized` flags silently auto-confirm the *next* selected cogProfile. PR-D introduced the bifCogGroup branch without the call; PR-E added it. When adding any future cogProfile teardown branch, mirror this pattern.
-
-**withBIF specifier gate (PR-E Fix #4, tightened post-code-review)**: BIF is the only cognitive specifier without a "suspected" graceful-degradation pathway. Every other cog tier softens automatically when source data is weak (ID/GDD auto-bridge to `withSuspected*` when `cogSourceSupportsConfirmation()` returns false; without* tiers assert lower-stakes absence-of-impairment). BIF has only `withBIF` as an endpoint — there is no `withSuspectedBIF` by design (Greenspan 2017 rationale at §11.7). So the gate must enforce upstream what the auto-bridge enforces for the other tiers: a data source must be on file before the diagnosis is asserted.
-
-**Two-part gate** — `bifSpecifierAllowed()` returns `S.cogProfile==='borderline' && !!S.cogDataSource`. Single source of truth, referenced from both `toggleBifSpecifierGate()` and the `preserveBif` guard in the bridge.
-
-1. **HTML** — the row is declared `style="display:none"` and the checkbox `disabled` by default ([autism-ap-builder.html](../autism-ap-builder.html) ~line 678), with an inline `<span id="withBifGateNote">` and a `title` tooltip pointing at the carried-forward-outside-diagnosis pathway (cogProfile = Borderline + cogDataSource = Prior outside evaluation).
-2. **JS** — `toggleBifSpecifierGate()` manages three things:
-   - **Row visibility** — the entire `<label id="withBifRow">` is hidden unless `cogProfile === 'borderline'`. This is a **distinct, looser condition** from the gate-allow predicate: the row appears as soon as the clinician signals intent to document BIF (by picking Borderline), and the inline contextual hint then walks them through the remaining source step.
-   - **Checkbox enable/disable** — the `disabled` attribute follows `bifSpecifierAllowed()` (both arms).
-   - **State cleanup** — when the gate closes while withBIF is currently checked, the function removes `withBIF` from `S.specifiers` and unchecks the DOM. Without this cleanup, deselecting cogDataSource while withBIF is set would leave a stale specifier silently emitting bare BIF prose in the chart.
-3. **Bridge integration** — the helper is called at the end of `bridgeCogProfileToSpecifier()`, so every cogProfile or cogDataSource change re-evaluates the gate. The bridge's `preserveBif` (which re-adds withBIF after the COG_SPEC_EXCL clear) uses `bifSpecifierAllowed()` so the preserve and the gate share the same predicate — they cannot drift apart.
-4. **Init** — `toggleBifSpecifierGate()` is also called once at `DOMContentLoaded` so the row visibility, disabled state, and note text are JS-rendered on first load rather than relying on the static HTML defaults matching the initial state.
-5. **Defense-in-depth** — the specifier checkbox change handler has a fail-closed guard: if a synthetic event delivers a `change` for withBIF past the disabled attribute (rare browser quirk), the handler reverts both the DOM and the generic Set-add that fires earlier in the same handler chain.
-6. **Downstream consistency** — `withBifSourceQualifier` also routes through `bifSpecifierAllowed()` rather than an inline cogProfile check, so any future broadening of the predicate propagates to the qualifier automatically.
-
-**Why a single source predicate**: the original PR-E gate only checked `cogProfile==='borderline'`. The follow-up code review found that a clinician could still produce bare BIF prose by setting cogProfile=borderline and checking withBIF without picking a cogDataSource. Extending the gate's predicate to also require cogDataSource — and routing both the gate and the bridge's preserve through `bifSpecifierAllowed()` — closes that gap and prevents future drift between the two consumers.
-
-**Pathways through the tightened gate**:
-
-| cogProfile | cogDataSource | withBIF | Result |
-|---|---|---|---|
-| borderline | comprehensive | ✓ | `with borderline intellectual functioning (BIF)` — bare, confirmation-equivalent |
-| borderline | priorExternal | ✓ | `with borderline intellectual functioning (BIF)` — bare; carried-forward outside diagnosis case |
-| borderline | screener | ✓ | `... (BIF) (brief screening only; comprehensive cognitive battery recommended to confirm)` |
-| borderline | clinical | ✓ | `... (BIF) (clinical impression only; comprehensive cognitive battery recommended to confirm)` |
-| borderline | *(empty)* | — | **withBIF blocked**; note: `(requires a Cognitive Data Source selection)` |
-| *(not borderline)* | any | — | **withBIF blocked**; note: `(requires Cognitive Profile = Borderline)` |
-
-Every path through the gate produces either qualified or appropriately-attributed BIF prose; no path produces bare BIF with no source on file.
-
-**Maintainer note**: do not add a `withSuspectedBIF` specifier or an inline-source selector to the withBIF checkbox row in an attempt to "soften" the gate. The no-`withSuspectedBIF` rule is intentional (Greenspan 2017). When adding a new spec-label consumer for BIF, route it through `applySpecLabelTransforms()` (§11.12) — `withBifSourceQualifier` handles screener/clinical sources; priorExternal and comprehensive correctly produce bare prose because the gate guarantees no data-less BIF assertion can pass.
-
-### 11.13 BIF + impaired-adaptive cross-check (PR-F)
-
-A passive informational hint fires in the adaptive section when `cogProfile==='borderline'` is paired with adaptProfile ∈ `{mildlyImpaired, moderatelyImpaired, severelyImpaired}`. The hint surfaces the differential-zone question the literature (AACN 2020; Wexler 2023) makes most active for the BIF call — empirical data show no meaningful adaptive-function gap between FSIQ 70–79 and 80–89, so adaptive impairment paired with borderline IQ is exactly the population where the BIF vs mild ID call is live.
-
-**Hint behavior**:
-- Fires only on the three impaired adaptive levels. `belowPotential` is intentionally excluded — that descriptor implies the clinician has already attributed the adaptive gap to a non-cognitive cause (Level 1/2 ASD pattern).
-- Auto-hides when the predicate becomes false (cogProfile changes away, adaptive changes to a non-impaired or `belowPotential` level). No dismiss-and-record mechanism — sticking with the floor-effect-warning pattern.
-- Severity word is interpolated from adaptProfile via `IMPAIRED_ADAPTIVE_WORDS`.
-- Text explicitly names alternative causes (ADHD, mood, trauma, informant variability) so the clinician knows the hint is informational, not prescriptive — final call may still be BIF when adaptive deficits are better explained by something else.
-
-**Wiring**:
-- The function `toggleBifAdaptiveCrossCheck()` is called from three places:
-  - End of `bridgeCogProfileToSpecifier()` — covers cogProfile, cogDataSource, ageGroup, adaptiveStandardized, AND adaptProfile changes (all of which fire the bridge as of PR-J).
-  - The `adaptProfile` change/deselect handlers — explicit call alongside the bridge re-fire, so the cross-check updates even if a future refactor decouples it from the bridge.
-  - The DOMContentLoaded init hook — keeps the static HTML default in sync with state.
-
-  > **REVERSED 2026-05-25 (PR-J)** — the prior council-D4 invariant ("adaptProfile change handler does NOT fire the bridge; avoid surprise specifier flips from far-away controls") is no longer in force. PR-J reopens D4. The pathway pill introduced in PR-I C2 renders the bridge result at the cluster focal point in the same render frame, so the flip is now visible at the clinician's focus rather than hidden 200px below. See §11.16 below for the convergence rationale and the commit message for `PR-J: Bridge converges on currentClinicalPathway()`.
-
-**Visual treatment**: gray italic on a warm-cream background with a yellow-amber left-border accent — same color family as the floor-effect warning (gray italic) but with the border-left differentiator distinguishing it as carrying a clinical recommendation rather than pure information. The two warnings cannot co-fire (floor-effect requires `young`; BIF cross-check requires `borderline`, which is gated to `older`).
-
-**Council decision (Round 3, 91%)**: option A from the 3-voice council (DBP attending + clinical workflow analyst + UX designer). The combined-confidence residual reflects honest uncertainty about post-implementation behavioral effect (will clinicians actually reconsider, or will the hint become noise?) and reverse-flow asymmetry (clinicians who set adaptive first, then cogProfile, get a less salient hint). Both are only observable from in-clinic use; revisit after a month.
-
-**Maintainer note**: do not extend the predicate to `cogProfile==='lowAverage' + impaired adaptive`. The AACN/Wexler argument empirically applies there too, but the coding pathway differs (lowAverage doesn't land in R41.83), and the clinical question shifts from "BIF vs mild ID" to "lowAverage vs mild ID via adaptive criterion." Different question, different hint text would be needed. Flag as separable future work.
-
-### 11.14 ID vs GDD predicate split (PR-G)
-
-The `confirmable` predicate at [autism-ap-builder.html:4559](../autism-ap-builder.html#L4559) is split into two predicates as of PR-G:
-
-- `confirmableId = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed()` — unchanged from prior behavior. DSM-5-TR ID criteria mandate cognitive deficit + adaptive deficit + onset in developmental period; the tool enforces this via cogSource (comprehensive or priorExternal) + adaptive-impaired + standardized-adaptive evidence (Vineland-3/BASC-3 consistent in priorTesting OR the clinician-attested checkbox).
-- `confirmableGdd = cogSourceSupportsConfirmation()` — loosened. F88 GDD is used when ID cannot be reliably assessed (typically under 5); adaptive deficits are typical but not strictly required by DSM-5-TR or AACAP. A comprehensive developmental battery (Bayley-4, Mullen, Griffiths, DAYC-2) is sufficient on its own to drop the "provisional/suspected" framing. The adaptive section continues to inform downstream prose but no longer gates the confirmed-vs-suspected GDD bridge.
-
-**Rationale and council provenance.** The pre-PR-G predicate over-enforced on Bayley-4 (which itself includes adaptive subscales — the predicate's adaptive requirement was partly redundant) and added friction in the common comprehensive-developmental-battery case. The implementation council (Option α, 91.4%) chose the simplest fix that aligns with the F88 definition. `clinical-council reopens` — revisits the PR-C-era assumption that ID and GDD share a single predicate.
-
-**Maintainer note**: do not collapse `confirmableId` and `confirmableGdd` back into a single `confirmable`. The asymmetry is load-bearing. If a future change adds a third tier (e.g., a separate `confirmableBif`), follow the same pattern — extract the predicate, name it explicitly, and route the cogVal branch through it.
-
-### 11.15 BIF priorExternal attribution (PR-G)
-
-The `withBifSourceQualifier` transform at [autism-ap-builder.html:1513](../autism-ap-builder.html#L1513) now appends a priorExternal attribution string when `cogDataSource === 'priorExternal'`:
-
-> `"(per prior outside evaluation; supporting records not available for direct review at this visit)"`
-
-This mirrors the `priorExtAttribution` pattern used for the ID/GDD F70/F71/F72/F88 dx lines around line 1716. Before PR-G, a BIF call grounded in an outside report produced bare prose indistinguishable from one grounded in a same-visit comprehensive battery — a documentation-discipline gap surfaced by the Concern 1 clinical-validity council (Asymmetry 6, 96.5% combined confidence).
-
-**Maintainer note**: BIF prose now has four output variants (bare for comprehensive, screener qualifier, clinical qualifier, priorExternal attribution). When adding a fifth cogDataSource value (if ever), add the corresponding branch in `withBifSourceQualifier` rather than leaving the new value to fall through to bare prose.
-
-### 11.16 Pill/bridge convergence (PR-J)
-
-Concern 2.5 mini-council; α+β at 95.7% combined. Closes the pill-vs-bridge divergence that PR-I C1+C2 shipped as an honest residual: the pathway pill recomputed on every `render()` but `bridgeCogProfileToSpecifier()` did not re-fire on `adaptProfile` changes (per the prior council-D4 invariant). A clinician selecting `severelyImpaired + standardized adaptive` *after* picking `cogProfile=id_mild + comprehensive` would see the pill correctly say "Confirmed Mild ID" while the auto-bridged specifier checkbox still showed `withSuspectedID`. Two summaries of the same clinical picture on the same screen, disagreeing.
-
-**Two changes in one council outcome:**
-
-- **α** — adaptProfile change handler now calls `bridgeCogProfileToSpecifier(S.cogProfile)`. Mirrors the pattern already used by cogDataSource and adaptiveStandardized handlers.
-- **β** — `currentClinicalPathway()` was extended to include a `specKey` field on every return shape (`'withID'`, `'withSuspectedID'`, `'withGDD'`, `'withSuspectedGDD'`, `null` for BIF and unknown, `'withoutID'`/`'withoutGDD'` for normal range by age). `bridgeCogProfileToSpecifier()` now derives the specifier key from `currentClinicalPathway()?.specKey` instead of duplicating the inline decision tree. One predicate, two consumers (pill + bridge), zero drift possible.
-
-**D4 reversal rationale.** Prior council finding D4 said: avoid surprise specifier flips from far-away controls — the specifier checkbox sits ~200px below the clinician's focus on the adaptive section, and an automatic flip would feel like the tool moving things behind their back. That reasoning was sound when D4 was written. PR-I C2 introduced the pathway pill at the top of the Cognitive Profile section, which renders the bridge's decision in the same render frame as any input change. The flip is now visible at the clinician's focal point rather than hidden, so the original D4 risk no longer applies. `clinical-council reopens D4` — see the §11.13 wiring note above for the back-pointer.
-
-**Known residual (pre-existing, not introduced by PR-J).** Manual specifier overrides remain volatile under adjacent control changes — clinician unchecks `withID` to assert `withSuspectedID`, then changes adaptive, auto-bridge re-overrides intent. PR-L addressed this separately by introducing `S.specifiersManuallySet` and the three release paths (uncheck the pin, "Re-sync with pathway" button on the pill, cogProfile change clears all pins).
-
-**Maintainer note**: when adding a new cog/adaptive predicate that affects the bridge, extend `currentClinicalPathway()`'s `specKey` return rather than adding inline logic in `bridgeCogProfileToSpecifier()`. The single-predicate property is load-bearing.
+**Maintainer note**: do not "soften" any of this by adding `else if(cogVal==='borderline') toCheck='withBIF'` to the bridge, by introducing `withSuspectedBIF`, or by adding an inline-source selector to the checkbox row. The no-`withSuspectedBIF` rule is intentional (`[greenspan-2017]`). When adding a new BIF spec-label consumer, route it through `applySpecLabelTransforms()`. The BIF age-gate (hidden for toddler/preschool) couples with these guards so BIF is only documentable for older patients and only as a deliberate choice.
 
 ### 11.8 Smart-quote injection risk (CLAUDE.md "Critical constraints")
 
-Per CLAUDE.md: *"Smart/curly quotes (U+2016, U+2017) must never appear in JS string literals. They cause 'Invalid or unexpected token' syntax errors and silently break the entire script with no console output."*
-
-Editing flow that triggers this most often: a clipboard paste, an editor with smart-quote autocorrect enabled, or an AI-generated edit that smartens quotes. The recovery is documented in CLAUDE.md.
+Per CLAUDE.md: smart/curly single quotes (U+2018, U+2019) must never appear in JS string literals — they cause an "Invalid or unexpected token" syntax error and silently break the entire script with no console output. Triggered most often by a clipboard paste, an editor with smart-quote autocorrect, or an AI edit that smartens quotes. Recovery is the PowerShell replace documented in CLAUDE.md.
 
 ### 11.9 Em-dash injection in prose (CLAUDE.md "Critical constraints")
 
-Generated note prose must avoid em dashes (`—`). They're permitted in structural section headers but read as overwritten in clinical prose. Easy to introduce when adding new prose generators.
+Generated note prose must avoid em dashes (`—`); they are permitted in structural section headers but read as overwritten in clinical prose. Easy to introduce when adding new prose generators.
 
 ### 11.10 Box-drawing characters in JS literals (CLAUDE.md "Critical constraints")
 
@@ -1338,40 +1246,85 @@ The `─` (U+2500) and `═` (U+2550) characters in the note output's section di
 
 ### 11.11 GDD severity injection — adjective vs comma form
 
-F88 has no severity sub-coding in ICD-10, so the prose adjective ("mild" / "moderate" / "severe") is the only place GDD severity surfaces in output. Two helpers in `autism-ap-builder.html` (declared just above `SPEC_LABELS`):
+F88 has no severity sub-coding in ICD-10, so the prose adjective ("mild" / "moderate" / "severe") is the only place GDD severity surfaces in output. Two helpers (declared just above `SPEC_LABELS`):
 
-- `gddSevWord()` — returns the severity word derived from `S.cogProfile` (`gdd_mild` → `'mild'`, etc.); returns `''` for the unspecified `gdd` bucket so the fallback prose stays clean.
-- `withGddSev(label)` — inserts the severity adjective before the literal string `"Global Developmental Delay"` in any spec-label string. Used at the three spec-label consumers (A&P note `SPEC_LABELS` consumer, ABA letter `abaSpecMap` consumer, IEP letter `specMap` consumer).
+- `gddSevWord()` — returns the severity word from `S.cogProfile` (`gdd_mild` → `'mild'`); returns `''` for the unspecified `gdd` bucket so the fallback prose stays clean.
+- `withGddSev(label)` — inserts the adjective before the literal `"Global Developmental Delay"` in any spec-label string. Used at the three spec-label consumers.
 
-The F88 diagnosis lines (confirmed and suspected) in `generateNote()` use the **comma form** (`Global Developmental Delay, mild (F88)`) to match the ID dx-line cadence (`Intellectual disability, mild (F70)`). The spec-label strings use the **adjective form** (`with mild Global Developmental Delay`) because that reads more naturally in running prose.
+The F88 dx lines in `generateNote()` use the **comma form** (`Global Developmental Delay, mild (F88)`) to match the ID dx-line cadence; the spec-label strings use the **adjective form** (`with mild Global Developmental Delay`) because it reads more naturally in running prose.
 
-**Maintainer note**: do not turn this into a `withGDD_mild`/`withGDD_moderate`/`withGDD_severe` proliferation in `SPEC_LABELS`. Severity is derived from `cogProfile`, not from the specifier itself — adding keyed labels would break that single source of truth and create two paths to the same conclusion. If a future change adds a new spec-label consumer for GDD, route it through `applySpecLabelTransforms()` (see §11.12).
+**Maintainer note**: do not turn this into a `withGDD_mild`/`withGDD_moderate`/`withGDD_severe` proliferation in `SPEC_LABELS`. Severity is derived from `cogProfile`, not the specifier — keyed labels would break that single source of truth. If a future change adds a new spec-label consumer for GDD, route it through `applySpecLabelTransforms()` (§11.12).
 
 ### 11.12 Spec-label transforms — unified pipeline
 
 All three spec-label consumers (A&P note, ABA letter, IEP letter) run their per-specifier labels through a single helper `applySpecLabelTransforms(k, label)`, which composes three transforms in order:
 
-1. `withGddSev(label)` — adjective severity injection for GDD (see §11.11).
-2. `withBifSourceQualifier(k, label)` — appended parenthetical on `withBIF` when `cogDataSource` is `screener` or `clinical`. Output: `"with borderline intellectual functioning (BIF) (brief screening only; comprehensive cognitive battery recommended to confirm)"` or the `clinical impression only` variant.
-3. `withLowAvgQualifier(k, label)` — appended parenthetical on `withoutGDD` when `cogProfile==='lowAverage'` and `ageGroup` is `toddler` or `preschool`. Output: `"without global developmental delay (development appropriate for age) (based on currently available information; formal developmental assessment recommended to further characterize)"`.
+1. `withGddSev(label)` — adjective severity injection for GDD (§11.11).
+2. `withBifSourceQualifier(k, label)` — appended parenthetical on `withBIF` for `screener` / `clinical` sources, plus the priorExternal attribution (§11.15).
+3. `withLowAvgQualifier(k, label)` — appended parenthetical on `withoutGDD` when `cogProfile==='lowAverage'` and `ageGroup` is toddler/preschool.
 
-The qualifiers are intentionally additive (concatenation, not text-replacement) so the underlying SPEC_LABELS / abaSpecMap / specMap strings remain the single source of truth for the core label content. Each transform short-circuits when its key or state preconditions aren't met.
+Transforms are additive (concatenation, not text-replacement) so the underlying `SPEC_LABELS` / `abaSpecMap` / `specMap` strings remain the single source of truth. Each short-circuits when its key or state preconditions aren't met.
 
-**Maintainer note**: when adding a new spec-label consumer, route it through `applySpecLabelTransforms()` rather than calling the SPEC_LABELS lookup directly. When adding a new transform, register it inside `applySpecLabelTransforms()` rather than wrapping the consumers individually — consumer-level wrapping is what the original audit found to be unmaintainable.
+**Maintainer note**: when adding a new spec-label consumer, route it through `applySpecLabelTransforms()` rather than calling the `SPEC_LABELS` lookup directly. When adding a new transform, register it inside `applySpecLabelTransforms()` rather than wrapping the consumers individually — consumer-level wrapping is what the original audit found unmaintainable.
 
-### 11.17 Archetype presets — in-visit quick-start scaffolding (council 2026-05-29)
+### 11.13 BIF + impaired-adaptive cross-check
 
-A "Quick start" bar at the top of `.left-panel` offers six one-click archetype presets plus a composable `+ADHD` modifier, to cut in-visit entry cost (the maintainer's stated pain was "too slow to enter live" during a visit). The engine — `PRESETS`, `MODIFIERS`, `formHasInput()`, `applyPreset()` — is defined just after `setByPath()` ([autism-ap-builder.html](../autism-ap-builder.html)).
+A passive informational hint fires in the adaptive section when `cogProfile==='borderline'` is paired with adaptProfile ∈ `{mildlyImpaired, moderatelyImpaired, severelyImpaired}`. It surfaces the differential-zone question the literature (`[aacn-2020]`; `[wexler-2023]`) makes most active for the BIF call: there is no meaningful adaptive-function gap between FSIQ 70–79 and 80–89, so adaptive impairment paired with borderline IQ is exactly the population where the BIF vs mild ID call is live.
 
-**Mechanism.** `applyPreset(key, opts)` does **not** assign `S` directly. It `.click()`s the real form controls (radios by `name`+`value`, set-membership checkboxes by `data-key`+`value`, langModifier chips by `mod_<key>` id), so every existing change-handler side effect fires — the cog→specifier bridge, `syncCommNeedsFromLangLevel`, `syncABATargetsFromNeeds`, `syncSchoolSvcFromNeeds`, the `.sel` classes, and `render()`. This is deliberate: a preset can never diverge from the hand-click code path, because it *is* the hand-click code path. Each click is guarded (`!checked` for inputs, `!S.langModifiers.has()` for chips) so it can't toggle an auto-populated selection back off. `reset:true` (default; archetype buttons) calls `clearAll({confirmed:true})` first, gated by a `formHasInput()` confirm; `reset:false` (the modifier button) overlays without clearing.
+**Behavior**:
+- Fires only on the three impaired adaptive levels. `belowPotential` is excluded — it implies the clinician has already attributed the adaptive gap to a non-cognitive cause (Level 1/2 ASD pattern).
+- Auto-hides when the predicate becomes false. No dismiss-and-record mechanism (matches the floor-effect-warning pattern).
+- Severity word interpolated from adaptProfile via `IMPAIRED_ADAPTIVE_WORDS`.
+- Text names alternative causes (ADHD, mood, trauma, informant variability) so it reads as informational, not prescriptive.
 
-**Cross-preset invariant (council FOR ≥95%, the load-bearing rule).** No preset sets the diagnostic determination: `diagStatus`, `asdLevelSC`, `asdLevelRRB`, `criteriaA`/`criteriaB`, `criteriaC`/`D`/`E`, and `ev.*` are never touched. The clinician affirms every diagnosis-determining call, every time. Only the two early-workup presets (`p1`/`p2`) set `cogProfile='unknown'` — an explicit *non*-assertion that drives the "awaiting comprehensive battery" pathway (verified: leaves `S.specifiers` and `S.specifiersManuallySet` empty — no auto-pin). No preset sets a specific cognitive tier; higher-support presets (`p4`/`p6`) leave `cogProfile` blank rather than presume ID.
+**Wiring**: `toggleBifAdaptiveCrossCheck()` is called from the end of `bridgeCogProfileToSpecifier()` (which fires on cogProfile / cogDataSource / ageGroup / adaptiveStandardized / adaptProfile changes), the `adaptProfile` change/deselect handlers, and the DOMContentLoaded init.
 
-**What presets set vs. derive.** Presets set *findings* only — age, language baseline, need clusters, common ABA targets, and `insuranceType='medicaid'` (the population default). Therapy referrals (via `resolveOv`/`rule*`, §7), school services (`syncSchoolSvcFromNeeds`), and additional ABA targets (`syncABATargetsFromNeeds`, add-only, §9.2) auto-derive from those findings. `therapyStatus` is left blank — it asserts the child is *already in* therapy, which is a finding, not a scaffold. Pre-staged `abaTargets` set while the ABA params section is hidden (no `diagStatus`) survive and display correctly once the clinician affirms a confirmed diagnosis (verified end-to-end).
+**Visual**: gray italic on a warm-cream background with a yellow-amber left-border accent — same family as the floor-effect warning, with the border distinguishing a clinical recommendation from pure information. The two cannot co-fire (floor-effect requires `young`; this requires `borderline`, gated to `older`).
 
-**Council provenance.** The six-plus-one set was ratified grounded in national autism epidemiology for a majority-Medicaid specialty clinic (references.md §7 `[cdc-addm-2022]`): co-occurring ID ~37–40%, ADHD ~40–60%, ~25–30% minimally verbal. The load-bearing consequence: the "verbal, no-ID, Level 1" stereotype is *not* the plurality here, so higher-support and language-delayed early-eval archetypes carry more weight than in a commercial-insurance clinic. Fork A resolved the cognitive rule (`unknown` for `p1`/`p2`, blank elsewhere; DBP↔PSY intentional-disagreement pair, FOR 94%). Fork B chose `+ADHD` as a composable modifier over N standalone ADHD×age presets (FOR 93%). Two archetypes were pruned: a "deferred/inconclusive" preset (→ recommendation that the default *empty* state itself read "evaluation in progress") and an "established follow-up" preset (→ a separate follow-up/med-check mode, `spawn_task` candidate — different note shape, out of scope for an eval-A&P builder).
+**Maintainer note**: do not extend the predicate to `cogProfile==='lowAverage' + impaired adaptive`. The AACN/Wexler argument applies there empirically, but lowAverage doesn't land in R41.83 and the clinical question shifts ("lowAverage vs mild ID via adaptive criterion") — different question, different hint text. Separable future work.
 
-**Maintainer note**: do **not** add `'echolalic'` to any preset's `mods` array — `toggleMod('echolalic')` auto-checks DSM criterion B1 (§4.4), which would silently violate the cross-preset invariant. Only side-effect-free langModifiers belong in `mods`; the code carries a `WARY:` marker at the `mods` loop. Retuning a preset is pure data in the `PRESETS` map, but re-confirm it sets no diagnosis-determining field. The archetype labels/contents are tunable to the real clinic case-mix; the *membership* is council-ratified, but the *ordering* of buttons should follow observed frequency.
+### 11.14 ID vs GDD predicate split
+
+The `confirmable` predicate at [autism-ap-builder.html:4559](../autism-ap-builder.html#L4559) is two predicates, intentionally:
+
+- `confirmableId = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed()`. DSM-5-TR ID criteria require cognitive deficit + adaptive deficit + developmental onset; enforced via cogSource (comprehensive or priorExternal) + adaptive-impaired + standardized-adaptive evidence (consistent Vineland-3/BASC-3 in priorTesting OR the clinician-attested checkbox).
+- `confirmableGdd = cogSourceSupportsConfirmation()` — looser. F88 GDD applies when ID cannot be reliably assessed (typically under 5); adaptive deficits are typical but not strictly required by DSM-5-TR/AACAP, and a comprehensive developmental battery (Bayley-4, Mullen, Griffiths, DAYC-2) is sufficient on its own to drop the provisional framing. (Bayley-4 itself includes adaptive subscales, so the old combined predicate was partly redundant here.)
+
+Provenance: PR-G.
+
+**Maintainer note**: do not collapse `confirmableId` and `confirmableGdd` back into a single `confirmable`. The asymmetry is load-bearing. If a future change adds a third tier (e.g. `confirmableBif`), follow the pattern — extract the predicate, name it explicitly, route the cogVal branch through it.
+
+### 11.15 BIF priorExternal attribution
+
+`withBifSourceQualifier` at [autism-ap-builder.html:1513](../autism-ap-builder.html#L1513) appends a priorExternal attribution when `cogDataSource === 'priorExternal'`:
+
+> `"(per prior outside evaluation; supporting records not available for direct review at this visit)"`
+
+This mirrors the `priorExtAttribution` pattern used for the ID/GDD F70/F71/F72/F88 dx lines (~line 1716). Without it, a BIF call grounded in an outside report produces bare prose indistinguishable from one grounded in a same-visit comprehensive battery. Provenance: PR-G.
+
+**Maintainer note**: BIF prose has four output variants (bare for comprehensive, screener qualifier, clinical qualifier, priorExternal attribution). When adding a fifth cogDataSource value, add the corresponding branch in `withBifSourceQualifier` rather than letting it fall through to bare prose.
+
+### 11.16 Pill/bridge convergence
+
+`currentClinicalPathway()` is the single predicate behind both the pathway pill (rendered at the top of the Cognitive Profile section) and the auto-bridge. It returns a `specKey` field on every shape (`'withID'`, `'withSuspectedID'`, `'withGDD'`, `'withSuspectedGDD'`, `null` for BIF/unknown, `'withoutID'`/`'withoutGDD'` for normal-range-by-age); `bridgeCogProfileToSpecifier()` derives the specifier from `currentClinicalPathway()?.specKey` rather than duplicating the decision tree, and the adaptProfile change handler fires the bridge. One predicate, two consumers, zero drift — the pill and the auto-bridged specifier checkbox cannot show two disagreeing summaries of the same clinical picture.
+
+**Known residual**: manual specifier overrides remain volatile under adjacent control changes (clinician unchecks `withID` to assert `withSuspectedID`, changes adaptive, the auto-bridge re-overrides intent). Addressed by `S.specifiersManuallySet` and three release paths: uncheck the pin, the "Re-sync with pathway" button on the pill, or a cogProfile change (clears all pins).
+
+**Maintainer note**: when adding a new cog/adaptive predicate that affects the bridge, extend `currentClinicalPathway()`'s `specKey` return rather than adding inline logic in `bridgeCogProfileToSpecifier()`. The single-predicate property is load-bearing.
+
+### 11.17 Archetype presets — in-visit quick-start scaffolding
+
+A "Quick start" bar at the top of `.left-panel` offers six one-click archetype presets plus a composable `+ADHD` modifier, to cut in-visit entry cost. The engine — `PRESETS`, `MODIFIERS`, `formHasInput()`, `applyPreset()` — is defined just after `setByPath()`.
+
+**Mechanism.** `applyPreset(key, opts)` does **not** assign `S` directly. It `.click()`s the real form controls (radios by `name`+`value`, set-membership checkboxes by `data-key`+`value`, langModifier chips by `mod_<key>` id), so every existing change-handler side effect fires — the cog→specifier bridge, `syncCommNeedsFromLangLevel`, `syncABATargetsFromNeeds`, `syncSchoolSvcFromNeeds`, the `.sel` classes, and `render()`. A preset can never diverge from the hand-click code path because it *is* the hand-click code path. Each click is guarded (`!checked` for inputs, `!S.langModifiers.has()` for chips) so it can't toggle an auto-populated selection back off. `reset:true` (default; archetype buttons) calls `clearAll({confirmed:true})` first, gated by a `formHasInput()` confirm; `reset:false` (the modifier button) overlays without clearing.
+
+**Cross-preset invariant (the load-bearing rule).** No preset sets the diagnostic determination: `diagStatus`, `asdLevelSC`, `asdLevelRRB`, `criteriaA`/`criteriaB`, `criteriaC`/`D`/`E`, and `ev.*` are never touched. The clinician affirms every diagnosis-determining call, every time. Only the two early-workup presets (`p1`/`p2`) set `cogProfile='unknown'` — an explicit *non*-assertion driving the "awaiting comprehensive battery" pathway (leaves `S.specifiers` and `S.specifiersManuallySet` empty — no auto-pin). No preset sets a specific cognitive tier; higher-support presets (`p4`/`p6`) leave `cogProfile` blank rather than presume ID.
+
+**What presets set vs. derive.** Presets set *findings* only — age, language baseline, need clusters, common ABA targets, and `insuranceType='medicaid'` (the population default). Therapy referrals (§7), school services (`syncSchoolSvcFromNeeds`), and additional ABA targets (`syncABATargetsFromNeeds`, add-only, §9.2) auto-derive. `therapyStatus` is left blank — it asserts the child is *already in* therapy, which is a finding, not a scaffold. Pre-staged `abaTargets` set while the ABA params section is hidden (no `diagStatus`) survive and display once the clinician affirms a confirmed diagnosis.
+
+The six-plus-one membership is council-ratified, grounded in national autism epidemiology for a majority-Medicaid specialty clinic (`[cdc-addm-2022]`; references.md §7): co-occurring ID ~37–40%, ADHD ~40–60%, ~25–30% minimally verbal — so the "verbal, no-ID, Level 1" stereotype is not the plurality here, and higher-support / language-delayed early-eval archetypes carry more weight than in a commercial-insurance clinic.
+
+**Maintainer note**: do **not** add `'echolalic'` to any preset's `mods` array — `toggleMod('echolalic')` auto-checks DSM criterion B1 (§4.4), which would silently violate the cross-preset invariant. Only side-effect-free langModifiers belong in `mods`; the code carries a `WARY:` marker at the `mods` loop. Retuning a preset is pure data in the `PRESETS` map, but re-confirm it sets no diagnosis-determining field. Membership is council-ratified; button *ordering* should follow observed frequency.
 
 ---
 
