@@ -1,0 +1,127 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD), Level 1 (Social Communication) / Level 2 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
+
+Co-occurring conditions:
+  • ADHD, Combined presentation (F90.2)
+  • Anxiety disorder (F41.9)
+
+── Co-occurring Condition Notes ──
+
+ADHD (Combined presentation): Full assessment and management plan are documented in the ADHD problem block below.
+Anxiety Disorder: Clinically significant anxiety confirmed as a clinically distinct co-occurring condition. Presentation is likely atypical in the context of ASD (increased rigidity, somatic complaints, behavioral dysregulation rather than verbalized worry). {Describe predominant anxiety features observed in this patient.}
+
+── Clinical Summary ──
+
+The patient is an adolescent who is conversational, with cognitive functioning in the low-average range and adaptive behavior below cognitive potential. They demonstrate a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including behavior, and social development. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Behavior/interfering: noncompliance/defiance
+  • Social/play: perspective-taking/Theory of Mind
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder [Level 1 (SC) / Level 2 (RRBs)] (F84.0) ──
+
+1. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA therapy is recommended as the primary evidence-based behavioral intervention for them and is medically necessary given their confirmed diagnosis of Autism Spectrum Disorder, Level 1 (Social Communication) / Level 2 (Restricted/Repetitive Behaviors), with the following documented functional impairments establishing medical necessity: severe noncompliance; social skill impairments (perspective-taking); significant adaptive impairment. These impairments substantially limit their ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.
+The documented impairments noted above require individualized, function-based behavioral support that cannot be adequately addressed through less intensive consultation alone. ABA-based programming is recommended; services should be age-appropriate, prioritize self-determination and skill generalization across natural environments, and directly address the impairments established above. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria.
+
+Supporting References:
+  1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
+  2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services. Parent training sessions will address: understanding the function of target behaviors, implementation of reinforcement strategies in natural routines, generalization of clinic and school skills to home settings, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: Programming will use the least restrictive, most naturalistic procedures appropriate to the individual's profile. Patient assent will be sought for all intervention activities as developmentally appropriate; assent withdrawal will be honored and documented. Positive reinforcement-based strategies are the first-line approach; restrictive procedures require documented justification and oversight per BACB ethical standards.
+  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
+
+2. AUTISM-INFORMED PSYCHOTHERAPY
+CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: anxiety.
+Therapist with ASD-specific training required. Approaches must account for their communication profile, cognitive style, and sensory differences.
+Self-advocacy and self-determination should be integrated into treatment.
+
+3. SOCIAL SKILLS INTERVENTION
+PEERS (Program for the Education and Enrichment of Relational Skills) or comparable evidence-based program for adolescents/young adults. Generalization to natural settings should be explicitly planned and monitored.
+
+4. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+5. SCHOOL / EDUCATIONAL SUPPORTS
+504 Plan in place. Review accommodations for adequacy; consider whether IEP eligibility is more appropriate given identified functional needs.
+Recommended school-based services:
+  • Counseling / social-emotional support
+  • Low student:teacher ratio
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Behavioral and Emotional Accommodations:
+    - Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks
+    - Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+6. MEDICAL REFERRALS
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
+      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
+      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
+      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
+  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: ADHD, anxiety. Behavioral strategies should be maximized prior to and concurrent with any medication.
+
+  References (genetics):
+    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
+    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
+
+7. FAMILY RESOURCES & NEXT STEPS
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+── Problem 2: ADHD, Combined Presentation (F90.2) ──
+
+Assessment:
+  ADHD (Combined presentation) confirmed as a distinct co-occurring condition. Attention and impulse control deficits cause functional impairment beyond what is accounted for by ASD-related processing differences alone. {Describe primary symptom domains and settings of greatest impairment — e.g., sustained attention failures in structured tasks, impulsivity at home and school, hyperactivity beyond developmental expectations.}
+
+Plan:
+  Treatment is indicated based on the functional impairment documented in the Assessment above.
+  Medication approach in ASD+ADHD differs from standard ADHD care: only ~49% of ASD children respond to methylphenidate (vs. higher rates in non-autistic ADHD); adverse effect rates are higher. Non-stimulants, particularly guanfacine ER, have RCT support in ASD and may be preferred as first-line agents in many patients.
+  • Non-stimulants (consider first-line in ASD):
+    - Guanfacine ER: start 1 mg daily; increase by 1 mg/week to maximum 4 mg/day. Has RCT evidence in ASD (50% positive response; also benefits irritability, anxiety, sleep, tics). Additional benefit if sleep or anxiety co-occurring.
+    - Clonidine ER: start 0.1 mg at night; increase weekly by 0.1 mg to maximum 0.4 mg/day. More sedating than guanfacine; useful if sleep-onset is a target.
+    - Atomoxetine: start 0.5 mg/kg/day; titrate to 1.2–1.4 mg/kg/day (max 100 mg/day). Black box warning: suicidal ideation; monitor closely.
+  • Stimulants (if non-stimulant insufficient or not tolerated):
+    - Methylphenidate IR: start 2.5 mg AM; increase by 2.5 mg every 5–7 days. Maximum 35 mg/day (≤25 kg) or 60 mg/day (>25 kg).
+    - Amphetamine salts IR: start 2.5 mg; maximum 40 mg/day (or 60 mg/day if >50 kg). No RCTs in ASD; extrapolated from ADHD data.
+    - ER formulations preferred once effective IR dose established.
+  • Cardiac screening before initiation (history and exam; ECG if indicated).
+  • Monitor at each titration step: appetite, weight/growth, sleep onset, mood/irritability, and stereotypy. Note: ASD patients are less likely to self-report adverse effects; behavioral change is the signal.
+  • Vanderbilt or Conners Rating Scales (teacher and parent forms) at each titration visit to quantify response.
+  • IEP/504 accommodations (extended time, preferential seating, chunked assignments) regardless of medication status.
+  • Psychiatry co-management for medication management; via existing referral or new referral if not already placed.
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

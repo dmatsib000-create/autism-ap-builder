@@ -1,0 +1,89 @@
+NOTE: This letter is a physician recommendation to be submitted by the family as supporting
+documentation for their written request. Under IDEA, the parent/guardian must also submit
+a brief separate written request to the school district.
+────────────────────────────────────────────────────────────
+
+PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
+IEP Review Request
+
+Date: {Date}
+
+{Principal / Special Education Coordinator Name}
+{School Name}
+{School Address}
+
+Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 3 (requiring very substantial support)
+
+Dear {Principal / Special Education Coordinator Name}:
+
+I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
+
+She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 3 (requiring very substantial support) (with accompanying intellectual disability), confirmed at the evaluation referenced above.
+
+[Note to clinician: The "with intellectual disability" specifier is checked but no ID severity (Mild, Moderate, Severe) is selected in the Cognitive Profile section of the tool. Please select a severity so accommodation recommendations specific to the level of intellectual disability render correctly in this letter.]
+
+────────────────────────────────────────────────────────────
+EDUCATIONAL IMPACT
+────────────────────────────────────────────────────────────
+These conditions result in the following challenges that require specialized support in the educational setting:
+  • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
+  • Behavior: Behavioral safety concerns requiring active supervision and impacting the safety of the student and others in the environment; elopement risk requiring direct supervision at all times, limiting ability to participate in group or less-structured activities.
+  • Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.
+  • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
+
+────────────────────────────────────────────────────────────
+REQUEST FOR IEP TEAM MEETING
+────────────────────────────────────────────────────────────
+I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
+
+Under IDEA (34 C.F.R. §300.324(b)(1)), a parent may request an IEP team meeting at any time to review and revise the IEP. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED SERVICES
+────────────────────────────────────────────────────────────
+I recommend the following updates to the current IEP:
+
+Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
+
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners; receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary.
+
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: sensory support plan (Sensory Profile 2 and/or SPM-2 evaluation): individualized sensory regulation strategies implemented in the classroom in coordination with the teacher; adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence.
+
+Paraprofessional Support (1:1 Aide): A dedicated paraprofessional is recommended based on the documented support needs identified in this evaluation. Specific rationale: active elopement risk requiring continuous proximity supervision; behavioral safety needs requiring capacity for immediate adult intervention; communication access requiring adult facilitation for AAC use and participation in instruction; significant adaptive skill deficits requiring adult support throughout the school day. The aide's role and prompting hierarchy should be explicitly specified in the IEP to promote independence and prevent prompt dependency.
+
+Extended School Year (ESY): ESY services are recommended based on the documented risk of significant skill regression during extended breaks from school. Students with ASD at this level of need are at elevated risk for regression in communication, behavioral regulation, and adaptive skills during summer break, with evidence of disproportionate recovery time upon return to the school year. ESY eligibility and services should be formally determined by the IEP team based on documented regression data; this clinical evaluation supports the team's consideration of ESY services.
+
+Low Student-to-Teacher Ratio Classroom: A small group or self-contained classroom setting with a low student-to-teacher ratio is recommended. The structured, lower-stimulation environment of a small classroom supports sensory regulation, individualized instructional pacing, and behavioral consistency that is not reliably achievable in a general education classroom of typical size without highly intensive support.
+
+Visual Supports and Visual Schedules: Visual supports are a research-supported, ASD-specific accommodation that significantly improve predictability, independence, and behavioral regulation. Recommended visual supports include: a daily visual schedule (individual desk copy and classroom display), visual task sequences for multi-step activities, visual transition warnings (timer with visual cue), and visual rules and expectations posted in the classroom. Visual supports should be developed in collaboration with the SLP and/or OT and implemented consistently across all school settings including specials, lunch, and recess.
+
+Functional Behavior Assessment (FBA): An FBA is recommended to identify the function (purpose) of interfering behaviors and to develop an individualized, function-based Behavior Intervention Plan (BIP). Behaviors warranting FBA: aggression toward others, self-injurious behavior, elopement/wandering. I recommend that the FBA be conducted by a Board-Certified Behavior Analyst (BCBA) or a school-based behavior specialist with documented training in functional behavior assessment, and include direct observation, ABC data collection, and structured interviews with caregivers and teachers. The resulting BIP should be implemented consistently by all school staff and reviewed regularly by the IEP team based on collected data, with formal review recommended at minimum every quarter.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED ACCOMMODATIONS
+────────────────────────────────────────────────────────────
+I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
+
+Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):
+  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
+
+Individually Indicated Accommodations Based on Evaluation Findings:
+  • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
+
+Behavioral and Emotional Accommodations:
+  • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  • Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that food selectivity in ASD is sensory-based and not volitional
+
+────────────────────────────────────────────────────────────
+Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+
+Sincerely,
+
+
+___________________________________
+{Physician Name}, MD
+UF Behavior and Development Clinic
+{Phone Number}
+
+Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

@@ -1,0 +1,6 @@
+# The golden-output test net compares reference files byte-for-byte against the
+# generator's LF output. Force LF in the working tree so Windows autocrlf can't
+# convert checked-out goldens to CRLF and cause false test failures on clone.
+tests/golden/*.txt   text eol=lf
+tests/*.mjs          text eol=lf
+tests/fixtures/*.mjs text eol=lf
