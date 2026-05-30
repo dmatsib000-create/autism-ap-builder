@@ -64,7 +64,7 @@ async function main() {
   if (UPDATE && !existsSync(GOLD_DIR)) mkdirSync(GOLD_DIR, { recursive: true });
 
   const files = readdirSync(FIXT_DIR).filter(f => f.endsWith('.mjs')).sort();
-  let pass = 0, fail = 0;
+  let pass = 0, fail = 0, matched = 0;
   const failures = [];
   const pending = []; // in --update mode: the changes we would make, pending confirmation
 
@@ -75,6 +75,7 @@ async function main() {
       throw new Error(`${file}: must default-export { name, outputs[], apply(S) }`);
     }
     if (filter && !fx.name.includes(filter)) continue;
+    matched++;
 
     const app = makeApp();
     fx.apply(app.S);
@@ -113,6 +114,15 @@ async function main() {
         );
       }
     }
+  }
+
+  // A filter that matched nothing is almost always a typo'd scenario name. Don't
+  // let it look like a clean pass — say so plainly and exit non-zero.
+  if (filter && matched === 0) {
+    console.log(`\nNo scenario name contains "${filter}" — nothing ran.`);
+    console.log('Check the spelling, or run without a name to run them all. Available scenarios:');
+    for (const f of files) console.log(`  ${f.replace(/\.mjs$/, '')}`);
+    process.exit(1);
   }
 
   if (UPDATE) {
