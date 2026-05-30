@@ -30,7 +30,7 @@ export default {
     S.needsBehavior.add('rigidity');
     S.needsBehavior.add('noncompliance');
 
-    S.schoolPlacement = 'general';
+    S.schoolPlacement = 'genEd';
     S.schoolDoc = 'iep';
     ['sped', 'slp_school', 'social_skills_school', 'visual'].forEach(k => S.schoolSvc.add(k));
 

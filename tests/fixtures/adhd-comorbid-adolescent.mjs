@@ -30,7 +30,7 @@ export default {
     S.needsBehavior.add('noncompliance');
     S.needsSocial.add('perspective');
 
-    S.schoolPlacement = 'general';
+    S.schoolPlacement = 'genEdSupport';
     S.schoolDoc = '504';
     ['counseling', 'lowRatio'].forEach(k => S.schoolSvc.add(k));
 
