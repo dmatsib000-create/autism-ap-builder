@@ -1,0 +1,25 @@
+name: tests
+
+# Runs the golden-output regression net on every push and PR. The harness loads
+# the real autism-ap-builder.html and evaluates its <script> in Node, so this
+# also catches the silent catastrophe CLAUDE.md warns about: a stray smart/curly
+# quote that makes the whole script un-parseable produces no console error in a
+# browser, but it makes `node tests/run.mjs` throw here — turning a clinic-time
+# "the tool is blank" into a red check before merge.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # No dependencies to install — the tests are plain Node (>= 18), so we run
+      # them directly. `npm ci` would fail anyway: there is no lockfile.
+      - run: npm test
