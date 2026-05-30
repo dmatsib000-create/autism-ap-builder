@@ -32,6 +32,12 @@ const GENERATORS = {
   iep: app => app.generateIEPLetterPlain(),
 };
 
+// Normalize line endings before comparing. The generators always emit \n, so a
+// golden that has been checked out (or hand-edited) as CRLF should still match.
+// This keeps the comparison correct even on a machine where .gitattributes was
+// not honored — we never want a whole-file false failure over line endings.
+const norm = s => s.replace(/\r\n/g, '\n');
+
 function firstDiff(expected, actual) {
   const e = expected.split('\n');
   const a = actual.split('\n');
@@ -57,7 +63,9 @@ async function confirm(question) {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   const answer = (await rl.question(`\n${question} `)).trim().toLowerCase();
   rl.close();
-  return answer === 'yes' || answer === 'y';
+  const ok = answer === 'yes' || answer === 'y';
+  if (!ok) console.log('\nAborted. Nothing was changed.');
+  return ok;
 }
 
 async function main() {
@@ -67,6 +75,7 @@ async function main() {
   let pass = 0, fail = 0, matched = 0;
   const failures = [];
   const pending = []; // in --update mode: the changes we would make, pending confirmation
+  const catalog = []; // {name, describe} for every loaded fixture — used in the "nothing ran" list
 
   for (const file of files) {
     const mod = await import(pathToFileURL(join(FIXT_DIR, file)).href);
@@ -74,6 +83,7 @@ async function main() {
     if (!fx || !fx.name || !Array.isArray(fx.outputs) || typeof fx.apply !== 'function') {
       throw new Error(`${file}: must default-export { name, outputs[], apply(S) }`);
     }
+    catalog.push({ name: fx.name, describe: fx.describe || '' });
     if (filter && !fx.name.includes(filter)) continue;
     matched++;
 
@@ -87,14 +97,16 @@ async function main() {
       const goldPath = join(GOLD_DIR, `${fx.name}.${out}.txt`);
       const label = `${fx.name}.${out}`;
       const hadGold = existsSync(goldPath);
-      const expected = hadGold ? readFileSync(goldPath, 'utf8') : null;
+      // Compare on line-ending-normalized text (norm); write the raw actual (LF).
+      const expected = hadGold ? norm(readFileSync(goldPath, 'utf8')) : null;
+      const actualN = norm(actual);
 
       if (UPDATE) {
         // Only record real changes; identical references need no confirmation.
         if (!hadGold) {
-          pending.push({ goldPath, label, actual, status: 'new', lines: actual.split('\n').length });
-        } else if (expected !== actual) {
-          pending.push({ goldPath, label, actual, status: 'changed', diff: firstDiff(expected, actual) });
+          pending.push({ goldPath, label, actual, status: 'new', lines: actualN.split('\n').length });
+        } else if (expected !== actualN) {
+          pending.push({ goldPath, label, actual, status: 'changed', diff: firstDiff(expected, actualN) });
         }
         continue;
       }
@@ -102,11 +114,11 @@ async function main() {
       if (!hadGold) {
         fail++;
         failures.push(`${label}: no reference file — run \`node tests/run.mjs --update\``);
-      } else if (expected === actual) {
+      } else if (expected === actualN) {
         pass++;
       } else {
         fail++;
-        const d = firstDiff(expected, actual);
+        const d = firstDiff(expected, actualN);
         failures.push(
           `${label}: differs at line ${d.line}\n` +
           `    saved: ${JSON.stringify(d.expected)}\n` +
@@ -116,12 +128,19 @@ async function main() {
     }
   }
 
-  // A filter that matched nothing is almost always a typo'd scenario name. Don't
-  // let it look like a clean pass — say so plainly and exit non-zero.
-  if (filter && matched === 0) {
-    console.log(`\nNo scenario name contains "${filter}" — nothing ran.`);
-    console.log('Check the spelling, or run without a name to run them all. Available scenarios:');
-    for (const f of files) console.log(`  ${f.replace(/\.mjs$/, '')}`);
+  // Running zero scenarios must never look like a clean pass. Two ways it happens:
+  // an empty fixtures dir, or a filter (usually a typo'd name) that matched nothing.
+  if (matched === 0) {
+    if (catalog.length === 0) {
+      console.log('\nNo fixtures found in tests/fixtures — nothing ran.');
+    } else {
+      console.log(`\nNo scenario name contains "${filter}" — nothing ran.`);
+      console.log('Check the spelling, or run without a name to run them all. Available scenarios:');
+      const w = Math.max(...catalog.map(c => c.name.length));
+      for (const c of catalog) {
+        console.log(`  ${c.name.padEnd(w)}${c.describe ? '  — ' + c.describe : ''}`);
+      }
+    }
     process.exit(1);
   }
 
@@ -156,11 +175,9 @@ async function runUpdate(pending) {
     }
   }
 
+  // confirm() prints its own reason on a no (non-TTY notice, or "Aborted").
   const ok = await confirm('Save these as the new correct output? Type "yes" to confirm:');
-  if (!ok) {
-    console.log('\nAborted. Nothing was changed.');
-    process.exit(1);
-  }
+  if (!ok) process.exit(1);
 
   for (const p of pending) writeFileSync(p.goldPath, p.actual);
   console.log(`\nSaved ${pending.length} reference(s).`);

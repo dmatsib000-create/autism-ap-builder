@@ -33,10 +33,21 @@ const EXPORTS = [
 ];
 
 function extractScript(html) {
-  const open = html.indexOf('<script>');
-  const close = html.lastIndexOf('</script>');
-  if (open < 0 || close < 0) throw new Error('Could not find <script> block in HTML');
-  return html.slice(open + '<script>'.length, close);
+  // The harness assumes the app is one inline <script> block. If a second script
+  // (or a <script src=...>) is ever added, a naive first-open/last-close span
+  // would silently swallow everything between them. Guard so that change fails
+  // loudly here instead of producing a garbage "app".
+  const openTags = html.match(/<script\b[^>]*>/gi) || [];
+  const closeTags = html.match(/<\/script>/gi) || [];
+  if (openTags.length !== 1 || closeTags.length !== 1) {
+    throw new Error(
+      `Expected exactly one <script> block in the HTML, found ${openTags.length} open / ` +
+      `${closeTags.length} close. If the app's structure changed, update extractScript().`
+    );
+  }
+  const open = html.indexOf(openTags[0]);
+  const close = html.indexOf('</script>', open);
+  return html.slice(open + openTags[0].length, close);
 }
 
 // Forgiving DOM/browser stubs. Because the DOMContentLoaded callback never runs,
@@ -100,7 +111,7 @@ export function makeApp() {
     throw friendlyError(
       'The checker could not read the app\'s code at all.',
       'This usually means autism-ap-builder.html has a typo in its <script> — a stray ' +
-      'curly quote (‘ ’) or an unclosed bracket are the usual causes. Open the app ' +
+      'curly/smart quote or an unclosed bracket are the usual causes. Open the app ' +
       'in a browser; if it is broken too, fix it there first.',
       err
     );
