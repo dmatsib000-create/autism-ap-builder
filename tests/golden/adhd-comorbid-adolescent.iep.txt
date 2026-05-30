@@ -1,0 +1,70 @@
+NOTE: This letter is a physician recommendation to be submitted by the family as supporting
+documentation for their written request. Under IDEA, the parent/guardian must also submit
+a brief separate written request to the school district.
+────────────────────────────────────────────────────────────
+
+PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
+504 Review / IEP Eligibility Request
+
+Date: {Date}
+
+{Principal / Special Education Coordinator Name}
+{School Name}
+{School Address}
+
+Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (requiring substantial support)
+
+Dear {Principal / Special Education Coordinator Name}:
+
+I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
+
+They have received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support), confirmed at the evaluation referenced above. In addition, they carry the following co-occurring diagnoses, each of which contributes to the educational challenges described below: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder.
+
+────────────────────────────────────────────────────────────
+EDUCATIONAL IMPACT
+────────────────────────────────────────────────────────────
+These conditions result in the following challenges that require specialized support in the educational setting:
+  • Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.
+  • Behavior: Difficulty with emotional regulation and behavioral compliance that interrupts instruction for this student and peers.
+
+────────────────────────────────────────────────────────────
+REQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW
+────────────────────────────────────────────────────────────
+I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.
+
+Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).
+
+────────────────────────────────────────────────────────────
+RECOMMENDED SERVICES
+────────────────────────────────────────────────────────────
+If eligible for special education services, I recommend the IEP include the following:
+
+Counseling and Social-Emotional Support Services: School-based counseling is recommended to address the social-emotional and behavioral regulation needs documented above. Goals: anxiety management strategies (graduated exposure, relaxation techniques, cognitive coping) adapted for the school setting; social skill generalization in the school environment, reinforcing goals targeted in specialized social skills instruction.
+
+Low Student-to-Teacher Ratio Classroom: A small group or self-contained classroom setting with a low student-to-teacher ratio is recommended. The structured, lower-stimulation environment of a small classroom supports sensory regulation, individualized instructional pacing, and behavioral consistency that is not reliably achievable in a general education classroom of typical size without highly intensive support.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED ACCOMMODATIONS
+────────────────────────────────────────────────────────────
+I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
+
+Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):
+  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
+
+Behavioral and Emotional Accommodations:
+  • Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks
+  • Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
+
+────────────────────────────────────────────────────────────
+Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+
+Sincerely,
+
+
+___________________________________
+{Physician Name}, MD
+UF Behavior and Development Clinic
+{Phone Number}
+
+Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

@@ -18,12 +18,22 @@ claude_code/
 │   ├── references.md                            Centralized bibliography (short handles + verification ledger)
 │   ├── quickstart.png                           Tool screenshot (used in README)
 │   └── audits/                                  Per-area audit procedures
+├── tests/                       Tracked golden-output regression tests (Node, no deps)
+│   ├── harness.mjs                              Loads the real HTML, exposes generators (no file changes)
+│   ├── run.mjs                                  Runner: `npm test`, `npm run test:update`
+│   ├── fixtures/                                One *.mjs per clinical scenario (sets up S)
+│   └── golden/                                  Committed expected note/letter output
+├── package.json                 Tracked: `test` / `test:update` scripts
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
 ├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
 └── scratch/                     Working drafts: skill updates, prompts, test files (untracked)
 ```
 
-Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, and `docs/` are tracked in git and pushed to GitHub. Everything else is local.
+Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, and `package.json` are tracked in git and pushed to GitHub. Everything else is local.
+
+### Tests (golden-output regression net)
+
+`npm test` runs the golden-output tests in `tests/`. Each fixture sets up an `S` state and snapshots the exact plain text from `generateNote()` and the ABA/IEP letter generators against a committed golden file. The harness loads the **real** `autism-ap-builder.html` and evaluates its `<script>` in Node with DOM stubs — it does **not** modify the file or require a browser. **When a change alters note output**, run `npm run test:update`, eyeball the golden diffs to confirm the change is intentional and clinically correct, and commit the updated goldens in the same commit. See `tests/README.md` for adding fixtures.
 
 ### Intake protocol for non-trivial requests
 
