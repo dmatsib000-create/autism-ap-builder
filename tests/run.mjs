@@ -126,6 +126,31 @@ async function main() {
         );
       }
     }
+
+    // Loud check for the v3() silent-fallback bug: a finite verb used with a
+    // "they" patient but missing from V3_MAP renders ungrammatically ("they
+    // has") AND warns. The harness captured those warnings. We anchor on the
+    // stable "v3():" prefix of the app's warning, not the wording after it (the
+    // app has a matching back-reference comment on that prefix).
+    const v3Missing = [...new Set((app.__warnings || []).filter(w => w.startsWith('v3():')))];
+    if (v3Missing.length) {
+      if (UPDATE) {
+        // Update mode doesn't fail (the human reviews the diff), but it must not
+        // bake "they has" into a golden unannounced — surface the missing verbs.
+        console.log(
+          `\n⚠ ${fx.name}: singular-"they" verb(s) missing from V3_MAP — the saved golden ` +
+          `will contain ungrammatical output until they are added:\n` +
+          v3Missing.map(w => '    ' + w).join('\n')
+        );
+      } else {
+        fail++;
+        failures.push(
+          `${fx.name}: singular-"they" verb-agreement bug — verb(s) missing from V3_MAP:\n` +
+          v3Missing.map(w => '    ' + w).join('\n') +
+          `\n    Fix: add the verb(s) to V3_MAP in autism-ap-builder.html (see docs/audits/verb-agreement.md).`
+        );
+      }
+    }
   }
 
   // Running zero scenarios must never look like a clean pass. Two ways it happens:
