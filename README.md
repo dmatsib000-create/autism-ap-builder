@@ -71,7 +71,7 @@ The DSM-5 Criteria section shows a live badge: ✓ All criteria met when complet
 
 ### The other two tabs
 
-The **ABA Letter** and **IEP Letter** tabs activate as their inputs are populated. The ABA Letter tab appears when the ABA referral fires (see Auto-logic in Part 2 for the full trigger list — it's needs-driven, not gated on diagnosis status alone) or is manually included via Adjust Referrals. The IEP Letter tab appears when school documentation status is set and the patient is not a toddler. Both tabs use the same one-form-three-outputs model — you don't enter anything separately, the letters auto-generate from the same checkboxes that drove the A&P note.
+The **ABA Letter** and **IEP Letter** tabs activate as their inputs are populated. The ABA Letter tab appears when the ABA referral fires (see the [technical reference](docs/branching-logic.md) §7 for the full trigger list — it's needs-driven, not gated on diagnosis status alone) or is manually included via the Adjust Referrals override pills. The IEP Letter tab appears when school documentation status is set and the patient is not a toddler. Both tabs use the same one-form-three-outputs model — you don't enter anything separately, the letters auto-generate from the same checkboxes that drove the A&P note.
 
 ## What you get
 
@@ -80,21 +80,10 @@ One form on the left produces three coordinated outputs on the right. You don't 
 | Output tab | What it contains | When the tab appears |
 |---|---|---|
 | **A&P Note** | Clinical summary (auto-generated narrative covering age, visit type, language, cognitive profile, DSM-5 status, severity levels, prior testing, specifiers); DSM-5 criteria table with evidence text; problem-based plan including therapy referrals with clinical rationale, medical referrals (genetics with AMA-cited guideline framing, neurology, audiology, GI, etc.), safety counseling, anticipatory guidance, and return-to-clinic interval | Always visible |
-| **ABA Letter** | Pre-filled medical-necessity intro paragraph; diagnosis statement with DSM-5 specifiers and severity level (uses max of Social Communication and RRB so highest support need drives authorization); requested weekly hours; recommended setting(s); treatment targets each with a one-sentence clinical rationale; authorization period and therapist signature block | When the ABA referral fires (see Auto-logic — needs-driven, not gated on diagnosis status alone) or is manually included via the Adjust Referrals section |
+| **ABA Letter** | Pre-filled medical-necessity intro paragraph; diagnosis statement with DSM-5 specifiers and severity level (uses max of Social Communication and RRB so highest support need drives authorization); requested weekly hours; recommended setting(s); treatment targets each with a one-sentence clinical rationale; authorization period and therapist signature block | When the ABA referral fires (needs-driven, not gated on diagnosis status alone; see the [technical reference](docs/branching-logic.md) §7) or is manually included via the Adjust Referrals override pills |
 | **IEP Letter** | IDEA-branch-appropriate opening (initial evaluation request / amendment / 504 upgrade / rule-out evaluation support); diagnosis statement with DSM-5 specifiers and severity; educational impact bullets; one rationale paragraph per requested school service; accommodation list; statutory citations (IDEA §300.301 / §300.302 / §300.324) | When school documentation status is set AND age group is not toddler (toddlers route through Early Steps, not K-12 IDEA) |
 
-> *Concrete output may evolve as the tool's prose generators are updated. The fragments below are illustrative as of May 2026 — re-verify against live output if precise wording matters for your workflow.*
-
-<!-- AI MAINTENANCE NOTE: Re-verify the sample fragments below when generateClinicalSummary(), _abaContent(), or _iepLetterContent() prose changes. The drift-warning date above should also be updated to reflect when samples were last validated. -->
-
-**A&P note — clinical summary opening:**
-> Marcus is a school-aged child evaluated today for autism spectrum disorder. He presents with conversational language, cognitive functioning in the average range, and mildly impaired adaptive behavior relative to chronological age...
-
-**ABA Letter — treatment target with clinical rationale:**
-> Reduction of self-injurious behavior (SIB): SIB is a Behavior of Danger; even infrequent events carry risk of permanent injury. A function-based behavior intervention plan (BIP) is required; FBA must precede intervention. Medical and behavioral co-management indicated.
-
-**IEP Letter — service-rationale paragraph:**
-> Speech-Language Pathology (school-based): Recommended to address pragmatic language deficits, including difficulty with conversational reciprocity, perspective-taking in social exchanges, and contextual understanding of figurative language. Service is medically necessary to support access to general education curriculum per IDEA §300.34.
+> *To see concrete output, open the [live tool](https://dmatsib000-create.github.io/autism-ap-builder/autism-ap-builder.html) and work the quick-start example above — it's faster and always current than any sample pasted here.*
 
 ## What this tool does not do
 
@@ -233,302 +222,20 @@ Quick decoder for the acronyms and short forms used in the rest of this document
 
 **Tool-internal conventions**
 - **Add-only** — auto-population helpers add checks but never remove them; the clinician's manual unchecks persist across re-renders
-- **The bridge** — the cognitive-profile → DSM-5 specifier auto-link (described in Auto-logic section)
+- **The bridge** — the cognitive-profile → DSM-5 specifier auto-link (see the [technical reference](docs/branching-logic.md) §11.7 and the clinician guide)
 - **Override pill** — the three-state Auto/Include/Exclude toggle in the Adjust Referrals section that overrides a referral rule
 - **`{placeholder}` field** — bracketed text in letter output that the clinician fills in after copying (e.g., `{Student Name}`); the Copy for Epic format replaces these with `***` cursor stops
 
-## Input sections
+## How it works
 
-### 1 — Patient Profile
-- **Age group:** Toddler / Preschool / School-age / Adolescent / Young adult. Age group gates several features: RITA-T and CARS-2 pathways, community independence checkbox, social skills group resources, transition planning language, and IEP tab visibility.
-- **Pronouns:** He / She / They / Not specified — used throughout note and IEP letter.
-- **Visit type:** Initial evaluation / Re-evaluation / Follow-up — sets opening sentence of clinical summary.
-- **Base Communication Level:** Nonverbal / min. verbal → Single words → 2–3 word phrases → Simple sentences → Conversational → Fluent / no concerns → Mixed / hard to characterize (SLP eval). A green **"Age-appropriate for developmental level"** qualifier card sits below the radio — checking it signals the output level is normal for the child's developmental stage and suppresses SLP / communication auto-triggers without changing the selected level. **Language Features / Concerns** chip strip (domain-grouped): Pragmatics (pragmatic deficits, echolalic / scripted speech), Language Form (morphosyntax errors, semantic deficits / literal thinking), Speech (speech-sound errors, reduced intelligibility), Other (formal / pedantic speech, advanced vocabulary). Selecting nonverbal or single words automatically checks expressive language needs (and functional AAC for nonverbal) in the Communication domain. This auto-population is **add-only** — meaning the auto-logic adds checks but never removes them, so any manual unchecks you make persist across re-renders. This convention applies throughout the tool's auto-population helpers.
-- **Cognitive profile:** Severe / Moderate / Mild ID → GDD (unspecified / mild / moderate / severe) → Borderline (BIF) → Low average → Average → High average (110–119) → Superior (120–129) → Very superior / gifted (130+) → Unknown / under evaluation. ID options are hidden and cleared for toddler/preschool (DSM-5: ID requires reliable standardized testing, typically ≥5 years). GDD options are hidden and cleared for school-age and older. Selecting a cognitive option automatically pre-checks the matching DSM-5 specifier.
-- **Cognitive Data Source:** Comprehensive eval this visit / Prior external testing / Screener only (KBIT-2R, etc.) / Clinical impression only. Combined with the adaptive evidence flag below, this gates whether the auto-checked DSM-5 specifier is `withID` (confirmable) or `withSuspectedID` (provisional). Only `comprehensive` and `priorExternal` source values can produce a confirmable specifier.
-- **Adaptive behavior:** Severely / moderately / mildly impaired → Below cognitive potential → Commensurate with cognitive level → Age-appropriate / WNL. A **"Based on standardized adaptive assessment"** checkbox below the radio signals that the impairment level reflects a formal measure (Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive) — required for DSM-5 ID/GDD confirmation. Without it (or without a `consistent` Vineland-3 or BASC-3 in Prior Testing), the cognitive-profile-to-specifier bridge (described under Auto-logic below) holds the specifier in `withSuspectedID` / `withSuspectedGDD`.
-- **Identified strengths:** Free-text field with clickable chips (visual learner, strong memory, hyperlexia, special interests, etc.). Hyperlexia is documented here — it auto-triggers SLP referral and psychoeducational evaluation via text-search on this field.
+One checkbox form on the left drives all three outputs on the right. Each input mutates a single state object; on every change the tool re-runs its rule functions to decide which therapy referrals, school services, ABA targets, and note sections fire, then regenerates the A&P note, ABA letter, and IEP letter from scratch. Nothing is entered twice: the letters derive from the same state that drives the note.
 
-### 2 — Diagnostic Workup & Next Steps
-- **Diagnosis status:** Confirmed / Suspected / Rule-out — changes note language, ICD-10 codes, and IEP letter branch throughout.
-- **ASD severity levels (SC and RRB):** Levels 1–3 per DSM-5's two-domain model; justification text boxes included. ABA and IEP letters use `max(SC, RRB)` so the highest support need across either domain drives authorization and educational placement.
-- **Specifiers:** `withLang`, `withID`, `withSuspectedID`, `withGDD`, `withSuspectedGDD`, `withBIF`, `withoutID`, `withoutGDD`, `withGenetic`, `withNDD`, plus catatonia. The ID/GDD/BIF group is mutually exclusive (only one member checked at a time). Clicking a specifier whose compat set doesn't include the current cogProfile clears the cogProfile (back-propagation); selecting a cogProfile auto-checks the matching specifier (forward bridge). Suspected vs confirmed status follows from the cogDataSource and adaptive-evidence gating described in Section 1.
-- **Diagnostic eval path:** Selects which evaluation route is documented (CARS-2 scheduled, ADOS-2 uncertain, RITA-T, development-only, etc.).
-- **Prior testing reviewed:** CARS-2 ST/HF, ADOS-2 (with module), ADI-R, ASD-PEDS, MIGDAS-2, SRS-2, GARS-3 — each with outcome dropdown (Consistent / Equivocal / Not consistent). Vineland-3, BASC-3, and Conners 4 included as behavioral/adaptive instruments; Vineland-3 or BASC-3 with a `consistent` outcome can satisfy the adaptive-evidence requirement for an ID/GDD specifier confirmation. Consistent results are cited automatically in the ABA Letter and IEP Letter.
-- **CARS-2 completed at this visit:** Flips CARS-2 note language from future to past tense.
-- **Seizure concern:** Checkbox for non-emergent seizure history (triggers EEG referral); sub-checkbox to also refer to neurology now without waiting for EEG result.
+The full mechanics, every input field, every auto-trigger rule, the cognitive-profile/specifier bridge, the DSM-5 gate, and the letter content rules, are documented in two companion references rather than repeated here:
 
-### 3 — DSM-5 Criteria Evidence
-- Checkboxes for A1, A2, A3 (all required) and B1–B4 (≥2 required), plus C/D/E specifying criteria.
-- Free-text evidence boxes under each criterion for specific clinical examples.
-- Live badge shows criteria met count and whether threshold is reached.
-- **B2 (insistence on sameness)** automatically populates `rigidity` in the behavioral needs Set, which activates transition accommodations, counseling school-service auto-select, and IEP transition impact language.
+- **[Clinician's guide](docs/branching-logic-for-clinicians.html)** — plain English, with vignettes and diagrams. Start here to understand *what the tool decides and why* without reading code.
+- **[Technical reference](docs/branching-logic.md)** — the maintainer- and Claude-facing spec, with every output-shaping branch keyed to `autism-ap-builder.html` line numbers. Start here if you are changing the code.
 
-### 4 — Functional Need Domains
-Six domain Sets, each with specific checkboxes:
-
-| Domain | Examples |
-|---|---|
-| **Communication** | Expressive, receptive, pragmatic, functional AAC |
-| **Behavior** | Aggression, SIB, elopement, tantrums, noncompliance, property destruction, pica, disruptive vocalizations |
-| **Adaptive / Self-care** | Toileting, dressing, feeding ADL, hygiene, community safety, community independence |
-| **Sensory** | Auditory, tactile, visual, vestibular/proprioceptive, oral |
-| **Motor** | Fine motor, handwriting, gross motor, coordination/praxis |
-| **Social** | Peer interaction, play, perspective-taking, emotional recognition, conversation, reciprocity |
-
-Checked items auto-populate ABA targets and school services (see Auto-logic below).
-
-**Additional Domains** (below the six domain Sets):
-- **Regulatory / Behavioral:** Emotional regulation difficulties (with optional frequency/description), academic / learning difficulties
-- **Medical:** Feeding difficulties, sleep difficulties, behavioral hearing screen inconclusive, seizure concern (with sub-checkbox to refer to neurology now), suspicion for sleep-disordered breathing, focal neurological findings
-- **Genetics-relevant exam findings** (drives the Genetics referral language and expands the conditions under which the Genetics referral fires when ASD is not yet confirmed):
-  - **Dysmorphism** radio: No concern / Suspected dysmorphology / Confirmed dysmorphic features (geneticist-documented). Suspected dysmorphology alone does not trigger a genetics referral — pair with another flag or a confirmed diagnosis.
-  - **Congenital anomalies on physical examination** checkbox.
-  - **Documented developmental regression** checkbox. When checked, reveals a sub-radio for **Regression timing**: Ongoing or recent (weeks to months) / Distant, currently stable (≥1 year ago) / Timing unclear from records. Timing changes the urgency framing in both the genetics referral and the neurology referral prose.
-- **Support Services:** Social work referral (with sub-checklist for reason — APD/Medicaid waiver, financial counseling, caregiver support, community navigation, family support, family safety).
-
-**Behavior frequency inputs:** For Tier 2 interfering behaviors (tantrums, noncompliance, property destruction, disruptive vocalizations) and emotional regulation, an optional text field appears when the behavior is checked. If filled, the description is appended to that behavior in the ABA medical necessity paragraph (e.g., "tantrums/meltdowns (3–5x/day, 10–20 min each)"). If left blank, the behavior name alone appears — no placeholder, no post-copy editing required.
-
-### 5 — Comorbid Conditions
-Checkboxes for co-occurring diagnoses with ICD-10 codes. Each generates its own Assessment and Plan block in the note when "Include plan" is toggled:
-
-- ADHD (combined / inattentive / hyperactive / suspected)
-- Anxiety disorder
-- Major depressive disorder
-- OCD
-- Trauma / adverse childhood experiences — appears in the A&P note by default; inclusion in the IEP letter is gated behind an explicit per-letter opt-in sub-checkbox (default off) since the IEP letter becomes part of the cumulative educational record. When on, the IEP letter uses functional language ("additional psychosocial history with ongoing impact on emotional regulation and stress response") rather than the ICD-10 code, and a reminder banner above the letter preview prompts the clinician to verify family consent.
-- Language disorder
-- Specific learning disorders — reading (dyslexia), math, written expression, or suspected (domain-uncharacterized). Suspected SLD is mutually exclusive with the confirmed-domain options.
-- DCD (developmental coordination disorder)
-- Sleep disorder
-- GI issues
-- Pediatric Feeding Disorder — chronic, acute, or suspected
-- ARFID (Avoidant/Restrictive Food Intake Disorder)
-- Epilepsy / seizure disorder
-- Intellectual disability / Global developmental delay (suspected or confirmed)
-- Catatonia
-
-### 6 — School & Educational Supports
-- **School placement** and **documentation status** (IEP / 504 / neither / needed).
-- **School services:** Checkboxes for SLP, OT, PT, counseling, social skills group, 1:1 aide, ESY, low ratio classroom, sensory accommodations, visual supports, FBA, psychoeducational evaluation, specialized academic instruction.
-- Services can be manually toggled on or off; auto-selected services show a blue "auto" badge.
-- **IEP tab** appears when school documentation is set and age group is not toddler (toddlers use Early Steps, not K-12 IDEA).
-
-### 7 — Safety Counseling
-Checkboxes for safety topics addressed at the visit: elopement/wandering, road safety, water safety, fire/heat, SIB safety, medication safety, online safety, bullying/victimization, stranger danger / reduced protective response. Each generates a dedicated safety counseling documentation paragraph.
-
-### 8 — Anticipatory Guidance
-Topics addressed with family: ABA overview, school/IEP, sleep, feeding, communication strategies, caregiver support, sibling guidance, transition planning, UF CARD, social skills, puberty, driving, and more.
-
-### ABA Letter Parameters *(appears when ABA is included)*
-- Insurance type, requested hours/week, therapy settings (home / clinic / school / community / telehealth).
-- ABA target checkboxes (pre-populated by auto-logic, manually adjustable).
-- ABA start date, authorization period, therapist name fields.
-
-### Adjust Referrals
-Each therapy and referral has an Auto / Include / Exclude pill toggle, allowing the clinician to override the auto-logic without losing the override on re-render.
-
-## Auto-logic
-
-The tool uses rule functions and sync helpers to reduce repetitive data entry.
-
-### Therapy referrals (auto-triggered)
-
-| Therapy | Triggers |
-|---|---|
-| ABA | Any of: toddler or preschool age group; nonverbal/minimally verbal; confirmed ID (hasID + `withID` specifier); significant adaptive impairment; any behavioral need; any safety need; functional AAC need; ASD Level 2 or 3. (ABA fires on needs/age/severity, not on ASD diagnosis status alone.) |
-| SLP | Any communication need; any language level other than "Fluent / no concerns" unless the age-appropriate qualifier is active; any language feature chip (pragmatic, echolalic, morphosyntax, semantic, speech-sound, reduced intelligibility, pedantic, hyperlexia); language disorder comorbid |
-| OT | Sensory needs, fine motor / handwriting / coordination needs, any adaptive need, DCD comorbid |
-| PT | Gross motor needs, coordination needs, DCD comorbid |
-| Psychotherapy | School-age, adolescent, or young adult AND verbal-enough AND any of: anxiety, depression, OCD, trauma, emotional regulation flag, OR adolescent/young-adult + boundary-violation behaviors |
-| PCIT | Toddler, preschool, or school-age (NOT adolescent/young adult) AND any of: aggression, tantrums, noncompliance, property destruction, ADHD, anxiety, trauma |
-| Social skills group | Preschool, school-age, or adolescent (NOT young adult) AND not minimally verbal AND (any social need OR boundary-violation behaviors) |
-| Genetics | Confirmed ASD, OR diagStatus non-empty AND any of: developmental regression, confirmed dysmorphology, congenital anomalies. Suspected dysmorphology alone does not trigger. |
-| Neurology | Epilepsy comorbid, focal neurological findings, "refer neurology now" checkbox, OR developmental regression (any timing) |
-| Psychiatry | Confirmed ADHD, anxiety, depression, or OCD, OR (aggression or SIB AND school-age/adolescent/young-adult) |
-| GI | GI comorbid, feeding concern, any PFD variant (chronic/acute/suspected), any ARFID variant (confirmed/suspected), pica |
-| Audiology | Hearing screen fail (any age), OR toddler/preschool + (speech-sound errors OR reduced intelligibility OR morphosyntax errors) |
-| QB Test | ADHD suspected comorbid AND school-age, adolescent, or young adult |
-| Early Steps | Toddler **only** AND (confirmed OR suspected ASD) |
-| FDLRS | Preschool **only** AND not in public school AND (confirmed OR suspected ASD) — FDLRS is a Florida-specific early intervention network |
-| EEG | Seizure concern checkbox |
-| CARD | Confirmed ASD (UF Center for Autism and Related Disabilities) |
-
-All referrals can be overridden via the Adjust Referrals section.
-
-### Genetics referral prose branching
-
-When the genetics referral fires, the lead sentence and modifier list adapt to the patient's state:
-
-- **Lead sentence** has three variants:
-  - `diagStatus === 'confirmed'` → "The patient carries a confirmed neurodevelopmental diagnosis…"
-  - `diagStatus !== 'confirmed'` AND ongoing regression → "The patient is under evaluation for a neurodevelopmental disorder…" (the urgency parenthetical in the modifier list carries the medical-necessity argument; the "warrant genetics input" hedge is omitted to avoid stacking)
-  - Any other under-evaluation case → "…under evaluation… with clinical findings that warrant genetics input during the diagnostic workup"
-  - Override-forced with no clinical flags → "…under evaluation…; genetics input is requested per clinician judgment"
-- **Severity modifier** (`sevPhrase`) inserts ", with co-occurring intellectual disability or global developmental delay (severity influences expected diagnostic yield)" when `hasID()` is true or any of `withGDD` / `withSuspectedGDD` / `withSuspectedID` specifiers are checked.
-- **Modifier list** (`addFlags`) appends comma-joined clauses for: confirmed dysmorphic features, features suggestive of possible dysmorphology pending formal evaluation, congenital anomalies on physical examination, and developmental regression with timing-appropriate framing (ongoing → urgent; distant → routine; unsure → expedited pending clarification).
-
-The references block at the end of MEDICAL REFERRALS emits AMA-style citations for AAP 2025 and Srivastava 2019 when the genetics referral fires; the in-prose superscripts (¹, ²) and the numbered reference list are coupled by convention, not by a shared data structure.
-
-### Neurology referral prose branching
-
-The neurology line composes one clause per active trigger (focal neurological findings, epilepsy, developmental regression, neurologyNowForSeizure-only fallback) so concurrent triggers each contribute their own clause rather than silently dropping. For developmental-regression-only triggers, the prose varies by timing: ongoing → "Urgent evaluation… consider EEG (rule out Landau-Kleffner / ESES), MRI, and metabolic workup"; distant → "Routine evaluation… expedited evaluation not required unless trajectory changes"; unsure → "Expedited evaluation… clarify trajectory."
-
-### ABA target auto-population
-
-Checking needs checkboxes and DSM-5 criteria automatically checks the corresponding ABA targets:
-
-- Elopement (need) OR safety counseling for elopement → Reduce elopement
-- SIB (need) OR safety counseling for SIB → Reduce self-injurious behavior
-- Aggression or property destruction (needs) → Reduce aggression
-- Tantrums (need) or emotional regulation flag → Reduce tantrums / emotional dysregulation
-- Pica (need) → Reduction of pica
-- Vocal disruption, B1 (stereotypy), OR any behavioral need → Reduce stereotypy
-- Boundary-violation behaviors → Boundary skills
-- Play or peer-interaction social needs → Play skills / peer interaction
-- Expressive, receptive, or functional-AAC communication needs → Functional communication
-- Toileting, dressing, or feeding-ADL adaptive needs → Self-help / ADL
-- Community safety or community independence (adaptive needs) → Safety skills
-- Menstrual-care adaptive need → Menstrual care skills
-- Confirmed severe or moderate ID (cogProfile) → Self-help / ADL (additional trigger beyond adaptive needs above)
-- Academic flag → Academic readiness / instruction-following — **toddler/preschool only** (excluded for school-age+ because academic instruction is the school district's FAPE obligation under IDEA, and academic ABA targets are a frequent claims-examiner denial reason for older children)
-- Toddler/preschool + (any social or communication need) → Joint attention AND Imitation
-- B2 (insistence on sameness) → Transitions; also pushes `rigidity` into needsBehavior, activating downstream transition accommodations, counseling auto-select, and IEP language
-- Emotional regulation flag → Self-regulation and coping strategies
-
-ABA target auto-population is **add-only** — manually unchecked targets are not re-checked on re-render. Exception: `rigidity` is derived from B2 and cleared when B2 is unchecked (no standalone checkbox to maintain manual state).
-
-### Communication needs auto-population
-
-Selecting a language level automatically pre-checks communication functional needs:
-
-| Language level | Auto-checked |
-|---|---|
-| Nonverbal / min. verbal | Expressive language delays + Functional AAC needs |
-| Single words, 2–3 word phrases, Simple sentences | Expressive language delays |
-| Conversational, Fluent / no concerns | *(none)* |
-
-Suppressed entirely if the age-appropriate qualifier card is checked. Add-only — manual unchecks are respected.
-
-### Cognitive profile ↔ DSM-5 specifier bridge
-
-Selecting a cognitive profile auto-checks the matching ID/GDD/BIF specifier. Whether the specifier is the confirmed (`withID`, `withGDD`) or suspected (`withSuspectedID`, `withSuspectedGDD`) variant depends on the **Cognitive Data Source** + **adaptive evidence** gating:
-
-- `cogDataSource === 'comprehensive'` OR `'priorExternal'` → eligible for confirmed variant
-- AND a formally impaired adaptive profile (severely / moderately / mildly impaired or below cognitive potential)
-- AND either a `consistent` Vineland-3 / BASC-3 in Prior Testing, OR the "Based on standardized adaptive assessment" checkbox is on
-
-If all three conditions are met → confirmed specifier. Otherwise → suspected specifier.
-
-**Back-propagation:** clicking a specifier whose compat set doesn't include the current cogProfile clears the cogProfile and resets the cogDataSource / adaptive-evidence flags (and unchecks the standardized-assessment checkbox).
-
-### School service auto-population
-
-- Communication needs, language level non-fluent (without age-appropriate qualifier), language disorder comorbid, conversation/reciprocity social needs, pragmatic deficits, pedantic speech, or echolalia → SLP school-based service
-- Sensory, fine motor, handwriting, coordination, any adaptive need, or DCD comorbid → OT school
-- Gross motor or DCD comorbid → PT school
-- Any social need OR boundary-violation behaviors → Social skills school
-- Any behavioral need → FBA
-- Elopement, aggression, SIB, vocal disruption, or pica → Aide + FBA (the more dangerous behaviors escalate from FBA-only to FBA + 1:1 aide)
-- Anxiety, depression, confirmed or suspected ADHD, OCD, trauma, rigidity (from B2), emotional regulation, or boundary-violation behaviors → Counseling
-- LD suspected OR (school-age+ AND hyperlexia in strengths) → Psychoeducational evaluation
-- Confirmed ID (hasID()) → Specialized academic instruction (SPED)
-
-School service auto-population is also add-only; `schoolSvcManualOff` tracks services the clinician explicitly unchecked so they are not re-added on re-render. Auto-added services display a blue "auto" badge.
-
-## Output details
-
-### A&P note structure
-
-Section numbers are assigned dynamically as sections fire — any section that has no triggered content is skipped, and remaining sections renumber accordingly. Top-down order of sections as they emit:
-
-```
-CLINICAL SUMMARY
-  Auto-generated narrative: age, visit type, language level, cognitive profile,
-  adaptive profile, DSM-5 status, severity levels (SC + RRB with justifications),
-  prior testing outcomes, specifiers.
-
-ASSESSMENT
-  DSM-5 Criteria table (A1–A3, B1–B4, C/D/E) with evidence text.
-  ICD-10 codes for the primary autism diagnosis and any "include plan" comorbids.
-
-PLAN
-  Problem 1: Autism Spectrum Disorder
-    Subsections fire as triggers are met, each numbered in emit order:
-      • Applied Behavior Analysis (ABA) — tiered medical-necessity paragraph,
-        treatment targets list with one-sentence clinical rationale per target,
-        age-appropriate service model language (EIBI/NDBI for young children;
-        FBA-guided comprehensive services for school-age; self-determination
-        framing for adolescents/young adults).
-      • Parent-Child Interaction Therapy (PCIT)
-      • Autism-Informed Psychotherapy
-      • Social Skills Intervention
-      • Speech-Language Pathology (SLP)
-      • Occupational Therapy (OT)
-      • Physical Therapy (PT)
-      • School / Educational Supports
-      • Sleep Management
-      • Medical Referrals — Audiology, Genetics (with AMA-cited guideline framing
-        and references block at end of section), EEG, Neurology, QbTest,
-        Psychiatry, GI, Sleep Study, Social Work
-      • Safety Counseling
-      • Family Resources & Next Steps (CARD, NAMI, Autism Society, APD, etc.)
-      • Anticipatory Guidance
-
-  Problem 2–N: Comorbid condition blocks (when "Include plan" is on for the comorbid)
-    Each has its own Assessment paragraph + Plan paragraph.
-
-RETURN TO CLINIC
-  Interval and next-visit instructions.
-```
-
-### IEP letter branches
-
-The IEP letter's branch is selected by `S.schoolDoc`:
-
-| `S.schoolDoc` value | Letter type | Statutory frame |
-|---|---|---|
-| `iep` | IEP Review Request | IDEA §300.324 — review/update existing IEP to reflect new evaluation findings |
-| `iep_needed` | Initial Special Education Evaluation Request | IDEA §300.301 / §300.302 — district must evaluate within 60 days of written parental consent |
-| `504` | 504 Review / IEP Eligibility Request | Reviews current 504 accommodations and recommends consideration of IEP eligibility upgrade |
-| `neither` | Initial Special Education Evaluation Request | Same as `iep_needed` (default route when no documentation exists and patient is not in a private-school no-IEP placement) |
-| `''` (empty) | No letter — IEP Letter tab is hidden | — |
-
-Each requested school service generates a rationale paragraph in the letter, not just a label — connecting the service to the documented functional need.
-
-For trauma comorbid, IEP inclusion is gated behind an explicit per-letter opt-in (default off) — when on, the letter uses functional language ("additional psychosocial history with ongoing impact on emotional regulation and stress response") rather than ICD-10 trauma codes.
-
-### Copy formats
-
-Each output tab has its own sticky copy bar with tab-specific buttons.
-
-**A&P Note tab — top-level toolbar:**
-
-| Button | What it does |
-|---|---|
-| Print | Triggers the browser print dialog with a clean printable stylesheet |
-| Copy Plain | Full note in plain text with monospace section dividers |
-| ★ Copy Rich Text | Full note as formatted HTML — pastes with fonts, bold, and structure into Word or Epic SmartText |
-| Clear All | Resets the entire form to defaults (with an inline confirmation prompt) |
-
-**A&P Note tab — per-pane partial-copy bar** (bottom of the output preview, for copying just one section instead of the full note):
-
-| Button | What it copies |
-|---|---|
-| Assessment (plain) | Just the Assessment section in plain text |
-| Plan (plain) | Just the Plan section in plain text |
-| All (plain) | Full note in plain text (same as the top-level Copy Plain) |
-| ★ Copy Rich Text | Full note as formatted HTML (same as the top-level Copy Rich Text) |
-
-**ABA Letter tab and IEP Letter tab (same three buttons each):**
-
-| Button | What it copies |
-|---|---|
-| Copy Letter (plain) | Letter in plain text |
-| ★ Copy Letter (rich) | Letter as formatted HTML for Word/Epic |
-| Copy for Epic (`***`) | Plain text with every `{placeholder}` field replaced by `***` Epic cursor stops, Tab-navigable in the Epic note composer |
-
-Note: the **Copy for Epic (`***`)** format exists only on the ABA and IEP letter tabs, not on the A&P note tab. The A&P note relies on Rich Text or Plain Text for Epic pasting; clinician-specific fields in the A&P plan are typically filled in directly rather than through cursor stops.
+These two are the single source of truth for the tool's behavior; this README intentionally does not restate them, so they cannot drift out of sync.
 
 ## Technical notes
 
