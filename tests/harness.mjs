@@ -100,6 +100,16 @@ function scriptBody() {
 export function makeApp() {
   const { document, window, navigator } = makeStubs();
   const noop = () => {};
+  // Capture console.warn so the runner can turn the v3() silent-fallback warning
+  // (a verb missing from V3_MAP → ungrammatical output for a "they" patient) into
+  // a hard test failure. The app warns during note generation, which happens
+  // after makeApp() returns, so we hand the live array back by reference on
+  // app.__warnings and let it fill in as the generators run. Everything else on
+  // console (log/error) passes through unchanged.
+  const warnings = [];
+  const captureConsole = Object.assign(Object.create(console), {
+    warn: (...a) => { warnings.push(a.join(' ')); },
+  });
   const body = scriptBody() + `\n;return { ${EXPORTS.join(', ')} };`;
   let factory;
   try {
@@ -117,7 +127,9 @@ export function makeApp() {
     );
   }
   try {
-    return factory(document, window, navigator, noop, noop, console);
+    const app = factory(document, window, navigator, noop, noop, captureConsole);
+    app.__warnings = warnings;
+    return app;
   } catch (err) {
     // We get here when the code reads fine but something it relies on is missing
     // when run outside a browser — most often a generator function was renamed,

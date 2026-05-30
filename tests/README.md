@@ -39,6 +39,20 @@ handler that never fires under Node — which is why this works without a real D
 or a headless browser. The script is re-evaluated fresh for every fixture, so no
 state leaks between them through the shared module-scope `S`.
 
+## Singular-"they" verb-agreement guard
+
+The app rewrites third-person-singular verbs to the bare form for `they` patients
+via a hardcoded `V3_MAP` (`v3()` in the app). A verb missing from that map falls
+through to ungrammatical output ("they has") and only emits a `console.warn` —
+invisible to a clinician in production. The harness captures those warnings on
+`app.__warnings`, and the runner turns any `v3()` missing-verb warning into a
+hard failure (compare mode). The `they-pronoun-broad-prose` fixture exists to
+exercise this: it turns on every needs category, both letters, comorbidities,
+and the ID specifier under one `they` patient, so a missing verb surfaces as a
+failure instead of being baked silently into a golden. Any new `they`-pronoun
+fixture gets the same protection automatically. When the guard fires, add the
+named verb to `V3_MAP` (see `docs/audits/verb-agreement.md`).
+
 ## Adding a fixture
 
 Create `tests/fixtures/<name>.mjs`:
