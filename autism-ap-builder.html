@@ -1787,6 +1787,8 @@ function v3(w){
   // warning fires only if a dev opens the console with a "they" patient on the
   // exact code path that uses the missing verb. A clinician in production with
   // a "they" patient will see ungrammatical output without any signal.
+  // The "v3():" prefix of this warning is matched by tests/run.mjs to fail the
+  // golden-output suite on a missing verb; keep that prefix stable if you reword.
   if(!(w in V3_MAP)) console.warn('v3(): verb "'+w+'" not in V3_MAP — add it to prevent silent agreement bug for "they" patients');
   return V3_MAP[w] || w;
 }

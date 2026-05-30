@@ -12,6 +12,12 @@ on:
     branches: ['**']
   pull_request:
 
+# A branch with an open PR gets both a push and a pull_request event; cancel any
+# superseded run for the same ref so we don't run the suite twice over.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
