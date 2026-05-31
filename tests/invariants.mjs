@@ -48,8 +48,16 @@ function balancedAfter(marker) {
 
 // Top-level identifier keys of a flat object literal slice (`{ a: '...', b: ... }`).
 // Only used on tables known to be flat (no nested object values).
+// We blank out string-literal VALUES first: a colon inside a value (a label
+// sub-clause like 'APD: waiver...' or a URL 'https://...') would otherwise be
+// read as a phantom key by the `identifier:` regex. The replace keeps the quotes
+// (so the literal still parses structurally) but empties the contents, including
+// escaped quotes. Order: single- then double-quoted; the targeted tables don't
+// mix quote styles within one value, so there's no cross-eating.
+const stripStringValues = s =>
+  s.replace(/'(?:[^'\\]|\\.)*'/g, "''").replace(/"(?:[^"\\]|\\.)*"/g, '""');
 const flatObjectKeys = slice =>
-  [...slice.matchAll(/([A-Za-z_]\w*)\s*:/g)].map(m => m[1]);
+  [...stripStringValues(slice).matchAll(/([A-Za-z_]\w*)\s*:/g)].map(m => m[1]);
 
 // Compare two key collections as sets; returns the symmetric difference.
 function diff(aLabel, a, bLabel, b) {
@@ -82,11 +90,33 @@ check('SW reasons (SW_REASON_LABELS vs §8 HTML checkboxes)',
   diff('SW_REASON_LABELS', swLabelKeys, '§8 HTML', swHtmlKeys));
 
 // ── B. Override registry: OV_DEFS / OV_GROUPS / S.overrides agree ────────────
-const ovDefKeys = [...balancedAfter('const OV_DEFS=').matchAll(/key:'([^']+)'/g)].map(m => m[1]);
+// Accept either quote style on the key (key:'x' or key:"x"). A single-quote-only
+// match would make a future double-quoted entry invisible here — a false NEGATIVE
+// (the dangerous direction), so we also cross-check the def count below.
+const ovDefsSlice = balancedAfter('const OV_DEFS=');
+const ovDefKeys = [...ovDefsSlice.matchAll(/key:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+// Belt-and-suspenders: every `key:` token in OV_DEFS must have yielded a key. If
+// a future entry uses a syntax this regex doesn't catch, the counts diverge and
+// we fail loudly rather than silently skipping that def.
+const ovDefKeyTokens = (ovDefsSlice.match(/key:/g) || []).length;
+if (ovDefKeyTokens !== ovDefKeys.length) {
+  failures.push(
+    `OV_DEFS: found ${ovDefKeyTokens} \`key:\` tokens but extracted ${ovDefKeys.length} keys — ` +
+    `an entry uses a key syntax invariants.mjs doesn't parse (update the OV_DEFS key regex).`
+  );
+}
 // OV_GROUPS: flatten every keys:[...] array.
 const ovGroupKeys = [...balancedAfter('const OV_GROUPS=').matchAll(/keys:\[([^\]]*)\]/g)]
   .flatMap(m => [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]));
 const ovInitKeys = flatObjectKeys(balancedAfter('overrides:{'));
+
+// A key listed in two groups would dedupe away in the set-diff below and pass
+// silently, but it renders a duplicate pill in the UI. "Grouped exactly once" is
+// the real invariant, so assert no duplicates before the set comparison.
+const ovGroupDupes = ovGroupKeys.filter((k, i) => ovGroupKeys.indexOf(k) !== i);
+if (ovGroupDupes.length) {
+  failures.push(`OV_GROUPS: key(s) listed in more than one group: ${[...new Set(ovGroupDupes)].join(', ')}`);
+}
 
 // Every def is grouped exactly once, and every grouped key has a def.
 check('Override pills (OV_DEFS vs OV_GROUPS)',
