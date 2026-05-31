@@ -91,7 +91,7 @@
 body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* Focus ring — high-contrast, keyboard-only, used on inputs and interactives */
-:where(button,input,select,textarea,a,label.r-opt,.mod-chip,.str-chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+:where(button,input,select,textarea,a,label.r-opt,.mod-chip,.chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
 .app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
 .app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
@@ -238,7 +238,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
-.r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
+.r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
 .cb-row{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
@@ -247,11 +247,29 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .beh-freq-row{margin:2px 0 4px 24px}
 .beh-freq-inp{width:100%;max-width:400px;font-size:var(--text-11);padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
+/* ── .chip: shared primitive for selectable chip controls (tech-debt #4) ──
+   One token-driven base generalizing the chip family (.r-opt, .mod-chip,
+   .str-chip, …). Tint is set via scoped --chip-tint* custom props, so a single
+   .is-on rule serves every color; size/affordance deltas are opt-in modifiers.
+   .is-on is the single canonical "selected/on" class (replaces .sel/.active/.used).
+   Migrated families compose this; the wiring guard (tests/wiring.mjs) enforces
+   the JS↔CSS name contract. Adjacent families are migrated one at a time. */
+.chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;border:1.5px solid var(--border-default);border-radius:var(--radius-pill);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);line-height:1.3;cursor:pointer;user-select:none;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);--chip-tint:var(--accent);--chip-tint-soft:var(--accent-soft);--chip-tint-strong:var(--accent-hover)}
+@media (hover:hover){.chip:hover{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong)}}
+.chip.is-on{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong);font-weight:500}
+.chip--sm{font-size:var(--text-11)}
+.chip--success{--chip-tint:var(--green);--chip-tint-soft:var(--green-light);--chip-tint-strong:var(--green-dark)}
+.chip--check.is-on::before{content:'✓ '}
+.chip--ring.is-on{box-shadow:inset 0 0 0 1px var(--chip-tint)}
 .modifier-strip{display:flex;flex-wrap:wrap;gap:var(--space-1);padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
-.mod-chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-strong);cursor:pointer;font-size:var(--text-11-5);font-weight:500;background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
-@media (hover:hover){.mod-chip:hover{border-color:var(--accent);background:var(--accent-soft)}}
-.mod-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover)}
-.mod-chip.active::before{content:'✓ '}
+/* .mod-chip composes .chip and keeps only its deltas: stronger border, larger
+   font at always-500 weight, inherited (darker) text, and the ✓-on-selected
+   affordance. The accent on-state and shared base come from .chip / .chip.is-on.
+   The :hover color:inherit cancels .chip:hover's text recolor (mod-chip's
+   original hover did not recolor text). Responsive touch sizing is below. */
+.mod-chip{padding:4px 10px;border-color:var(--border-strong);color:inherit;font-size:var(--text-11-5);font-weight:500}
+@media (hover:hover){.mod-chip:hover{color:inherit}}
+.mod-chip.is-on::before{content:'✓ '}
 .lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
@@ -263,9 +281,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .chip-grp-hd{font-size:var(--text-9);font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:6px}
-.str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:var(--text-11);background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
-@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}}
-.str-chip.used{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500}
+/* .str-chip migrated to the .chip primitive (chip chip--sm chip--success); see Phase 2. */
 .strengths-area{width:100%;font-size:var(--text-12);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
@@ -427,7 +443,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
 .dx-banner .radio-grid{gap:var(--space-1)}
 .dx-banner .r-opt{font-size:var(--text-12);font-weight:500}
-.dx-banner .r-opt.sel{background:var(--blue);color:white;border-color:var(--blue-dark)}
+.dx-banner .r-opt.is-on{background:var(--blue);color:white;border-color:var(--blue-dark)}
 .dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
@@ -679,17 +695,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <span class="field-sublabel" style="margin-top:10px">Language Features / Concerns</span>
         <div class="modifier-strip">
           <span class="chip-grp-hd">Pragmatics</span>
-          <div class="mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use)</div>
-          <div class="mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
+          <div class="chip mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use)</div>
+          <div class="chip mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
           <span class="chip-grp-hd">Language Form</span>
-          <div class="mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / morphosyntax errors</div>
-          <div class="mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal thinking</div>
+          <div class="chip mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / morphosyntax errors</div>
+          <div class="chip mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal thinking</div>
           <span class="chip-grp-hd">Speech</span>
-          <div class="mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')">Speech-sound errors</div>
-          <div class="mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')">Reduced intelligibility</div>
+          <div class="chip mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')">Speech-sound errors</div>
+          <div class="chip mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')">Reduced intelligibility</div>
           <span class="chip-grp-hd">Other</span>
-          <div class="mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech</div>
-          <div class="mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary for age</div>
+          <div class="chip mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech</div>
+          <div class="chip mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary for age</div>
         </div>
       </div>
 
@@ -818,27 +834,27 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Identified Strengths</span>
         <div class="strength-chips" id="strengthChips">
-          <span class="str-chip" onclick="addStrength('Strong visual memory')">Visual memory</span>
-          <span class="str-chip" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
-          <span class="str-chip" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
-          <span class="str-chip" onclick="addStrength('Responsive to music')">Music</span>
-          <span class="str-chip" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
-          <span class="str-chip" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
-          <span class="str-chip" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</span>
-          <span class="str-chip" onclick="addStrength('Strong technology and computer skills')">Technology</span>
-          <span class="str-chip" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
-          <span class="str-chip" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
-          <span class="str-chip" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
-          <span class="str-chip" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
-          <span class="str-chip" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
-          <span class="str-chip" onclick="addStrength('Persistent and determined')">Persistent</span>
-          <span class="str-chip" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
-          <span class="str-chip" onclick="addStrength('Motivated by social praise')">Social praise</span>
-          <span class="str-chip" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
-          <span class="str-chip" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
-          <span class="str-chip" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
-          <span class="str-chip" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
-          <span class="str-chip" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')">Visual memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')">Music</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')">Technology</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')">Persistent</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')">Social praise</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
         </div>
         <textarea class="strengths-area" id="strengthsField" placeholder="Click chips above or type freely..." rows="2"></textarea>
         <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -1541,7 +1557,7 @@ function setByPath(obj, path, val){
 // Each preset drives the REAL form controls via applyPreset() — it clicks
 // radios/checkboxes/chips so every existing change-handler side effect fires
 // (cog→specifier bridge, langLevel→needsComm sync, syncABATargetsFromNeeds,
-// syncSchoolSvcFromNeeds, .sel classes, render). It does NOT assign S directly, so a
+// syncSchoolSvcFromNeeds, .is-on classes, render). It does NOT assign S directly, so a
 // preset can never drift from the hand-click code path.
 //
 // THE SIX + ONE were ratified by the design council (FOR ≥95% on the cross-preset
@@ -1632,7 +1648,7 @@ function applyPreset(key,opts){
     if(r && !r.checked) r.click();
   });
   // langModifier chips are .mod-chip divs with onclick=toggleMod(key); guard on S
-  // (toggleMod manages the Set + active class) so re-application can't toggle one off.
+  // (toggleMod manages the Set + is-on class) so re-application can't toggle one off.
   // WARY: do NOT add 'echolalic' to any preset's mods — toggleMod('echolalic') auto-
   // checks DSM criterion B1 (see toggleMod ~:4968), which would violate the cross-preset
   // invariant that presets never set criteria. Only side-effect-free langModifiers belong here.
@@ -4811,7 +4827,7 @@ function syncTherapyStatusFromActivity(){
       S.therapyStatus[key] = '';
       document.querySelectorAll(`input[name="therapyStatus_${key}"]`).forEach(r=>{
         r.checked = false;
-        r.closest('.r-opt')?.classList.remove('sel');
+        r.closest('.r-opt')?.classList.remove('is-on');
       });
     }
   });
@@ -5053,7 +5069,7 @@ function toggleCogDataSourceVisibility(){
   g.style.display = isVisibleTier ? '' : 'none';
   if(!isVisibleTier && S.cogDataSource){
     S.cogDataSource='';
-    document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+    document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
   }
   // Swap label text to match the active cogProfile tier. ID-tier and BIF →
   // IQ instruments; GDD-tier → DQ developmental instruments. The
@@ -5114,16 +5130,16 @@ function toggleMod(key){
       if(ta&&!ta.value.trim()){ta.value='Scripted/echolalic speech';S.ev.b1=ta.value;}
     }
   }
-  document.getElementById('mod_'+key).classList.toggle('active',S.langModifiers.has(key));
+  document.getElementById('mod_'+key).classList.toggle('is-on',S.langModifiers.has(key));
   render();
 }
 
 // ─── STRENGTH CHIPS ──────────────────────────────────────────────────────────
 function syncStrengthChips(){
   const val=(document.getElementById('strengthsField')||{}).value||'';
-  document.querySelectorAll('.str-chip').forEach(c=>{
+  document.querySelectorAll('#strengthChips .chip').forEach(c=>{
     const m=c.getAttribute('onclick').match(/addStrength\('([^']+)'\)/);
-    if(m) c.classList.toggle('used',val.includes(m[1]));
+    if(m) c.classList.toggle('is-on',val.includes(m[1]));
   });
 }
 function addStrength(text){
@@ -5229,11 +5245,11 @@ function clearAll(opts){
     wrap.querySelector('.btn-outline').addEventListener('click',()=>{wrap.remove();original.style.display='';});
     return;
   }
-  document.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+  document.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
   document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
   document.querySelectorAll('textarea').forEach(t=>{t.value='';});
   syncStrengthChips();
-  document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('is-on'));
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
   Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',unevenCog:false,unevenCogDesc:'',cogDataSource:'',adaptProfile:'',adaptiveStandardized:false,strengths:'',
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
@@ -5274,7 +5290,7 @@ function clearAll(opts){
   ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
-  document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+  document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
   const adapStdCb=document.getElementById('adaptiveStandardizedCb');if(adapStdCb)adapStdCb.checked=false;
   toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
@@ -5632,7 +5648,7 @@ function updateAgeBasedVisibility(){
     idCogGroup.style.display=hideIDCog?'none':'';
     if(hideIDCog&&hasID()){
       S.cogProfile='';
-      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -5647,7 +5663,7 @@ function updateAgeBasedVisibility(){
     bifCogGroup.style.display=hideBifCog?'none':'';
     if(hideBifCog&&S.cogProfile==='borderline'){
       S.cogProfile='';
-      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       // Mirror the idCogGroup/gddCogGroup teardown pattern: stale cogDataSource
       // and adaptiveStandardized flags from the prior age can silently auto-
@@ -5673,7 +5689,7 @@ function updateAgeBasedVisibility(){
     gddCogGroup.style.display=hideGddCog?'none':'';
     if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
-      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -5686,7 +5702,7 @@ function updateAgeBasedVisibility(){
 function clearIdGddEvidenceFlags(){
   S.cogDataSource='';
   S.adaptiveStandardized=false;
-  document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
   const adapStdCb=document.getElementById('adaptiveStandardizedCb'); if(adapStdCb) adapStdCb.checked=false;
   toggleCogDataSourceVisibility();
 }
@@ -5932,7 +5948,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     inp.addEventListener('click',()=>{
       if(!inp._wasChecked) return; // normal selection — change handler takes over
       inp.checked=false;
-      inp.closest('.r-opt').classList.remove('sel');
+      inp.closest('.r-opt').classList.remove('is-on');
       const nm=inp.name;
       // data-bind: if a radio declares its state path via data-bind="path.to.field",
       // the deselect (re-click) path clears that field generically. Fields with side
@@ -5956,7 +5972,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     inp.addEventListener('change',()=>{
       const nm=inp.name;
-      document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
+      document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('is-on',r.checked));
       // data-bind: declarative scalar write. Fields with side effects (bridge, visibility
       // toggles, syncs) keep their explicit branch below and do NOT carry data-bind.
       if(inp.dataset.bind){
@@ -5986,7 +6002,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         const newTier  = tierOf(inp.value);
         if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){
           S.cogDataSource='';
-          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
         }
         // PR-K: cogProfile change = fresh clinical context. Clear any prior manual
         // specifier pins so the new auto-bridge starts clean. Without this, a previously-
@@ -6052,7 +6068,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(rtRow) rtRow.style.display=inp.checked?'':'none';
           if(!inp.checked){
             S.regressionTiming='';
-            document.querySelectorAll('input[name="regressionTiming"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+            document.querySelectorAll('input[name="regressionTiming"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
           }
         }
       } else {
@@ -6168,7 +6184,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             // auto-confirms the next cogProfile pick without re-attestation.
             if(inp.checked && S.cogProfile && COG_PROFILE_COMPAT[v] && !COG_PROFILE_COMPAT[v].includes(S.cogProfile)){
               S.cogProfile='';
-              document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+              document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
               toggleCogDataSourceVisibility();
               clearIdGddEvidenceFlags();
               const adapStdCb=document.getElementById('adaptiveStandardizedCb');
@@ -6203,7 +6219,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
           if(v==='depression'){
             const r=document.getElementById('depressionSafetyRow');if(r)r.style.display=inp.checked?'':'none';
-            if(!inp.checked){S.depressionSafety='';document.querySelectorAll('input[name="depressionSafety"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('sel');});}
+            if(!inp.checked){S.depressionSafety='';document.querySelectorAll('input[name="depressionSafety"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('is-on');});}
           }
           if(v==='pfd_chronic'||v==='pfd_acute'){
             const show=S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute');
