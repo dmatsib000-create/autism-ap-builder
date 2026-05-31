@@ -81,6 +81,65 @@
   --ease:cubic-bezier(.2,.7,.2,1);
   /* Focus ring (used via outline) */
   --focus-ring:0 0 0 2px var(--bg-card),0 0 0 4px color-mix(in srgb,var(--accent) 70%,transparent);
+  /* Display face slot — Current uses the system UI stack (so the default render
+     is unchanged); themes point this at their bespoke display serif. */
+  --font-display:var(--font);
+  /* Letter section-rule — PINNED conservative + theme-independent. The generated
+     ABA/IEP letters must stay formal in every theme, so .aba-doc .aba-sec reads
+     these (not --blue-*, which the themes recolor). Defaults equal the current
+     blue values, so the default render is byte-identical; all themes set them to
+     the SAME values, so the letter never inherits the theme accent. */
+  --letter-ink:#1438a8; --letter-rule:#dbeafe;
+}
+
+/* ============================================================================
+ * THEMES (Phase 1) — opt-in, applied via <html data-theme="warm|slate">.
+ * Each block RE-POINTS the existing token names to new values; no class or
+ * markup renames, so every existing rule recolors automatically and the four
+ * test lanes stay green (they snapshot generated TEXT / lint class names, not
+ * CSS values). Current (blue) is the default: absent data-theme => :root above.
+ * Spacing (--space-*) and the type scale (--text-*) are intentionally NOT
+ * themed in Phase 1. Webfonts fall back to the system stack until they are
+ * self-hosted (no external requests allowed); colors/shadows/radii apply now.
+ * --amber*/--letter-* are deliberately NOT overridden (clinical semantics +
+ * formal-letter pin stay theme-independent).
+ * ========================================================================== */
+:root[data-theme="warm"]{
+  /* brand accent -> burnt amber (—-accent/-soft/-hover alias these) */
+  --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212;
+  /* warm paper + ink scale */
+  --gray-50:#f6f0e2; --gray-100:#efe7d6; --gray-200:#ddd2bd; --gray-300:#c9bca2;
+  --gray-400:#938876; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d;
+  --gray-800:#2a251d; --gray-900:#211d16;
+  --surface:#f3ecdc; --bg-card:#fbf6ea; --bg-elevated:#fffdf7;
+  --border-subtle:#e7ddc8;
+  --green:#5d7a3a; --green-light:#e6ecd4; --green-dark:#3c5021;
+  --red:#a8432b; --red-light:#f3dcd2; --red-dark:#7a2c19;
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --radius-sm:3px; --radius:5px; --radius-md:7px;
+  --shadow-sm:0 1px 2px rgba(80,60,25,.10);
+  --shadow:0 1px 3px rgba(80,60,25,.12),0 1px 2px rgba(80,60,25,.08);
+  --shadow-md:0 2px 6px rgba(80,60,25,.12),0 1px 3px rgba(80,60,25,.08);
+  --shadow-lg:0 12px 30px rgba(70,50,20,.16),0 3px 8px rgba(70,50,20,.10);
+}
+:root[data-theme="slate"]{
+  /* brand accent -> editorial vermilion */
+  --blue:#c8362a; --blue-light:#f6ded9; --blue-dark:#9c241a;
+  /* cool slate paper + graphite ink scale */
+  --gray-50:#f4f4f2; --gray-100:#ececea; --gray-200:#dcdcd8; --gray-300:#bcbcb6;
+  --gray-400:#878d97; --gray-500:#5a5f68; --gray-600:#454a52; --gray-700:#2c2f35;
+  --gray-800:#191b1f; --gray-900:#15171a;
+  --surface:#f6f6f4; --bg-card:#fcfcfb; --bg-elevated:#ffffff;
+  --border-subtle:#e6e6e2;
+  --green:#4a6b43; --green-light:#e4ebe0; --green-dark:#314a2c;
+  --red:#a8302a; --red-light:#f2dad7; --red-dark:#7a201b;
+  --font:'Libre Franklin',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-display:'Newsreader',Georgia,'Times New Roman',serif;
+  /* editorial = near-square corners, flat surfaces */
+  --radius-sm:0; --radius:2px; --radius-md:2px; --radius-lg:3px;
+  --shadow-sm:none; --shadow:none; --shadow-md:none; --shadow-card:none;
+  --shadow-lg:0 10px 30px rgba(25,27,31,.10),0 2px 6px rgba(25,27,31,.06);
 }
 
 /* Respect user motion preference — globally disable transitions */
@@ -95,10 +154,13 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
 .app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
-.app-header h1{font-size:var(--text-15);font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.app-header h1{font-family:var(--font-display);font-size:var(--text-15);font-weight:700;letter-spacing:-.02em;line-height:1.25}
 .app-header .sub{margin-top:5px;display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap}
 .header-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.88);white-space:nowrap}
 .header-sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 2px}
+/* Theme cycle button — inherits .btn-outline; the swatch previews the live accent. */
+.btn-theme{display:inline-flex;align-items:center;gap:6px}
+.theme-swatch{width:11px;height:11px;border-radius:var(--radius-pill);background:var(--accent);border:1px solid rgba(255,255,255,.55);flex-shrink:0}
 .header-actions{display:flex;gap:var(--space-2);align-items:center}
 .btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:var(--text-12);font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
 @media (hover:hover){.btn:hover{box-shadow:var(--shadow-sm)}.btn:active{transform:translateY(.5px)}}
@@ -455,7 +517,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc h3{font-size:13pt;font-weight:bold;text-align:center;margin-bottom:4px;letter-spacing:.02em}
 .aba-doc .aba-subtitle{text-align:center;font-size:10pt;color:var(--gray-600);margin-bottom:20px;font-style:italic}
 .aba-doc .aba-meta{font-size:10.5pt;margin-bottom:6px}
-.aba-doc .aba-sec{font-size:9.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;color:var(--blue-dark);border-bottom:1.5px solid var(--blue-light);padding-bottom:2px;margin:20px 0 8px}
+.aba-doc .aba-sec{font-size:9.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;color:var(--letter-ink);border-bottom:1.5px solid var(--letter-rule);padding-bottom:2px;margin:20px 0 8px}
 .aba-doc p{margin:5px 0;font-size:10.5pt}
 .aba-doc ul{margin:4px 0 4px 22px;padding:0}
 .aba-doc li{margin-bottom:3px;font-size:10.5pt}
@@ -578,6 +640,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 @media (hover:hover){.preset-btn:hover{border-color:var(--accent,#2563eb);color:var(--accent-hover,#1d4ed8);background:var(--accent-soft,#eff6ff)}}
 .preset-btn.preset-mod{border-style:dashed;font-style:italic;color:var(--gray-500,#6b7280)}
 </style>
+<!-- Pre-paint theme restore: set data-theme before first paint so there is no
+     flash of the default theme. UI preference only (string), never PHI. -->
+<script data-theme-boot>try{var _t=localStorage.getItem('apTheme');if(_t==='warm'||_t==='slate')document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
 <body>
 <header class="app-header">
@@ -591,6 +656,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
   <div class="header-actions">
+    <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" aria-label="Switch color theme" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
+    <div class="header-sep"></div>
     <button class="btn btn-outline" onclick="window.print()">Print</button>
     <button class="btn btn-outline" onclick="copyNote('plain','all')">Copy Plain</button>
     <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
@@ -6331,7 +6398,28 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   updateAgeBasedVisibility();
   renderOverrides();
+  // Sync the theme button label to whatever the pre-paint script restored.
+  applyTheme(document.documentElement.getAttribute('data-theme')||'');
 });
+
+// ─── THEMES ──────────────────────────────────────────────────────────────────
+// Three opt-in color/font themes; Current (blue) is the default. The chosen
+// theme is persisted to localStorage as a bare string ('' | 'warm' | 'slate') —
+// a UI preference, never PHI. Phase 1 is a pure CSS-variable revalue: setting
+// data-theme on <html> re-points the token block; no clinical logic is touched.
+var AP_THEMES=[{id:'',label:'Current'},{id:'warm',label:'Warm Instrument'},{id:'slate',label:'Editorial Slate'}];
+function applyTheme(id){
+  if(id) document.documentElement.setAttribute('data-theme',id);
+  else document.documentElement.removeAttribute('data-theme');
+  var t=AP_THEMES.find(function(x){return x.id===id;})||AP_THEMES[0];
+  var lbl=document.getElementById('themeLabel'); if(lbl) lbl.textContent='Theme: '+t.label;
+  try{localStorage.setItem('apTheme',id);}catch(e){}
+}
+function cycleTheme(){
+  var cur=document.documentElement.getAttribute('data-theme')||'';
+  var i=AP_THEMES.findIndex(function(x){return x.id===cur;});
+  applyTheme(AP_THEMES[(i+1)%AP_THEMES.length].id);
+}
 </script>
 </body>
 </html>

@@ -44,16 +44,20 @@ const EXPORTS = [
 ];
 
 function extractScript(html) {
-  // The harness assumes the app is one inline <script> block. If a second script
-  // (or a <script src=...>) is ever added, a naive first-open/last-close span
-  // would silently swallow everything between them. Guard so that change fails
-  // loudly here instead of producing a garbage "app".
-  const openTags = html.match(/<script\b[^>]*>/gi) || [];
-  const closeTags = html.match(/<\/script>/gi) || [];
-  if (openTags.length !== 1 || closeTags.length !== 1) {
+  // The app keeps ALL its logic in one BARE `<script>` block at the end of
+  // <body>. Small bootstrap blocks are permitted but MUST carry an attribute
+  // (e.g. `<script data-theme-boot>` for the pre-paint theme restore in <head>)
+  // so they are distinguishable and excluded here. We evaluate ONLY the bare
+  // block. A naive first-open/last-close span would silently swallow everything
+  // between an added block and the app; matching the bare-tag span avoids that,
+  // and asserting exactly one bare block still fails loudly if a second
+  // attribute-less <script> is ever introduced.
+  const openTags = html.match(/<script>/gi) || [];   // bare <script> only, no attrs
+  if (openTags.length !== 1) {
     throw new Error(
-      `Expected exactly one <script> block in the HTML, found ${openTags.length} open / ` +
-      `${closeTags.length} close. If the app's structure changed, update extractScript().`
+      `Expected exactly one bare <script> block (the application), found ${openTags.length}. ` +
+      `Bootstrap blocks must carry an attribute (e.g. data-theme-boot). ` +
+      `If the app's structure changed, update extractScript().`
     );
   }
   const open = html.indexOf(openTags[0]);

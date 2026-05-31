@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editorial Slate — design prototype (autism A&P builder)</title>
+<!--
+  EDITORIAL SLATE — standalone design prototype.
+  Same controls and same three document tabs as the Warm Instrument prototype,
+  so the two directions compare apples-to-apples. Only the chrome language
+  changes. The document tabs render the generated clinical documents in their
+  PRESERVED plain/formal format (mono A&P note with box-drawing dividers; serif
+  formal letters with {placeholder} highlights). Changes nothing in
+  autism-ap-builder.html.
+
+  SIGNATURE DETAIL: "The red-pencil underscore + rules instead of boxes."
+   1. Structure is hairline RULES, never cards or drop shadows (the document
+      sheet is the one exception, getting a single soft shadow).
+   2. The lone vermilion accent appears ONLY as a 2px rule drawn left-to-right
+      beneath a live element (.underscore + @keyframes pencil), like an editor's
+      red-pencil stroke.
+   3. Section headers use a vermilion KICKER over a Newsreader title with a
+      hanging FOLIO numeral in the left margin — a typeset-page cadence.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Surfaces — cool paper; pure white reserved for the document sheet */
+  --paper-0:#ececea; --paper-1:#f6f6f4; --paper-2:#fcfcfb; --paper-3:#ffffff;
+  /* Ink — graphite */
+  --ink-900:#191b1f; --ink-700:#2c2f35; --ink-500:#5a5f68; --ink-400:#878d97;
+  /* Accent — editorial vermilion (the red pencil) */
+  --red:#c8362a; --red-deep:#9c241a; --red-tint:#f6ded9; --red-ink:#86201a;
+  /* Rules — the structural primitive */
+  --rule:#dcdcd8; --rule-strong:#bcbcb6; --rule-heavy:#2c2f35;
+  /* Semantic clinical signal (muted earth, distinct, AA) */
+  --green:#4a6b43; --green-tint:#e4ebe0; --green-ink:#314a2c;
+  --brick:#a8302a; --brick-tint:#f2dad7; --brick-ink:#7a201b;
+  --slate:#3c5a73; --slate-tint:#dfe7ee; --slate-ink:#274157;
+  --plum:#6d4a6b; --plum-tint:#e9dee8; --plum-ink:#4a2f48;
+  --amber:#9a6b12; --amber-dark:#6b480a;  /* "suspected" pathway — off the red accent */
+  /* Type */
+  --font-display:'Newsreader',Georgia,'Times New Roman',serif;
+  --font:'Libre Franklin',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'Spline Sans Mono','IBM Plex Mono','Courier New',monospace;
+  --font-letter:Georgia,'Times New Roman',Charter,serif;
+  /* Spacing (4px rhythm) */
+  --s1:4px; --s2:6px; --s3:8px; --s4:10px; --s5:12px; --s6:14px; --s7:16px; --s8:20px; --s9:24px;
+  /* Type scale */
+  --t9:9px; --t10:10px; --t11:11px; --t12:12px; --t13:13px; --t15:15px; --t16:16px; --t22:22px; --t26:26px;
+  /* Radii — near-square */
+  --r-sm:0; --r:2px; --r-md:2px; --r-lg:3px;
+  /* Motion */
+  --dur-fast:110ms; --dur:150ms; --dur-slow:220ms; --ease:cubic-bezier(.2,.7,.2,1);
+  /* Focus — vermilion ring */
+  --focus:0 0 0 2px var(--paper-2),0 0 0 4px color-mix(in srgb,var(--red) 65%,transparent);
+  --sheet-shadow:0 10px 30px rgba(25,27,31,.10),0 2px 6px rgba(25,27,31,.06);
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font); font-size:var(--t13); color:var(--ink-700);
+  background:var(--paper-0);
+  display:flex; flex-direction:column; height:100vh; overflow:hidden;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility;
+}
+:where(button,input,select,textarea,a,label,.chip,.r-opt,.tab,.sec-head):focus-visible{
+  outline:none; box-shadow:var(--focus);
+}
+
+/* ---------- Header: editorial masthead, ruled ---------- */
+.app-header{
+  flex-shrink:0; display:flex; align-items:flex-end; justify-content:space-between; gap:var(--s5);
+  padding:9px 20px 8px; background:var(--paper-2); border-bottom:2px solid var(--rule-heavy);
+}
+.brand{display:flex; flex-direction:column; gap:2px; min-width:0}
+.brand .kicker-top{font-size:var(--t9); font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--red)}
+.brand .mark{font-family:var(--font-display); font-weight:700; font-size:var(--t26); color:var(--ink-900); letter-spacing:-.01em; line-height:1}
+.header-right{display:flex; flex-direction:column; align-items:flex-end; gap:var(--s3)}
+.badges{display:flex; gap:var(--s2); align-items:center; flex-wrap:wrap}
+.badge{
+  font-size:var(--t9); font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  padding:3px 8px; border:1px solid var(--rule-strong); background:var(--paper-2); color:var(--ink-500); border-radius:var(--r);
+}
+.badge.live{border-color:var(--red); color:var(--red-ink); border-left-width:3px}
+.header-actions{display:flex; gap:var(--s2); align-items:center}
+
+/* ---------- Buttons = flat, ruled. Solid vermilion (.btn-primary) is the
+   sanctioned filled accent, for primary ACTIONS only; state uses the underscore. ---------- */
+.btn{
+  font-family:var(--font); font-size:var(--t12); font-weight:600; letter-spacing:.01em;
+  padding:7px 14px; border-radius:var(--r); border:1px solid var(--rule-strong);
+  background:var(--paper-2); color:var(--ink-700); cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.btn:hover{border-color:var(--ink-700)}
+.btn:active{background:var(--paper-0)}
+.btn-primary{background:var(--red); border-color:var(--red-deep); color:#fff}
+.btn-primary:hover{background:var(--red-deep)}
+.btn-ghost{background:transparent; border-color:var(--rule-strong)}
+.btn-ghost:hover{border-color:var(--red); color:var(--red-ink)}
+.btn-danger{background:transparent; border-color:rgba(168,48,42,.45); color:var(--brick-ink)}
+.btn-danger:hover{background:var(--brick-tint); border-color:var(--brick)}
+.btn-sm{padding:4px 10px; font-size:var(--t11)}
+
+/* ---------- Layout ---------- */
+.main{display:grid; grid-template-columns:460px 1fr; flex:1; overflow:hidden}
+.left-panel{background:var(--paper-1); border-right:1px solid var(--rule-strong); overflow-y:auto; padding:0 14px 16px}
+.panel-masthead{position:sticky; top:0; z-index:5; background:var(--paper-1); padding:10px 0 6px; border-bottom:1px solid var(--rule-heavy); margin-bottom:2px}
+.panel-masthead .kicker-top{font-size:var(--t9); font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--red)}
+.panel-masthead .pm-title{font-family:var(--font-display); font-size:var(--t15); font-weight:600; color:var(--ink-900)}
+.right-panel{display:flex; flex-direction:column; overflow:hidden; background:var(--paper-0)}
+
+/* ---------- Sections = ruled regions, no cards ---------- */
+.section{border-top:1px solid var(--rule-strong)}
+.section:first-of-type{border-top:none}
+.sec-head{
+  display:grid; grid-template-columns:30px 1fr auto; align-items:baseline; gap:var(--s3);
+  cursor:pointer; user-select:none; padding:10px 2px 8px;
+}
+.folio{font-family:var(--font-display); font-size:19px; font-weight:500; color:var(--ink-900); line-height:1; text-align:center}
+.sec-titles{display:flex; flex-direction:column; gap:3px; min-width:0}
+.kicker{font-size:var(--t9); font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--red)}
+.sec-title{font-family:var(--font-display); font-size:var(--t15); font-weight:600; color:var(--ink-900); line-height:1.1}
+.sec-meta{display:flex; align-items:baseline; gap:var(--s3)}
+.sec-sum{font-size:var(--t10); color:var(--ink-500); font-style:italic}
+.sec-chev{font-size:var(--t10); color:var(--ink-400); transition:transform var(--dur) var(--ease)}
+.section.collapsed .sec-chev{transform:rotate(-90deg)}
+.section.collapsed .sec-body{display:none}
+.sec-body{padding:0 2px 12px 40px}   /* hang content under the title column */
+.field{margin-bottom:11px}
+.field:last-child{margin-bottom:0}
+.field-label{display:block; font-size:var(--t10); font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-500); margin-bottom:6px; padding-bottom:3px; border-bottom:1px solid var(--rule)}
+.field-hint{font-size:var(--t10); color:var(--ink-400); margin-top:6px; font-style:italic}
+
+/* ---------- SIGNATURE: the red-pencil underscore ----------
+   The underscore PERSISTS while .is-on (a static state cue, scannable at rest).
+   The left-to-right draw fires ONLY on genuine activation, via a one-shot
+   .just-on class added in JS and removed when the animation ends — so toggling
+   many chips per note doesn't replay 15 animations. */
+@keyframes pencil{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.underscore{position:relative}
+.underscore.is-on::after{
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:var(--red); transform-origin:left;
+}
+.underscore.just-on::after{animation:pencil 200ms var(--ease)}
+
+/* ---------- Chips ---------- */
+.chips{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4)}
+.chip{
+  display:inline-flex; align-items:center; gap:var(--s2);
+  padding:5px 4px 6px; border:none; border-bottom:1px solid var(--rule-strong); border-radius:0;
+  background:transparent; color:var(--ink-700); font-size:var(--t12); line-height:1.3;
+  cursor:pointer; user-select:none;
+  transition:color var(--dur-fast) var(--ease);
+}
+.chip:hover{color:var(--ink-900); border-bottom-color:var(--ink-400)}
+/* Selected chip: additive cues so a set is scannable in <2s — neutral graphite
+   tint + bold ink + persistent red-pencil underscore (.underscore ::after) + em-dash.
+   Tint is neutral (not the red accent) to keep "solid fill = action" intact. */
+.chip.is-on{color:var(--ink-900); font-weight:600; background:var(--paper-0); border-radius:var(--r); border-bottom-color:transparent; padding-left:8px; padding-right:8px}
+.chip.is-on::before{content:'\2014'; color:var(--red); font-weight:700}
+
+/* ---------- Radio options ---------- */
+.r-row{display:flex; flex-wrap:wrap; gap:var(--s2)}
+.r-opt{
+  display:inline-flex; align-items:center; gap:var(--s2);
+  padding:5px 11px; border:1px solid var(--rule-strong); border-radius:var(--r);
+  background:var(--paper-2); color:var(--ink-700); font-size:var(--t12); cursor:pointer;
+  transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease);
+}
+.r-opt:hover{border-color:var(--ink-700)}
+.r-opt input{display:none}
+/* Selected radio: graphite tint + heavier border + a left vermilion tick, so the
+   chosen option reads instantly among equal-width siblings (border+bold alone was too quiet). */
+.r-opt.is-on{color:var(--ink-900); font-weight:600; border-color:var(--ink-700); background:var(--paper-0); padding-left:9px; border-left:3px solid var(--red)}
+
+/* ---------- Checkbox rows = ruled tabular list ---------- */
+.cb-list{display:flex; flex-direction:column; border-top:1px solid var(--rule)}
+.cb-row{
+  display:flex; align-items:flex-start; gap:var(--s3); cursor:pointer;
+  padding:5px 4px; font-size:var(--t12); line-height:1.35;
+  border-bottom:1px solid var(--rule);
+  transition:background var(--dur-fast) var(--ease);
+}
+.cb-row:hover{background:var(--paper-2)}
+.cb-row input{margin-top:2px; width:15px; height:15px; accent-color:var(--red); flex-shrink:0; cursor:pointer}
+.cb-row.is-on{color:var(--ink-900); font-weight:500}
+
+/* ---------- Toggle ---------- */
+.tog-row{display:flex; align-items:center; gap:var(--s3); padding:3px 0}
+.tog{position:relative; width:38px; height:20px; flex-shrink:0; cursor:pointer}
+.tog input{display:none}
+.tog-sl{position:absolute; inset:0; background:var(--rule-strong); border-radius:var(--r); transition:background var(--dur) var(--ease)}
+.tog-sl::after{content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:var(--paper-2); border-radius:1px; box-shadow:0 1px 2px rgba(25,27,31,.25); transition:transform var(--dur) var(--ease)}
+.tog input:checked + .tog-sl{background:var(--red)}
+.tog input:checked + .tog-sl::after{transform:translateX(18px)}
+.tog-label{font-size:var(--t12); color:var(--ink-700)}
+
+/* ---------- Pathway tag (semantic, flat, left-ruled) ---------- */
+.pathway-pill{
+  display:inline-flex; align-items:center; gap:var(--s2); flex-wrap:wrap;
+  padding:5px 10px; border:1px solid var(--rule-strong); border-left-width:3px; border-radius:var(--r);
+  font-size:var(--t11); font-weight:600; line-height:1.3; background:var(--paper-2); color:var(--ink-500); margin-bottom:9px;
+}
+.pathway-pill .pp-prefix{font-size:var(--t9); font-weight:700; text-transform:uppercase; letter-spacing:.1em; opacity:.85}
+/* Suspected pulled OFF the vermilion accent (which now means active/action) onto
+   a distinct muted amber, so a pathway tag can't be misread as a selection. The
+   text label carries the meaning regardless; this just removes the hue clash. */
+.pathway-pill.confirmed{border-left-color:var(--slate); color:var(--slate-ink)}
+.pathway-pill.suspected{border-left-color:var(--amber); color:var(--amber-dark)}
+.pathway-pill.bif{border-left-color:var(--plum); color:var(--plum-ink)}
+.pathway-pill.typical{border-left-color:var(--green); color:var(--green-ink)}
+
+/* ---------- Text input ---------- */
+.txt{
+  width:100%; font-family:var(--font); font-size:var(--t12); color:var(--ink-700);
+  padding:8px 0; border:none; border-bottom:1px solid var(--rule-strong); border-radius:0;
+  background:transparent;
+  transition:border-color var(--dur-fast) var(--ease);
+}
+.txt:focus{outline:none; border-bottom-color:var(--red); border-bottom-width:2px}
+.txt::placeholder{color:var(--ink-400)}
+.phi-hint{font-size:var(--t10); color:var(--red-ink); margin-top:6px; display:flex; gap:5px; align-items:baseline}
+.phi-hint::before{content:'\26A0'}
+
+/* ---------- Right panel: preview ---------- */
+.rp-header{
+  flex-shrink:0; display:flex; align-items:stretch; justify-content:space-between; gap:var(--s4);
+  padding:0 18px; background:var(--paper-2); border-bottom:2px solid var(--rule-heavy);
+}
+.tabs{display:flex; gap:var(--s6); align-items:stretch}
+.tab{
+  font-family:var(--font); font-size:var(--t12); font-weight:600; letter-spacing:.02em;
+  padding:11px 2px; border:none; background:transparent; color:var(--ink-500); cursor:pointer;
+  position:relative; transition:color var(--dur) var(--ease);
+}
+.tab:hover{color:var(--ink-900)}
+.tab.is-on{color:var(--ink-900)}
+.tab.is-on::after{content:''; position:absolute; left:0; right:0; bottom:-2px; height:3px; background:var(--red); transform-origin:left}
+.tab.just-on::after{animation:pencil 200ms var(--ease)}
+.rp-title{display:flex; align-items:center; font-size:var(--t10); color:var(--ink-500); font-style:italic; text-align:right}
+
+.preview{flex:1; overflow-y:auto; padding:28px 24px; display:flex; justify-content:center}
+/* the document "sheet" — pure white page with the one allowed shadow; frame only */
+.sheet{
+  width:100%; max-width:780px; background:var(--paper-3);
+  border:1px solid var(--rule); box-shadow:var(--sheet-shadow);
+  padding:38px 44px; align-self:flex-start;
+}
+
+/* ===== PRESERVED FORMAL DOCUMENTS (interior unchanged, formal) ===== */
+.note-content{font-family:var(--font-mono); font-size:12px; line-height:1.75; white-space:pre-wrap; color:#191b1f}
+.note-ok{background:var(--green-tint); border-left:4px solid var(--green); color:var(--green-ink); padding:9px 13px; margin-bottom:14px; font-size:12px; font-family:var(--font)}
+.note-err{background:var(--brick-tint); border-left:4px solid var(--brick); color:var(--brick-ink); padding:9px 13px; margin-bottom:14px; font-size:12px; font-family:var(--font)}
+.aba-doc{font-family:var(--font-letter); font-size:11.5pt; line-height:1.85; color:#1a1a1a}
+.aba-doc h3{font-size:13pt; text-align:center; margin-bottom:4px; letter-spacing:.02em}
+.aba-doc .aba-subtitle{text-align:center; font-size:10pt; color:#555; font-style:italic; margin-bottom:20px}
+.aba-doc .aba-meta{font-size:10.5pt; margin-bottom:6px}
+.aba-doc .aba-sec{font-size:9.5pt; font-weight:bold; text-transform:uppercase; letter-spacing:.08em; color:#2c2f35; border-bottom:1px solid #bcbcb6; padding-bottom:3px; margin:20px 0 8px}
+.aba-doc p{margin:6px 0; font-size:10.5pt}
+.aba-doc ul{margin:5px 0 5px 22px}
+.aba-doc li{margin-bottom:3px; font-size:10.5pt}
+.aba-doc .aba-sig{margin-top:24px; border-top:1px solid #999; padding-top:12px; font-size:10pt; color:#444; line-height:2.1}
+.iep-ph{background:#fef9c3; color:#92400e; border-radius:3px; padding:0 3px; font-style:italic}
+
+/* ---------- Sticky copy bar (frame) ---------- */
+.copybar{flex-shrink:0; display:flex; justify-content:flex-end; gap:var(--s2); padding:9px 16px; background:var(--paper-2); border-top:1px solid var(--rule-strong)}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0; pointer-events:none;
+  background:var(--ink-900); color:var(--paper-2); padding:10px 18px; border-radius:var(--r); font-size:var(--t12); font-weight:500;
+  box-shadow:var(--sheet-shadow); transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease); z-index:50}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+.mnav{display:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:768px){
+  body{overflow:auto; height:auto}
+  .main{grid-template-columns:1fr; flex:none}
+  .left-panel,.right-panel{overflow:visible}
+  .left-panel{border-right:none; border-bottom:2px solid var(--rule-heavy)}
+  .mnav{display:flex; gap:var(--s2); padding:10px 14px; background:var(--paper-2); border-bottom:1px solid var(--rule-strong); position:sticky; top:0; z-index:10}
+  .mnav .btn{flex:1}
+  .preview{padding:16px}
+  .sheet{padding:22px 18px}
+  body.show-output .left-panel{display:none}
+  body:not(.show-output) .right-panel{display:none}
+  /* Density is desktop-only: restore comfortable touch targets on mobile so the
+     ruled list and radios stay tappable (>=44px). The media query wins over the
+     tightened desktop padding above. */
+  .cb-row{min-height:44px; padding:10px 6px; align-items:center}
+  .cb-row input{width:18px; height:18px}
+  .r-opt{min-height:42px; padding:9px 12px}
+  .tog{width:42px; height:24px}
+  .tog-sl::after{width:20px; height:20px}
+  .tog input:checked + .tog-sl::after{transform:translateX(18px)}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="kicker-top">Developmental-Behavioral Pediatrics</span>
+    <span class="mark">Autism Assessment &amp; Plan</span>
+  </div>
+  <div class="header-right">
+    <div class="badges">
+      <span class="badge">No PHI</span>
+      <span class="badge">DSM-5-TR</span>
+      <span class="badge live">School-age</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="toast('Loaded preset')">Presets</button>
+      <button class="btn btn-danger btn-sm" onclick="toast('Cleared')">Reset</button>
+      <button class="btn btn-primary btn-sm" onclick="toast('Copied A&amp;P note')">Copy note</button>
+    </div>
+  </div>
+</header>
+
+<nav class="mnav">
+  <button class="btn" onclick="document.body.classList.remove('show-output')">Input form</button>
+  <button class="btn btn-primary" onclick="document.body.classList.add('show-output')">View document</button>
+</nav>
+
+<div class="main">
+  <!-- ============ LEFT: input form (editorial chrome) ============ -->
+  <aside class="left-panel">
+    <div class="panel-masthead">
+      <div class="kicker-top">Input</div>
+      <div class="pm-title">Encounter parameters</div>
+    </div>
+
+    <!-- Section 1 -->
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="folio">1</span>
+        <span class="sec-titles"><span class="kicker">Diagnosis</span><span class="sec-title">Diagnostic Status</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum1">Confirmed</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="pathway-pill confirmed">
+          <span class="pp-prefix">Pathway</span> Confirmed ASD &middot; Level 1 (SC) / Level 1 (RRB)
+        </div>
+        <div class="field">
+          <span class="field-label">Diagnosis</span>
+          <div class="r-row" data-radio="dx">
+            <label class="r-opt is-on underscore"><input type="radio" name="dx" checked>Confirmed ASD</label>
+            <label class="r-opt underscore"><input type="radio" name="dx">Suspected / R/O</label>
+            <label class="r-opt underscore"><input type="radio" name="dx">Not ASD</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Severity &mdash; Social Communication</span>
+          <div class="r-row" data-radio="sc">
+            <label class="r-opt is-on underscore"><input type="radio" name="sc" checked>Level 1</label>
+            <label class="r-opt underscore"><input type="radio" name="sc">Level 2</label>
+            <label class="r-opt underscore"><input type="radio" name="sc">Level 3</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="folio">2</span>
+        <span class="sec-titles"><span class="kicker">Profile</span><span class="sec-title">Developmental Domains</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum2">3 selected</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="field">
+          <span class="field-label">Areas needing support</span>
+          <div class="chips" data-chips="domains">
+            <span class="chip is-on underscore">Communication</span>
+            <span class="chip is-on underscore">Behavior / RRB</span>
+            <span class="chip underscore">Adaptive</span>
+            <span class="chip is-on underscore">Sensory</span>
+            <span class="chip underscore">Motor</span>
+            <span class="chip underscore">Social</span>
+          </div>
+          <div class="field-hint">Click a chip to toggle. Active items get a red-pencil underscore.</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Comorbidities</span>
+          <div class="chips" data-chips="comorbid">
+            <span class="chip underscore">ADHD</span>
+            <span class="chip underscore">Anxiety</span>
+            <span class="chip underscore">ID</span>
+            <span class="chip underscore">Language disorder</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="folio">3</span>
+        <span class="sec-titles"><span class="kicker">Plan</span><span class="sec-title">Plan &amp; Therapies</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum3">4 services</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="field">
+          <span class="field-label">School-based services to request</span>
+          <div class="cb-list" data-cb="svc">
+            <label class="cb-row is-on"><input type="checkbox" checked> Special education services</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> Speech-language therapy</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> Occupational therapy</label>
+            <label class="cb-row"><input type="checkbox"> Physical therapy</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> 1:1 paraprofessional / aide</label>
+            <label class="cb-row"><input type="checkbox"> Extended school year (ESY)</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Letters</span>
+          <div class="tog-row"><label class="tog"><input type="checkbox" checked onchange="toast('ABA letter '+(this.checked?'enabled':'disabled'))"><span class="tog-sl"></span></label><span class="tog-label">Generate ABA letter of medical necessity</span></div>
+          <div class="tog-row"><label class="tog"><input type="checkbox" checked onchange="toast('IEP letter '+(this.checked?'enabled':'disabled'))"><span class="tog-sl"></span></label><span class="tog-label">Generate IEP support letter</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">Return to clinic</span>
+          <input class="txt" type="text" placeholder="e.g., 6 months, 1 year, as needed...">
+          <div class="phi-hint">Type "the child" or [NAME] only. No identifiers.</div>
+        </div>
+      </div>
+    </section>
+
+  </aside>
+
+  <!-- ============ RIGHT: preview (formal documents on a white sheet) ============ -->
+  <main class="right-panel">
+    <div class="rp-header">
+      <div class="tabs">
+        <button class="tab is-on" data-tab="note" onclick="setTab('note')">A&amp;P Note</button>
+        <button class="tab" data-tab="aba" onclick="setTab('aba')">ABA Letter</button>
+        <button class="tab" data-tab="iep" onclick="setTab('iep')">IEP Letter</button>
+      </div>
+      <span class="rp-title" id="rpTitle">Plain clinical note &middot; copies into Epic verbatim</span>
+    </div>
+
+    <div class="preview">
+      <div class="sheet">
+
+        <!-- A&P NOTE — preserved monospace formal format -->
+        <div id="doc-note">
+          <div class="note-ok"><strong>&#10003; DSM-5 criteria complete</strong></div>
+<div class="note-content">══════════════════════════════════════════════════════
+  ASSESSMENT &amp; PLAN
+══════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder ──────────────
+
+Autism Spectrum Disorder, confirmed this evaluation.
+DSM-5-TR criteria met across social communication and
+restricted/repetitive behavior domains. Current
+severity: Level 1 (requiring support) for social
+communication and Level 1 for restricted, repetitive
+behaviors. The child presents with documented needs in
+communication, behavioral regulation, and sensory
+processing.
+
+  Plan:
+   - Refer to ABA (letter of medical necessity attached)
+   - Speech-language therapy evaluation
+   - Occupational therapy evaluation
+   - School: IEP eligibility under Autism category
+   - Return to clinic in 6 months
+
+── Problem 2: Care coordination ─────────────────────
+
+Family provided with educational-rights guidance and
+local support resources. Safety counseling completed.
+</div>
+        </div>
+
+        <!-- ABA LETTER — preserved formal serif letter -->
+        <div id="doc-aba" class="aba-doc" style="display:none">
+          <h3>Letter of Medical Necessity</h3>
+          <div class="aba-subtitle">Applied Behavior Analysis (ABA) Therapy</div>
+          <p class="aba-meta"><strong>Date:</strong> <span class="iep-ph">{DATE}</span></p>
+          <p class="aba-meta"><strong>Patient:</strong> <span class="iep-ph">{NAME}</span> &nbsp;|&nbsp; <strong>DOB:</strong> <span class="iep-ph">{DOB}</span></p>
+          <p class="aba-meta"><strong>Re:</strong> Medical necessity for ABA therapy, 25 hours/week</p>
+
+          <div class="aba-sec">Diagnosis</div>
+          <p>The above-named patient is a school-age child under my care with a confirmed diagnosis of Autism Spectrum Disorder (ICD-10 F84.0), established through comprehensive evaluation consistent with DSM-5-TR criteria.</p>
+
+          <div class="aba-sec">Clinical Justification</div>
+          <p>Applied Behavior Analysis is the standard of care and is medically necessary to address deficits in functional communication, social engagement, and adaptive behavior, and to reduce interfering behaviors. I am requesting authorization for 25 hours per week in the home and clinic settings.</p>
+          <ul>
+            <li>Functional communication / requesting (manding)</li>
+            <li>Joint attention and social referencing</li>
+            <li>Self-help and daily-living skills</li>
+            <li>Reduction of interfering behaviors</li>
+          </ul>
+
+          <div class="aba-sig">
+            Sincerely,<br>
+            <span class="iep-ph">{PROVIDER NAME, CREDENTIALS}</span><br>
+            <span class="iep-ph">{CLINIC / NPI}</span>
+          </div>
+        </div>
+
+        <!-- IEP LETTER — preserved formal serif letter -->
+        <div id="doc-iep" class="aba-doc" style="display:none">
+          <h3>Re: Educational Support Recommendations</h3>
+          <div class="aba-subtitle">To the IEP Team</div>
+          <p class="aba-meta"><strong>Date:</strong> <span class="iep-ph">{DATE}</span></p>
+          <p class="aba-meta"><strong>Student:</strong> <span class="iep-ph">{NAME}</span> &nbsp;|&nbsp; <strong>DOB:</strong> <span class="iep-ph">{DOB}</span></p>
+
+          <div class="aba-sec">Background</div>
+          <p>I am the physician for the above-named student, who carries a confirmed diagnosis of Autism Spectrum Disorder. This letter supports eligibility for special-education services under the Autism category of IDEA.</p>
+
+          <div class="aba-sec">Recommended Services &amp; Accommodations</div>
+          <ul>
+            <li>Special education services</li>
+            <li>Speech-language therapy</li>
+            <li>Occupational therapy</li>
+            <li>1:1 paraprofessional / aide support</li>
+          </ul>
+          <p>These supports are educationally necessary to provide a free and appropriate public education. Please contact my office at <span class="iep-ph">{PHONE}</span> with questions.</p>
+
+          <div class="aba-sig">
+            Respectfully,<br>
+            <span class="iep-ph">{PROVIDER NAME, CREDENTIALS}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="copybar">
+      <button class="btn btn-sm" onclick="toast('Copied plain text')">Copy plain</button>
+      <button class="btn btn-primary btn-sm" onclick="toast('Copied for Epic')">Copy for Epic</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleSec(head){ head.parentElement.classList.toggle('collapsed'); }
+
+// Radio groups
+document.querySelectorAll('[data-radio]').forEach(function(grp){
+  grp.querySelectorAll('.r-opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      grp.querySelectorAll('.r-opt').forEach(function(o){ o.classList.remove('is-on'); });
+      reArm(opt);
+      var inp = opt.querySelector('input'); if(inp) inp.checked = true;
+    });
+  });
+});
+
+// Chips
+document.querySelectorAll('[data-chips]').forEach(function(grp){
+  grp.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var turningOn = !chip.classList.contains('is-on');
+      chip.classList.toggle('is-on');
+      if(turningOn) reArm(chip);
+      updateChipSummaries();
+    });
+  });
+});
+
+// Checkbox rows
+document.querySelectorAll('[data-cb] .cb-row').forEach(function(row){
+  var box = row.querySelector('input');
+  row.addEventListener('change', function(){ row.classList.toggle('is-on', box.checked); updateSvcSummary(); });
+});
+
+// Re-trigger the pencil-draw animation by reflowing
+// Fire the red-pencil DRAW once, only on genuine activation. The .is-on
+// underscore persists as a static cue; .just-on carries the one-shot animation
+// and is removed when it ends, so rapid toggling never replays a backlog.
+function reArm(el){
+  el.classList.add('is-on');
+  el.classList.add('just-on');
+  el.addEventListener('animationend', function h(){ el.classList.remove('just-on'); el.removeEventListener('animationend', h); });
+}
+
+function updateChipSummaries(){
+  var d = document.querySelectorAll('[data-chips="domains"] .chip.is-on').length;
+  document.getElementById('sum2').textContent = d + ' selected';
+}
+function updateSvcSummary(){
+  var n = document.querySelectorAll('[data-cb="svc"] .cb-row.is-on').length;
+  document.getElementById('sum3').textContent = n + ' services';
+}
+
+// Tabs
+var TITLES = {
+  note:'Plain clinical note · copies into Epic verbatim',
+  aba:'Formal letter of medical necessity · insurer-facing',
+  iep:'Formal IEP support letter · school-facing'
+};
+function setTab(which){
+  document.querySelectorAll('.tab').forEach(function(t){
+    var on = t.dataset.tab===which;
+    t.classList.toggle('is-on', on);
+    // draw the underscore once on the newly-selected tab only
+    if(on && !t.classList.contains('just-on')){
+      t.classList.add('just-on');
+      t.addEventListener('animationend', function h(){ t.classList.remove('just-on'); t.removeEventListener('animationend', h); });
+    } else if(!on){ t.classList.remove('just-on'); }
+  });
+  document.getElementById('doc-note').style.display = which==='note' ? '' : 'none';
+  document.getElementById('doc-aba').style.display  = which==='aba'  ? '' : 'none';
+  document.getElementById('doc-iep').style.display  = which==='iep'  ? '' : 'none';
+  document.getElementById('rpTitle').textContent = TITLES[which];
+}
+
+// Toast
+var toastTimer;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1600);
+}
+</script>
+</body>
+</html>

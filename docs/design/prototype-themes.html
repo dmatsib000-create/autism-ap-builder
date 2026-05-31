@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Switchable themes — design prototype (autism A&P builder)</title>
+<!--
+  THREE SWITCHABLE THEMES in one file: Current (blue, DEFAULT) · Warm Instrument ·
+  Editorial Slate. Demonstrates the theming architecture from 05-theming-plan.md:
+    - ONE canonical set of CSS variable names, set by :root (default) and
+      overridden by :root[data-theme="warm"] / [data-theme="slate"].
+    - ONE shared markup; per-theme STRUCTURE overrides (Slate flattens boxes to
+      rules, rules its lists, runs denser, uses a masthead section header) are
+      gated behind [data-theme="slate"].
+    - A header CYCLE button persists the choice to localStorage (UI pref only,
+      no PHI). Default = Current; nothing changes unless the user opts in.
+  The three document tabs render the generated clinical documents in their
+  PRESERVED plain/formal format in EVERY theme. Changes nothing in
+  autism-ap-builder.html. Prototype loads fonts from Google Fonts; the real app
+  must self-host/inline them (no external network).
+
+  Critique fixes carried in: persistent state cue + one-shot activation glow/draw
+  (.just-on); selected cues additive; "suspected" pathway off the brand accent;
+  mobile >=44px touch targets.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   CANONICAL TOKENS — every component reads ONLY these names. Themes set values.
+   ============================================================================ */
+:root{
+  /* ---- THEME: Current (blue) — the default, approximates today's app ---- */
+  --surface-desk:#e9ecf1; --surface-panel:#eef1f6; --surface-card:#ffffff; --surface-raised:#ffffff;
+  --ink-900:#1f1f28; --ink-700:#363640; --ink-500:#6b6b75; --ink-400:#9b9ba3;
+  --accent:#1e50d2; --accent-deep:#1438a8; --accent-tint:#dbeafe; --accent-ink:#1438a8;
+  --line:#e6e6ea; --line-strong:#d2d2d8; --line-heavy:#363640;
+  --ok:#16a34a; --ok-tint:#dcfce7; --ok-ink:#166534;
+  --err:#dc2626; --err-tint:#fee2e2; --err-ink:#991b1b;
+  /* pathway hues (each carries a text label too -> colorblind-safe).
+     "suspected" is deliberately OFF the brand accent in every theme. */
+  --pw-confirmed:#5b5a86; --pw-confirmed-tint:#e3e2ee; --pw-confirmed-ink:#3a3960;
+  --pw-suspected:#b45309; --pw-suspected-tint:#fde7c8; --pw-suspected-ink:#7c3a06;
+  --pw-bif:#7a5278; --pw-bif-tint:#ecdfeb; --pw-bif-ink:#523450;
+  --pw-typical:#16a34a; --pw-typical-tint:#dcfce7; --pw-typical-ink:#166534;
+  /* type */
+  --font-display:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-ui:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-mono:'Courier New',Courier,monospace;
+  --font-letter:Georgia,'Times New Roman',Charter,serif;  /* LETTERS — formal, theme-independent */
+  --letter-rule:#c9bca2;  /* the .aba-sec rule — pinned conservative in ALL themes */
+  /* spacing (4px rhythm) */
+  --s1:4px; --s2:6px; --s3:8px; --s4:10px; --s5:12px; --s6:14px; --s7:16px; --s8:20px; --s9:24px;
+  /* type scale */
+  --t9:9px; --t10:10px; --t11:11px; --t12:12px; --t13:13px; --t15:15px; --t16:16px; --t18:18px; --t22:22px; --t26:26px;
+  /* shape */
+  --r-sm:4px; --r:6px; --r-md:8px; --r-pill:999px;
+  /* shadows + the letterpress "key" pair (Warm uses them; others = none) */
+  --shadow-sm:0 1px 2px rgba(15,15,25,.05);
+  --shadow-card:0 1px 3px rgba(15,15,25,.06),0 1px 2px rgba(15,15,25,.04);
+  --shadow-lg:0 8px 24px rgba(15,15,25,.12),0 2px 6px rgba(15,15,25,.06);
+  --key-rest:none; --key-press:none; --emboss:none;
+  --sheet-bg:var(--surface-raised); --sheet-radius:var(--r-md);
+  /* motion */
+  --dur-fast:110ms; --dur:150ms; --ease:cubic-bezier(.2,.7,.2,1);
+  --focus:0 0 0 2px var(--surface-card),0 0 0 4px color-mix(in srgb,var(--accent) 65%,transparent);
+}
+
+/* ---- THEME: Warm Instrument ---- */
+:root[data-theme="warm"]{
+  --surface-desk:#e6ddc9; --surface-panel:#f3ecdc; --surface-card:#fbf6ea; --surface-raised:#fffdf7;
+  --ink-900:#2a251d; --ink-700:#41392d; --ink-500:#6c6253; --ink-400:#938876;
+  --accent:#bf6a1e; --accent-deep:#9a5212; --accent-tint:#f4e2c4; --accent-ink:#7a3d0a;
+  --line:#ddd2bd; --line-strong:#c9bca2; --line-heavy:#41392d;
+  --ok:#5d7a3a; --ok-tint:#e6ecd4; --ok-ink:#3c5021;
+  --err:#a8432b; --err-tint:#f3dcd2; --err-ink:#7a2c19;
+  --pw-confirmed:#5b5a86; --pw-confirmed-tint:#e3e2ee; --pw-confirmed-ink:#3a3960;
+  --pw-suspected:#a85a2c; --pw-suspected-tint:#f0dcc8; --pw-suspected-ink:#6e3613; /* clay, off the amber accent */
+  --pw-bif:#7a5278; --pw-bif-tint:#ecdfeb; --pw-bif-ink:#523450;
+  --pw-typical:#5d7a3a; --pw-typical-tint:#e6ecd4; --pw-typical-ink:#3c5021;
+  --font-display:'Fraunces',Georgia,serif;
+  --font-ui:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','Courier New',monospace;
+  --letter-rule:#c9bca2;
+  --r-sm:3px; --r:5px; --r-md:7px;
+  --shadow-sm:0 1px 2px rgba(80,60,25,.10);
+  --shadow-card:0 1px 3px rgba(80,60,25,.12),0 1px 2px rgba(80,60,25,.08);
+  --shadow-lg:0 12px 30px rgba(70,50,20,.16),0 3px 8px rgba(70,50,20,.10);
+  --key-rest:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(120,90,40,.08),0 1px 1.5px rgba(80,60,25,.14);
+  --key-press:inset 0 1px 2px rgba(90,65,25,.22);
+  --emboss:0 1px 0 rgba(255,255,255,.8);
+}
+
+/* ---- THEME: Editorial Slate ---- */
+:root[data-theme="slate"]{
+  --surface-desk:#ececea; --surface-panel:#f6f6f4; --surface-card:#fcfcfb; --surface-raised:#ffffff;
+  --ink-900:#191b1f; --ink-700:#2c2f35; --ink-500:#5a5f68; --ink-400:#878d97;
+  --accent:#c8362a; --accent-deep:#9c241a; --accent-tint:#f6ded9; --accent-ink:#86201a;
+  --line:#dcdcd8; --line-strong:#bcbcb6; --line-heavy:#2c2f35;
+  --ok:#4a6b43; --ok-tint:#e4ebe0; --ok-ink:#314a2c;
+  --err:#a8302a; --err-tint:#f2dad7; --err-ink:#7a201b;
+  --pw-confirmed:#3c5a73; --pw-confirmed-tint:#dfe7ee; --pw-confirmed-ink:#274157;
+  --pw-suspected:#9a6b12; --pw-suspected-tint:#f1e6cf; --pw-suspected-ink:#6b480a; /* muted amber, off the vermilion accent */
+  --pw-bif:#6d4a6b; --pw-bif-tint:#e9dee8; --pw-bif-ink:#4a2f48;
+  --pw-typical:#4a6b43; --pw-typical-tint:#e4ebe0; --pw-typical-ink:#314a2c;
+  --font-display:'Newsreader',Georgia,serif;
+  --font-ui:'Libre Franklin',system-ui,sans-serif;
+  --font-mono:'Spline Sans Mono','IBM Plex Mono','Courier New',monospace;
+  --letter-rule:#bcbcb6;
+  --r-sm:0; --r:2px; --r-md:2px;
+  --shadow-sm:none; --shadow-card:none;
+  --shadow-lg:0 10px 30px rgba(25,27,31,.10),0 2px 6px rgba(25,27,31,.06);
+  --key-rest:none; --key-press:none; --emboss:none;
+}
+
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition:none!important;animation:none!important} }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-ui); font-size:var(--t13); color:var(--ink-700); background:var(--surface-desk);
+  display:flex; flex-direction:column; height:100vh; overflow:hidden;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease);}
+:where(button,input,select,textarea,a,label,.chip,.r-opt,.tab,.sec-head):focus-visible{outline:none; box-shadow:var(--focus); border-radius:var(--r-sm)}
+
+/* ---------- Header ---------- */
+.app-header{flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:var(--s5);
+  padding:11px 20px; background:var(--surface-card); border-bottom:1px solid var(--line-strong); box-shadow:var(--shadow-sm)}
+.brand{display:flex; align-items:baseline; gap:var(--s4); min-width:0}
+.brand .mark{font-family:var(--font-display); font-weight:600; font-size:var(--t22); color:var(--ink-900); letter-spacing:-.01em; line-height:1; text-shadow:var(--emboss)}
+.brand .mark .amp{color:var(--accent)}
+.brand .tag{font-size:var(--t11); color:var(--ink-500); white-space:nowrap}
+.badges{display:flex; gap:var(--s2); align-items:center; flex-wrap:wrap}
+.badge{font-size:var(--t9); font-weight:700; letter-spacing:.09em; text-transform:uppercase; padding:3px 8px;
+  border:1px solid var(--line-strong); border-radius:var(--r-pill); background:var(--surface-card); color:var(--ink-500)}
+.badge.live{border-color:var(--accent); color:var(--accent-ink); background:var(--accent-tint)}
+.header-actions{display:flex; gap:var(--s2); align-items:center}
+/* the theme cycle button */
+.theme-btn{font-family:var(--font-ui); font-size:var(--t11); font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border:1px solid var(--line-strong);
+  border-radius:var(--r); background:var(--surface-card); color:var(--ink-700); box-shadow:var(--key-rest);
+  transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.theme-btn:hover{border-color:var(--accent)}
+.theme-btn .swatch{width:11px; height:11px; border-radius:var(--r-pill); background:var(--accent); border:1px solid var(--accent-deep)}
+
+/* ---------- Buttons ---------- */
+.btn{font-family:var(--font-ui); font-size:var(--t12); font-weight:600; letter-spacing:.01em; cursor:pointer;
+  padding:7px 14px; border-radius:var(--r); border:1px solid var(--line-strong); background:var(--surface-card); color:var(--ink-700);
+  box-shadow:var(--key-rest);
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.btn:hover{border-color:var(--ink-400)}
+.btn:active{box-shadow:var(--key-press); transform:translateY(.5px)}
+.btn-primary{background:var(--accent); border-color:var(--accent-deep); color:#fff}
+.btn-primary:hover{background:var(--accent-deep)}
+.btn-ghost{background:transparent; box-shadow:none}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent-ink)}
+.btn-danger{background:transparent; box-shadow:none; border-color:color-mix(in srgb,var(--err) 45%,transparent); color:var(--err-ink)}
+.btn-danger:hover{background:var(--err-tint); border-color:var(--err)}
+.btn-sm{padding:4px 10px; font-size:var(--t11)}
+
+/* ---------- Layout ---------- */
+.main{display:grid; grid-template-columns:455px 1fr; flex:1; overflow:hidden}
+.left-panel{background:var(--surface-panel); border-right:1px solid var(--line-strong); overflow-y:auto; padding:14px}
+.right-panel{display:flex; flex-direction:column; overflow:hidden; background:var(--surface-desk)}
+
+/* ---------- Sections (default/warm = cards; slate override = ruled) ---------- */
+.section{margin-bottom:12px; border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden;
+  background:var(--surface-card); box-shadow:var(--shadow-card);
+  transition:box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.section:focus-within{border-color:var(--line-strong)}
+.sec-head{display:grid; grid-template-columns:26px 1fr auto; align-items:baseline; gap:var(--s3);
+  cursor:pointer; user-select:none; padding:11px 13px; background:var(--surface-card)}
+.sec-num{font-family:var(--font-display); font-weight:700; font-size:var(--t18); color:var(--ink-900); line-height:1; text-align:center; text-shadow:var(--emboss)}
+.sec-titles{display:flex; flex-direction:column; gap:2px; min-width:0}
+.sec-kicker{display:none; font-size:var(--t9); font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent)}
+.sec-title{font-size:var(--t11); font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-700); line-height:1.2}
+.sec-meta{display:flex; align-items:baseline; gap:var(--s3)}
+.sec-sum{font-size:var(--t10); color:var(--accent-ink); font-weight:600}
+.sec-chev{font-size:var(--t10); color:var(--ink-400); transition:transform var(--dur) var(--ease)}
+.section.collapsed .sec-chev{transform:rotate(-90deg)}
+.section.collapsed .sec-body{display:none}
+.sec-body{padding:13px}
+.field{margin-bottom:13px}
+.field:last-child{margin-bottom:0}
+.field-label{display:block; font-size:var(--t11); font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-500); margin-bottom:7px}
+.field-hint{font-size:var(--t10); color:var(--ink-400); margin-top:5px; font-style:italic}
+
+/* ---------- SIGNATURE state cues — persistent state + one-shot activation ---------- */
+/* persistent base for the ::after marker holder */
+.sig{position:relative}
+@keyframes warmup{0%{opacity:.2}45%{opacity:1; box-shadow:0 0 7px color-mix(in srgb,var(--accent) 65%,transparent)}100%{opacity:1; box-shadow:none}}
+@keyframes pencil{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* WARM: amber filament edge, persistent while on; warm-up glow once on .just-on */
+[data-theme="warm"] .sig.is-on::after{content:''; position:absolute; left:8px; right:8px; bottom:-1px; height:2px; background:var(--accent); border-radius:2px}
+[data-theme="warm"] .sig.just-on::after{animation:warmup 420ms var(--ease)}
+/* SLATE: vermilion red-pencil underscore, persistent while on; draw once on .just-on */
+[data-theme="slate"] .sig.is-on::after{content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--accent); transform-origin:left}
+[data-theme="slate"] .sig.just-on::after{animation:pencil 200ms var(--ease)}
+
+/* ---------- Chips ---------- */
+.chips{display:flex; flex-wrap:wrap; gap:var(--s2)}
+.chip{display:inline-flex; align-items:center; gap:var(--s1); padding:5px 12px;
+  border:1.5px solid var(--line); border-radius:var(--r-pill); background:var(--surface-card); color:var(--ink-700);
+  font-size:var(--t12); line-height:1.3; cursor:pointer; user-select:none; box-shadow:var(--key-rest);
+  transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.chip:hover{border-color:var(--line-strong)}
+.chip:active{box-shadow:var(--key-press); transform:translateY(.5px)}
+/* default + warm: filled tint + check */
+.chip.is-on{background:var(--accent-tint); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+.chip.is-on::before{content:'\2713'; font-size:var(--t11)}
+/* slate override: flat underlined chip; selected = neutral tint + persistent underscore + em-dash (additive) */
+[data-theme="slate"] .chip{border:none; border-bottom:1px solid var(--line-strong); border-radius:0; background:transparent; box-shadow:none; padding:5px 4px 6px}
+[data-theme="slate"] .chip:hover{color:var(--ink-900); border-bottom-color:var(--ink-400)}
+[data-theme="slate"] .chip.is-on{background:var(--surface-desk); border-radius:var(--r); border-bottom-color:transparent; color:var(--ink-900); padding-left:8px; padding-right:8px}
+[data-theme="slate"] .chip.is-on::before{content:'\2014'; color:var(--accent); font-weight:700}
+
+/* ---------- Radio options ---------- */
+.r-row{display:flex; flex-wrap:wrap; gap:var(--s2)}
+.r-opt{display:inline-flex; align-items:center; gap:var(--s2); padding:7px 13px;
+  border:1px solid var(--line); border-radius:var(--r); background:var(--surface-card); color:var(--ink-700);
+  font-size:var(--t12); cursor:pointer; box-shadow:var(--key-rest);
+  transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.r-opt:hover{border-color:var(--line-strong)}
+.r-opt:active{box-shadow:var(--key-press); transform:translateY(.5px)}
+.r-opt input{display:none}
+.r-opt.is-on{background:var(--accent-tint); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+[data-theme="warm"] .r-opt.is-on{box-shadow:inset 0 0 0 1px var(--accent),var(--key-rest)}
+/* slate override: graphite tint + left vermilion tick (not a fill) */
+[data-theme="slate"] .r-opt.is-on{background:var(--surface-desk); border-color:var(--ink-700); color:var(--ink-900); border-left:3px solid var(--accent); padding-left:11px}
+
+/* ---------- Checkbox rows (default/warm = spaced; slate = ruled tabular) ---------- */
+.cb-list{display:flex; flex-direction:column; gap:2px}
+.cb-row{display:flex; align-items:flex-start; gap:var(--s3); cursor:pointer; padding:6px 8px;
+  border-radius:var(--r-sm); font-size:var(--t12); line-height:1.4; transition:background var(--dur-fast) var(--ease)}
+.cb-row:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.cb-row input{margin-top:2px; width:15px; height:15px; accent-color:var(--accent); flex-shrink:0; cursor:pointer}
+.cb-row.is-on{color:var(--ink-900)}
+[data-theme="slate"] .cb-list{border-top:1px solid var(--line)}
+[data-theme="slate"] .cb-row{border-bottom:1px solid var(--line); border-radius:0; padding:5px 4px}
+[data-theme="slate"] .cb-row.is-on{font-weight:500}
+
+/* ---------- Toggle ---------- */
+.tog-row{display:flex; align-items:center; gap:var(--s3); padding:4px 0}
+.tog{position:relative; width:38px; height:21px; flex-shrink:0; cursor:pointer}
+.tog input{display:none}
+.tog-sl{position:absolute; inset:0; background:var(--line-strong); border-radius:var(--r-pill); transition:background var(--dur) var(--ease)}
+.tog-sl::after{content:''; position:absolute; top:2px; left:2px; width:17px; height:17px; background:var(--surface-raised); border-radius:50%; box-shadow:var(--shadow-sm); transition:transform var(--dur) var(--ease)}
+.tog input:checked + .tog-sl{background:var(--accent)}
+.tog input:checked + .tog-sl::after{transform:translateX(17px)}
+[data-theme="slate"] .tog-sl,[data-theme="slate"] .tog-sl::after{border-radius:1px}
+.tog-label{font-size:var(--t12); color:var(--ink-700)}
+
+/* ---------- Pathway tag (semantic, labeled) ---------- */
+.pathway-pill{display:inline-flex; align-items:center; gap:var(--s2); flex-wrap:wrap; padding:6px 12px;
+  border:1px solid var(--line-strong); border-radius:14px; font-size:var(--t11); font-weight:600; line-height:1.3;
+  background:var(--surface-card); color:var(--ink-500); margin-bottom:10px}
+.pathway-pill .pp-prefix{font-size:var(--t9); font-weight:700; text-transform:uppercase; letter-spacing:.08em; opacity:.85}
+.pathway-pill.confirmed{background:var(--pw-confirmed-tint); border-color:var(--pw-confirmed); color:var(--pw-confirmed-ink)}
+.pathway-pill.suspected{background:var(--pw-suspected-tint); border-color:var(--pw-suspected); color:var(--pw-suspected-ink)}
+.pathway-pill.bif{background:var(--pw-bif-tint); border-color:var(--pw-bif); color:var(--pw-bif-ink)}
+.pathway-pill.typical{background:var(--pw-typical-tint); border-color:var(--pw-typical); color:var(--pw-typical-ink)}
+/* slate: pathway = flat left-ruled tag */
+[data-theme="slate"] .pathway-pill{border-radius:var(--r); border-color:var(--line-strong); border-left-width:3px; background:var(--surface-card)}
+[data-theme="slate"] .pathway-pill.confirmed{border-left-color:var(--pw-confirmed)}
+[data-theme="slate"] .pathway-pill.suspected{border-left-color:var(--pw-suspected)}
+[data-theme="slate"] .pathway-pill.bif{border-left-color:var(--pw-bif)}
+[data-theme="slate"] .pathway-pill.typical{border-left-color:var(--pw-typical)}
+
+/* ---------- Text input ---------- */
+.txt{width:100%; font-family:var(--font-ui); font-size:var(--t12); color:var(--ink-700); padding:8px 10px;
+  border:1px solid var(--line-strong); border-radius:var(--r); background:var(--surface-raised);
+  transition:border-color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease)}
+.txt:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.txt::placeholder{color:var(--ink-400)}
+[data-theme="slate"] .txt{border:none; border-bottom:1px solid var(--line-strong); border-radius:0; background:transparent; padding:8px 0}
+[data-theme="slate"] .txt:focus{box-shadow:none; border-bottom:2px solid var(--accent)}
+.phi-hint{font-size:var(--t10); color:var(--accent-ink); margin-top:5px; display:flex; gap:5px; align-items:baseline}
+.phi-hint::before{content:'\26A0'}
+
+/* ---------- Right panel: preview ---------- */
+.rp-header{flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:var(--s4);
+  padding:9px 18px; background:var(--surface-card); border-bottom:1px solid var(--line-strong); box-shadow:var(--shadow-sm)}
+.tabs{display:flex; gap:var(--s2); background:var(--surface-desk); padding:4px; border-radius:var(--r-md)}
+.tab{font-family:var(--font-ui); font-size:var(--t11); font-weight:600; letter-spacing:.01em; cursor:pointer;
+  padding:6px 15px; border-radius:var(--r); border:1px solid transparent; background:transparent; color:var(--ink-500);
+  position:relative; transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.tab:hover{color:var(--ink-700)}
+.tab.is-on{background:var(--surface-raised); color:var(--accent-ink); box-shadow:var(--key-rest); border-color:var(--line)}
+[data-theme="warm"] .tab.is-on{box-shadow:var(--key-rest)}
+/* slate: tabs = ruled section-nav with the underscore */
+[data-theme="slate"] .tabs{background:transparent; padding:0; gap:var(--s6)}
+[data-theme="slate"] .tab{border-radius:0; padding:8px 2px}
+[data-theme="slate"] .tab.is-on{background:transparent; box-shadow:none; border-color:transparent; color:var(--ink-900)}
+[data-theme="slate"] .tab.is-on::after{content:''; position:absolute; left:0; right:0; bottom:-2px; height:3px; background:var(--accent); transform-origin:left}
+[data-theme="slate"] .tab.just-on::after{animation:pencil 200ms var(--ease)}
+.rp-title{font-size:var(--t10); color:var(--ink-500); font-style:italic; text-align:right}
+
+.preview{flex:1; overflow-y:auto; padding:26px 24px; display:flex; justify-content:center}
+.sheet{width:100%; max-width:780px; background:var(--sheet-bg); border:1px solid var(--line);
+  border-radius:var(--sheet-radius); box-shadow:var(--shadow-lg); padding:34px 40px; align-self:flex-start}
+
+/* ===== PRESERVED FORMAL DOCUMENTS — interior identical & formal in EVERY theme ===== */
+/* The A&P note is a PRESERVED formal document — pinned to a system monospace with
+   solid box-drawing coverage (Consolas/Menlo/DejaVu all render U+2500/U+2550 full-
+   width and gapless), the SAME in every theme. Not themed via --font-mono: the
+   webfont monos (esp. Spline Sans Mono) lack full box-drawing glyphs and the
+   dividers would fall back to dashed/gappy lines. System fonts ⇒ nothing to self-host.
+   The characters themselves stay (they copy into Epic verbatim). */
+.note-content{font-family:Consolas,'Menlo','DejaVu Sans Mono','Liberation Mono','Courier New',monospace; font-size:12px; line-height:1.6; white-space:pre-wrap; color:#1f1f28}
+.note-ok{background:var(--ok-tint); border-left:4px solid var(--ok); color:var(--ok-ink); padding:9px 13px; margin-bottom:14px; font-size:12px; font-family:var(--font-ui); border-radius:0 4px 4px 0}
+.note-err{background:var(--err-tint); border-left:4px solid var(--err); color:var(--err-ink); padding:9px 13px; margin-bottom:14px; font-size:12px; font-family:var(--font-ui); border-radius:0 4px 4px 0}
+.aba-doc{font-family:var(--font-letter); font-size:11.5pt; line-height:1.85; color:#1a1a1a}
+.aba-doc h3{font-size:13pt; text-align:center; margin-bottom:4px; letter-spacing:.02em}
+.aba-doc .aba-subtitle{text-align:center; font-size:10pt; color:#555; font-style:italic; margin-bottom:20px}
+.aba-doc .aba-meta{font-size:10.5pt; margin-bottom:6px}
+.aba-doc .aba-sec{font-size:9.5pt; font-weight:bold; text-transform:uppercase; letter-spacing:.08em; color:#2b2620; border-bottom:1px solid var(--letter-rule); padding-bottom:3px; margin:20px 0 8px}
+.aba-doc p{margin:6px 0; font-size:10.5pt}
+.aba-doc ul{margin:5px 0 5px 22px}
+.aba-doc li{margin-bottom:3px; font-size:10.5pt}
+.aba-doc .aba-sig{margin-top:24px; border-top:1px solid #999; padding-top:12px; font-size:10pt; color:#444; line-height:2.1}
+.iep-ph{background:#fef9c3; color:#92400e; border-radius:3px; padding:0 3px; font-style:italic}
+
+/* ---------- Sticky copy bar ---------- */
+.copybar{flex-shrink:0; display:flex; justify-content:flex-end; gap:var(--s2); padding:9px 16px; background:var(--surface-card); border-top:1px solid var(--line-strong)}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0; pointer-events:none;
+  background:var(--ink-900); color:var(--surface-raised); padding:10px 18px; border-radius:var(--r-md); font-size:var(--t12); font-weight:500;
+  box-shadow:var(--shadow-lg); transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease); z-index:50}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+.mnav{display:none}
+
+/* ============================================================================
+   SLATE DENSITY + MASTHEAD HEADER (desktop) — structure overrides, gated.
+   ============================================================================ */
+[data-theme="slate"] .left-panel{padding:0 14px 16px}
+[data-theme="slate"] .section{margin-bottom:0; border:none; border-top:1px solid var(--line-strong); border-radius:0; box-shadow:none; overflow:visible; background:transparent}
+[data-theme="slate"] .section:first-of-type{border-top:none}
+[data-theme="slate"] .sec-head{grid-template-columns:30px 1fr auto; gap:var(--s3); padding:10px 2px 8px; background:transparent}
+[data-theme="slate"] .sec-num{font-size:19px; font-weight:500}      /* folio */
+[data-theme="slate"] .sec-kicker{display:block}                      /* show the kicker */
+[data-theme="slate"] .sec-title{font-family:var(--font-display); font-size:var(--t15); font-weight:600; text-transform:none; letter-spacing:0; color:var(--ink-900)}
+[data-theme="slate"] .sec-sum{font-style:italic; color:var(--ink-500); font-weight:400}
+[data-theme="slate"] .sec-body{padding:0 2px 12px 40px}
+[data-theme="slate"] .field{margin-bottom:11px}
+[data-theme="slate"] .field-label{font-size:var(--t10); letter-spacing:.1em; margin-bottom:6px; padding-bottom:3px; border-bottom:1px solid var(--line)}
+
+/* ---------- Responsive: comfortable touch targets win over slate density ---------- */
+@media (max-width:768px){
+  body{overflow:auto; height:auto}
+  .main{grid-template-columns:1fr; flex:none}
+  .left-panel,.right-panel{overflow:visible}
+  .left-panel{border-right:none; border-bottom:1px solid var(--line-strong)}
+  .mnav{display:flex; gap:var(--s2); padding:10px 14px; background:var(--surface-card); border-bottom:1px solid var(--line-strong); position:sticky; top:0; z-index:10}
+  .mnav .btn{flex:1}
+  .preview{padding:16px}
+  .sheet{padding:22px 18px}
+  body.show-output .left-panel{display:none}
+  body:not(.show-output) .right-panel{display:none}
+  /* >=44px targets in every theme; overrides slate desktop density */
+  .cb-row,[data-theme="slate"] .cb-row{min-height:44px; padding:10px 8px; align-items:center}
+  .cb-row input{width:18px; height:18px}
+  .r-opt,[data-theme="slate"] .r-opt{min-height:42px; padding:10px 13px}
+  .tog{width:42px; height:24px}
+  .tog-sl::after{width:20px; height:20px}
+  .tog input:checked + .tog-sl::after{transform:translateX(18px)}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="mark">Autism A<span class="amp">&amp;</span>P</span>
+    <span class="tag">Assessment &amp; Plan builder</span>
+  </div>
+  <div class="badges">
+    <span class="badge">No PHI</span>
+    <span class="badge">DSM-5-TR</span>
+    <span class="badge live">School-age</span>
+  </div>
+  <div class="header-actions">
+    <button class="theme-btn" id="themeBtn" onclick="cycleTheme()" title="Switch theme (persists)">
+      <span class="swatch"></span><span id="themeLabel">Theme: Current</span>
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="toast('Loaded preset')">Presets</button>
+    <button class="btn btn-danger btn-sm" onclick="toast('Cleared')">Reset</button>
+    <button class="btn btn-primary btn-sm" onclick="toast('Copied A&amp;P note')">Copy note</button>
+  </div>
+</header>
+
+<nav class="mnav">
+  <button class="btn" onclick="document.body.classList.remove('show-output')">Input form</button>
+  <button class="btn btn-primary" onclick="document.body.classList.add('show-output')">View document</button>
+</nav>
+
+<div class="main">
+  <aside class="left-panel">
+
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="sec-num">1</span>
+        <span class="sec-titles"><span class="sec-kicker">Diagnosis</span><span class="sec-title">Diagnostic Status</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum1">Confirmed</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="pathway-pill confirmed"><span class="pp-prefix">Pathway</span> Confirmed ASD &middot; Level 1 (SC) / Level 1 (RRB)</div>
+        <div class="field">
+          <span class="field-label">Diagnosis</span>
+          <div class="r-row" data-radio="dx">
+            <label class="r-opt is-on sig"><input type="radio" name="dx" checked>Confirmed ASD</label>
+            <label class="r-opt sig"><input type="radio" name="dx">Suspected / R/O</label>
+            <label class="r-opt sig"><input type="radio" name="dx">Not ASD</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Severity &mdash; Social Communication</span>
+          <div class="r-row" data-radio="sc">
+            <label class="r-opt is-on sig"><input type="radio" name="sc" checked>Level 1</label>
+            <label class="r-opt sig"><input type="radio" name="sc">Level 2</label>
+            <label class="r-opt sig"><input type="radio" name="sc">Level 3</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="sec-num">2</span>
+        <span class="sec-titles"><span class="sec-kicker">Profile</span><span class="sec-title">Developmental Domains</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum2">3 selected</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="field">
+          <span class="field-label">Areas needing support</span>
+          <div class="chips" data-chips="domains">
+            <span class="chip is-on sig">Communication</span>
+            <span class="chip is-on sig">Behavior / RRB</span>
+            <span class="chip sig">Adaptive</span>
+            <span class="chip is-on sig">Sensory</span>
+            <span class="chip sig">Motor</span>
+            <span class="chip sig">Social</span>
+          </div>
+          <div class="field-hint">Click a chip to toggle. Selected state persists; the activation flourish fires once.</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Comorbidities</span>
+          <div class="chips" data-chips="comorbid">
+            <span class="chip sig">ADHD</span>
+            <span class="chip sig">Anxiety</span>
+            <span class="chip sig">ID</span>
+            <span class="chip sig">Language disorder</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sec-head" onclick="toggleSec(this)">
+        <span class="sec-num">3</span>
+        <span class="sec-titles"><span class="sec-kicker">Plan</span><span class="sec-title">Plan &amp; Therapies</span></span>
+        <span class="sec-meta"><span class="sec-sum" id="sum3">4 services</span><span class="sec-chev">&#9660;</span></span>
+      </div>
+      <div class="sec-body">
+        <div class="field">
+          <span class="field-label">School-based services to request</span>
+          <div class="cb-list" data-cb="svc">
+            <label class="cb-row is-on"><input type="checkbox" checked> Special education services</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> Speech-language therapy</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> Occupational therapy</label>
+            <label class="cb-row"><input type="checkbox"> Physical therapy</label>
+            <label class="cb-row is-on"><input type="checkbox" checked> 1:1 paraprofessional / aide</label>
+            <label class="cb-row"><input type="checkbox"> Extended school year (ESY)</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Letters</span>
+          <div class="tog-row"><label class="tog"><input type="checkbox" checked onchange="toast('ABA letter '+(this.checked?'enabled':'disabled'))"><span class="tog-sl"></span></label><span class="tog-label">Generate ABA letter of medical necessity</span></div>
+          <div class="tog-row"><label class="tog"><input type="checkbox" checked onchange="toast('IEP letter '+(this.checked?'enabled':'disabled'))"><span class="tog-sl"></span></label><span class="tog-label">Generate IEP support letter</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">Return to clinic</span>
+          <input class="txt" type="text" placeholder="e.g., 6 months, 1 year, as needed...">
+          <div class="phi-hint">Type "the child" or [NAME] only. No identifiers.</div>
+        </div>
+      </div>
+    </section>
+
+  </aside>
+
+  <main class="right-panel">
+    <div class="rp-header">
+      <div class="tabs">
+        <button class="tab is-on" data-tab="note" onclick="setTab('note')">A&amp;P Note</button>
+        <button class="tab" data-tab="aba" onclick="setTab('aba')">ABA Letter</button>
+        <button class="tab" data-tab="iep" onclick="setTab('iep')">IEP Letter</button>
+      </div>
+      <span class="rp-title" id="rpTitle">Plain clinical note &middot; copies into Epic verbatim</span>
+    </div>
+
+    <div class="preview">
+      <div class="sheet">
+
+        <div id="doc-note">
+          <div class="note-ok"><strong>&#10003; DSM-5 criteria complete</strong></div>
+<div class="note-content">══════════════════════════════════════════════════════
+  ASSESSMENT &amp; PLAN
+══════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder ──────────────
+
+Autism Spectrum Disorder, confirmed this evaluation.
+DSM-5-TR criteria met across social communication and
+restricted/repetitive behavior domains. Current
+severity: Level 1 (requiring support) for social
+communication and Level 1 for restricted, repetitive
+behaviors. The child presents with documented needs in
+communication, behavioral regulation, and sensory
+processing.
+
+  Plan:
+   - Refer to ABA (letter of medical necessity attached)
+   - Speech-language therapy evaluation
+   - Occupational therapy evaluation
+   - School: IEP eligibility under Autism category
+   - Return to clinic in 6 months
+
+── Problem 2: Care coordination ─────────────────────
+
+Family provided with educational-rights guidance and
+local support resources. Safety counseling completed.
+</div>
+        </div>
+
+        <div id="doc-aba" class="aba-doc" style="display:none">
+          <h3>Letter of Medical Necessity</h3>
+          <div class="aba-subtitle">Applied Behavior Analysis (ABA) Therapy</div>
+          <p class="aba-meta"><strong>Date:</strong> <span class="iep-ph">{DATE}</span></p>
+          <p class="aba-meta"><strong>Patient:</strong> <span class="iep-ph">{NAME}</span> &nbsp;|&nbsp; <strong>DOB:</strong> <span class="iep-ph">{DOB}</span></p>
+          <p class="aba-meta"><strong>Re:</strong> Medical necessity for ABA therapy, 25 hours/week</p>
+          <div class="aba-sec">Diagnosis</div>
+          <p>The above-named patient is a school-age child under my care with a confirmed diagnosis of Autism Spectrum Disorder (ICD-10 F84.0), established through comprehensive evaluation consistent with DSM-5-TR criteria.</p>
+          <div class="aba-sec">Clinical Justification</div>
+          <p>Applied Behavior Analysis is the standard of care and is medically necessary to address deficits in functional communication, social engagement, and adaptive behavior, and to reduce interfering behaviors. I am requesting authorization for 25 hours per week in the home and clinic settings.</p>
+          <ul>
+            <li>Functional communication / requesting (manding)</li>
+            <li>Joint attention and social referencing</li>
+            <li>Self-help and daily-living skills</li>
+            <li>Reduction of interfering behaviors</li>
+          </ul>
+          <div class="aba-sig">Sincerely,<br><span class="iep-ph">{PROVIDER NAME, CREDENTIALS}</span><br><span class="iep-ph">{CLINIC / NPI}</span></div>
+        </div>
+
+        <div id="doc-iep" class="aba-doc" style="display:none">
+          <h3>Re: Educational Support Recommendations</h3>
+          <div class="aba-subtitle">To the IEP Team</div>
+          <p class="aba-meta"><strong>Date:</strong> <span class="iep-ph">{DATE}</span></p>
+          <p class="aba-meta"><strong>Student:</strong> <span class="iep-ph">{NAME}</span> &nbsp;|&nbsp; <strong>DOB:</strong> <span class="iep-ph">{DOB}</span></p>
+          <div class="aba-sec">Background</div>
+          <p>I am the physician for the above-named student, who carries a confirmed diagnosis of Autism Spectrum Disorder. This letter supports eligibility for special-education services under the Autism category of IDEA.</p>
+          <div class="aba-sec">Recommended Services &amp; Accommodations</div>
+          <ul>
+            <li>Special education services</li>
+            <li>Speech-language therapy</li>
+            <li>Occupational therapy</li>
+            <li>1:1 paraprofessional / aide support</li>
+          </ul>
+          <p>These supports are educationally necessary to provide a free and appropriate public education. Please contact my office at <span class="iep-ph">{PHONE}</span> with questions.</p>
+          <div class="aba-sig">Respectfully,<br><span class="iep-ph">{PROVIDER NAME, CREDENTIALS}</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="copybar">
+      <button class="btn btn-sm" onclick="toast('Copied plain text')">Copy plain</button>
+      <button class="btn btn-primary btn-sm" onclick="toast('Copied for Epic')">Copy for Epic</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---- Theme cycle (UI pref only — no PHI). Default '' = Current. ---- */
+var THEMES = [
+  { id:'',      label:'Current' },
+  { id:'warm',  label:'Warm Instrument' },
+  { id:'slate', label:'Editorial Slate' },
+];
+function applyTheme(id){
+  if(id) document.documentElement.setAttribute('data-theme', id);
+  else   document.documentElement.removeAttribute('data-theme');
+  var t = THEMES.find(function(x){return x.id===id;}) || THEMES[0];
+  document.getElementById('themeLabel').textContent = 'Theme: ' + t.label;
+  try { localStorage.setItem('apTheme', id); } catch(e){}
+}
+function cycleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || '';
+  var i = THEMES.findIndex(function(x){return x.id===cur;});
+  applyTheme(THEMES[(i+1)%THEMES.length].id);
+}
+(function(){ var saved=''; try{ saved=localStorage.getItem('apTheme')||''; }catch(e){} applyTheme(saved); })();
+
+/* ---- Section collapse ---- */
+function toggleSec(head){ head.parentElement.classList.toggle('collapsed'); }
+
+/* ---- One-shot activation: state persists via .is-on; flourish fires once via
+   .just-on, removed on animationend (timeout fallback for the no-anim default). ---- */
+function reArm(el){
+  el.classList.add('is-on');
+  el.classList.add('just-on');
+  var done = function(){ el.classList.remove('just-on'); el.removeEventListener('animationend', done); };
+  el.addEventListener('animationend', done);
+  setTimeout(done, 500);
+}
+
+/* ---- Radio groups ---- */
+document.querySelectorAll('[data-radio]').forEach(function(grp){
+  grp.querySelectorAll('.r-opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      grp.querySelectorAll('.r-opt').forEach(function(o){ o.classList.remove('is-on','just-on'); });
+      reArm(opt);
+      var inp = opt.querySelector('input'); if(inp) inp.checked = true;
+    });
+  });
+});
+
+/* ---- Chips ---- */
+document.querySelectorAll('[data-chips]').forEach(function(grp){
+  grp.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var turningOn = !chip.classList.contains('is-on');
+      if(turningOn){ reArm(chip); }
+      else { chip.classList.remove('is-on','just-on'); }
+      updateChipSummaries();
+    });
+  });
+});
+
+/* ---- Checkbox rows ---- */
+document.querySelectorAll('[data-cb] .cb-row').forEach(function(row){
+  var box = row.querySelector('input');
+  row.addEventListener('change', function(){ row.classList.toggle('is-on', box.checked); updateSvcSummary(); });
+});
+
+function updateChipSummaries(){
+  document.getElementById('sum2').textContent = document.querySelectorAll('[data-chips="domains"] .chip.is-on').length + ' selected';
+}
+function updateSvcSummary(){
+  document.getElementById('sum3').textContent = document.querySelectorAll('[data-cb="svc"] .cb-row.is-on').length + ' services';
+}
+
+/* ---- Tabs ---- */
+var TITLES = {
+  note:'Plain clinical note · copies into Epic verbatim',
+  aba:'Formal letter of medical necessity · insurer-facing',
+  iep:'Formal IEP support letter · school-facing'
+};
+function setTab(which){
+  document.querySelectorAll('.tab').forEach(function(t){
+    var on = t.dataset.tab===which;
+    t.classList.toggle('is-on', on);
+    if(on){
+      t.classList.add('just-on');
+      var done = function(){ t.classList.remove('just-on'); t.removeEventListener('animationend', done); };
+      t.addEventListener('animationend', done); setTimeout(done, 500);
+    } else { t.classList.remove('just-on'); }
+  });
+  document.getElementById('doc-note').style.display = which==='note' ? '' : 'none';
+  document.getElementById('doc-aba').style.display  = which==='aba'  ? '' : 'none';
+  document.getElementById('doc-iep').style.display  = which==='iep'  ? '' : 'none';
+  document.getElementById('rpTitle').textContent = TITLES[which];
+}
+
+/* ---- Toast ---- */
+var toastTimer;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1600);
+}
+</script>
+</body>
+</html>
