@@ -21,11 +21,19 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # if one Node version breaks, still report the others
+      matrix:
+        # Test the floor the tests claim (>= 18, per package.json engines) and a
+        # current line. A single pin would let a feature that works locally but
+        # not on the floor (or vice versa) slip through — the matrix catches the
+        # skew instead of just relocating it. Bump alongside the engines floor.
+        node-version: ['18', '22']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      # No dependencies to install — the tests are plain Node (>= 18), so we run
-      # them directly. `npm ci` would fail anyway: there is no lockfile.
+          node-version: ${{ matrix.node-version }}
+      # No dependencies to install — the tests are plain Node, so we run them
+      # directly. `npm ci` would fail anyway: there is no lockfile.
       - run: npm test
