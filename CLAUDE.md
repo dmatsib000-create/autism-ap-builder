@@ -18,13 +18,15 @@ claude_code/
 │   ├── references.md                            Centralized bibliography (short handles + verification ledger)
 │   ├── quickstart.png                           Tool screenshot (used in README)
 │   └── audits/                                  Per-area audit procedures
-├── tests/                       Tracked regression tests (Node, no deps): golden + unit lanes
+├── tests/                       Tracked regression tests (Node, no deps): golden + unit + wiring + invariants lanes
 │   ├── harness.mjs                              Loads the real HTML, exposes generators + pure deciders (no file changes)
 │   ├── run.mjs                                  Golden-lane runner: `npm run test:golden`, `npm run test:update`
 │   ├── unit.mjs                                 Unit-lane runner: `npm run test:unit` (pure decision fns)
+│   ├── wiring.mjs                               Wiring-lane runner: `npm run test:wiring` (chip/state class contract, source lint)
+│   ├── invariants.mjs                           Invariants-lane runner: `npm run test:invariants` (parallel lookup-table key sets, source lint)
 │   ├── fixtures/                                One *.mjs per clinical scenario (sets up S)
 │   └── golden/                                  Committed expected note/letter output
-├── package.json                 Tracked: `test` (both lanes) / `test:golden` / `test:unit` / `test:update`
+├── package.json                 Tracked: `test` (all four lanes) / `test:golden` / `test:unit` / `test:wiring` / `test:invariants` / `test:update`
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
 ├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
 └── scratch/                     Working drafts: skill updates, prompts, test files (untracked)
@@ -32,14 +34,16 @@ claude_code/
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, and `package.json` are tracked in git and pushed to GitHub. Everything else is local.
 
-### Tests (golden + unit regression net)
+### Tests (golden + unit + wiring + invariants regression net)
 
-`npm test` runs two lanes against the **real**, unmodified `autism-ap-builder.html` (the harness evaluates its `<script>` in Node with DOM stubs — no browser, no file changes):
+`npm test` runs four lanes against the **real**, unmodified `autism-ap-builder.html` (the golden/unit lanes evaluate its `<script>` in Node with DOM stubs; the wiring/invariants lanes read the file as text — no browser, no file changes):
 
 - **Golden lane** (`tests/run.mjs`) — each fixture sets up an `S` state and snapshots the exact plain text from `generateNote()` and the ABA/IEP letter generators against a committed golden file. **When a change alters note output**, run `npm run test:update`, eyeball the golden diffs to confirm the change is intentional and clinically correct, and commit the updated goldens in the same commit.
 - **Unit lane** (`tests/unit.mjs`) — asserts on the pure clinical-decision functions (`bifSpecifierAllowed`, `currentClinicalPathway`) behind specifier/BIF gating. These sit behind DOM wrappers the golden lane can't reach (they fire only from `onchange`/`render`), so the unit lane tests the gate predicate and the never-auto-bridge invariant directly.
+- **Wiring lane** (`tests/wiring.mjs`) — source-text lint of the chip/state CSS-class contract: every state class JS toggles has a CSS rule, and every chip-family CSS rule is applied or toggled. Catches a JS/CSS/markup rename desync the output lanes can't see.
+- **Invariants lane** (`tests/invariants.mjs`) — source-text lint that hand-maintained parallel lookup tables share the same key set: the three social-work-reason tables (`SW_REASON_LABELS`, the note prose's separate `swLbls` copy, the §8 HTML checkboxes) and the override registry (`OV_DEFS` / `OV_GROUPS` / `S.overrides` init, where `socialWork` is intentionally absent from `S.overrides`). When you add or remove a key in any one of these tables, the lane fails until the parallel tables match — update them in the same commit.
 
-See `tests/README.md` for adding fixtures and the two-lane rationale.
+See `tests/README.md` for adding fixtures and the lane rationale.
 
 ### Intake protocol for non-trivial requests
 
