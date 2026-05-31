@@ -403,7 +403,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .cr-wrap .cb-row{flex:1;margin:0}
 .plan-pill{display:none;cursor:pointer;font-size:var(--text-10);padding:1px 8px;border-radius:999px;user-select:none;white-space:nowrap;flex-shrink:0;border:1px solid;transition:all .12s;font-family:var(--font);line-height:1.6}
 .svc-auto-badge{font-size:var(--text-9);padding:2px 7px;border-radius:var(--radius-pill);background:linear-gradient(180deg,var(--accent-soft) 0%,#cdddfb 100%);color:var(--accent-hover);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);margin-left:4px;font-weight:600;vertical-align:middle;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
-.plan-pill.pill-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
+.plan-pill.is-on{display:inline-flex;background:var(--blue-light);color:var(--blue-dark);border-color:var(--blue)}
 .prior-test-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
 .outcome-sel{font-size:var(--text-13);padding:6px 10px;border-radius:4px;border:1.5px solid var(--gray-400);background:#fff;color:var(--gray-900);cursor:pointer;min-height:32px}
 .outcome-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -5221,7 +5221,7 @@ function toggleComorbidPlan(cv){
   const pill=document.querySelector(`.plan-pill[data-cv="${cv}"]`);
   if(!pill)return;
   if(S.comorbidInPlan.has(cv)){S.comorbidInPlan.delete(cv);pill.className='plan-pill pill-off';pill.textContent='Note only';}
-  else{S.comorbidInPlan.add(cv);pill.className='plan-pill pill-on';pill.textContent='Include plan';}
+  else{S.comorbidInPlan.add(cv);pill.className='plan-pill is-on';pill.textContent='Include plan';}
   render();
 }
 
@@ -6211,7 +6211,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         }
         if(k==='comorbid'){
           const pill=document.querySelector(`.plan-pill[data-cv="${v}"]`);
-          if(pill){if(inp.checked){S.comorbidInPlan.add(v);pill.className='plan-pill pill-on';pill.textContent='Include plan';}else{S.comorbidInPlan.delete(v);pill.className='plan-pill';}}
+          if(pill){if(inp.checked){S.comorbidInPlan.add(v);pill.className='plan-pill is-on';pill.textContent='Include plan';}else{S.comorbidInPlan.delete(v);pill.className='plan-pill';}}
           // Show/hide sub-option rows
           if(v==='sleep_disorder'){
             const r=document.getElementById('sleepFactorsRow');if(r)r.style.display=inp.checked?'':'none';
