@@ -584,7 +584,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div>
     <h1>Autism A&amp;P Builder — Developmental-Behavioral Pediatrics</h1>
     <div class="sub">
-      <span class="header-badge">Deterministic</span>
+      <span class="header-badge">Rule-based</span>
       <span class="header-badge">AI-free</span>
       <span class="header-badge">No PHI stored</span>
       <span class="header-badge">EHR-ready</span>
@@ -733,7 +733,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row" style="margin-bottom:6px"><input type="checkbox" id="unevenCogCb" onchange="S.unevenCog=this.checked;toggleUnevenCog();render()"> Uneven / splinter cognitive profile</label>
         <div id="unevenCogWrap" style="display:none;margin:0 0 6px 26px">
           <textarea class="evidence-area" id="unevenCogField" placeholder="e.g., VCI average; PSI borderline; notable verbal-nonverbal discrepancy..." rows="2" oninput="S.unevenCogDesc=this.value;render()"></textarea>
-          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="chip-strip">
           <div class="chip-tier" id="cogProfileIdGroup">
@@ -742,7 +742,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt"><input type="radio" name="cogProfile" value="id_mild">Mild ID</label>
           </div>
           <div class="chip-tier" id="gddCogGroup">
-            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified</label>
+            <label class="r-opt"><input type="radio" name="cogProfile" value="gdd">Unspecified delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_mild">Mild delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_moderate">Moderate delays</label>
             <label class="r-opt"><input type="radio" name="cogProfile" value="gdd_severe">Severe delays</label>
@@ -857,7 +857,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <span class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
         </div>
         <textarea class="strengths-area" id="strengthsField" placeholder="Click chips above or type freely..." rows="2"></textarea>
-        <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+        <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
       </div>
 
     </div>
@@ -935,7 +935,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationSCField" class="strengths-area" placeholder="Justification for SC level (optional) — e.g., requires adult prompting for all social initiations; responses to peers consistently atypical..." style="min-height:36px;margin-top:5px"></textarea>
-          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="field-group">
           <span class="field-label">Severity — Restricted / Repetitive Behaviors</span>
@@ -945,7 +945,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="3">Level 3</label>
           </div>
           <textarea id="levelJustificationRRBField" class="strengths-area" placeholder="Justification for RRB level (optional) — e.g., severe distress with any deviation from routine; stereotypies constant and disruptive across settings..." style="min-height:36px;margin-top:5px"></textarea>
-          <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         </div>
         <div class="field-group">
           <span class="field-label">Specifiers</span>
@@ -976,7 +976,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button class="btn btn-blue btn-sm" onclick="dsmCheckAll()">Check all criteria</button>
         <button class="btn btn-gray btn-sm" onclick="dsmClearAll()">Clear all criteria</button>
       </div>
-      <span class="phi-hint">All evidence textareas below are PHI-free zones — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+      <span class="phi-hint">All evidence textareas below are PHI-free zones — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
       <div class="field-group">
         <span class="field-label">Criterion A — Social Communication (all 3 required)</span>
         <div class="cb-list">
@@ -1060,7 +1060,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <hr class="divider">
       <div class="field-group">
         <span class="field-label">Behavior / Interfering</span>
-        <span class="phi-hint">Frequency/description inputs below are PHI-free zones — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+        <span class="phi-hint">Frequency/description inputs below are PHI-free zones — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
         <div class="cb-list">
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="aggression"> Aggression toward others</label>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="sib"> Self-injurious behavior (SIB)</label>
@@ -1455,7 +1455,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
   <div class="note-preview" id="notePreview">
-    <div class="note-empty">Select options on the left to generate the A&amp;P note.<br><br>
+    <div class="note-empty">Select options in the input form to generate the A&amp;P note.<br><br>
     <small>No PHI collected or stored. All output requires clinician review.</small></div>
   </div>
   <div class="note-sticky-bar" id="noteStickyBar">
@@ -4747,7 +4747,7 @@ function render(){
 
   // Standard note preview
   const hasInput=S.diagStatus||S.ageGroup||S.criteriaA.size||S.criteriaB.size;
-  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options on the left to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();return;}
+  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();return;}
   let html='';
   if(S.diagStatus==='confirmed'){
     if(!v.complete){const iss=[];if(v.aCount<3)iss.push('A: '+v.aCount+'/3');if(v.bCount<2)iss.push('B: '+v.bCount+'/4');if(!v.cde)iss.push('C/D/E incomplete');html+=`<div class="note-err"><strong>⚠ Criteria Warning:</strong> DSM-5 criteria incomplete for confirmed ASD: ${iss.join('; ')}.</div>`;}
@@ -5166,7 +5166,7 @@ async function copyNote(format,part){
   }
   try{await navigator.clipboard.writeText(plain);}
   catch(e){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-  flashBtn('✓ Copied!');
+  flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!');
 }
 function flashBtn(msg){
   const b=document.getElementById('copyRichBtn');if(!b)return;
@@ -5237,7 +5237,7 @@ function clearAll(opts){
     original.style.display='none';
     const wrap=document.createElement('div');
     wrap.className='confirm-inline';
-    wrap.innerHTML='<span class="confirm-prompt">Clear everything?</span>'
+    wrap.innerHTML='<span class="confirm-prompt">Clear all selections? This can\'t be undone.</span>'
       +'<button class="btn btn-danger" type="button">Yes, clear</button>'
       +'<button class="btn btn-outline" type="button">Cancel</button>';
     host.appendChild(wrap);
