@@ -467,7 +467,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
 .mnav-btn{flex:1;padding:10px 8px;font-size:var(--text-13);font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--gray-500);border-bottom:3px solid transparent;font-family:var(--font);transition:color .15s,border-color .15s;letter-spacing:.01em}
-.mnav-btn.mnav-active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
+.mnav-btn.is-on{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
 /* ── Paper-card wrapper for output preview (desktop only) ───────────── */
 .note-paper{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:4px;margin:0 auto;max-width:900px}
 .note-paper > .note-doc,.note-paper > .note-content,.note-paper > .aba-doc{border:none;box-shadow:none;border-radius:var(--radius-md);margin:0}
@@ -600,7 +600,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 </header>
 
 <div id="mobile-nav">
-  <button class="mnav-btn mnav-active" id="mnav-input" onclick="showMobilePanel('input')">&#9998; Input Form</button>
+  <button class="mnav-btn is-on" id="mnav-input" onclick="showMobilePanel('input')">&#9998; Input Form</button>
   <button class="mnav-btn" id="mnav-output" onclick="showMobilePanel('output')">&#128203; View Note</button>
 </div>
 
@@ -5096,8 +5096,8 @@ function toggleCogDataSourceVisibility(){
 // ─── MOBILE PANEL TOGGLE ─────────────────────────────────────────────────────
 function showMobilePanel(which){
   document.body.classList.toggle('mob-output',which==='output');
-  document.getElementById('mnav-input').classList.toggle('mnav-active',which==='input');
-  document.getElementById('mnav-output').classList.toggle('mnav-active',which==='output');
+  document.getElementById('mnav-input').classList.toggle('is-on',which==='input');
+  document.getElementById('mnav-output').classList.toggle('is-on',which==='output');
   if(which==='input')window.scrollTo(0,0);
 }
 
