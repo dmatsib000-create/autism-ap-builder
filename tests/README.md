@@ -6,9 +6,9 @@ plain text against a committed golden file. If a code change alters output, the
 diff shows up here so it can be reviewed as an intentional change, not shipped by
 accident.
 
-## Two test lanes
+## Test lanes
 
-`npm test` runs both:
+`npm test` runs all four:
 
 - **Golden lane** (`tests/run.mjs`, `npm run test:golden`) — the regression net
   described above. Snapshots the exact note/letter text a clinician copies.
@@ -23,15 +23,32 @@ accident.
   Greenspan 2017) directly. It also covers the one DOM wrapper whose state cleanup
   is load-bearing — `toggleBifSpecifierGate` removing an unsupported `withBIF` — by
   handing `makeApp({ querySelector })` a mutable fake checkbox so the cleanup branch
-  runs and can be asserted. Both lanes share `makeApp()` and the real, unmodified
+  runs and can be asserted. These lanes share `makeApp()` and the real, unmodified
   shipped script.
+- **Wiring lane** (`tests/wiring.mjs`, `npm run test:wiring`) — a source-text lint
+  (no script eval) that checks the chip/state class contract: every state class
+  JS toggles has a CSS rule, and every chip-family CSS rule is actually applied or
+  toggled. Catches a rename that desyncs JS/CSS/markup — invisible to the output
+  lanes. Proves the wiring is connected, not that it looks right (the preview
+  check still owns "looks right").
+- **Invariants lane** (`tests/invariants.mjs`, `npm run test:invariants`) — a
+  source-text lint that checks hand-maintained parallel lookup tables share the
+  same key set: the three social-work-reason tables (`SW_REASON_LABELS`, the note
+  prose's own `swLbls` copy with intentionally different casing, and the §8 HTML
+  checkboxes) and the override registry (`OV_DEFS` / `OV_GROUPS` / the `S.overrides`
+  init, where `socialWork` is intentionally absent from `S.overrides`). A
+  half-finished edit that adds a key in one table but not another renders a
+  referral reason or override pill in one place and silently drops it elsewhere;
+  the output lanes can't see it because some tables live in unreachable scopes.
 
 ## Running
 
 ```
-npm test                 # both lanes: golden then unit
+npm test                 # all four lanes: golden, unit, wiring, invariants
 npm run test:golden      # golden lane only
 npm run test:unit        # unit lane only
+npm run test:wiring      # wiring lane only
+npm run test:invariants  # invariants lane only
 npm run test:update      # re-save goldens — lists what changed and asks first
 node tests/run.mjs aba   # run only fixtures whose name includes "aba"
 ```
