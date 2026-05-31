@@ -20,7 +20,10 @@ accident.
   the golden lane can't reach them — but the wrappers are thin appliers over
   these pure deciders, which read `S` and touch no DOM. The unit lane tests the
   gate predicate and the never-auto-bridge invariant (borderline → no specifier,
-  Greenspan 2017) directly. Both lanes share `makeApp()` and the real, unmodified
+  Greenspan 2017) directly. It also covers the one DOM wrapper whose state cleanup
+  is load-bearing — `toggleBifSpecifierGate` removing an unsupported `withBIF` — by
+  handing `makeApp({ querySelector })` a mutable fake checkbox so the cleanup branch
+  runs and can be asserted. Both lanes share `makeApp()` and the real, unmodified
   shipped script.
 
 ## Running

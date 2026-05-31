@@ -36,6 +36,9 @@ const EXPORTS = [
   // bridgeCogProfileToSpecifier) cannot. See tests/README.md "Two test lanes".
   'bifSpecifierAllowed',
   'currentClinicalPathway',
+  // DOM wrapper whose gate-cleanup branch (delete unsupported withBIF) is exercised
+  // by the unit lane via an injected querySelector (see makeStubs opts).
+  'toggleBifSpecifierGate',
 ];
 
 function extractScript(html) {
@@ -60,7 +63,12 @@ function extractScript(html) {
 // these only need to be non-throwing: the top-level script merely *registers*
 // the handler and defines functions. Any element-like access returns a proxy
 // that swallows reads/writes so a stray top-level reference can't crash eval.
-function makeStubs() {
+// opts.querySelector (optional): a function (selector) => stub-element | null that
+// replaces the default null-returning document.querySelector. The unit lane uses
+// this to hand a mutable fake checkbox to DOM wrappers like toggleBifSpecifierGate
+// so their state-cleanup branches can run and be asserted. Default stays () => null
+// so the golden lane and the pure-decider unit cases see "no DOM" as before.
+function makeStubs({ querySelector } = {}) {
   const noop = () => {};
   const elHandler = {
     get(_, p) {
@@ -84,7 +92,7 @@ function makeStubs() {
     addEventListener: noop,
     removeEventListener: noop,
     getElementById: () => el,
-    querySelector: () => null,
+    querySelector: querySelector || (() => null),
     querySelectorAll: () => [],
     createElement: () => el,
     body: el,
@@ -103,8 +111,8 @@ function scriptBody() {
   return scriptCache;
 }
 
-export function makeApp() {
-  const { document, window, navigator } = makeStubs();
+export function makeApp(opts = {}) {
+  const { document, window, navigator } = makeStubs(opts);
   const noop = () => {};
   // Capture console.warn so the runner can turn the v3() silent-fallback warning
   // (a verb missing from V3_MAP → ungrammatical output for a "they" patient) into

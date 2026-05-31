@@ -93,12 +93,52 @@ const CASES = [
   { name: 'No profile selected -> pathway null',
     setup(S){ S.cogProfile=''; },
     check(a){ assert.equal(a.currentClinicalPathway(), null); } },
+
+  // ── toggleBifSpecifierGate() cleanup wiring (DOM wrapper) ──
+  // The gate is the only direct enforcement that an unsupported withBIF can't
+  // survive on the chart (the note prose does NOT re-check the gate on the base
+  // label). The harness's null querySelector would normally early-return this
+  // function; each case below injects a mutable fake checkbox so the cleanup
+  // branch runs against the real S. Same `cb` object is visible to the injected
+  // querySelector and the post-call assertion via the enclosing IIFE.
+  (() => {
+    const cb = { checked: true, disabled: false };
+    return {
+      name: 'Gate cleanup: borderline + no source -> withBIF removed',
+      querySelector: s => s.includes('withBIF') ? cb : null,
+      setup(S){ S.cogProfile='borderline'; S.cogDataSource=''; S.specifiers.add('withBIF'); },
+      check(a){ a.toggleBifSpecifierGate();
+                assert.equal(a.S.specifiers.has('withBIF'), false, 'withBIF should be deleted');
+                assert.equal(cb.checked, false, 'checkbox should be unchecked');
+                assert.equal(cb.disabled, true, 'checkbox should be disabled'); } };
+  })(),
+  (() => {
+    const cb = { checked: true, disabled: false };
+    return {
+      name: 'Gate cleanup: wrong profile (average) -> withBIF removed',
+      querySelector: s => s.includes('withBIF') ? cb : null,
+      setup(S){ S.cogProfile='average'; S.cogDataSource='comprehensive'; S.specifiers.add('withBIF'); },
+      check(a){ a.toggleBifSpecifierGate();
+                assert.equal(a.S.specifiers.has('withBIF'), false, 'withBIF should be deleted'); } };
+  })(),
+  (() => {
+    const cb = { checked: true, disabled: false };
+    return {
+      name: 'Gate open: borderline + comprehensive -> withBIF retained',
+      querySelector: s => s.includes('withBIF') ? cb : null,
+      setup(S){ S.cogProfile='borderline'; S.cogDataSource='comprehensive'; S.specifiers.add('withBIF'); },
+      check(a){ a.toggleBifSpecifierGate();
+                assert.equal(a.S.specifiers.has('withBIF'), true, 'withBIF should be retained');
+                assert.equal(cb.disabled, false, 'checkbox should be enabled'); } };
+  })(),
 ];
 
 let pass = 0;
 const failures = [];
 for (const c of CASES) {
-  const app = makeApp();
+  // A case may inject a custom document.querySelector (gate-wiring cases hand a
+  // mutable fake checkbox to toggleBifSpecifierGate); otherwise default null DOM.
+  const app = makeApp(c.querySelector ? { querySelector: c.querySelector } : undefined);
   c.setup(app.S);
   try {
     c.check(app);
