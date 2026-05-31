@@ -32,12 +32,14 @@ const EXPORTS = [
   '_iepLetterContent',
   // Pure clinical-decision functions for the unit lane (tests/unit.mjs). They
   // read S and return a value with no DOM access, so they run under the harness
-  // even though the DOM wrappers that call them in the app (toggleBifSpecifierGate,
-  // bridgeCogProfileToSpecifier) cannot. See tests/README.md "Two test lanes".
+  // even though the DOM wrappers that call them in the app (e.g.
+  // bridgeCogProfileToSpecifier) don't with the default null DOM.
+  // See tests/README.md "Two test lanes".
   'bifSpecifierAllowed',
   'currentClinicalPathway',
   // DOM wrapper whose gate-cleanup branch (delete unsupported withBIF) is exercised
-  // by the unit lane via an injected querySelector (see makeStubs opts).
+  // by the unit lane via an injected querySelector (see makeStubs opts) — the one
+  // wrapper the unit lane drives directly rather than through its pure core.
   'toggleBifSpecifierGate',
 ];
 

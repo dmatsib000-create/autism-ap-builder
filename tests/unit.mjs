@@ -100,7 +100,9 @@ const CASES = [
   // label). The harness's null querySelector would normally early-return this
   // function; each case below injects a mutable fake checkbox so the cleanup
   // branch runs against the real S. Same `cb` object is visible to the injected
-  // querySelector and the post-call assertion via the enclosing IIFE.
+  // querySelector and the post-call assertion via the enclosing IIFE. Each `cb`
+  // is built once at module load; the runner executes every case exactly once, so
+  // that's fine — but do not add repeat/retry to the loop without resetting `cb`.
   (() => {
     const cb = { checked: true, disabled: false };
     return {
@@ -119,7 +121,8 @@ const CASES = [
       querySelector: s => s.includes('withBIF') ? cb : null,
       setup(S){ S.cogProfile='average'; S.cogDataSource='comprehensive'; S.specifiers.add('withBIF'); },
       check(a){ a.toggleBifSpecifierGate();
-                assert.equal(a.S.specifiers.has('withBIF'), false, 'withBIF should be deleted'); } };
+                assert.equal(a.S.specifiers.has('withBIF'), false, 'withBIF should be deleted');
+                assert.equal(cb.checked, false, 'checkbox should be unchecked'); } };
   })(),
   (() => {
     const cb = { checked: true, disabled: false };
