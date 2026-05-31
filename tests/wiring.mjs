@@ -50,7 +50,7 @@ for (const m of html.matchAll(/className\s*=\s*"([^"]*)"/g)) addTokens(m[1]);
 
 // The chip/selectable-control + state family this guard governs. Scoping to an
 // explicit family (rather than every class in the app) keeps the assertions
-// meaningful and quiet. Add entries here as the chip refactor migrates names.
+// meaningful and quiet. Add an entry when a new selectable control is introduced.
 // Selection state across the chip family is fully unified to .is-on as of
 // tech-debt #4 (PR-2). The legacy on-names (sel/active/used/tab-active/
 // mnav-active/pill-on) are retired — none are toggled anymore. .pill-off stays:
