@@ -51,9 +51,11 @@ for (const m of html.matchAll(/className\s*=\s*"([^"]*)"/g)) addTokens(m[1]);
 // The chip/selectable-control + state family this guard governs. Scoping to an
 // explicit family (rather than every class in the app) keeps the assertions
 // meaningful and quiet. Add entries here as the chip refactor migrates names.
+// Chip-family "on" names are now unified to .is-on; the legacy names are kept
+// here so a future reintroduction of one without a CSS rule still trips the guard.
 const STATE_FAMILY = [
-  'sel', 'active', 'used', 'tab-active', 'mnav-active', 'is-on', 'pill-on', 'pill-off',
-  'dx-active', 'has-content', 'outcome-required', 'collapsed', 'vt-unset', 'used',
+  'is-on', 'sel', 'active', 'used', 'tab-active', 'mnav-active', 'pill-on', 'pill-off',
+  'dx-active', 'has-content', 'outcome-required', 'collapsed', 'vt-unset',
 ];
 const CHIP_FAMILY = [
   'chip', 'r-opt', 'mod-chip', 'str-chip', 'chip-tier', 'chip-strip', 'chip-grp-hd',
