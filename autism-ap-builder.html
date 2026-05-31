@@ -238,7 +238,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
-.r-opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
+.r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
 .cb-list{display:flex;flex-direction:column;gap:3px}
 .cb-row{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
@@ -443,7 +443,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
 .dx-banner .radio-grid{gap:var(--space-1)}
 .dx-banner .r-opt{font-size:var(--text-12);font-weight:500}
-.dx-banner .r-opt.sel{background:var(--blue);color:white;border-color:var(--blue-dark)}
+.dx-banner .r-opt.is-on{background:var(--blue);color:white;border-color:var(--blue-dark)}
 .dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
@@ -1557,7 +1557,7 @@ function setByPath(obj, path, val){
 // Each preset drives the REAL form controls via applyPreset() — it clicks
 // radios/checkboxes/chips so every existing change-handler side effect fires
 // (cog→specifier bridge, langLevel→needsComm sync, syncABATargetsFromNeeds,
-// syncSchoolSvcFromNeeds, .sel classes, render). It does NOT assign S directly, so a
+// syncSchoolSvcFromNeeds, .is-on classes, render). It does NOT assign S directly, so a
 // preset can never drift from the hand-click code path.
 //
 // THE SIX + ONE were ratified by the design council (FOR ≥95% on the cross-preset
@@ -4827,7 +4827,7 @@ function syncTherapyStatusFromActivity(){
       S.therapyStatus[key] = '';
       document.querySelectorAll(`input[name="therapyStatus_${key}"]`).forEach(r=>{
         r.checked = false;
-        r.closest('.r-opt')?.classList.remove('sel');
+        r.closest('.r-opt')?.classList.remove('is-on');
       });
     }
   });
@@ -5069,7 +5069,7 @@ function toggleCogDataSourceVisibility(){
   g.style.display = isVisibleTier ? '' : 'none';
   if(!isVisibleTier && S.cogDataSource){
     S.cogDataSource='';
-    document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+    document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
   }
   // Swap label text to match the active cogProfile tier. ID-tier and BIF →
   // IQ instruments; GDD-tier → DQ developmental instruments. The
@@ -5245,7 +5245,7 @@ function clearAll(opts){
     wrap.querySelector('.btn-outline').addEventListener('click',()=>{wrap.remove();original.style.display='';});
     return;
   }
-  document.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+  document.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
   document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
   document.querySelectorAll('textarea').forEach(t=>{t.value='';});
   syncStrengthChips();
@@ -5290,7 +5290,7 @@ function clearAll(opts){
   ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
-  document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('sel');});
+  document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
   const adapStdCb=document.getElementById('adaptiveStandardizedCb');if(adapStdCb)adapStdCb.checked=false;
   toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
@@ -5648,7 +5648,7 @@ function updateAgeBasedVisibility(){
     idCogGroup.style.display=hideIDCog?'none':'';
     if(hideIDCog&&hasID()){
       S.cogProfile='';
-      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      idCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -5663,7 +5663,7 @@ function updateAgeBasedVisibility(){
     bifCogGroup.style.display=hideBifCog?'none':'';
     if(hideBifCog&&S.cogProfile==='borderline'){
       S.cogProfile='';
-      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      bifCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       // Mirror the idCogGroup/gddCogGroup teardown pattern: stale cogDataSource
       // and adaptiveStandardized flags from the prior age can silently auto-
@@ -5689,7 +5689,7 @@ function updateAgeBasedVisibility(){
     gddCogGroup.style.display=hideGddCog?'none':'';
     if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
       S.cogProfile='';
-      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+      gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
       clearIdGddEvidenceFlags();
     }
@@ -5702,7 +5702,7 @@ function updateAgeBasedVisibility(){
 function clearIdGddEvidenceFlags(){
   S.cogDataSource='';
   S.adaptiveStandardized=false;
-  document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+  document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
   const adapStdCb=document.getElementById('adaptiveStandardizedCb'); if(adapStdCb) adapStdCb.checked=false;
   toggleCogDataSourceVisibility();
 }
@@ -5948,7 +5948,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     inp.addEventListener('click',()=>{
       if(!inp._wasChecked) return; // normal selection — change handler takes over
       inp.checked=false;
-      inp.closest('.r-opt').classList.remove('sel');
+      inp.closest('.r-opt').classList.remove('is-on');
       const nm=inp.name;
       // data-bind: if a radio declares its state path via data-bind="path.to.field",
       // the deselect (re-click) path clears that field generically. Fields with side
@@ -5972,7 +5972,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     inp.addEventListener('change',()=>{
       const nm=inp.name;
-      document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('sel',r.checked));
+      document.querySelectorAll(`input[name="${nm}"]`).forEach(r=>r.closest('.r-opt').classList.toggle('is-on',r.checked));
       // data-bind: declarative scalar write. Fields with side effects (bridge, visibility
       // toggles, syncs) keep their explicit branch below and do NOT carry data-bind.
       if(inp.dataset.bind){
@@ -6002,7 +6002,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         const newTier  = tierOf(inp.value);
         if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){
           S.cogDataSource='';
-          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+          document.querySelectorAll('input[name="cogDataSource"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
         }
         // PR-K: cogProfile change = fresh clinical context. Clear any prior manual
         // specifier pins so the new auto-bridge starts clean. Without this, a previously-
@@ -6068,7 +6068,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(rtRow) rtRow.style.display=inp.checked?'':'none';
           if(!inp.checked){
             S.regressionTiming='';
-            document.querySelectorAll('input[name="regressionTiming"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+            document.querySelectorAll('input[name="regressionTiming"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
           }
         }
       } else {
@@ -6184,7 +6184,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             // auto-confirms the next cogProfile pick without re-attestation.
             if(inp.checked && S.cogProfile && COG_PROFILE_COMPAT[v] && !COG_PROFILE_COMPAT[v].includes(S.cogProfile)){
               S.cogProfile='';
-              document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('sel');});
+              document.querySelectorAll('input[name="cogProfile"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
               toggleCogDataSourceVisibility();
               clearIdGddEvidenceFlags();
               const adapStdCb=document.getElementById('adaptiveStandardizedCb');
@@ -6219,7 +6219,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
           if(v==='depression'){
             const r=document.getElementById('depressionSafetyRow');if(r)r.style.display=inp.checked?'':'none';
-            if(!inp.checked){S.depressionSafety='';document.querySelectorAll('input[name="depressionSafety"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('sel');});}
+            if(!inp.checked){S.depressionSafety='';document.querySelectorAll('input[name="depressionSafety"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('is-on');});}
           }
           if(v==='pfd_chronic'||v==='pfd_acute'){
             const show=S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute');
