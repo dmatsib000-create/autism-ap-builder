@@ -18,12 +18,13 @@ claude_code/
 │   ├── references.md                            Centralized bibliography (short handles + verification ledger)
 │   ├── quickstart.png                           Tool screenshot (used in README)
 │   └── audits/                                  Per-area audit procedures
-├── tests/                       Tracked golden-output regression tests (Node, no deps)
-│   ├── harness.mjs                              Loads the real HTML, exposes generators (no file changes)
-│   ├── run.mjs                                  Runner: `npm test`, `npm run test:update`
+├── tests/                       Tracked regression tests (Node, no deps): golden + unit lanes
+│   ├── harness.mjs                              Loads the real HTML, exposes generators + pure deciders (no file changes)
+│   ├── run.mjs                                  Golden-lane runner: `npm run test:golden`, `npm run test:update`
+│   ├── unit.mjs                                 Unit-lane runner: `npm run test:unit` (pure decision fns)
 │   ├── fixtures/                                One *.mjs per clinical scenario (sets up S)
 │   └── golden/                                  Committed expected note/letter output
-├── package.json                 Tracked: `test` / `test:update` scripts
+├── package.json                 Tracked: `test` (both lanes) / `test:golden` / `test:unit` / `test:update`
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
 ├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
 └── scratch/                     Working drafts: skill updates, prompts, test files (untracked)
@@ -31,9 +32,14 @@ claude_code/
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, and `package.json` are tracked in git and pushed to GitHub. Everything else is local.
 
-### Tests (golden-output regression net)
+### Tests (golden + unit regression net)
 
-`npm test` runs the golden-output tests in `tests/`. Each fixture sets up an `S` state and snapshots the exact plain text from `generateNote()` and the ABA/IEP letter generators against a committed golden file. The harness loads the **real** `autism-ap-builder.html` and evaluates its `<script>` in Node with DOM stubs — it does **not** modify the file or require a browser. **When a change alters note output**, run `npm run test:update`, eyeball the golden diffs to confirm the change is intentional and clinically correct, and commit the updated goldens in the same commit. See `tests/README.md` for adding fixtures.
+`npm test` runs two lanes against the **real**, unmodified `autism-ap-builder.html` (the harness evaluates its `<script>` in Node with DOM stubs — no browser, no file changes):
+
+- **Golden lane** (`tests/run.mjs`) — each fixture sets up an `S` state and snapshots the exact plain text from `generateNote()` and the ABA/IEP letter generators against a committed golden file. **When a change alters note output**, run `npm run test:update`, eyeball the golden diffs to confirm the change is intentional and clinically correct, and commit the updated goldens in the same commit.
+- **Unit lane** (`tests/unit.mjs`) — asserts on the pure clinical-decision functions (`bifSpecifierAllowed`, `currentClinicalPathway`) behind specifier/BIF gating. These sit behind DOM wrappers the golden lane can't reach (they fire only from `onchange`/`render`), so the unit lane tests the gate predicate and the never-auto-bridge invariant directly.
+
+See `tests/README.md` for adding fixtures and the two-lane rationale.
 
 ### Intake protocol for non-trivial requests
 

@@ -30,6 +30,12 @@ const EXPORTS = [
   'generateIEPLetterPlain',
   '_abaContent',
   '_iepLetterContent',
+  // Pure clinical-decision functions for the unit lane (tests/unit.mjs). They
+  // read S and return a value with no DOM access, so they run under the harness
+  // even though the DOM wrappers that call them in the app (toggleBifSpecifierGate,
+  // bridgeCogProfileToSpecifier) cannot. See tests/README.md "Two test lanes".
+  'bifSpecifierAllowed',
+  'currentClinicalPathway',
 ];
 
 function extractScript(html) {

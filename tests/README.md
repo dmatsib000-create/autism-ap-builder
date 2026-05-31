@@ -1,4 +1,4 @@
-# Golden-output tests for `autism-ap-builder.html`
+# Tests for `autism-ap-builder.html`
 
 A regression net for the note generator. Each fixture sets up an `S` state, runs
 the real shipped `generateNote()` / letter generators, and compares the exact
@@ -6,10 +6,29 @@ plain text against a committed golden file. If a code change alters output, the
 diff shows up here so it can be reviewed as an intentional change, not shipped by
 accident.
 
+## Two test lanes
+
+`npm test` runs both:
+
+- **Golden lane** (`tests/run.mjs`, `npm run test:golden`) — the regression net
+  described above. Snapshots the exact note/letter text a clinician copies.
+- **Unit lane** (`tests/unit.mjs`, `npm run test:unit`) — asserts on the pure
+  clinical-decision functions (`bifSpecifierAllowed`, `currentClinicalPathway`)
+  that drive specifier / BIF gating. These live behind DOM wrappers
+  (`toggleBifSpecifierGate`, `bridgeCogProfileToSpecifier`) that fire only from
+  `onchange`/`render` and early-return on the harness's null `querySelector`, so
+  the golden lane can't reach them — but the wrappers are thin appliers over
+  these pure deciders, which read `S` and touch no DOM. The unit lane tests the
+  gate predicate and the never-auto-bridge invariant (borderline → no specifier,
+  Greenspan 2017) directly. Both lanes share `makeApp()` and the real, unmodified
+  shipped script.
+
 ## Running
 
 ```
-npm test                 # compare current output against golden files
+npm test                 # both lanes: golden then unit
+npm run test:golden      # golden lane only
+npm run test:unit        # unit lane only
 npm run test:update      # re-save goldens — lists what changed and asks first
 node tests/run.mjs aba   # run only fixtures whose name includes "aba"
 ```
