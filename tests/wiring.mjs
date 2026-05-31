@@ -21,7 +21,9 @@ import { dirname, join } from 'node:path';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const html = readFileSync(join(HERE, '..', 'autism-ap-builder.html'), 'utf8');
 
-const styleBlock = html.slice(html.indexOf('<style>') + 7, html.indexOf('</style>'));
+// Strip CSS comments first: a comment like `/* .str-chip migrated */` would
+// otherwise read as a live `.str-chip` rule and produce a false dead-rule report.
+const styleBlock = html.slice(html.indexOf('<style>') + 7, html.indexOf('</style>')).replace(/\/\*[\s\S]*?\*\//g, '');
 const scriptBlock = html.slice(html.indexOf('<script>') + 8, html.lastIndexOf('</script>'));
 
 // All class names that have at least one CSS rule (any `.name` selector token).
@@ -54,7 +56,7 @@ const STATE_FAMILY = [
   'dx-active', 'has-content', 'outcome-required', 'collapsed', 'vt-unset', 'used',
 ];
 const CHIP_FAMILY = [
-  'r-opt', 'mod-chip', 'str-chip', 'chip-tier', 'chip-strip', 'chip-grp-hd',
+  'chip', 'r-opt', 'mod-chip', 'str-chip', 'chip-tier', 'chip-strip', 'chip-grp-hd',
   'plan-pill', 'ov-pill', 'tab-btn',
 ];
 

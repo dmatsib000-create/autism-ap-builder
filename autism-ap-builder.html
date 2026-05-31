@@ -91,7 +91,7 @@
 body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);background:var(--gray-100);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* Focus ring — high-contrast, keyboard-only, used on inputs and interactives */
-:where(button,input,select,textarea,a,label.r-opt,.mod-chip,.str-chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+:where(button,input,select,textarea,a,label.r-opt,.mod-chip,.chip,.ev-src-chip,.ev-obs-chip,.ov-pill,.lang-qual-card,.tab-btn,.sec-head,.expander-btn,.mnav-btn):focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
 .app-header{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;overflow:hidden}
 .app-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.55) 65%,rgba(255,255,255,.05) 100%)}
 .app-header::after{content:'';position:absolute;top:-55px;left:-25px;width:260px;height:150px;background:radial-gradient(ellipse,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
@@ -277,9 +277,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .chip-grp-hd{font-size:var(--text-9);font-weight:700;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;width:100%;padding:6px 0 3px;margin-top:1px;border-top:1px solid var(--gray-200)}
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:6px}
-.str-chip{padding:3px 10px;border-radius:var(--radius-pill);border:1.5px solid var(--border-default);cursor:pointer;font-size:var(--text-11);background:var(--bg-card);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none;color:var(--gray-700)}
-@media (hover:hover){.str-chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}}
-.str-chip.used{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500}
+/* .str-chip migrated to the .chip primitive (chip chip--sm chip--success); see Phase 2. */
 .strengths-area{width:100%;font-size:var(--text-12);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
@@ -832,27 +830,27 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Identified Strengths</span>
         <div class="strength-chips" id="strengthChips">
-          <span class="str-chip" onclick="addStrength('Strong visual memory')">Visual memory</span>
-          <span class="str-chip" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
-          <span class="str-chip" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
-          <span class="str-chip" onclick="addStrength('Responsive to music')">Music</span>
-          <span class="str-chip" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
-          <span class="str-chip" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
-          <span class="str-chip" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</span>
-          <span class="str-chip" onclick="addStrength('Strong technology and computer skills')">Technology</span>
-          <span class="str-chip" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
-          <span class="str-chip" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
-          <span class="str-chip" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
-          <span class="str-chip" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
-          <span class="str-chip" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
-          <span class="str-chip" onclick="addStrength('Persistent and determined')">Persistent</span>
-          <span class="str-chip" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
-          <span class="str-chip" onclick="addStrength('Motivated by social praise')">Social praise</span>
-          <span class="str-chip" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
-          <span class="str-chip" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
-          <span class="str-chip" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
-          <span class="str-chip" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
-          <span class="str-chip" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')">Visual memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')">Music</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')">Technology</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')">Persistent</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')">Social praise</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
+          <span class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
         </div>
         <textarea class="strengths-area" id="strengthsField" placeholder="Click chips above or type freely..." rows="2"></textarea>
         <span class="phi-hint">PHI-free zone — type "the child" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -5135,9 +5133,9 @@ function toggleMod(key){
 // ─── STRENGTH CHIPS ──────────────────────────────────────────────────────────
 function syncStrengthChips(){
   const val=(document.getElementById('strengthsField')||{}).value||'';
-  document.querySelectorAll('.str-chip').forEach(c=>{
+  document.querySelectorAll('#strengthChips .chip').forEach(c=>{
     const m=c.getAttribute('onclick').match(/addStrength\('([^']+)'\)/);
-    if(m) c.classList.toggle('used',val.includes(m[1]));
+    if(m) c.classList.toggle('is-on',val.includes(m[1]));
   });
 }
 function addStrength(text){
