@@ -212,7 +212,8 @@
 /* Header label parts (theme-agnostic base; preserves the current "N — Title"). */
 .sec-folio::after{content:'\2014';margin:0 .32em}   /* the dash; removed in Slate */
 .sec-kicker{display:none}                            /* shown only in the Slate masthead */
-.sec-title{text-transform:inherit}                   /* default: inherits sec-head uppercase */
+/* (no .sec-title base rule needed: text-transform is inherited by default, so the
+   title picks up .sec-head's uppercase automatically; Slate overrides it below.) */
 
 /* Warm: debossed Fraunces folio numeral (the warm signature on the header). */
 [data-theme="warm"] .sec-folio{font-family:var(--font-display);text-shadow:var(--emboss)}
@@ -220,7 +221,11 @@
 /* Slate: section = ruled region, not a card. */
 [data-theme="slate"] .section{border:none;border-top:1px solid var(--border-strong);border-radius:0;box-shadow:none;background:transparent}
 [data-theme="slate"] .sec-head{background:none;border-bottom-color:var(--border-subtle);align-items:center}
-[data-theme="slate"] .sec-head:hover{background:rgba(0,0,0,.02)}
+@media (hover:hover){[data-theme="slate"] .sec-head:hover{background:rgba(0,0,0,.02)}}
+/* Slate: keep the active-section highlight on-palette — a vermilion tint instead
+   of the shared --amber-light semantic, which would clash with the masthead.
+   !important to beat the existing `.dx-active .sec-head{...!important}` rule. */
+[data-theme="slate"] .dx-active .sec-head{background:var(--accent-soft)!important}
 
 /* Slate: the masthead header — hanging-style folio + vermilion kicker + Newsreader title. */
 [data-theme="slate"] .sec-label{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center}
