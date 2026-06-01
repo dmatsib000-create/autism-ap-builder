@@ -78,6 +78,37 @@ handler that never fires under Node — which is why this works without a real D
 or a headless browser. The script is re-evaluated fresh for every fixture, so no
 state leaks between them through the shared module-scope `S`.
 
+## What these lanes do NOT cover (the DOM blind spot)
+
+All four lanes are intentionally **no-browser**: the golden/unit lanes eval the
+`<script>` against no-op DOM stubs, and the wiring/invariants lanes never run the
+script at all. That is what keeps the suite zero-dependency — plain Node, no
+`npm install`, no lockfile, no headless browser — a property the CI workflow and
+this README both advertise and rely on.
+
+The cost is a real blind spot: **nothing here exercises the app's DOM-mutating
+paths.** `render()` and the functions it drives — `updateSectionHeaders()` /
+`setSH()`, `toggleSec()`, the section completion-dot prepend, the `onchange` /
+`onclick` handlers — fire only from real DOM events and never run under Node. An
+uncaught throw inside `render()` is invisible to every lane.
+
+This is not hypothetical. A change once nested new spans inside `.sec-head`, which
+broke `setSH()`'s `h.querySelector('span:last-child')` lookup so `insertBefore`
+threw on *every* render — yet all four lanes stayed green, because the throw fires
+*after* note generation, so `generateNote()`'s text was unchanged. It surfaced
+only in a manual in-browser pass. A jsdom-based DOM smoke lane was considered and
+**deliberately declined**: a faithful one needs a DOM library, and that would
+trade away the zero-dependency property documented above. The boundary is
+accepted on purpose, not unnoticed.
+
+**The mitigation is process, not code.** After any change that touches
+section-header markup or other DOM-manipulating JS (`render()` and what it calls),
+open the app on the preview server, populate state (an archetype preset plus a
+diagnosis selection, which triggers a full `render()`), and confirm the console is
+clean and the UI renders. That preview sweep is the only check that sees this
+class of bug — treat it as mandatory for DOM-touching changes, the same way
+`test:update` review is mandatory for output changes.
+
 ## Singular-"they" verb-agreement guard
 
 The app rewrites third-person-singular verbs to the bare form for `they` patients
