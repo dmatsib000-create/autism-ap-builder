@@ -229,6 +229,11 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){.btn-danger:hover{background:rgba(255,0,0,.12);border-color:rgba(252,165,165,.7)}}
 .btn-blue{background:var(--accent);color:white}
 @media (hover:hover){.btn-blue:hover{background:var(--accent-hover)}}
+/* Warm a11y (WCAG 1.4.3): white on --accent amber (#bf6a1e) is 3.97:1 and fails
+   the 4.5:1 text floor; the deeper amber passes (rest 5.84:1, hover darker).
+   Scoped to Warm only — Current (6.7:1) and Slate (5.23:1) already pass. */
+[data-theme="warm"] .btn-blue{background:var(--blue-dark)}
+@media (hover:hover){[data-theme="warm"] .btn-blue:hover{background:#7a3d0a}}
 .btn-gray{background:var(--gray-200);color:var(--gray-700)}
 @media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
 .btn-green{background:#16a34a;color:white}
