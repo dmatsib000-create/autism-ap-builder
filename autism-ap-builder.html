@@ -141,6 +141,9 @@
   --shadow:0 1px 3px rgba(80,60,25,.12),0 1px 2px rgba(80,60,25,.08);
   --shadow-md:0 2px 6px rgba(80,60,25,.12),0 1px 3px rgba(80,60,25,.08);
   --shadow-lg:0 12px 30px rgba(70,50,20,.16),0 3px 8px rgba(70,50,20,.10);
+  /* Phase 2 letterpress key shadows (warm only; read by the signature layer) */
+  --key-rest:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(120,90,40,.08),0 1px 1.5px rgba(80,60,25,.14);
+  --key-press:inset 0 1px 2px rgba(90,65,25,.22);
 }
 :root[data-theme="slate"]{
   /* brand accent -> editorial vermilion */
@@ -160,6 +163,41 @@
   --shadow-sm:none; --shadow:none; --shadow-md:none; --shadow-card:none;
   --shadow-lg:0 10px 30px rgba(25,27,31,.10),0 2px 6px rgba(25,27,31,.06);
 }
+
+/* ==========================================================================
+ * PHASE 2 signature cue layer (Commit A). CSS-only; attaches to the EXISTING
+ * .is-on selectors (no new helper class). Persistent cues only: the marker
+ * appears on selection and stays. No one-shot animation, no JS. Warm = letter-
+ * press keys plus an amber filament on the live edge; Slate = a red-pencil
+ * vermilion underscore (additive over the existing tint; the graphite fill-
+ * neutralize is Commit B, where it can be made chip-variant-safe). The only
+ * preserved-document touch is the warm sheet BACKGROUND (frame, not interior).
+ * ========================================================================== */
+
+/* Warm: letterpress keys */
+[data-theme="warm"] .btn{box-shadow:var(--key-rest)}
+[data-theme="warm"] .btn:active{box-shadow:var(--key-press);transform:translateY(.5px)}
+[data-theme="warm"] .chip:active,[data-theme="warm"] .r-opt:active{transform:translateY(.5px)}
+/* Warm: amber filament on the live edge (chip bottom, active-tab top) */
+[data-theme="warm"] .chip.is-on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--accent);border-radius:2px}
+[data-theme="warm"] .tab-btn.is-on::after{content:'';position:absolute;left:10px;right:10px;top:-1px;height:2px;background:var(--accent);border-radius:2px}
+/* (warm .r-opt.is-on inset amber ring already comes from the base .r-opt.is-on rule) */
+
+/* Slate: red-pencil vermilion underscore on live elements (additive, persistent) */
+[data-theme="slate"] .chip.is-on::after,
+[data-theme="slate"] .r-opt.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
+[data-theme="slate"] .tab-btn.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent)}
+/* Slate: selected-chip glyph becomes an em-dash, ONLY where a mark already exists */
+[data-theme="slate"] .chip--check.is-on::before{content:'\2014 ';color:var(--accent);font-weight:700}
+/* Slate: square the toggle (track + knob) */
+[data-theme="slate"] .tog-sl{border-radius:2px}
+[data-theme="slate"] .tog-sl::after{border-radius:1px}
+
+/* Warm document sheet: warm paper. Frame only (background); the note/letter
+ * interior text, fonts, dividers and letter ink are unchanged. */
+[data-theme="warm"] .note-content,
+[data-theme="warm"] .note-doc,
+[data-theme="warm"] .aba-doc{background:var(--bg-elevated)}
 
 /* Respect user motion preference — globally disable transitions */
 @media (prefers-reduced-motion: reduce) {
@@ -317,7 +355,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .info-popover strong{color:var(--gray-800);font-weight:600}
 /* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
+.r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
@@ -335,7 +373,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    .is-on is the single canonical "selected/on" class (replaces .sel/.active/.used).
    Migrated families compose this; the wiring guard (tests/wiring.mjs) enforces
    the JS↔CSS name contract. Adjacent families are migrated one at a time. */
-.chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;border:1.5px solid var(--border-default);border-radius:var(--radius-pill);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);line-height:1.3;cursor:pointer;user-select:none;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);--chip-tint:var(--accent);--chip-tint-soft:var(--accent-soft);--chip-tint-strong:var(--accent-hover)}
+.chip{position:relative;display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;border:1.5px solid var(--border-default);border-radius:var(--radius-pill);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);line-height:1.3;cursor:pointer;user-select:none;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);--chip-tint:var(--accent);--chip-tint-soft:var(--accent-soft);--chip-tint-strong:var(--accent-hover)}
 @media (hover:hover){.chip:hover{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong)}}
 .chip.is-on{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong);font-weight:500}
 .chip--sm{font-size:var(--text-11)}
@@ -528,7 +566,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
-.tab-btn{padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
+.tab-btn{position:relative;padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
 @media (hover:hover){.tab-btn:hover{color:var(--gray-800)}}
 .tab-btn.is-on{background:var(--bg-card);color:var(--accent-hover);box-shadow:var(--shadow-sm);border-color:var(--border-subtle)}
 /* ── ABA letter preview ─────────────── */
