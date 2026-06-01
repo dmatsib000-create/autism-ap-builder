@@ -125,7 +125,7 @@
  * ========================================================================== */
 :root[data-theme="warm"]{
   /* brand accent -> burnt amber (--accent/-soft/-hover alias these) */
-  --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212;
+  --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212; --blue-darker:#7a3d0a; /* --blue-darker: AA-safe btn-blue hover */
   /* warm paper + ink scale */
   --gray-50:#f6f0e2; --gray-100:#efe7d6; --gray-200:#ddd2bd; --gray-300:#c9bca2;
   --gray-400:#938876; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d;
@@ -221,7 +221,7 @@
 /* Slate: section = ruled region, not a card. */
 [data-theme="slate"] .section{border:none;border-top:1px solid var(--border-strong);border-radius:0;box-shadow:none;background:transparent}
 [data-theme="slate"] .sec-head{background:none;border-bottom-color:var(--border-subtle);align-items:center}
-@media (hover:hover){[data-theme="slate"] .sec-head:hover{background:rgba(0,0,0,.02)}}
+@media (hover:hover){[data-theme="slate"] .sec-head:hover{background:var(--gray-100)}}
 /* Slate: keep the active-section highlight on-palette — a vermilion tint instead
    of the shared --amber-light semantic, which would clash with the masthead.
    !important to beat the existing `.dx-active .sec-head{...!important}` rule. */
@@ -287,10 +287,10 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .btn-blue{background:var(--accent);color:white}
 @media (hover:hover){.btn-blue:hover{background:var(--accent-hover)}}
 /* Warm a11y (WCAG 1.4.3): white on --accent amber (#bf6a1e) is 3.97:1 and fails
-   the 4.5:1 text floor; the deeper amber passes (rest 5.84:1, hover darker).
-   Scoped to Warm only — Current (6.7:1) and Slate (5.23:1) already pass. */
+   the 4.5:1 text floor; the deeper amber passes (rest --blue-dark 5.84:1,
+   hover --blue-darker 8.4:1). Warm only — Current (6.7:1) and Slate (5.23:1) pass. */
 [data-theme="warm"] .btn-blue{background:var(--blue-dark)}
-@media (hover:hover){[data-theme="warm"] .btn-blue:hover{background:#7a3d0a}}
+@media (hover:hover){[data-theme="warm"] .btn-blue:hover{background:var(--blue-darker)}}
 .btn-gray{background:var(--gray-200);color:var(--gray-700)}
 @media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
 .btn-green{background:#16a34a;color:white}
@@ -5490,7 +5490,11 @@ function updateSectionHeaders(){
     let dot=h.querySelector('.sec-dot');
     if(!dot){dot=document.createElement('span');dot.className='sec-dot';h.prepend(dot);}
     let sum=h.querySelector('.sec-sum');
-    if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector('span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
+    // `:scope >` is required: the masthead restructure nested spans inside
+    // .sec-label, so a bare `span:last-child` matches the nested .sec-title and
+    // insertBefore throws (it isn't a direct child of h). We want the chevron,
+    // which is the last DIRECT-child span (true for restructured + utility headers).
+    if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector(':scope > span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
     dot.className='sec-dot'+(hasData?' dot-has':'');
     h.closest('.section')?.classList.toggle('has-content',!!hasData);
     sum.textContent=summary?' — '+summary:'';
