@@ -144,6 +144,7 @@
   /* Phase 2 letterpress key shadows (warm only; read by the signature layer) */
   --key-rest:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(120,90,40,.08),0 1px 1.5px rgba(80,60,25,.14);
   --key-press:inset 0 1px 2px rgba(90,65,25,.22);
+  --emboss:0 1px 0 rgba(255,255,255,.75); /* debossed folio numeral (Commit B) */
 }
 :root[data-theme="slate"]{
   /* brand accent -> editorial vermilion */
@@ -198,6 +199,57 @@
 [data-theme="warm"] .note-content,
 [data-theme="warm"] .note-doc,
 [data-theme="warm"] .aba-doc{background:var(--bg-elevated)}
+
+/* ==========================================================================
+ * PHASE 2 signature layer (Commit B). Editorial Slate structural transform
+ * (cards to rules, masthead header, density) plus the Warm debossed folio.
+ * The new .sec-* classes sit OUTSIDE the wiring lane's policed families, and
+ * section headers are static (not note output), so all four lanes stay green.
+ * Default theme renders the restructured header IDENTICALLY to before via the
+ * folio separator below; only Slate restyles it into a masthead.
+ * ========================================================================== */
+
+/* Header label parts (theme-agnostic base; preserves the current "N — Title"). */
+.sec-folio::after{content:'\2014';margin:0 .32em}   /* the dash; removed in Slate */
+.sec-kicker{display:none}                            /* shown only in the Slate masthead */
+.sec-title{text-transform:inherit}                   /* default: inherits sec-head uppercase */
+
+/* Warm: debossed Fraunces folio numeral (the warm signature on the header). */
+[data-theme="warm"] .sec-folio{font-family:var(--font-display);text-shadow:var(--emboss)}
+
+/* Slate: section = ruled region, not a card. */
+[data-theme="slate"] .section{border:none;border-top:1px solid var(--border-strong);border-radius:0;box-shadow:none;background:transparent}
+[data-theme="slate"] .sec-head{background:none;border-bottom-color:var(--border-subtle);align-items:center}
+[data-theme="slate"] .sec-head:hover{background:rgba(0,0,0,.02)}
+
+/* Slate: the masthead header — hanging-style folio + vermilion kicker + Newsreader title. */
+[data-theme="slate"] .sec-label{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center}
+[data-theme="slate"] .sec-folio{grid-column:1;grid-row:1/3;align-self:center;font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1;color:var(--gray-600)}
+[data-theme="slate"] .sec-folio::after{content:none}
+[data-theme="slate"] .sec-kicker{display:block;grid-column:2;grid-row:1;font-size:var(--text-9);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);line-height:1.3}
+[data-theme="slate"] .sec-title{grid-column:2;grid-row:2;font-family:var(--font-display);font-weight:600;font-size:var(--text-13);text-transform:none;letter-spacing:0;line-height:1.15;color:var(--gray-900)}
+
+/* Slate: ruled tabular checkbox lists. */
+[data-theme="slate"] .cb-list{border-top:1px solid var(--border-subtle)}
+[data-theme="slate"] .cb-row{border-bottom:1px solid var(--border-subtle);border-radius:0}
+
+/* Slate: graphite selection (rules, not fill). :not(.chip--success) preserves the
+ * green success-chip semantic; .chip--success is the only tint variant. The
+ * vermilion underscore from Commit A is the live cue on top of the graphite. */
+[data-theme="slate"] .chip:not(.chip--success){--chip-tint:var(--gray-400);--chip-tint-soft:var(--gray-100);--chip-tint-strong:var(--gray-900)}
+[data-theme="slate"] .r-opt.is-on{background:var(--gray-100);border-color:var(--gray-300);color:var(--gray-900);box-shadow:none}
+[data-theme="slate"] .tab-btn.is-on{background:transparent;border-color:transparent;box-shadow:none;color:var(--gray-900)}
+
+/* Slate: density (desktop only). Mobile keeps the >=44px comfortable targets in
+ * the max-width:768px block below — this min-width gate guarantees no regression. */
+@media (min-width:769px){
+  [data-theme="slate"] .section{margin-bottom:0}        /* rules abut into a continuous stack */
+  [data-theme="slate"] .sec-head{padding:6px 12px;min-height:32px}
+  [data-theme="slate"] .sec-body{padding:8px}
+  [data-theme="slate"] .r-opt{padding:3px 8px}
+  [data-theme="slate"] .chip{padding:2px 8px}
+  [data-theme="slate"] .cb-row{padding:3px 7px}
+}
 
 /* Respect user motion preference — globally disable transitions */
 @media (prefers-reduced-motion: reduce) {
@@ -775,7 +827,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 1. Patient Profile -->
   <div class="section">
-    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)">1 &mdash; Patient Profile <span>&#9660;</span></div>
+    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">1</span><span class="sec-kicker">Profile</span><span class="sec-title">Patient Profile</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
 
       <div class="field-group">
@@ -994,7 +1046,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 2. Diagnostic Workup -->
   <div id="dxWorkupSection" class="section">
-    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
+    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
@@ -1051,7 +1103,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 3. DSM-5 Criteria -->
   <div class="section">
-    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
+    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">3</span><span class="sec-kicker">Criteria</span><span class="sec-title">DSM-5 Criteria Evidence</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
@@ -1157,7 +1209,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 4. Functional Need Domains -->
   <div class="section">
-    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)">4 &mdash; Functional Need Domains <span>&#9660;</span></div>
+    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">4</span><span class="sec-kicker">Needs</span><span class="sec-title">Functional Need Domains</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Communication</span>
@@ -1290,7 +1342,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 5. Comorbid Conditions -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)">5 &mdash; Comorbid Conditions <span>&#9660;</span></div>
+    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">5</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
@@ -1362,7 +1414,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 6. School -->
   <div class="section">
-    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)">6 &mdash; School &amp; Educational Supports <span>&#9660;</span></div>
+    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">6</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Placement</span>
@@ -1410,7 +1462,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 7. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)">7 &mdash; Safety Counseling <span>&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">7</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
@@ -1427,7 +1479,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 8. Anticipatory Guidance -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)">8 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
+    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">8</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
