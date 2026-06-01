@@ -21,9 +21,13 @@ import { dirname, join } from 'node:path';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const html = readFileSync(join(HERE, '..', 'autism-ap-builder.html'), 'utf8');
 
+// Raw (un-stripped) style block for the comment-integrity guard below. The
+// stripped version (for class wiring) is derived from this.
+const styleRaw = html.slice(html.indexOf('<style>') + 7, html.indexOf('</style>'));
+
 // Strip CSS comments first: a comment like `/* .str-chip migrated */` would
 // otherwise read as a live `.str-chip` rule and produce a false dead-rule report.
-const styleBlock = html.slice(html.indexOf('<style>') + 7, html.indexOf('</style>')).replace(/\/\*[\s\S]*?\*\//g, '');
+const styleBlock = styleRaw.replace(/\/\*[\s\S]*?\*\//g, '');
 const scriptBlock = html.slice(html.indexOf('<script>') + 8, html.lastIndexOf('</script>'));
 
 // All class names that have at least one CSS rule (any `.name` selector token).
@@ -66,6 +70,38 @@ const CHIP_FAMILY = [
 ];
 
 const failures = [];
+
+// (0) CSS comment integrity. A literal `*/` inside comment PROSE closes the
+// comment early, leaking the rest of the comment into the stylesheet as invalid
+// CSS that silently invalidates the following rule. This actually happened: a
+// banner comment containing `--amber*/--letter-*` closed early and killed the
+// entire `:root[data-theme="warm"]` block, so the Warm theme never applied while
+// every test stayed green (golden/unit snapshot generated TEXT; the class-wiring
+// checks below don't parse CSS validity). Two cheap, targeted assertions:
+//   a. `/*` and `*/` counts must balance across the style block.
+//   b. No `*/` may appear immediately after a `--custom-prop-token` fragment —
+//      the signature of a hyphenated token (`--amber*/...`) being misread as a
+//      comment close. We scan only INSIDE comments so real CSS like
+//      `width:calc(2*/* x */1)` (pathological but legal) can't false-positive.
+{
+  const opens = (styleRaw.match(/\/\*/g) || []).length;
+  const closes = (styleRaw.match(/\*\//g) || []).length;
+  if (opens !== closes) {
+    failures.push(`CSS comment delimiters unbalanced in <style>: ${opens} '/*' vs ${closes} '*/' (a '*/' inside comment text closes it early)`);
+  }
+  // Walk comments; flag any whose TEXT contains an extra '*/' beyond its closer,
+  // or a '--word*/' fragment (custom-property token swallowed as a comment end).
+  for (const m of styleRaw.matchAll(/\/\*[\s\S]*?\*\//g)) {
+    const inner = m[0].slice(2, -2); // text between the matched /* and */
+    if (inner.includes('*/')) {
+      failures.push(`CSS comment closes early near: ${JSON.stringify(m[0].slice(0, 60))} ('*/' appears inside comment text)`);
+    }
+  }
+  // Belt-and-suspenders: the exact bug signature, anywhere in <style>.
+  if (/--[\w-]*\*\//.test(styleRaw)) {
+    failures.push(`A '--token*/' fragment appears in <style> — a hyphenated custom-property name is closing a CSS comment early`);
+  }
+}
 
 // (1) Every JS-toggled state class in our family must have a CSS rule. This is
 // the desync catcher: rename in JS without renaming in CSS -> fails here.
