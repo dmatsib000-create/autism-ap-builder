@@ -125,7 +125,7 @@
  * ========================================================================== */
 :root[data-theme="warm"]{
   /* brand accent -> burnt amber (--accent/-soft/-hover alias these) */
-  --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212;
+  --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212; --blue-darker:#7a3d0a; /* --blue-darker: AA-safe btn-blue hover */
   /* warm paper + ink scale */
   --gray-50:#f6f0e2; --gray-100:#efe7d6; --gray-200:#ddd2bd; --gray-300:#c9bca2;
   --gray-400:#938876; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d;
@@ -141,6 +141,10 @@
   --shadow:0 1px 3px rgba(80,60,25,.12),0 1px 2px rgba(80,60,25,.08);
   --shadow-md:0 2px 6px rgba(80,60,25,.12),0 1px 3px rgba(80,60,25,.08);
   --shadow-lg:0 12px 30px rgba(70,50,20,.16),0 3px 8px rgba(70,50,20,.10);
+  /* Phase 2 letterpress key shadows (warm only; read by the signature layer) */
+  --key-rest:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(120,90,40,.08),0 1px 1.5px rgba(80,60,25,.14);
+  --key-press:inset 0 1px 2px rgba(90,65,25,.22);
+  --emboss:0 1px 0 rgba(255,255,255,.75); /* debossed folio numeral (Commit B) */
 }
 :root[data-theme="slate"]{
   /* brand accent -> editorial vermilion */
@@ -159,6 +163,97 @@
   --radius-sm:0; --radius:2px; --radius-md:2px; --radius-lg:3px;
   --shadow-sm:none; --shadow:none; --shadow-md:none; --shadow-card:none;
   --shadow-lg:0 10px 30px rgba(25,27,31,.10),0 2px 6px rgba(25,27,31,.06);
+}
+
+/* ==========================================================================
+ * PHASE 2 signature cue layer (Commit A). CSS-only; attaches to the EXISTING
+ * .is-on selectors (no new helper class). Persistent cues only: the marker
+ * appears on selection and stays. No one-shot animation, no JS. Warm = letter-
+ * press keys plus an amber filament on the live edge; Slate = a red-pencil
+ * vermilion underscore (additive over the existing tint; the graphite fill-
+ * neutralize is Commit B, where it can be made chip-variant-safe). The only
+ * preserved-document touch is the warm sheet BACKGROUND (frame, not interior).
+ * ========================================================================== */
+
+/* Warm: letterpress keys */
+[data-theme="warm"] .btn{box-shadow:var(--key-rest)}
+[data-theme="warm"] .btn:active{box-shadow:var(--key-press);transform:translateY(.5px)}
+[data-theme="warm"] .chip:active,[data-theme="warm"] .r-opt:active{transform:translateY(.5px)}
+/* Warm: amber filament on the live edge (chip bottom, active-tab top) */
+[data-theme="warm"] .chip.is-on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--accent);border-radius:2px}
+[data-theme="warm"] .tab-btn.is-on::after{content:'';position:absolute;left:10px;right:10px;top:-1px;height:2px;background:var(--accent);border-radius:2px}
+/* (warm .r-opt.is-on inset amber ring already comes from the base .r-opt.is-on rule) */
+
+/* Slate: red-pencil vermilion underscore on live elements (additive, persistent) */
+[data-theme="slate"] .chip.is-on::after,
+[data-theme="slate"] .r-opt.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
+[data-theme="slate"] .tab-btn.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent)}
+/* Slate: selected-chip glyph becomes an em-dash, ONLY where a mark already exists */
+[data-theme="slate"] .chip--check.is-on::before{content:'\2014 ';color:var(--accent);font-weight:700}
+/* Slate: square the toggle (track + knob) */
+[data-theme="slate"] .tog-sl{border-radius:2px}
+[data-theme="slate"] .tog-sl::after{border-radius:1px}
+
+/* Warm document sheet: warm paper. Frame only (background); the note/letter
+ * interior text, fonts, dividers and letter ink are unchanged. */
+[data-theme="warm"] .note-content,
+[data-theme="warm"] .note-doc,
+[data-theme="warm"] .aba-doc{background:var(--bg-elevated)}
+
+/* ==========================================================================
+ * PHASE 2 signature layer (Commit B). Editorial Slate structural transform
+ * (cards to rules, masthead header, density) plus the Warm debossed folio.
+ * The new .sec-* classes sit OUTSIDE the wiring lane's policed families, and
+ * section headers are static (not note output), so all four lanes stay green.
+ * Default theme renders the restructured header IDENTICALLY to before via the
+ * folio separator below; only Slate restyles it into a masthead.
+ * ========================================================================== */
+
+/* Header label parts (theme-agnostic base; preserves the current "N — Title"). */
+.sec-folio::after{content:'\2014';margin:0 .32em}   /* the dash; removed in Slate */
+.sec-kicker{display:none}                            /* shown only in the Slate masthead */
+/* (no .sec-title base rule needed: text-transform is inherited by default, so the
+   title picks up .sec-head's uppercase automatically; Slate overrides it below.) */
+
+/* Warm: debossed Fraunces folio numeral (the warm signature on the header). */
+[data-theme="warm"] .sec-folio{font-family:var(--font-display);text-shadow:var(--emboss)}
+
+/* Slate: section = ruled region, not a card. */
+[data-theme="slate"] .section{border:none;border-top:1px solid var(--border-strong);border-radius:0;box-shadow:none;background:transparent}
+[data-theme="slate"] .sec-head{background:none;border-bottom-color:var(--border-subtle);align-items:center}
+@media (hover:hover){[data-theme="slate"] .sec-head:hover{background:var(--gray-100)}}
+/* Slate: keep the active-section highlight on-palette — a vermilion tint instead
+   of the shared --amber-light semantic, which would clash with the masthead.
+   !important to beat the existing `.dx-active .sec-head{...!important}` rule. */
+[data-theme="slate"] .dx-active .sec-head{background:var(--accent-soft)!important}
+
+/* Slate: the masthead header — hanging-style folio + vermilion kicker + Newsreader title. */
+[data-theme="slate"] .sec-label{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center}
+[data-theme="slate"] .sec-folio{grid-column:1;grid-row:1/3;align-self:center;font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1;color:var(--gray-600)}
+[data-theme="slate"] .sec-folio::after{content:none}
+[data-theme="slate"] .sec-kicker{display:block;grid-column:2;grid-row:1;font-size:var(--text-9);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);line-height:1.3}
+[data-theme="slate"] .sec-title{grid-column:2;grid-row:2;font-family:var(--font-display);font-weight:600;font-size:var(--text-13);text-transform:none;letter-spacing:0;line-height:1.15;color:var(--gray-900)}
+
+/* Slate: ruled tabular checkbox lists. */
+[data-theme="slate"] .cb-list{border-top:1px solid var(--border-subtle)}
+[data-theme="slate"] .cb-row{border-bottom:1px solid var(--border-subtle);border-radius:0}
+
+/* Slate: graphite selection (rules, not fill). :not(.chip--success) preserves the
+ * green success-chip semantic; .chip--success is the only tint variant. The
+ * vermilion underscore from Commit A is the live cue on top of the graphite. */
+[data-theme="slate"] .chip:not(.chip--success){--chip-tint:var(--gray-400);--chip-tint-soft:var(--gray-100);--chip-tint-strong:var(--gray-900)}
+[data-theme="slate"] .r-opt.is-on{background:var(--gray-100);border-color:var(--gray-300);color:var(--gray-900);box-shadow:none}
+[data-theme="slate"] .tab-btn.is-on{background:transparent;border-color:transparent;box-shadow:none;color:var(--gray-900)}
+
+/* Slate: density (desktop only). Mobile keeps the >=44px comfortable targets in
+ * the max-width:768px block below — this min-width gate guarantees no regression. */
+@media (min-width:769px){
+  [data-theme="slate"] .section{margin-bottom:0}        /* rules abut into a continuous stack */
+  [data-theme="slate"] .sec-head{padding:6px 12px;min-height:32px}
+  [data-theme="slate"] .sec-body{padding:8px}
+  [data-theme="slate"] .r-opt{padding:3px 8px}
+  [data-theme="slate"] .chip{padding:2px 8px}
+  [data-theme="slate"] .cb-row{padding:3px 7px}
 }
 
 /* Respect user motion preference — globally disable transitions */
@@ -191,6 +286,11 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){.btn-danger:hover{background:rgba(255,0,0,.12);border-color:rgba(252,165,165,.7)}}
 .btn-blue{background:var(--accent);color:white}
 @media (hover:hover){.btn-blue:hover{background:var(--accent-hover)}}
+/* Warm a11y (WCAG 1.4.3): white on --accent amber (#bf6a1e) is 3.97:1 and fails
+   the 4.5:1 text floor; the deeper amber passes (rest --blue-dark 5.84:1,
+   hover --blue-darker 8.4:1). Warm only — Current (6.7:1) and Slate (5.23:1) pass. */
+[data-theme="warm"] .btn-blue{background:var(--blue-dark)}
+@media (hover:hover){[data-theme="warm"] .btn-blue:hover{background:var(--blue-darker)}}
 .btn-gray{background:var(--gray-200);color:var(--gray-700)}
 @media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
 .btn-green{background:#16a34a;color:white}
@@ -317,7 +417,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .info-popover strong{color:var(--gray-800);font-weight:600}
 /* Visually-hidden text for screen-reader-only labels. Standard WCAG 2.2 pattern. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.r-opt{display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
+.r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 .r-opt input{display:none}
@@ -335,7 +435,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    .is-on is the single canonical "selected/on" class (replaces .sel/.active/.used).
    Migrated families compose this; the wiring guard (tests/wiring.mjs) enforces
    the JS↔CSS name contract. Adjacent families are migrated one at a time. */
-.chip{display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;border:1.5px solid var(--border-default);border-radius:var(--radius-pill);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);line-height:1.3;cursor:pointer;user-select:none;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);--chip-tint:var(--accent);--chip-tint-soft:var(--accent-soft);--chip-tint-strong:var(--accent-hover)}
+.chip{position:relative;display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;border:1.5px solid var(--border-default);border-radius:var(--radius-pill);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);line-height:1.3;cursor:pointer;user-select:none;transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);--chip-tint:var(--accent);--chip-tint-soft:var(--accent-soft);--chip-tint-strong:var(--accent-hover)}
 @media (hover:hover){.chip:hover{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong)}}
 .chip.is-on{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong);font-weight:500}
 .chip--sm{font-size:var(--text-11)}
@@ -528,7 +628,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
-.tab-btn{padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
+.tab-btn{position:relative;padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
 @media (hover:hover){.tab-btn:hover{color:var(--gray-800)}}
 .tab-btn.is-on{background:var(--bg-card);color:var(--accent-hover);box-shadow:var(--shadow-sm);border-color:var(--border-subtle)}
 /* ── ABA letter preview ─────────────── */
@@ -732,7 +832,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 1. Patient Profile -->
   <div class="section">
-    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)">1 &mdash; Patient Profile <span>&#9660;</span></div>
+    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">1</span><span class="sec-kicker">Profile</span><span class="sec-title">Patient Profile</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
 
       <div class="field-group">
@@ -951,7 +1051,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 2. Diagnostic Workup -->
   <div id="dxWorkupSection" class="section">
-    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)">2 &mdash; Diagnostic Workup &amp; Next Steps <span>&#9660;</span></div>
+    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
@@ -1008,7 +1108,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 3. DSM-5 Criteria -->
   <div class="section">
-    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)">3 &mdash; DSM-5 Criteria Evidence <span>&#9660;</span></div>
+    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">3</span><span class="sec-kicker">Criteria</span><span class="sec-title">DSM-5 Criteria Evidence</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
@@ -1114,7 +1214,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 4. Functional Need Domains -->
   <div class="section">
-    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)">4 &mdash; Functional Need Domains <span>&#9660;</span></div>
+    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">4</span><span class="sec-kicker">Needs</span><span class="sec-title">Functional Need Domains</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Communication</span>
@@ -1247,7 +1347,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 5. Comorbid Conditions -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)">5 &mdash; Comorbid Conditions <span>&#9660;</span></div>
+    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">5</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
@@ -1319,7 +1419,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 6. School -->
   <div class="section">
-    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)">6 &mdash; School &amp; Educational Supports <span>&#9660;</span></div>
+    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">6</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Placement</span>
@@ -1367,7 +1467,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 7. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)">7 &mdash; Safety Counseling <span>&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">7</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
@@ -1384,7 +1484,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 8. Anticipatory Guidance -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)">8 &mdash; Anticipatory Guidance <span>&#9660;</span></div>
+    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">8</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
@@ -5390,7 +5490,11 @@ function updateSectionHeaders(){
     let dot=h.querySelector('.sec-dot');
     if(!dot){dot=document.createElement('span');dot.className='sec-dot';h.prepend(dot);}
     let sum=h.querySelector('.sec-sum');
-    if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector('span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
+    // `:scope >` is required: the masthead restructure nested spans inside
+    // .sec-label, so a bare `span:last-child` matches the nested .sec-title and
+    // insertBefore throws (it isn't a direct child of h). We want the chevron,
+    // which is the last DIRECT-child span (true for restructured + utility headers).
+    if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector(':scope > span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
     dot.className='sec-dot'+(hasData?' dot-has':'');
     h.closest('.section')?.classList.toggle('has-content',!!hasData);
     sum.textContent=summary?' — '+summary:'';
