@@ -1297,7 +1297,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Motor</span>
         <div class="cb-list col2">
-          <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="gross"> Gross motor delays / hypotonia</label>
+          <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="gross"> Gross motor delays</label>
+          <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="hypotonia"> Hypotonia / low muscle tone</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="fine"> Fine motor delays</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="coordination"> Motor coordination / DCD</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="handwriting"> Handwriting difficulties</label>
@@ -2087,7 +2088,7 @@ function ruleSLP() {
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
-function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
+function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() {
   // Fires when ASD is confirmed, OR when the clinician has staked out any
   // diagnostic position (diagStatus non-empty) AND at least one high-yield
@@ -2495,7 +2496,7 @@ function needsSummaryLines() {
   if(S.safety.size){const x=[];if(S.safety.has('elopement_counsel'))x.push('elopement/wandering');if(S.safety.has('sib_safety_counsel'))x.push('self-injury safety');if(S.safety.has('water_counsel'))x.push('water/drowning');if(S.safety.has('road_counsel'))x.push('road/traffic safety');if(S.safety.has('fire_counsel'))x.push('environmental hazard');if(S.safety.has('bullying'))x.push('bullying/victimization');if(S.safety.has('internet'))x.push('internet/social media safety');if(x.length)L.push('  • Safety: '+x.join(', '));}
   if(S.needsSocial.size){const x=[];if(S.needsSocial.has('peer'))x.push('peer interaction');if(S.needsSocial.has('play'))x.push('play skills');if(S.needsSocial.has('reciprocity'))x.push('social reciprocity');if(S.needsSocial.has('emotion'))x.push('emotion recognition');if(S.needsSocial.has('perspective'))x.push('perspective-taking/Theory of Mind');if(S.needsSocial.has('conversation'))x.push('conversation skills');L.push('  • Social/play: '+x.join(', '));}
   if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory: '+x.join(', '));}
-  if(S.needsMotor.size){const x=[];if(S.needsMotor.has('gross'))x.push('gross motor');if(S.needsMotor.has('fine'))x.push('fine motor');if(S.needsMotor.has('coordination'))x.push('coordination/DCD');if(S.needsMotor.has('handwriting'))x.push('handwriting');L.push('  • Motor: '+x.join(', '));}
+  if(S.needsMotor.size){const x=[];if(S.needsMotor.has('gross'))x.push('gross motor');if(S.needsMotor.has('hypotonia'))x.push('hypotonia');if(S.needsMotor.has('fine'))x.push('fine motor');if(S.needsMotor.has('coordination'))x.push('coordination/DCD');if(S.needsMotor.has('handwriting'))x.push('handwriting');L.push('  • Motor: '+x.join(', '));}
   const misc=[];if(S.emotionalReg)misc.push('emotional regulation');if(S.academic)misc.push('academic/learning');
   // Suppress the lightweight "Work-up & referrals" sleep echo when sleep_disorder is a full in-plan problem — the coded
   // problem block already documents it. Mirrors the SLEEP MANAGEMENT dedup guard; same in-plan condition.
@@ -3071,7 +3072,7 @@ function generateNote() {
   if(resolveOv('pt',rulePT())){
     L.push(n+++'. PHYSICAL THERAPY (PT)');
     {const sl=therapyStatusLine('pt','PT');if(sl){L.push(sl);L.push('');}}
-    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('coordination'))x.push('motor coordination/DCD');
+    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination'))x.push('motor coordination/DCD');
     L.push('Evaluation and treatment targeting: '+x.join(', ')+'. Goal: improve participation in PE, playground activities, and daily physical function.');L.push('');
   }
 
@@ -4342,9 +4343,10 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('pt_school')){
-    let s='Physical Therapy (PT): School-based PT services are recommended to address gross motor needs that affect safe navigation of the school environment and access to physical education.';
+    let s='Physical Therapy (PT): School-based PT services are recommended to address motor needs that affect safe navigation of the school environment and access to physical education.';
     const goals=[];
     if(S.needsMotor&&S.needsMotor.has('gross')) goals.push('gross motor skill development: balance, coordination, and age-appropriate locomotor skills');
+    if(S.needsMotor&&S.needsMotor.has('hypotonia')) goals.push('postural control and core strengthening to address low muscle tone affecting endurance, positioning, and sustained classroom participation');
     goals.push('safe navigation of the school campus (stairs, hallways, playground equipment)');
     if(S.comorbid.has('dcd')) goals.push('motor planning and body awareness targeting the Developmental Coordination Disorder profile');
     s+=' Goals: '+goals.join('; ')+'.';
@@ -6099,7 +6101,7 @@ function syncSchoolSvcFromNeeds(){
   };
   if(S.needsComm.size>0||(S.langLevel&&S.langLevel!=='ageAppropriate'&&!isLangAgeAppropriate())||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()||S.langModifiers.has('echolalic')) add('slp_school');
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
-  if(S.needsMotor.has('gross')||S.comorbid.has('dcd')) add('pt_school');
+  if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}
