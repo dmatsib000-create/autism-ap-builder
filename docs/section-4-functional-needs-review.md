@@ -1,6 +1,6 @@
 # §4 Functional Need Domains — validity review & roadmap
 
-**Status:** roadmap (no code changes applied yet) · **Reviewed:** 2026-06-02 · **Scope:** the §4 Functional Need Domains section of [`autism-ap-builder.html`](../autism-ap-builder.html) — validity/completeness of the input items in each domain, and the output text those inputs drive (needs-summary prose + therapy-rule + plan/letter text).
+**Status:** roadmap — **Unit 1 implemented 2026-06-02** (D1/D2 ABA-sync fixes); Units 2–5 pending · **Reviewed:** 2026-06-02 · **Scope:** the §4 Functional Need Domains section of [`autism-ap-builder.html`](../autism-ap-builder.html) — validity/completeness of the input items in each domain, and the output text those inputs drive (needs-summary prose + therapy-rule + plan/letter text).
 
 This is a point-in-time **review record**, not a re-runnable procedure (contrast `docs/audits/`). It captures a four-pass clinical-design council and the implementation roadmap it ratified. Source references use the house `file:line` convention (e.g., `autism-ap-builder.html:5952`); `§N` references point to `branching-logic.md`. Nothing here is implemented — it is the agreed plan of record.
 
@@ -12,7 +12,7 @@ The council's headline finding: the two highest-value defects are **output-logic
 
 | # | Unit | Contents | Golden? | branching-logic.md | Effort |
 |---|---|---|---|---|---|
-| **1** | **ABA-sync logic fixes** (highest stakes) | **D1** add a compliance / instructional-control ABA target; stop `noncompliance` from adding `reduce_stereotypy`. **D2** gate `reduce_stereotypy` to `b1` + `vocalDisruption` only (drop the `needsBehavior.size>0` catch-all); fold **D3** (vocalDisruption function is an FBA question) in as a note. | Yes | §9.2 / §7 | Med (new `abaTargets` key + sync edits) |
+| **1** ✅ | **ABA-sync logic fixes** (highest stakes) — **DONE 2026-06-02** | **D1** added `instructional_control` ABA target; `noncompliance` now maps to it and no longer adds `reduce_stereotypy`. **D2** `reduce_stereotypy` gated to `b1` + `vocalDisruption` only; **D3** FBA-function note added. Locked by 4 new unit-lane cases. | Yes (golden unchanged — sync is DOM-only) | §9.2 updated | done |
 | **2** | **Motor validity** | **C1** split "Gross motor delays / hypotonia" into two items; wire `hypotonia` into `rulePT`. | Yes | §12 (new `S` key) | Med |
 | **3** | **Clarity relabels** (no golden — ships clean) | **A2** `oral_motor` → "Oral-motor / motor speech". **B2** `feeding_adl` → "Self-feeding / utensil use". **E1** honest-pointer relabel of `academic` (see Ruling 2). | No | — | Low |
 | **4** | **Output annotations** | **C2** OT/PT coordination co-management line. **E2** one-line note distinguishing diagnostic criteria from treatment-target needs. | Yes | minor | Low |

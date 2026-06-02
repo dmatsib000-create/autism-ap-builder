@@ -134,6 +134,31 @@ const CASES = [
                 assert.equal(a.S.specifiers.has('withBIF'), true, 'withBIF should be retained');
                 assert.equal(cb.disabled, false, 'checkbox should be enabled'); } };
   })(),
+
+  // ── syncABATargetsFromNeeds(): behavior -> ABA-target mapping (DOM wrapper) ──
+  // The sync fires from onchange/render in the app and add()s keys to S.abaTargets;
+  // the golden lane can't reach it (fixtures set S.abaTargets directly). These cases
+  // lock the two fixes from the §4 review (Unit 1, council 2026-06-02): D1 noncompliance
+  // must map to instructional_control (and NOT stereotypy), and D2 reduce_stereotypy
+  // must NOT fire on a non-repetitive interfering behavior. Both would FAIL pre-fix.
+  { name: 'D1: noncompliance -> instructional_control, not stereotypy',
+    setup(S){ S.needsBehavior.add('noncompliance'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('instructional_control'), true, 'noncompliance should add instructional_control');
+              assert.equal(a.S.abaTargets.has('reduce_stereotypy'), false, 'noncompliance must NOT add reduce_stereotypy'); } },
+  { name: 'D2: aggression alone does not add reduce_stereotypy',
+    setup(S){ S.needsBehavior.add('aggression'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('reduce_aggression'), true, 'aggression should add reduce_aggression');
+              assert.equal(a.S.abaTargets.has('reduce_stereotypy'), false, 'aggression alone must NOT add reduce_stereotypy'); } },
+  { name: 'Stereotypy positive control: criteria B1 -> reduce_stereotypy',
+    setup(S){ S.criteriaB.add('b1'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('reduce_stereotypy'), true, 'b1 (repetitive movements) should add reduce_stereotypy'); } },
+  { name: 'Stereotypy positive control: vocalDisruption -> reduce_stereotypy',
+    setup(S){ S.needsBehavior.add('vocalDisruption'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('reduce_stereotypy'), true, 'disruptive vocalizations should add reduce_stereotypy'); } },
 ];
 
 let pass = 0;

@@ -1579,6 +1579,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_stereotypy"> Reduction of interfering repetitive behaviors (including disruptive vocalizations)</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_pica"> Reduction of pica / ingestion of non-food items</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="self_reg"> Self-regulation and coping strategies</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="instructional_control"> Instructional control and cooperation (following directions)</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="transitions"> Transition tolerance and behavioral flexibility</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="academics"> Academic readiness / instruction-following skills</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="boundary_skills"> Personal space and interpersonal boundary skills</label>
@@ -2890,6 +2891,7 @@ function generateNote() {
       reduce_stereotypy:'Reduction of interfering repetitive behaviors: programming targets repetitive behaviors with documented interference with learning, safety, or access to reinforcement, consistent with BACB ethical and neurodiversity-affirming practice standards. Stimming behaviors without documented functional interference are not appropriate reduction targets.',
       reduce_pica:'Reduction of pica (ingestion of non-food items): pica is a Behavior of Danger; any ingestion event carries risk of foreign body obstruction, internal injury, or toxic exposure. Environmental modification, direct supervision protocol, and function-based behavioral intervention are required; coordinate with GI evaluation.',
       self_reg:'Self-regulation and coping strategies: emotional regulation impairments documented; programming targets physiological arousal awareness, identification of regulatory states, and adaptive coping responses.',
+      instructional_control:'Instructional control and cooperation: documented difficulty following directions and responding to instruction limits access to learning across settings; programming builds cooperative responding, demand-following, and behavioral momentum through reinforcement-based, function-informed strategies (FBA-guided where the behavior is escape-maintained) rather than coercive compliance, paired with choice-making and antecedent supports to preserve autonomy.',
       transitions:'Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.',
       academics:'Academic readiness / instruction-following skills: targets prerequisite learning behaviors (attending to instruction, following multi-step directions, task initiation and completion) rather than academic content instruction; appropriate for this developmental profile.',
       boundary_skills:'Personal space and interpersonal boundary skills: documented boundary violations create risk of peer harm, disciplinary action, and exploitation; ABA-based explicit teaching of personal space concepts, appropriate touch by relationship type, and permission-seeking behaviors is indicated. All skills must be systematically generalized across school, home, and community settings.'
@@ -4006,6 +4008,7 @@ function _abaContent(){
     reduce_tantrum:'Meltdown and tantrum reduction; emotional regulation',
     reduce_stereotypy:'Reduction of interfering repetitive behaviors',
     self_reg:'Self-regulation and coping strategies',
+    instructional_control:'Instructional control and cooperation (following directions)',
     transitions:'Transition tolerance and behavioral flexibility',
     academics:'Pre-academic and academic readiness skills',
     menstrual_care:'Menstrual hygiene management (task analysis, multi-step self-care routine)',
@@ -4021,6 +4024,7 @@ function _abaContent(){
     safety_skills:'Community safety and personal safety advocacy',
     play:'Social-pragmatic skills for peer, school, and workplace contexts',
     transitions:'Flexibility and adaptation to schedule and role changes',
+    instructional_control:'Cooperation and self-management in instructional and work settings',
   };
   const isOlderForABA=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
   const targets=[...S.abaTargets].map(t=>(isOlderForABA&&TL_OLDER[t])||TL[t]||t);
@@ -5963,6 +5967,7 @@ function syncABATargetsFromNeeds(){
   if(S.needsBehavior.has('sib')||S.safety.has('sib_safety_counsel'))      add('reduce_sib');
   if(S.needsBehavior.has('aggression')||S.needsBehavior.has('property'))   add('reduce_aggression');
   if(S.needsBehavior.has('tantrums')||S.emotionalReg)                      add('reduce_tantrum');
+  if(S.needsBehavior.has('noncompliance'))                                 add('instructional_control');
   if(S.needsSocial.has('play')||S.needsSocial.has('peer'))                  add('play');
   if(S.needsComm.has('expressive')||S.needsComm.has('receptive')||S.needsComm.has('functional_aac')) add('functional_comm');
   if(S.needsAdaptive.has('toileting')||S.needsAdaptive.has('dressing')||S.needsAdaptive.has('feeding_adl')) add('self_help');
@@ -5974,8 +5979,12 @@ function syncABATargetsFromNeeds(){
   if(S.academic&&isYoung())                                                 add('academics');
   // Early intervention core targets — fire for toddler/preschool with social or communication needs
   if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
-  // Stereotypy — fire when b1 (repetitive movements/speech) checked, any interfering behavior present, or vocal disruption
-  if(S.criteriaB.has('b1')||S.needsBehavior.size>0||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
+  // Stereotypy — fire ONLY when b1 (repetitive movements/speech) is checked or disruptive vocalizations
+  // are present. The former `needsBehavior.size>0` catch-all was dropped (council 2026-06-02): it made ANY
+  // interfering behavior (aggression, elopement, SIB, noncompliance…) wrongly add a stereotypy-reduction
+  // target. NOTE: vocalDisruption's function (stereotypy vs communicative/attention-maintained) is an FBA
+  // determination — this presumes the interfering-repetitive framing and may be re-scoped after FBA.
+  if(S.criteriaB.has('b1')||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
   // Pica — specific high-risk behavior requiring dedicated ABA target
   if(S.needsBehavior.has('pica')) add('reduce_pica');
   if(S.needsBehavior.has('boundaryViol')) add('boundary_skills');
