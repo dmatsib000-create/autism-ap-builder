@@ -503,8 +503,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* ── 2-column checkbox grid for dense sub-domains ── */
 .cb-list.col2{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-3);row-gap:3px;align-items:start}
 .cb-list.col2>div{grid-column:1/-1}
-/* ── Comorbid group separators ── */
-.comorbid-grp{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
+/* ── Group separators (generic — used in the Functional Needs, Medical & Referral Flags, and Comorbidity sections) ── */
+.grp-sep{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 3px;border-bottom:1px solid var(--gray-200);margin-bottom:4px;margin-top:10px;grid-column:1/-1}
 /* ── Section completion left-border ── */
 .section.has-content{border-left:3px solid var(--green)}
 /* ── Prior-testing expander ── */
@@ -541,7 +541,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* Grouped override tiles — replaces the prior flat .ov-pill-grid with three clinical clusters
    (Core therapies, Medical & diagnostic, Florida resources). Each .ov-group wraps a header
    and its own pill grid. SLP/OT/PT sit first-three in the Core group so they're always in
-   the top-left scan zone. Group header reuses the .comorbid-grp pattern visually. */
+   the top-left scan zone. Group header reuses the .grp-sep pattern visually. */
 .ov-group{margin-top:8px}
 .ov-group:first-child{margin-top:0}
 .ov-group-head{font-size:var(--text-10);font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:4px 0 4px;display:block}
@@ -1305,61 +1305,69 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       </div>
       <hr class="divider">
       <div class="field-group">
-        <span class="field-label">Additional Domains</span>
+        <span class="field-label">Regulatory / Behavioral</span>
         <div class="cb-list">
-          <div class="comorbid-grp" style="margin-top:2px">Regulatory / Behavioral</div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="emotionalReg"> Emotional regulation difficulties</label>
           <div class="beh-freq-row" data-for="emotionalReg" style="display:none"><input class="beh-freq-inp" data-freqkey="emotionalReg" type="text" placeholder="Frequency/description (optional) — e.g., 2–3 episodes/day, triggered by transitions or demands"></div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="academic"> Academic / learning difficulties</label>
-          <div class="comorbid-grp">Medical</div>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="hearingScreenFail"> Behavioral hearing screen non-compliant or inconclusive</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="seizureConcern"> History concerning for seizures (staring spells, atypical regression, non-emergent) → EEG</label>
-          <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
-          <div class="comorbid-grp">Genetics-relevant exam findings</div>
-          <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
-          <div class="radio-grid" style="margin:4px 0">
-            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
-            <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
-          </div>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="congenitalAnomalies"> Congenital anomalies on physical examination</label>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="developmentalRegression"> Documented developmental regression → genetics + neurology referral</label>
-          <div id="regressionTimingRow" class="sub-options" style="display:none">
-            <span class="sub-label">Regression timing</span>
-            <div class="radio-grid" style="margin:2px 0 4px">
-              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
-              <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
-            </div>
-            <div class="field-hint" style="margin:0 0 4px;font-size:var(--text-11);color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
-          </div>
-          <div class="comorbid-grp">Support Services</div>
-          <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
-          <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
-            <span class="sub-label">Reason(s) for referral</span>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="apd_waiver"> APD/Medicaid waiver application assistance</label>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="financial"> Financial resource counseling</label>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="caregiver_support"> Caregiver support and mental health</label>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="community_nav"> Community resource navigation</label>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_support"> Family support coordination</label>
-            <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_safety"> Family safety concerns</label>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 5. Comorbid Conditions -->
+  <!-- 5. Co-occurring Medical Flags & Referrals (work-up triggers, exam findings, referrals — filled from exam/records, not parent report) -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">5</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-medflags" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">5</span><span class="sec-kicker">Referrals</span><span class="sec-title">Medical &amp; Referral Flags</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="cb-list">
+        <div class="grp-sep" style="margin-top:2px">Work-up &amp; referrals</div>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="hearingScreenFail"> Behavioral hearing screen non-compliant or inconclusive</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="seizureConcern"> History concerning for seizures (staring spells, atypical regression, non-emergent) → EEG</label>
+        <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
+        <div class="grp-sep">Genetics-relevant exam findings</div>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
+        <div class="radio-grid" style="margin:4px 0">
+          <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
+          <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
+          <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="confirmed"> Confirmed dysmorphic features (geneticist-documented)</label>
+        </div>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="congenitalAnomalies"> Congenital anomalies on physical examination</label>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="developmentalRegression"> Documented developmental regression → genetics + neurology referral</label>
+        <div id="regressionTimingRow" class="sub-options" style="display:none">
+          <span class="sub-label">Regression timing</span>
+          <div class="radio-grid" style="margin:2px 0 4px">
+            <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="ongoing"> Ongoing or recent (weeks to months)</label>
+            <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
+            <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
+          </div>
+          <div class="field-hint" style="margin:0 0 4px;font-size:var(--text-11);color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
+        </div>
+        <div class="grp-sep">Support Services</div>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
+        <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
+          <span class="sub-label">Reason(s) for referral</span>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="apd_waiver"> APD/Medicaid waiver application assistance</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="financial"> Financial resource counseling</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="caregiver_support"> Caregiver support and mental health</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="community_nav"> Community resource navigation</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_support"> Family support coordination</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_safety"> Family safety concerns</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Comorbid Conditions -->
+  <div class="section">
+    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">6</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
-        <div class="comorbid-grp" style="margin-top:2px">Psychiatric / Behavioral Health</div>
+        <div class="grp-sep" style="margin-top:2px">Psychiatric / Behavioral Health</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_combined"> ADHD, Combined presentation</label><span class="plan-pill" data-cv="adhd_combined">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_inattentive"> ADHD, Predominantly inattentive</label><span class="plan-pill" data-cv="adhd_inattentive">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_hyperactive"> ADHD, Predominantly hyperactive-impulsive</label><span class="plan-pill" data-cv="adhd_hyperactive">Include plan</span></div>
@@ -1379,7 +1387,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia"> Catatonia — features present at this visit (F06.1)</label><span class="plan-pill" data-cv="catatonia">Include plan</span></div>
         <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia_history"> Catatonia — prior episode (recovered or partial; F06.1 by history)</label><span class="plan-pill" data-cv="catatonia_history">Include plan</span></div>
 
-        <div class="comorbid-grp">Neurodevelopmental</div>
+        <div class="grp-sep">Neurodevelopmental</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><span class="plan-pill" data-cv="language_disorder">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_reading"> Specific learning disorder — reading / dyslexia (F81.0)</label><span class="plan-pill" data-cv="ld_reading">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_math"> Specific learning disorder — mathematics / dyscalculia (F81.2)</label><span class="plan-pill" data-cv="ld_math">Include plan</span></div>
@@ -1387,7 +1395,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><span class="plan-pill" data-cv="ld_suspected">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><span class="plan-pill" data-cv="dcd">Include plan</span></div>
 
-        <div class="comorbid-grp">Medical</div>
+        <div class="grp-sep">Medical diagnoses</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><span class="plan-pill" data-cv="epilepsy">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="sleep_disorder"> Sleep disorder (insomnia / circadian)</label><span class="plan-pill" data-cv="sleep_disorder">Include plan</span></div>
         <div id="sleepFactorsRow" class="sub-options" style="display:none">
@@ -1425,9 +1433,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
 
-  <!-- 6. School -->
+  <!-- 7. School -->
   <div class="section">
-    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">6</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">7</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Placement</span>
@@ -1473,9 +1481,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
 
-  <!-- 7. Safety -->
+  <!-- 8. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">7</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">8</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
@@ -1490,9 +1498,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
 
-  <!-- 8. Anticipatory Guidance -->
+  <!-- 9. Anticipatory Guidance -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">8</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">9</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
@@ -2487,7 +2495,11 @@ function needsSummaryLines() {
   if(S.needsSocial.size){const x=[];if(S.needsSocial.has('peer'))x.push('peer interaction');if(S.needsSocial.has('play'))x.push('play skills');if(S.needsSocial.has('reciprocity'))x.push('social reciprocity');if(S.needsSocial.has('emotion'))x.push('emotion recognition');if(S.needsSocial.has('perspective'))x.push('perspective-taking/Theory of Mind');if(S.needsSocial.has('conversation'))x.push('conversation skills');L.push('  • Social/play: '+x.join(', '));}
   if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory: '+x.join(', '));}
   if(S.needsMotor.size){const x=[];if(S.needsMotor.has('gross'))x.push('gross motor');if(S.needsMotor.has('fine'))x.push('fine motor');if(S.needsMotor.has('coordination'))x.push('coordination/DCD');if(S.needsMotor.has('handwriting'))x.push('handwriting');L.push('  • Motor: '+x.join(', '));}
-  const misc=[];if(S.emotionalReg)misc.push('emotional regulation');if(S.academic)misc.push('academic/learning');if(S.sleep)misc.push('sleep');if(S.feeding)misc.push('feeding/food selectivity');if(misc.length)L.push('  • Additional concerns: '+misc.join(', '));
+  const misc=[];if(S.emotionalReg)misc.push('emotional regulation');if(S.academic)misc.push('academic/learning');
+  // Suppress the lightweight "Work-up & referrals" sleep echo when sleep_disorder is a full in-plan problem — the coded
+  // problem block already documents it. Mirrors the SLEEP MANAGEMENT dedup guard; same in-plan condition.
+  if(S.sleep&&!(S.comorbid.has('sleep_disorder')&&S.comorbidInPlan.has('sleep_disorder')))misc.push('sleep');
+  if(S.feeding)misc.push('feeding/food selectivity');if(misc.length)L.push('  • Additional concerns: '+misc.join(', '));
   return L;
 }
 
@@ -3142,6 +3154,13 @@ function generateNote() {
   }
 
   // Sleep management (in-clinic)
+  // WARY: intentional dedup of two parallel sleep inputs by design (council-ratified, see below).
+  // S.sleep ("Work-up & referrals" group — managing/noting, NOT coding) and sleep_disorder ("Medical
+  // diagnoses" group — coded G47.9) deliberately co-exist as a symptom-vs-diagnosis pair, and BOTH feed this
+  // in-clinic block. The guard suppresses this block only when sleep_disorder is a full in-plan problem
+  // (S.comorbidInPlan), because that problem block already carries the management plan — otherwise the
+  // advice would print twice. Do NOT "simplify" to a plain OR: dropping the in-plan exclusion
+  // reintroduces the double-print this condition exists to prevent.
   if((S.sleep||S.comorbid.has('sleep_disorder'))&&!(S.comorbid.has('sleep_disorder')&&S.comorbidInPlan.has('sleep_disorder'))){
     L.push(n+++'. SLEEP MANAGEMENT');
     L.push('Sleep management addressed in this clinic. Behavioral sleep intervention initiated:');
@@ -5537,12 +5556,18 @@ function updateSectionHeaders(){
   if(S.needsComm.size)nd.push('Communication');if(S.needsBehavior.size)nd.push('Behavior');
   if(S.safety.size)nd.push('Safety');if(S.needsSensory.size)nd.push('Sensory');
   if(S.needsMotor.size)nd.push('Motor');if(S.needsAdaptive.size)nd.push('Adaptive');
-  if(S.needsSocial.size)nd.push('Social');if(S.emotionalReg||S.academic||S.sleep||S.feeding)nd.push('Other');
+  if(S.needsSocial.size)nd.push('Social');if(S.emotionalReg||S.academic)nd.push('Other');
   setSH('sh-needs',nd.length>0,nd.slice(0,4).join(' · ')+(nd.length>4?' +'+( nd.length-4):''));
-  // 5 Comorbid
+  // 5 Medical & Referral Flags (work-up triggers, exam findings, social-work referral — moved out of §4)
+  const mf=[];
+  if(S.feeding||S.sleep||S.hearingScreenFail||S.seizureConcern||S.sleepStudy||S.focalNeuroFindings)mf.push('Work-up');
+  if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
+  if(S.socialWork)mf.push('Social work');
+  setSH('sh-medflags',mf.length>0,mf.join(' · '));
+  // 6 Comorbid
   const cc=S.comorbid.size;
   setSH('sh-comorbid',cc>0,cc>0?cc+' condition'+(cc>1?'s':''):'');
-  // 6 School
+  // 7 School
   const sc=[];const spShort={notYet:'Not yet in school',daycare:'Daycare',genEd:'Gen ed',genEdSupport:'Gen ed+support',selfContained:'Self-contained',therapDay:'Therapeutic day',privateNoIEP:'Private (no IEP)',privateWithIEP:'Private (IEP svcs)',home:'Homeschool'};
   if(S.schoolPlacement)sc.push(spShort[S.schoolPlacement]||'');
   const sdShort={iep:'IEP',iep_needed:'IEP needed',504:'504 Plan',neither:'No doc'};
