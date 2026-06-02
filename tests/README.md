@@ -40,6 +40,15 @@ accident.
   half-finished edit that adds a key in one table but not another renders a
   referral reason or override pill in one place and silently drops it elsewhere;
   the output lanes can't see it because some tables live in unreachable scopes.
+  This lane also guards the **theme boundary** (section C): the formal-letter pins
+  (`--letter-ink` / `--letter-rule`) and the clinical amber semantic (`--amber*`)
+  must stay defined only in base `:root` and never be overridden inside a
+  `:root[data-theme=...]` block — otherwise the ABA/IEP letters bleed the theme
+  accent (Warm flips them amber, Slate vermilion), the exact preserved-document
+  regression the manual sweep would otherwise have to catch by eye. It does NOT
+  assert the Warm and Slate blocks define the same token *set* — they
+  intentionally differ (Warm's letterpress `--key-*`/`--emboss` vs Slate's
+  `--radius-lg`/`--shadow-card`), so set-equality would be a false positive.
 
 ## Running
 

@@ -128,11 +128,67 @@ const ovDefCycleable = ovDefKeys.filter(k => k !== 'socialWork');
 check('Override state (S.overrides init vs OV_DEFS minus socialWork)',
   diff('S.overrides', ovInitKeys, 'OV_DEFS\\socialWork', ovDefCycleable));
 
+// ── C. Preserved-document boundary tokens stay theme-independent ─────────────
+// The formal-letter pins (--letter-ink/--letter-rule) and the clinical amber
+// semantic (--amber/-light/-dark) are defined once in base :root and are
+// DELIBERATELY not overridden per theme (see the comment above the
+// :root[data-theme] blocks). If a theme block redefines one, the letters bleed
+// the theme accent (Warm would flip --letter-ink amber, Slate vermilion) or the
+// amber clinical signal drifts — the exact preserved-document regression the
+// manual preview sweep currently has to catch by eye. This static guard makes
+// that boundary fail at `npm test` instead.
+//
+// NAMES only, and intentionally strict: a theme re-declaring a pin even to the
+// SAME value is flagged — it has no business in a theme block at all. Whether a
+// value is correct stays the visual sweep / contrast audit's job (see
+// tests/README.md "the DOM blind spot"). We do NOT assert Warm/Slate define the
+// same token SET: they intentionally differ (Warm's --key-*/--emboss/--blue-darker
+// signature vs Slate's --radius-lg/--shadow-card), so set-equality would be a
+// false positive. This guards only the never-theme-these tokens.
+//
+// balancedAfter() can't be reused here: its marker would contain the '[' of the
+// attribute selector and it would grab `[data-theme="warm"]` instead of the
+// `{...}` rule body. cssBlockAfter finds the first '{' AFTER the full selector.
+const cssBlockAfter = sel => {
+  const i = html.indexOf(sel);
+  if (i < 0) throw new Error(
+    `invariants.mjs: selector "${sel}" not found in autism-ap-builder.html.\n` +
+    `    If a theme block was renamed or removed, update this test to match.`
+  );
+  const open = html.indexOf('{', i + sel.length);
+  let depth = 0;
+  for (let k = open; k < html.length; k++) {
+    if (html[k] === '{') depth++;
+    else if (html[k] === '}' && --depth === 0) return html.slice(open, k + 1);
+  }
+  throw new Error(`invariants.mjs: unbalanced "{" after selector "${sel}".`);
+};
+
+const PIN_TOKENS = ['--letter-ink', '--letter-rule', '--amber', '--amber-light', '--amber-dark'];
+const themeBlocks = [
+  ['Warm',  cssBlockAfter(':root[data-theme="warm"]')],
+  ['Slate', cssBlockAfter(':root[data-theme="slate"]')],
+];
+for (const tok of PIN_TOKENS) {
+  const def = tok + ':';                       // `--amber:` won't match `--amber-light:` (different next char)
+  for (const [themeName, block] of themeBlocks) {
+    if (block.includes(def)) failures.push(
+      `Boundary token ${tok} is overridden in the ${themeName} theme block — it must stay ` +
+      `theme-independent (formal-letter pin / clinical amber). Remove it from the theme block.`
+    );
+  }
+  if (!html.includes(def)) failures.push(
+    `Boundary token ${tok} is no longer defined anywhere — it must remain defined in base :root ` +
+    `(was it renamed or removed?).`
+  );
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
   `invariants: SW reasons ${swLabelKeys.length} keys; ` +
-  `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys`
+  `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
+  `boundary pins ${PIN_TOKENS.length} guarded theme-independent`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');
