@@ -183,11 +183,53 @@ for (const tok of PIN_TOKENS) {
   );
 }
 
+// ── D. ABA-target tables agree (checkbox ⇄ TL label map) ─────────────────────
+// Each ABA target has up to four hand-maintained parallel representations: the
+// form checkboxes (data-key="abaTargets"), the TL label map (ABA-letter target
+// list), the TARGET_RATIONALE map (ABA-letter rationale block), and the add('...')
+// calls in syncABATargetsFromNeeds(). Nothing else lints these, so a target added
+// to some-but-not-all tables silently desyncs. The sharpest failure: a missing TL
+// entry renders the RAW KEY in the ABA letter (the `||t` fallthrough in the targets
+// map ~`const targets=[...S.abaTargets].map(...)`), the exact bug that shipped when
+// pica was keyed reduce_pica everywhere but `pica_reduction` in TL. (Found in the
+// §4 review, docs/section-4-functional-needs-review.md.)
+//
+// TL is the load-bearing 1:1 table (its lookup falls through to the raw key), so
+// checkbox value-set MUST EQUAL TL key-set. The other tables are SUBSET-checked:
+// TARGET_RATIONALE is intentionally partial (its consumer .filter()s to keys it
+// has) and TL_OLDER intentionally overrides only some targets — but neither may
+// reference a target that has no checkbox (an orphan from a rename/removal), and
+// no sync add() may target a non-existent checkbox.
+const subset = (subLabel, sub, supLabel, sup) => {
+  const SUP = new Set(sup);
+  const orphans = [...new Set(sub)].filter(k => !SUP.has(k));
+  return orphans.length ? `in ${subLabel} but not ${supLabel}: ${orphans.join(', ')}` : null;
+};
+const abaCheckboxKeys = [...html.matchAll(/data-key="abaTargets"\s+value="([^"]+)"/g)].map(m => m[1]);
+const tlKeys = flatObjectKeys(balancedAfter('const TL='));
+const tlOlderKeys = flatObjectKeys(balancedAfter('const TL_OLDER='));
+const targetRationaleKeys = flatObjectKeys(balancedAfter('const TARGET_RATIONALE='));
+// Match the local `add('target')` helper only — the negative lookbehind excludes
+// Set-method calls like `S.needsBehavior.add('rigidity')` (the b2→rigidity cascade,
+// a derived behavior with no checkbox by design), which are not abaTargets adds.
+const abaSyncAddKeys = [...balancedAfter('function syncABATargetsFromNeeds')
+  .matchAll(/(?<!\.)\badd\('([^']+)'\)/g)].map(m => m[1]);
+
+check('ABA targets (checkboxes vs TL label map)',
+  diff('checkboxes', abaCheckboxKeys, 'TL', tlKeys));
+check('ABA targets (TL_OLDER overrides a real target)',
+  subset('TL_OLDER', tlOlderKeys, 'TL', tlKeys));
+check('ABA targets (TARGET_RATIONALE keys are real targets)',
+  subset('TARGET_RATIONALE', targetRationaleKeys, 'checkboxes', abaCheckboxKeys));
+check('ABA targets (sync add() targets a real checkbox)',
+  subset('sync add()', abaSyncAddKeys, 'checkboxes', abaCheckboxKeys));
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
   `invariants: SW reasons ${swLabelKeys.length} keys; ` +
   `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
+  `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent`
 );
 for (const f of failures) console.log('✗ ' + f);
