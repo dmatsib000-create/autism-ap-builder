@@ -229,10 +229,14 @@
 
 /* Slate: the masthead header — hanging-style folio + vermilion kicker + Newsreader title. */
 [data-theme="slate"] .sec-label{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center}
-[data-theme="slate"] .sec-folio{grid-column:1;grid-row:1/3;align-self:center;font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1;color:var(--gray-600)}
+[data-theme="slate"] .sec-folio{grid-column:1;grid-row:1/-1;align-self:center;font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1;color:var(--gray-600)}
 [data-theme="slate"] .sec-folio::after{content:none}
 [data-theme="slate"] .sec-kicker{display:block;grid-column:2;grid-row:1;font-size:var(--text-9);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);line-height:1.3}
 [data-theme="slate"] .sec-title{grid-column:2;grid-row:2;font-family:var(--font-display);font-weight:600;font-size:var(--text-13);text-transform:none;letter-spacing:0;line-height:1.15;color:var(--gray-900)}
+/* Tuck the section summary under the title (col 2, row 3) so it reads as part of
+   the masthead block instead of floating far-right. Needs the JS to insert it
+   INSIDE .sec-label (see setSH); the folio spans all rows to stay centered. */
+[data-theme="slate"] .sec-sum{grid-column:2;grid-row:3;align-self:start;margin-left:0;max-width:100%}
 
 /* Slate: ruled tabular checkbox lists. */
 [data-theme="slate"] .cb-list{border-top:1px solid var(--border-subtle)}
@@ -705,6 +709,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
      keeps its own borders/background, so visual continuity is preserved. */
   .section{overflow:visible}
   .sec-head{position:sticky;top:44px;z-index:40;box-shadow:0 1px 2px rgba(15,15,25,.04)}
+  /* Slate flattens .sec-head to transparent (rules, not cards). A transparent
+     STICKY header lets scrolled content bleed through it on mobile, so give it
+     an opaque panel fill here. (Default/Warm already have an opaque header bg.) */
+  [data-theme="slate"] .sec-head{background:var(--surface)}
   body[data-test-mode] .sec-head{position:static}
   /* Animated collapse on mobile — body shrinks smoothly so the user sees the
      section close (instead of teleporting). Replaces the scroll-then-collapse
@@ -5494,7 +5502,17 @@ function updateSectionHeaders(){
     // .sec-label, so a bare `span:last-child` matches the nested .sec-title and
     // insertBefore throws (it isn't a direct child of h). We want the chevron,
     // which is the last DIRECT-child span (true for restructured + utility headers).
-    if(!sum){sum=document.createElement('span');sum.className='sec-sum';const arr=h.querySelector(':scope > span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
+    if(!sum){
+      sum=document.createElement('span');sum.className='sec-sum';
+      // Numbered headers wrap their text in .sec-label; put the summary INSIDE it
+      // so the Slate masthead grid can place it under the title (CSS). Utility
+      // headers (no .sec-label) keep the original "before the chevron" insertion.
+      // `:scope >` targets the chevron as the last DIRECT-child span (the masthead
+      // nests spans, so a bare span:last-child would match the nested title).
+      const label=h.querySelector(':scope > .sec-label');
+      if(label){label.appendChild(sum);}
+      else{const arr=h.querySelector(':scope > span:last-child');arr?h.insertBefore(sum,arr):h.appendChild(sum);}
+    }
     dot.className='sec-dot'+(hasData?' dot-has':'');
     h.closest('.section')?.classList.toggle('has-content',!!hasData);
     sum.textContent=summary?' — '+summary:'';
