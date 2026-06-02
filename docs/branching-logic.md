@@ -921,7 +921,7 @@ if (!S.criteriaB.has('b2')) S.needsBehavior.delete('rigidity');
 
 If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehavior` (which in turn removes the `'transitions'` ABA target). The exception exists because rigidity is *derived* from B2 rather than manually entered — the clinician toggled B2, not the rigidity needs box.
 
-**Target population table** (`autism-ap-builder.html:4545–4574`):
+**Target population table** (`autism-ap-builder.html:5952–5985`):
 
 | Target | Auto-added when |
 |---|---|
@@ -929,13 +929,14 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `reduce_sib` | `needsBehavior.has('sib') \|\| safety.has('sib_safety_counsel')` |
 | `reduce_aggression` | `needsBehavior.has('aggression') \|\| needsBehavior.has('property')` |
 | `reduce_tantrum` | `needsBehavior.has('tantrums') \|\| S.behavFreq.emotionalReg === true` |
+| `instructional_control` | `needsBehavior.has('noncompliance')` — skill-acquisition target (cooperation / following directions), **not** a "compliance" reduction (neurodiversity-affirming framing). Added council 2026-06-02 (§4 review Unit 1); previously `noncompliance` had **no** target and wrongly fed `reduce_stereotypy` via the catch-all below. |
 | `play` | `needsSocial.has('play') \|\| needsSocial.has('peer')` |
 | `functional_comm` | `needsComm.has('expressive') \|\| needsComm.has('receptive') \|\| needsComm.has('functional_aac')` |
 | `safety_skills` | `needsAdaptive.has('commSafety') \|\| needsAdaptive.has('commIndependence')` |
 | `menstrual_care` | `needsAdaptive.has('menstrualCare')` |
 | `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA) |
 | `joint_attention` + `imitation` | `isYoung() && (needsSocial.size > 0 \|\| needsComm.size > 0)` |
-| `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.size > 0 \|\| needsBehavior.has('vocalDisruption')` |
+| `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` — gated to the repetitive-movement/speech criterion or disruptive vocalizations only. The former `needsBehavior.size > 0` catch-all was removed (council 2026-06-02, §4 review Unit 1 D2): it made *any* interfering behavior (aggression, elopement, SIB, noncompliance) add a stereotypy-reduction target. `vocalDisruption`'s function (stereotypy vs. communicative/attention-maintained) is an FBA determination. |
 | `reduce_pica` | `needsBehavior.has('pica')` |
 | `boundary_skills` | `needsBehavior.has('boundaryViol')` |
 | `transitions` | `criteriaB.has('b2')` (and `'rigidity'` added to needsBehavior). **Remove direction:** if `b2` becomes false, `'rigidity'` is deleted from `needsBehavior` (the one exception to add-only — see [§4.4](#44-side-effects-of-specific-criteria)), but `'transitions'` itself **stays** in `abaTargets` — the add-only contract still applies to the target. Clinician must manually uncheck if they want it gone. |
