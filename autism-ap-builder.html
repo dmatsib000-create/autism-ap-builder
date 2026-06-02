@@ -33,7 +33,7 @@
   --accent:var(--blue);--accent-soft:var(--blue-light);--accent-hover:var(--blue-dark);
   /* Neutral scale — warmed slightly toward clinical-paper neutral */
   --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
-  --gray-300:#d2d2d8;--gray-400:#9b9ba3;--gray-500:#6b6b75;
+  --gray-300:#d2d2d8;--gray-400:#6c6c76;--gray-500:#6b6b75; /* gray-400 darkened from #9b9ba3 for WCAG AA (>=4.5:1) on muted text/labels, incl. the panel surface (lands near gray-500 in this theme) */
   --gray-600:#4a4a55;--gray-700:#363640;--gray-800:#1f1f28;--gray-900:#111118;
   /* Semantic colors — *-dark are the deep variants used for text-on-light-tint surfaces
      (badges, toast, pathway-pill suspected/typical, etc.) and meet WCAG AA against their
@@ -128,7 +128,7 @@
   --blue:#bf6a1e; --blue-light:#f4e2c4; --blue-dark:#9a5212; --blue-darker:#7a3d0a; /* --blue-darker: AA-safe btn-blue hover */
   /* warm paper + ink scale */
   --gray-50:#f6f0e2; --gray-100:#efe7d6; --gray-200:#ddd2bd; --gray-300:#c9bca2;
-  --gray-400:#938876; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d;
+  --gray-400:#6f6650; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d; /* gray-400 darkened (was #938876) for WCAG AA, incl. the warm panel surface */
   --gray-800:#2a251d; --gray-900:#211d16;
   --surface:#f3ecdc; --bg-card:#fbf6ea; --bg-elevated:#fffdf7;
   --border-subtle:#e7ddc8;
@@ -151,7 +151,7 @@
   --blue:#c8362a; --blue-light:#f6ded9; --blue-dark:#9c241a;
   /* cool slate paper + graphite ink scale */
   --gray-50:#f4f4f2; --gray-100:#ececea; --gray-200:#dcdcd8; --gray-300:#bcbcb6;
-  --gray-400:#878d97; --gray-500:#5a5f68; --gray-600:#454a52; --gray-700:#2c2f35;
+  --gray-400:#6b707b; --gray-500:#5a5f68; --gray-600:#454a52; --gray-700:#2c2f35; /* gray-400 darkened (was #878d97) for WCAG AA, incl. the slate panel surface */
   --gray-800:#191b1f; --gray-900:#15171a;
   --surface:#f6f6f4; --bg-card:#fcfcfb; --bg-elevated:#ffffff;
   --border-subtle:#e6e6e2;
@@ -1508,8 +1508,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   </div>
 
   <!-- ABA Parameters (shown when ABA is included in plan) -->
-  <div id="abaParamsSection" class="section" style="display:none;border-color:#2563eb">
-    <div class="sec-head" style="background:#dbeafe;color:#1d4ed8" onclick="toggleSec(this,event)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
+  <div id="abaParamsSection" class="section" style="display:none;border-color:var(--accent)">
+    <div class="sec-head" style="background:var(--accent-soft);color:var(--accent-hover)" onclick="toggleSec(this,event)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">These fields generate a standalone insurance-facing Letter of Medical Necessity. Use the <strong>ABA Letter</strong> tab in the preview to review and copy.</p>
 
