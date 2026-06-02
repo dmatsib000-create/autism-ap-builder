@@ -1311,7 +1311,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="single" value="emotionalReg"> Emotional regulation difficulties</label>
           <div class="beh-freq-row" data-for="emotionalReg" style="display:none"><input class="beh-freq-inp" data-freqkey="emotionalReg" type="text" placeholder="Frequency/description (optional) — e.g., 2–3 episodes/day, triggered by transitions or demands"></div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="academic"> Academic / learning difficulties</label>
-          <div class="comorbid-grp">Medical</div>
+          <div class="comorbid-grp">Work-up &amp; referrals</div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="sleep"> Sleep difficulties</label>
           <label class="cb-row"><input type="checkbox" data-key="single" value="hearingScreenFail"> Behavioral hearing screen non-compliant or inconclusive</label>
@@ -1387,7 +1387,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><span class="plan-pill" data-cv="ld_suspected">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><span class="plan-pill" data-cv="dcd">Include plan</span></div>
 
-        <div class="comorbid-grp">Medical</div>
+        <div class="comorbid-grp">Medical diagnoses</div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><span class="plan-pill" data-cv="epilepsy">Include plan</span></div>
         <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="sleep_disorder"> Sleep disorder (insomnia / circadian)</label><span class="plan-pill" data-cv="sleep_disorder">Include plan</span></div>
         <div id="sleepFactorsRow" class="sub-options" style="display:none">
@@ -3142,6 +3142,13 @@ function generateNote() {
   }
 
   // Sleep management (in-clinic)
+  // WARY: intentional dedup of two parallel sleep inputs by design (council-ratified, see below).
+  // S.sleep (§4 "Work-up & referrals" — managing/noting, NOT coding) and sleep_disorder (§5 "Medical
+  // diagnoses" — coded G47.9) deliberately co-exist as a symptom-vs-diagnosis pair, and BOTH feed this
+  // in-clinic block. The guard suppresses this block only when sleep_disorder is a full in-plan problem
+  // (S.comorbidInPlan), because that problem block already carries the management plan — otherwise the
+  // advice would print twice. Do NOT "simplify" to a plain OR: dropping the in-plan exclusion
+  // reintroduces the double-print this condition exists to prevent.
   if((S.sleep||S.comorbid.has('sleep_disorder'))&&!(S.comorbid.has('sleep_disorder')&&S.comorbidInPlan.has('sleep_disorder'))){
     L.push(n+++'. SLEEP MANAGEMENT');
     L.push('Sleep management addressed in this clinic. Behavioral sleep intervention initiated:');
