@@ -17,6 +17,7 @@ The council's headline finding: the two highest-value defects are **output-logic
 | **3** | **Clarity relabels** (no golden — ships clean) | **A2** `oral_motor` → "Oral-motor / motor speech". **B2** `feeding_adl` → "Self-feeding / utensil use". **E1** honest-pointer relabel of `academic` (see Ruling 2). | No | — | Low |
 | **4** | **Output annotations** | **C2** OT/PT coordination co-management line. **E2** one-line note distinguishing diagnostic criteria from treatment-target needs. | Yes | minor | Low |
 | **5** | **Scheduled follow-up** | Academic **Option B** — auto-wire `academic` → IDEA psychoeducational-evaluation recommendation, with a single dedupe gate across the three psychoed triggers. | Yes | §7 / §9 | Med-High |
+| **6** | **New feature — fecal smearing (scatolia)** | §4 Behavior checkbox + conditional GI-workup-status sub-option; dedicated GI encopresis/constipation/overflow referral (medical-first, deduped with `ruleGI`); new `reduce_smearing` ABA target (4-table, guard-enforced); dignity-framed note/ABA/IEP output. Designed by a separate council 2026-06-02 — see "Unit 6" below. | Yes | §7 / §9 | Med-High |
 
 **Deferred — David's call:** **C4** add toe-walking / gait item (clinically real; scope vs. neurology-overlap tradeoff). **Keeps (ratified, no change):** B1 sensory model, D4 `boundaryViol` dual-home, E3 pragmatics stays in Social/Play, E4 `emotionalReg` placement.
 
@@ -94,6 +95,21 @@ The trigger `S.criteriaB.has('b1')||S.needsBehavior.size>0||S.needsBehavior.has(
 - **Ruling 4 — bundle by golden-impact** (see roadmap).
 - **Ruling 5 — C4 deferred to David.**
 - **Ruling 6 — meta-finding:** the highest-value outputs were output-logic defects, not label problems → §4 input validity cannot be judged from labels alone; the input→output trace is mandatory. The "§4 item that is really a pointer to machinery elsewhere" pattern (academic→School/IEP; the already-migrated feeding) is a recurring theme to watch when adding items.
+
+---
+
+## Unit 6 — Fecal smearing (scatolia)  *(separate council, 2026-06-02)*
+
+A new functional-need addition, designed by its own multi-voice council (DBP lead · BCBA-D · Gastroenterology · OT · Autistic parent/community reviewer · Clinical workflow analyst). Grounded against the **pica** wiring as the closest template (input checkbox `autism-ap-builder.html:1270`, `ruleGI` `:2115`, `reduce_pica` target `:5989`, ABA safety clause `:2831`, IEP accommodation `:3123`). PLAN ONLY — not implemented.
+
+**Headline principle: medical-first.** Fecal smearing is *behaviorally expressed but frequently medically driven* — chronic constipation with overflow incontinence / encopresis is a common cause and must be excluded before any behavioral framing. The design makes that sequencing structural, not advisory.
+
+- **Placement (1B) — SHIP.** A checkbox in §4 Behavior/Interfering (where it's observed, paralleling pica), **plus a conditional GI-workup-status sub-option** (constipation/overflow suspected · medical ruled out · unclear) that foregrounds "is this medical?" at the point of entry. Patterned on the existing conditional-reveal sub-options (`socialWorkReasonsRow`, PFD domains, `depressionSafety`), so it costs nothing until the item is checked. *(Rejected: 1C pure-medical-flag underweights the ABA dimension; 1D split doubles the control; 1A bare-checkbox is the fallback if the sub-option is later deemed over-built.)*
+- **Branching / referrals (2B+2C) — SHIP.** A **dedicated GI encopresis/constipation/overflow referral** (not generic `ruleGI`) fires whenever smearing is checked, **deduped** with `ruleGI` so GI isn't double-recommended. The sub-option **conditions the framing**: driver = "suspected/unclear" → plan leads with GI workup and softens behavioral language; "ruled out" → behavioral/ABA framing foregrounded. ABA fires concurrently (behavioral support can run during workup); OT sensory is conditional on a sensory-function indication.
+- **ABA target (C3) — SHIP.** New `reduce_smearing`, auto-synced from the checkbox, registered across all four parallel tables — **now auto-enforced by the invariants-lane ABA-target guard** (added 2026-06-02), so a partial registration fails `npm test` rather than shipping a raw key. Function-based; rationale explicitly *exclude medical cause first; FBA for sensory/communicative/escape function; non-punitive, skill-building* (the `reduce_pica` rationale `:2892` is the structural template, but **not** its "no safe frequency threshold / medical emergency" clause — clinically wrong for smearing). Label (autistic-parent-owned): **"Reduction of fecal smearing (scatolia); toileting and hygiene skill-building"**; `TL_OLDER` variant "Hygiene independence and self-management."
+- **Output & framing (C4) — SHIP.** Note prose, ABA letter rationale, and IEP accommodation all lead medical/communication and preserve dignity. Framed as a **health/hygiene risk** (infection/social), explicitly **not** pica's ingestion-emergency language. Non-stigmatizing throughout — no "disgusting/gross," no willful-misbehavior framing; the behavior is presented as a medical/communication/regulation signal.
+
+**Unit-6 residuals (eyeball on implement):** exact sub-option labels; the GI-dedupe mechanics with `ruleGI`; the final target label. **Tests on implement:** golden fixtures exercising the behavior + each sub-option state; `branching-logic.md` §7/§9 update.
 
 ---
 
