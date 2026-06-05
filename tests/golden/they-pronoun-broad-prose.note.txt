@@ -79,6 +79,7 @@ PEERS (Program for the Education and Enrichment of Relational Skills) or compara
 
 5. PHYSICAL THERAPY (PT)
 Evaluation and treatment targeting: motor coordination/DCD. Goal: improve participation in PE, playground activities, and daily physical function.
+  • OT/PT coordination: motor coordination difficulty is co-managed across both disciplines. OT addresses praxis, motor planning, and fine-motor coordination; PT addresses gross-motor coordination, balance, and postural control. Evaluations and goals are coordinated so both fine and gross motor domains are covered without overlap.
 
 6. SCHOOL / EDUCATIONAL SUPPORTS
 IEP in place; recommend review/update to reflect current evaluation findings.

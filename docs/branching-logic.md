@@ -648,7 +648,7 @@ Every recommendation follows this exact shape — there is no second mechanism. 
 | 4 | `ruleSocialSkills` | 1376 | Age ∈ {preschool, schoolAge, adolescent} AND not minimally verbal AND (social needs OR boundary) | `socialSkills` |
 | 5 | `ruleSLP` | 1381 | Communication needs OR language disorder OR pragmatic/articulation/echolalic modifiers | `slp` |
 | 6 | `ruleOT` | 1388 | Sensory needs OR fine motor needs OR adaptive needs OR DCD comorbid | `ot` |
-| 7 | `rulePT` | 1389 | Gross motor needs OR DCD comorbid | `pt` |
+| 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid | `pt` |
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (ID OR regression OR dysmorphism OR congenital anomaly OR focal neuro findings)) | `genetics` |
 | 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression | `neurology` |
 | 10 | `rulePsychiatry` | 1410 | Confirmed ADHD/anxiety/depression/OCD, OR (severe behavior AND age school+) | `psychiatry` |
@@ -667,7 +667,7 @@ Each `rule*()` returns `{ include: boolean, reasons: string[] }`. The `reasons` 
 
 The 18 rules fall into four natural groups. Each group is documented here in terms of *what clinical signal it cares about* — the table above remains the source of truth for the exact conditions.
 
-**Therapy services (1–7, 11):** What the patient should be doing weekly. ABA is gated on a mix of age, communication ability, and severity. PCIT covers early-childhood behavior-and-attachment work. Psychotherapy is reserved for verbal school-age and older with mental-health comorbidities. Social skills groups span preschool through adolescence but exclude minimally-verbal children (group format requires expressive language). SLP/OT/PT mirror their needs categories directly. GI is comorbidity-driven.
+**Therapy services (1–7, 11):** What the patient should be doing weekly. ABA is gated on a mix of age, communication ability, and severity. PCIT covers early-childhood behavior-and-attachment work. Psychotherapy is reserved for verbal school-age and older with mental-health comorbidities. Social skills groups span preschool through adolescence but exclude minimally-verbal children (group format requires expressive language). SLP/OT/PT mirror their needs categories directly. GI is comorbidity-driven. When motor coordination/DCD activates both OT and PT, the in-clinic PT block adds an OT/PT co-management line (OT: praxis and fine-motor coordination; PT: gross-motor coordination and postural control) so the dual referral does not read as redundant; it fires only when OT is also active.
 
 **Medical referrals (8–10, 12, 13, 17):** Specialist consultations the PCP should send. Genetics has the broadest trigger surface — any confirmed ASD plus any of several flags. Neurology and EEG both fire on seizure-adjacent findings but are independent rules (EEG can fire without neurology if `seizureConcern` is set in isolation, which is intentional — the EEG itself may resolve the question without a specialist referral). Audiology has a young-child speech-screen branch that's easy to miss.
 
@@ -1098,7 +1098,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 |---|---|---|
 | Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder |
 | Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care |
-| Physical Therapy | `pt_school` | Gross motor + safe navigation |
+| Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult) |
 | 1:1 Paraprofessional | `aide` | Elopement risk + behavior safety + communication access + adaptive deficits |
