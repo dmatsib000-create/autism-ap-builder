@@ -18,6 +18,7 @@ The council's headline finding: the two highest-value defects are **output-logic
 | **4** ◐ | **Output annotations** — **C2 DONE 2026-06-02; E2 deferred** | **C2** ✅ OT/PT co-management line added to the in-clinic PT block (fires on coordination/DCD when OT is also active); locked by the `they-pronoun-broad-prose` golden. **E2** deferred — council rated it KEEP-only / lowest value; revisit only if the dual criteria-vs-needs listing has actually confused a note reader. | Yes (1 golden updated) | §7 note added | C2 done |
 | **5** | **Scheduled follow-up** | Academic **Option B** — auto-wire `academic` → IDEA psychoeducational-evaluation recommendation, with a single dedupe gate across the three psychoed triggers. | Yes | §7 / §9 | Med-High |
 | **6** | **New feature — fecal smearing (scatolia)** | §4 Behavior checkbox + conditional GI-workup-status sub-option; dedicated GI encopresis/constipation/overflow referral (medical-first, deduped with `ruleGI`); new `reduce_smearing` ABA target (4-table, guard-enforced); dignity-framed note/ABA/IEP output. Designed by a separate council 2026-06-02 — see "Unit 6" below. | Yes | §7 / §9 | Med-High |
+| **7** | **Toddler scoping** | Early Steps wording "under 34 months" → "under 36 months" + generic promptness caveat (1B); a Part C→Part B transition-timing sentence for all toddlers; suppress school-based-service output for toddlers (incl. gating `syncSchoolSvcFromNeeds` on `!toddler`); hide §7 School section for toddlers with dynamic visible-folio renumbering. Designed + confirmed by a separate council 2026-06-02 (Q4 verified nothing reads folio numbers) — see "Unit 7" below. | Yes | §12 | Med |
 
 **Deferred — David's call:** **C4** add toe-walking / gait item (clinically real; scope vs. neurology-overlap tradeoff). **Keeps (ratified, no change):** B1 sensory model, D4 `boundaryViol` dual-home, E3 pragmatics stays in Social/Play, E4 `emotionalReg` placement.
 
@@ -110,6 +111,22 @@ A new functional-need addition, designed by its own multi-voice council (DBP lea
 - **Output & framing (C4) — SHIP.** Note prose, ABA letter rationale, and IEP accommodation all lead medical/communication and preserve dignity. Framed as a **health/hygiene risk** (infection/social), explicitly **not** pica's ingestion-emergency language. Non-stigmatizing throughout — no "disgusting/gross," no willful-misbehavior framing; the behavior is presented as a medical/communication/regulation signal.
 
 **Unit-6 residuals (eyeball on implement):** exact sub-option labels; the GI-dedupe mechanics with `ruleGI`; the final target label. **Tests on implement:** golden fixtures exercising the behavior + each sub-option state; `branching-logic.md` §7/§9 update.
+
+---
+
+## Unit 7 — Toddler scoping  *(separate council, 2026-06-02; clinical questions answered by David)*
+
+Toddlers (under 3) are served under **IDEA Part C** (early intervention / Early Steps), not **Part B** school services / IEP. Three changes align the tool with that boundary. Clinical forks were resolved by David (Q1–Q3); the one design question (folio numbering) was confirmed by a code check (Q4). PLAN ONLY — not implemented.
+
+**1. Early Steps age wording (`autism-ap-builder.html:3092`) — option 1B.** Change "Given developmental concerns and age **under 34 months**" → "**under 36 months**" (Florida Part C eligibility is birth to 36 months; the toddler bucket is 12–35mo, so always under 36). Append a generic promptness caveat: "Referral should be made promptly, as Part C eligibility must be established before the third birthday." Q3: the ~34-month practical cutoff is *soft guidance*, so the caveat names no hard number.
+
+**2. Part C → Part B transition sentence (Q1) — for all toddlers.** Add near the Early Steps block: "Around the third birthday, Early Steps coordinates transition to the local school district for evaluation of Part B (IEP) eligibility; transition planning begins several months before age 3." *Open micro-point:* the Early Steps block only fires for confirmed/suspected — default is to place the sentence there (covers nearly all toddlers); if it should also appear for rule-out toddlers, gate it independently on `ageGroup==='toddler'`.
+
+**3. Suppress school-based-service output for toddlers (fix 1).** Gate the school-based clauses on `ageGroup!=='toddler'`: the SLP/OT/PT "School-based and clinic-based … address different goals" lines (`:3032`, `:3068`, PT equivalent), the "Recommended school-based services:" block (`:3117`), and the concurrent-services note (`:3163`). **Critical coupling:** also gate `syncSchoolSvcFromNeeds` (`:6109` region) on `!toddler` — otherwise it auto-populates `S.schoolSvc` from needs and the school-based output fires anyway despite §7 being hidden. Fix 1 and fix 2 are coupled, not independent.
+
+**4. Hide §7 for toddlers + dynamic folios (fix 2 + option 2B).** Hide the §7 "School & Educational Supports" sec-head/body for toddlers (the IEP output tab is already toddler-gated). Renumber **visible** folios sequentially in `updateSectionHeaders` rather than relying on the static `1…9` text, so toddlers see a contiguous 1–8 with no gap. **Q4 confirmed safe:** nothing reads `.sec-folio` (the dot/summary logic is by `sh-*` id), no generated output or test references a form section by number, and `branching-logic.md`'s `§N` are independent doc anchors. This also future-proofs any later conditional section.
+
+**Unit-7 residuals (eyeball on implement):** exact transition-sentence wording; the rule-out-toddler micro-point above. **Tests on implement:** the `suspected-toddler` golden updates (Early Steps wording + transition line + removal of school-based text) — review the diff; add a toddler assertion that school-based text is absent. **Docs:** `branching-logic.md` §12 (toddler gates + the dynamic-folio mechanism).
 
 ---
 
