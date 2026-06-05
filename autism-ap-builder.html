@@ -3079,7 +3079,10 @@ function generateNote() {
     // split so the dual OT+PT referral does not read as redundant. Only fires when OT
     // is also active (respecting an OT override-off).
     if((S.needsMotor.has('coordination')||S.comorbid.has('dcd'))&&resolveOv('ot',ruleOT())){
-      L.push('  • OT/PT coordination: motor coordination difficulty (DCD) is co-managed across both disciplines. OT addresses praxis, motor planning, and fine-motor coordination; PT addresses gross-motor coordination, balance, and postural control. Evaluations and goals are coordinated so both fine and gross motor domains are covered without overlap.');
+      // Only name "(DCD)" when the comorbidity is actually set — a bare coordination
+      // need is not a diagnosis.
+      const dcdTag=S.comorbid.has('dcd')?' (DCD)':'';
+      L.push('  • OT/PT coordination: motor coordination difficulty'+dcdTag+' is co-managed across both disciplines. OT addresses praxis, motor planning, and fine-motor coordination; PT addresses gross-motor coordination, balance, and postural control. Evaluations and goals are coordinated so both fine and gross motor domains are covered without overlap.');
     }
     L.push('');
   }
