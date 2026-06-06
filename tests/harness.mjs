@@ -47,6 +47,12 @@ const EXPORTS = [
   // S.abaTargets directly. Covers the behavior->target mapping the golden lane can't
   // reach (golden fixtures set S.abaTargets directly and never invoke the sync).
   'syncABATargetsFromNeeds',
+  // Add-only school-service sync, same shape as syncABATargetsFromNeeds: DOM-driven,
+  // mutates S.schoolSvc via a guarded add() whose querySelector/cb.checked/badge steps
+  // are best-effort under the null DOM. The unit lane drives it to lock the Unit 5
+  // academic->psychoed wiring (and its preschool-and-up age gate), which the golden lane
+  // can't reach because fixtures set S.schoolSvc directly and never invoke the sync.
+  'syncSchoolSvcFromNeeds',
 ];
 
 function extractScript(html) {

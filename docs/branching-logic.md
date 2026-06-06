@@ -223,6 +223,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `abaHours` | string | [§1.2](#12-the-s-object--property-reference), [§9.6](#96-settings-and-hours) |
 | `abaSetting` | Set | [§9.6](#96-settings-and-hours) |
 | `abaTargets` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds) |
+| `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.9](#109-psychoeducational-evaluation-auto-recommendation) |
 | `adaptiveStandardized` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `adaptProfile` | string | [§1.2](#12-the-s-object--property-reference) |
 | `ag` | Set | [§1.2](#12-the-s-object--property-reference) |
@@ -934,7 +935,7 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `functional_comm` | `needsComm.has('expressive') \|\| needsComm.has('receptive') \|\| needsComm.has('functional_aac')` |
 | `safety_skills` | `needsAdaptive.has('commSafety') \|\| needsAdaptive.has('commIndependence')` |
 | `menstrual_care` | `needsAdaptive.has('menstrualCare')` |
-| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA) |
+| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA). For school-age and up, the academic *concern* instead routes to the `psychoed` school eval — see [§10.9](#109-psychoeducational-evaluation-auto-recommendation) |
 | `joint_attention` + `imitation` | `isYoung() && (needsSocial.size > 0 \|\| needsComm.size > 0)` |
 | `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` — gated to the repetitive-movement/speech criterion or disruptive vocalizations only. The former `needsBehavior.size > 0` catch-all was removed (council 2026-06-02, §4 review Unit 1 D2): it made *any* interfering behavior (aggression, elopement, SIB, noncompliance) add a stereotypy-reduction target. `vocalDisruption`'s function (stereotypy vs. communicative/attention-maintained) is an FBA determination. |
 | `reduce_pica` | `needsBehavior.has('pica')` |
@@ -1174,6 +1175,18 @@ These two Sets track *provenance* of each service:
 - `schoolSvcManualOff` — services the clinician manually turned off
 
 When state changes re-trigger auto-recommendations, services in `schoolSvcManualOff` are *not* re-added even if their auto-recommendation condition still holds. This mirrors the §9 `syncABATargetsFromNeeds()` add-only philosophy: respect clinician curation over recomputed defaults.
+
+### 10.9 Psychoeducational-evaluation auto-recommendation
+
+`syncSchoolSvcFromNeeds()` (`autism-ap-builder.html:6098`) holds the full needs→school-service auto-population mapping (it is the source of truth for which need adds which service). The `psychoed` service is auto-recommended from **three** triggers, which the `schoolSvc` Set dedupes to a **single** recommendation regardless of how many fire:
+
+1. `S.academic` **for preschool and up** — a flagged academic/learning concern is, for a school-age child, primarily an IDEA matter; its highest-value action is the district's psychoeducational-evaluation request (the 60-school-day obligation). Toddlers are excluded: they are served under Part C (Early Steps), not a Part B psychoed eval.
+2. `comorbid.has('ld_suspected')` — suspected SLD pending evaluation.
+3. School-age-and-up with hyperlexia (`hasHyperlexia()`).
+
+The single `schoolSvc.psychoed` entry then drives the recommendation in both the note (School / Educational Supports block) and the IEP letter (eval-request paragraph + the §10.5 `psychoed` service block) with no per-surface duplication.
+
+The `S.academic` trigger is **distinct from** the `'academics'` ABA-target FAPE gate (§9.2), which stays toddler/preschool-only: the academic *concern* drives a school evaluation, never a school-age medical-ABA target (academic instruction is the district's FAPE obligation, not billable medical ABA).
 
 ---
 
