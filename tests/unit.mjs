@@ -159,6 +159,37 @@ const CASES = [
     setup(S){ S.needsBehavior.add('vocalDisruption'); },
     check(a){ a.syncABATargetsFromNeeds();
               assert.equal(a.S.abaTargets.has('reduce_stereotypy'), true, 'disruptive vocalizations should add reduce_stereotypy'); } },
+
+  // ── syncSchoolSvcFromNeeds(): academic -> psychoed wiring (Unit 5, DOM wrapper) ──
+  // A flagged academic concern routes to the 'psychoed' school service (the IDEA
+  // psychoeducational-evaluation request) for preschool and up, deduped via the Set with
+  // the suspected-SLD and hyperlexia triggers. The golden lane can't reach this (fixtures
+  // set S.schoolSvc directly and never run the sync), so the causation is locked here.
+  { name: 'Unit 5: academic (school-age) -> psychoed added',
+    setup(S){ S.academic=true; S.ageGroup='schoolAge'; },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), true, 'academic should add psychoed for school-age'); } },
+  { name: 'Unit 5: academic (preschool) -> psychoed added (age-gate lower bound)',
+    setup(S){ S.academic=true; S.ageGroup='preschool'; },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), true, 'academic should add psychoed for preschool'); } },
+  { name: 'Unit 5: academic (toddler) -> psychoed NOT added (Part C, not Part B)',
+    setup(S){ S.academic=true; S.ageGroup='toddler'; },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), false, 'toddlers are served under Part C; no Part B psychoed eval'); } },
+  { name: 'Unit 5: academic + suspected SLD -> psychoed deduped to one Set entry',
+    setup(S){ S.academic=true; S.ageGroup='schoolAge'; S.comorbid.add('ld_suspected'); },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), true, 'psychoed present');
+              assert.equal([...a.S.schoolSvc].filter(s=>s==='psychoed').length, 1, 'psychoed must appear exactly once (Set dedup across triggers)'); } },
+  { name: 'Unit 5: academic but psychoed manually off -> not re-added',
+    setup(S){ S.academic=true; S.ageGroup='schoolAge'; S.schoolSvcManualOff.add('psychoed'); },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), false, 'a manual uncheck of psychoed must be respected'); } },
+  { name: 'Unit 5 negative control: no academic / no SLD -> no psychoed',
+    setup(S){ S.ageGroup='schoolAge'; },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('psychoed'), false, 'psychoed must not auto-fire without a driver'); } },
 ];
 
 let pass = 0;

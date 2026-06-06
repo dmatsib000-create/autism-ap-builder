@@ -6095,6 +6095,7 @@ function onDxEvalPathChange(){
   updateSectionHeaders();
 }
 
+// keep docs/branching-logic.md §10.9 in sync (school-service auto-recommendation; psychoed deduped from academic/ld_suspected/hyperlexia)
 function syncSchoolSvcFromNeeds(){
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
@@ -6117,7 +6118,13 @@ function syncSchoolSvcFromNeeds(){
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}
   if(S.comorbid.has('anxiety')||S.comorbid.has('depression')||hasADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.needsBehavior.has('rigidity')||S.emotionalReg||S.needsBehavior.has('boundaryViol')) add('counseling');
-  if(S.comorbid.has('ld_suspected')||(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&hasHyperlexia())) add('psychoed');
+  // A flagged academic concern routes to the psychoeducational-evaluation request (the IDEA
+  // 60-school-day obligation) via the same 'psychoed' service as suspected SLD, so the Set
+  // dedupes to a single recommendation across all three triggers. Toddlers are excluded:
+  // they are served under Part C (Early Steps), not a Part B psychoed eval. This is
+  // independent of the academic-ABA FAPE gate (academic ABA targets stay toddler/preschool-
+  // only because academic instruction is the district's obligation, not medical ABA).
+  if((S.academic&&S.ageGroup!=='toddler')||S.comorbid.has('ld_suspected')||(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&hasHyperlexia())) add('psychoed');
   if(hasID()) add('sped');
 }
 
