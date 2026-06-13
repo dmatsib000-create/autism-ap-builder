@@ -460,6 +460,24 @@ A few criteria toggle other state when set, beyond their own membership:
 
 The `diagStatus` field is the master gate for whether the app is documenting a diagnosis versus an evaluation — many other branches read it.
 
+#### 4.5.1 Evaluation-path output on a confirmed diagnosis
+
+The §2 Diagnostic Workup picker (`S.dxEvalPath`, six radios) describes *how* the diagnosis was/will be reached. Its note output is governed by one predicate, `evalPathShows` (in `generateNote()`), used for **both** the section-open test and the per-path content gate so a confirmed diagnosis can never leave a bare `DIAGNOSTIC WORKUP` header:
+
+```js
+const dxConfirmed = S.diagStatus === 'confirmed';
+const evalPathShows = S.dxEvalPath &&
+  (!dxConfirmed || S.dxEvalPath === 'certainYoung' || S.dxEvalPath === 'certainOlder');
+```
+
+| Path | On suspected / rule-out | On **confirmed** |
+|---|---|---|
+| `certainYoung`, `certainOlder` | shows ("Diagnosis Fairly Certain") | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
+| `devOnly`, `uncertainComp`, `uncertainADOS` | shows | **suppressed** — these describe an in-progress workup that reads wrong once the diagnosis is confirmed |
+| `ritaT` | shows (workup block) | suppressed here; RITA-T support instead appears in the clinical-summary sentence (`generateNote()` body, separate from this block) |
+
+Rationale: the CARS-2-backed "fairly certain" paths carry documentation value on a confirmed note (they name the supporting instrument and severity rating); the "uncertain / referring out" paths do not. Confirmed-case wording is selected via `dxConfirmed` inside the `certainYoung`/`certainOlder` branches. Locked by the `confirmed-certain-young-evalpath` golden fixture.
+
 ### 4.6 What criteria do *not* drive
 
 - ASD severity levels (§3) are orthogonal to criteria — a patient can be Level 3 with 2/3 A and 2/4 B (which would block "complete," but the levels themselves are independent)
