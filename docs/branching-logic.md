@@ -498,6 +498,12 @@ A chip is visible only when **both** axes pass. The `lang:'verbal'` tag is appli
 
 A chip entry is either a plain string or `{t:'text', lang:'verbal'}`. The build loop handles both: `const text = typeof entry==='string' ? entry : entry.t`.
 
+### 4.8 Evidence source chips (`EV_SRC_LABELS`, age-gated self-report)
+
+Above the observation chips sits a separate **source strip** (`.ev-src-chip`), built from `EV_SRC_LABELS` (`autism-ap-builder.html:2267`). Clicking a source chip inserts a `"Label: "` header into that criterion's evidence textarea (e.g. `"Parent report: "`) — a documentation-attribution convenience, distinct from the content chips.
+
+Four sources: **Direct observation · Parent report · Record review · Patient self-report**. The first three are always shown. **Patient self-report is age-gated to `adolescent` + `youngAdult`** via `EV_SRC_AGES = {self:['adolescent','youngAdult']}`: the build tags that chip with `data-src-ages`, and `updateEvChips()` toggles `.ev-src-chip[data-src-ages]` by `S.ageGroup` (the same `updateEvChips()` pass that filters the content chips; ungated source chips carry no `data-src-ages` and stay always-on). It is available on **all criteria including C** (a patient's retrospective account of early development is weak but not invalid — clinician judgment governs). No "insufficient alone" guard is attached: `validateCriteria()` already gates a *complete* diagnosis on the criteria structure regardless of source. Council-ratified 2026-06-12 (self-report is clinically primary for later-identified adolescent/adult ASD, where masking makes the patient's own account the only access to some criteria; meaningless/unreliable below adolescence).
+
 ---
 
 ## 5. Output tab visibility
