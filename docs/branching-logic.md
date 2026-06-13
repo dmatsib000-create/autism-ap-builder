@@ -653,7 +653,7 @@ Every recommendation follows this exact shape — there is no second mechanism. 
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (ID OR regression OR dysmorphism OR congenital anomaly OR focal neuro findings)) | `genetics` |
 | 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression | `neurology` |
 | 10 | `rulePsychiatry` | 1410 | Confirmed ADHD/anxiety/depression/OCD, OR (severe behavior AND age school+) | `psychiatry` |
-| 11 | `ruleGI` | 1415 | GI comorbid OR feeding OR PFD OR ARFID OR pica | `gi` |
+| 11 | `ruleGI` | 1415 | GI comorbid OR feeding OR PFD OR ARFID OR pica OR fecal smearing (only when its medical cause is **not** marked ruled-out via `S.smearWorkup`) | `gi` |
 | 12 | `ruleSleepRef` | 1416 | `S.sleepStudy === true` | `sleep_ref` |
 | 13 | `ruleAudiology` | 1417 | Hearing screen fail, OR (toddler/preschool AND speech concern) | `audiology` |
 | 14 | `ruleQBTest` | 1424 | ADHD suspected AND age ∈ {schoolAge, adolescent, youngAdult} | `qbtest` |
@@ -939,6 +939,7 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `joint_attention` + `imitation` | `isYoung() && (needsSocial.size > 0 \|\| needsComm.size > 0)` |
 | `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` — gated to the repetitive-movement/speech criterion or disruptive vocalizations only. The former `needsBehavior.size > 0` catch-all was removed (council 2026-06-02, §4 review Unit 1 D2): it made *any* interfering behavior (aggression, elopement, SIB, noncompliance) add a stereotypy-reduction target. `vocalDisruption`'s function (stereotypy vs. communicative/attention-maintained) is an FBA determination. |
 | `reduce_pica` | `needsBehavior.has('pica')` |
+| `reduce_smearing` | `needsBehavior.has('smearing')` — function-based hygiene/toileting target. Unlike `reduce_pica`, **not** a Behavior of Danger: the medical contributor (constipation with overflow incontinence / encopresis) is excluded or treated first via the GI referral, and the rationale uses no emergency / no-safe-frequency framing. |
 | `boundary_skills` | `needsBehavior.has('boundaryViol')` |
 | `transitions` | `criteriaB.has('b2')` (and `'rigidity'` added to needsBehavior). **Remove direction:** if `b2` becomes false, `'rigidity'` is deleted from `needsBehavior` (the one exception to add-only — see [§4.4](#44-side-effects-of-specific-criteria)), but `'transitions'` itself **stays** in `abaTargets` — the add-only contract still applies to the target. Clinician must manually uncheck if they want it gone. |
 | `self_reg` | `S.behavFreq.emotionalReg === true` |
@@ -1143,6 +1144,7 @@ The double gate is important: suspected ID alone (`withSuspectedID`) does not pr
 | `comorbid.has('pfd_*')` | Extended mealtime, adaptive utensils, oral-motor/dysphagia protocols |
 | `S.feeding && !pfd && !arfid` | Preferred-food permission, extended time |
 | `needsBehavior.has('pica')` | Environmental safety audit, direct supervision, emergency action plan |
+| `needsBehavior.has('smearing')` | Toileting and hygiene support: private routine, scheduled breaks, matter-of-fact staff response, coordination with the medical bowel plan. **Discreet by audience** — framed as toileting/hygiene with no graphic label in the school record (the A&P note and ABA letter name it clinically; the IEP letter does not). |
 | `needsBehavior.has('vocalDisruption')` | Individualized BSP, preferential seating, communication alternatives |
 | `S.behavFreq.emotionalReg` | Calm-down space, break pass, de-escalation plan |
 | `needsBehavior.has('boundaryViol')` | Structured peer activities, greeting procedures, BCBA consultation |

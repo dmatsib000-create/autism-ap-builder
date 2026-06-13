@@ -1268,6 +1268,16 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="vocalDisruption"> Disruptive vocalizations (repetitive, loud, or scripted speech disrupting the learning environment)</label>
           <div class="beh-freq-row" data-for="vocalDisruption" style="display:none"><input class="beh-freq-inp" data-freqkey="vocalDisruption" type="text" placeholder="Description (optional) — e.g., scripted phrases throughout instructional periods"></div>
           <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="pica"> Pica (ingestion of non-food items — safety risk)</label>
+          <label class="cb-row"><input type="checkbox" data-key="needsBehavior" value="smearing"> Fecal smearing (scatolia)</label>
+          <div id="smearWorkupRow" class="sub-options" style="display:none">
+            <span class="sub-label">Suspected medical contribution (constipation / overflow)?</span>
+            <div class="radio-grid">
+              <label class="r-opt"><input type="radio" name="smearWorkup" data-bind="smearWorkup" value="suspected"> Suspected — not yet worked up</label>
+              <label class="r-opt"><input type="radio" name="smearWorkup" data-bind="smearWorkup" value="ruled_out"> Ruled out</label>
+              <label class="r-opt"><input type="radio" name="smearWorkup" data-bind="smearWorkup" value="unclear"> Unclear</label>
+            </div>
+            <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">Optional. "Ruled out" removes the GI referral from the plan; "Suspected" or "Unclear" adds a bowel-workup (GI) referral and leads the plan with medical evaluation.</div>
+          </div>
           <label id="boundaryViolRow" class="cb-row"><input type="checkbox" data-key="needsBehavior" value="boundaryViol"> Boundary violations / impaired personal space (inappropriate touching, physical intrusiveness toward peers or adults)</label>
         </div>
       </div>
@@ -1580,6 +1590,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_tantrum"> Meltdown / tantrum reduction and emotional regulation</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_stereotypy"> Reduction of interfering repetitive behaviors (including disruptive vocalizations)</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_pica"> Reduction of pica / ingestion of non-food items</label>
+          <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="reduce_smearing"> Reduction of fecal smearing (scatolia) / toileting and hygiene skills</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="self_reg"> Self-regulation and coping strategies</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="instructional_control"> Instructional control and cooperation (following directions)</label>
           <label class="cb-row"><input type="checkbox" data-key="abaTargets" value="transitions"> Transition tolerance and behavioral flexibility</label>
@@ -1725,7 +1736,7 @@ const S = {
   priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'', cars2Done:false,
   comorbid:new Set(), comorbidInPlan:new Set(),
   traumaIncludeInIEP:false, // Opt-in disclosure gate; trauma stays in A&P note unless this is on.
-  sleepFactors:new Set(), depressionSafety:'',
+  sleepFactors:new Set(), depressionSafety:'', smearWorkup:'',
   pfdDomains:new Set(),
   arfidMechanism:new Set(), arfidImpact:new Set(),
   socialWorkReasons:new Set(),
@@ -2115,7 +2126,11 @@ function rulePsychiatry() {
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
   return {include:med||sev};
 }
-function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')||S.needsBehavior.has('pica')}; }
+// Fecal smearing contributes a GI trigger only when a medical cause is NOT ruled out
+// (suspected/unclear/unspecified) — once the clinician marks it ruled out, smearing stops
+// driving the referral (re-referring an excluded cause is contradictory). Routes through the
+// existing 'gi' override key, so it dedupes with the other GI triggers to a single referral.
+function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected')||S.needsBehavior.has('pica')||(S.needsBehavior.has('smearing')&&S.smearWorkup!=='ruled_out')}; }
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
   // Speech-driven audiology referral is restricted to toddler/preschool —
@@ -2841,6 +2856,7 @@ function generateNote() {
     if(S.needsBehavior.has('vocalDisruption')) specR.push('disruptive vocalizations'+(S.behavFreq.vocalDisruption?' ('+S.behavFreq.vocalDisruption+')':''));
     if(S.needsBehavior.has('rigidity'))        specR.push('behavioral rigidity and significant difficulty with transitions'+(S.criteriaB.has('b3')?' (manifest in part through fixated interests limiting engaging with non-preferred tasks)':''));
     if(S.emotionalReg)                         specR.push('emotional dysregulation'+(S.behavFreq.emotionalReg?' ('+S.behavFreq.emotionalReg+')':''));
+    if(S.needsBehavior.has('smearing'))        specR.push('fecal smearing (scatolia), with associated hygiene and skin/infection risk; medical contributors (constipation with overflow incontinence, encopresis) to be excluded or treated before behavioral attribution, with a function-based behavioral plan developed concurrently');
     // Tier 3 — Skill deficits: named, no frequency needed
     if(S.needsComm.has('expressive'))          specR.push('expressive language delays');
     if(S.needsComm.has('receptive'))           specR.push('receptive language delays');
@@ -2892,6 +2908,7 @@ function generateNote() {
       reduce_tantrum:'Meltdown/tantrum reduction and emotional regulation: emotional dysregulation documented; programming targets antecedent modification, coping skill development, and caregiver implementation strategies to reduce frequency and severity.',
       reduce_stereotypy:'Reduction of interfering repetitive behaviors: programming targets repetitive behaviors with documented interference with learning, safety, or access to reinforcement, consistent with BACB ethical and neurodiversity-affirming practice standards. Stimming behaviors without documented functional interference are not appropriate reduction targets.',
       reduce_pica:'Reduction of pica (ingestion of non-food items): pica is a Behavior of Danger; any ingestion event carries risk of foreign body obstruction, internal injury, or toxic exposure. Environmental modification, direct supervision protocol, and function-based behavioral intervention are required; coordinate with GI evaluation.',
+      reduce_smearing:'Reduction of fecal smearing (scatolia); toileting and hygiene skill-building: medical contributors (constipation with overflow incontinence, encopresis) must be excluded or treated first. A functional behavior assessment identifies the function (sensory, communicative, escape, or attention-maintained); intervention is non-punitive and skill-building, teaching toileting routines, hygiene independence, and a functional replacement skill, coordinated with medical management.',
       self_reg:'Self-regulation and coping strategies: emotional regulation impairments documented; programming targets physiological arousal awareness, identification of regulatory states, and adaptive coping responses.',
       instructional_control:'Instructional control and cooperation: documented difficulty following directions and responding to instruction limits access to learning across settings; programming builds cooperative responding, demand-following, and behavioral momentum through reinforcement-based, function-informed strategies (FBA-guided where the behavior is escape-maintained) rather than coercive compliance, paired with choice-making and antecedent supports to preserve autonomy.',
       transitions:'Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.',
@@ -3135,6 +3152,7 @@ function generateNote() {
       if(S.needsComm.size) accomBeh.push('Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations');
       if(S.comorbid.has('language_disorder')) accomBeh.push('Language: simplified verbal instructions, written directions provided alongside verbal, extended response time');
       if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all student areas; direct staff supervision during transitions and mealtimes; school nurse notification with emergency ingestion action plan');
+      if(S.needsBehavior.has('smearing')) accomBeh.push('Toileting and hygiene support: a consistent, private toileting and clean-up routine with visual step-by-step supports; proactively scheduled bathroom breaks; staff trained to respond calmly and matter-of-factly without drawing peer attention; coordination with the medical bowel-management plan; behavior support plan addressing the function identified by FBA');
       if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized BSP addressing function; reduced group size during high-disruption periods; staff trained in non-punitive response; alternative communication supports as indicated');
       if(S.emotionalReg) accomBeh.push('Emotional regulation: designated calm-down space; break pass for self-initiated regulation breaks; de-escalation plan on file with all staff; advance notice of schedule changes');
       if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers); social skills instruction addressing personal space and appropriate touch integrated into daily schedule; all staff trained on consistent, calm redirection protocol; ABA BCBA consultation for school-based boundary skill generalization');
@@ -3271,6 +3289,8 @@ function generateNote() {
     if(hGI){
       if(S.needsBehavior.has('pica')){
         L.push('  • Pediatric GI: Referral indicated given documented pica. Evaluation for foreign body ingestion risk, nutritional deficiencies (iron, zinc, lead exposure), and gastrointestinal sequelae of non-food ingestion. Coordinate with ABA team on pica reduction protocol; GI and behavioral interventions are complementary and should proceed concurrently.');
+      } else if(S.needsBehavior.has('smearing')&&S.smearWorkup!=='ruled_out'){
+        L.push('  • Pediatric GI: Referral indicated to evaluate for a medical contributor to fecal smearing, in particular constipation with overflow incontinence (encopresis), a common and treatable driver. Evaluation should include a bowel history, assessment for fecal impaction, and a bowel-management plan (disimpaction and maintenance as indicated). Medical evaluation should precede or run alongside behavioral support; GI and behavioral interventions are complementary.');
       } else {
         L.push('  • Pediatric GI: Evaluation for GI symptoms (constipation, GERD, abdominal pain). GI symptoms may contribute to behavioral dysregulation in ASD.');
       }
@@ -4026,6 +4046,7 @@ function _abaContent(){
     menstrual_care:'Menstrual hygiene management (task analysis, multi-step self-care routine)',
     boundary_skills:'Personal space and interpersonal boundary skills',
     reduce_pica:'Reduction of pica (ingestion of non-food items)',
+    reduce_smearing:'Reduction of fecal smearing (scatolia); toileting and hygiene skill-building',
   };
   // Age-specific overrides: developmental phrasing reads patronizing on an
   // adolescent or young-adult letter; replace with role-appropriate labels.
@@ -4037,6 +4058,7 @@ function _abaContent(){
     play:'Social-pragmatic skills for peer, school, and workplace contexts',
     transitions:'Flexibility and adaptation to schedule and role changes',
     instructional_control:'Cooperation and self-management in instructional and work settings',
+    reduce_smearing:'Hygiene independence and self-management',
   };
   const isOlderForABA=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
   const targets=[...S.abaTargets].map(t=>(isOlderForABA&&TL_OLDER[t])||TL[t]||t);
@@ -4286,6 +4308,7 @@ function _iepLetterContent(){
     }
     if(S.needsBehavior.has('vocalDisruption')) bp.push('repetitive or disruptive vocalizations that interfere with this student\'s access to instruction and with the right of other students to learn in an undisrupted educational environment');
     if(S.needsBehavior.has('pica')) bp.push('pica (ingestion of non-food items) requiring constant direct supervision and environmental safety modifications to prevent serious medical harm');
+    if(S.needsBehavior.has('smearing')) bp.push('toileting and personal-hygiene needs requiring structured support, scheduled opportunities, and a consistent, dignity-preserving staff response');
     const bStr=bp.length?bp.join('; '):null;
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
@@ -4490,6 +4513,7 @@ function _iepLetterContent(){
   if(hasPFD) accomBeh.push('Pediatric Feeding Disorder: extended mealtime duration to accommodate oral-motor processing; adaptive utensils or positioning supports as recommended by feeding therapy team; permission to bring foods prepared to tolerated texture or presentation; staff awareness that mealtime difficulty is medical and developmental, not behavioral non-compliance; nurse health plan documenting any dysphagia precautions or choking risk protocols; SLP and/or OT feeding consultation to guide school mealtime support');
   if(!hasPFD&&!S.comorbid.has('arfid')&&(S.feeding||S.needsAdaptive.has('feeding_adl'))) accomBeh.push('Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that food selectivity in ASD is sensory-based and not volitional');
   if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all classrooms, hallways, and areas the student accesses; non-food items secured or removed from reach; direct staff supervision during all transitions, unstructured periods, and mealtimes; school nurse notified with emergency action plan for suspected ingestion; cafeteria staff briefed; mouthing or ingestion incidents documented and reported to family same-day');
+  if(S.needsBehavior.has('smearing')) accomBeh.push('Toileting and hygiene support: a consistent, private toileting and clean-up routine with visual step-by-step supports; proactively scheduled bathroom breaks rather than waiting for requests; staff trained to respond calmly, matter-of-factly, and without drawing peer attention; coordination with the student\'s medical bowel-management plan; a behavior support plan addressing the function identified through functional behavior assessment; incidents handled discreetly and communicated with the family to preserve the student\'s dignity');
   if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized behavior support plan (BSP) addressing antecedents and function of vocalizations; preferential seating to minimize acoustic disruption to peers; access to communication tools or fidgets as possible alternatives to vocal stimming; staff trained in non-punitive response protocols; reduced group size or separate testing environment during high-disruption periods');
   if(S.emotionalReg) accomBeh.push('Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes');
   if(S.needsBehavior.has('boundaryViol')) accomBeh.push('Boundary and personal space: structured peer activities with adult proximity supervision during all unstructured and semi-structured periods; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers — no unsolicited hugging or touching); social skills instruction addressing personal space and appropriate touch integrated into weekly schedule; all staff trained on consistent, calm, non-shaming redirection protocol for boundary violations; BCBA consultation recommended for school-based generalization of boundary skill programming');
@@ -5485,7 +5509,7 @@ function clearAll(opts){
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
     visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     dysmorphism:'',congenitalAnomalies:false,developmentalRegression:false,regressionTiming:'',
-    teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',
+    teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
     schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
     insuranceType:'',abaHours:'',previewMode:'note'});
@@ -5517,7 +5541,7 @@ function clearAll(opts){
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
   S.strangerDanger=false;
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -6000,6 +6024,8 @@ function syncABATargetsFromNeeds(){
   if(S.criteriaB.has('b1')||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
   // Pica — specific high-risk behavior requiring dedicated ABA target
   if(S.needsBehavior.has('pica')) add('reduce_pica');
+  // Fecal smearing (scatolia) — function-based hygiene/toileting target; medical cause excluded first.
+  if(S.needsBehavior.has('smearing')) add('reduce_smearing');
   if(S.needsBehavior.has('boundaryViol')) add('boundary_skills');
   // Transitions + rigidity — fire when b2 (insistence on sameness) checked
   // B2 IS rigidity; also populate needsBehavior so IEP letter, accommodation, and counseling triggers activate
@@ -6367,6 +6393,12 @@ document.addEventListener('DOMContentLoaded',()=>{
           const fr=document.querySelector(`.beh-freq-row[data-for="${v}"]`);
           if(fr) fr.style.display=inp.checked?'':'none';
           if(!inp.checked) S.behavFreq[v]='';
+        }
+        // Fecal smearing reveals a GI-workup-status sub-option (the depressionSafety pattern).
+        // On uncheck, clear the scalar + the radios' visual state so it can't orphan.
+        if(k==='needsBehavior'&&v==='smearing'){
+          const r=document.getElementById('smearWorkupRow');if(r)r.style.display=inp.checked?'':'none';
+          if(!inp.checked){S.smearWorkup='';document.querySelectorAll('input[name="smearWorkup"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('is-on');});}
         }
         if(k==='needsAdaptive'&&v==='hygiene'){
           updateAgeBasedVisibility();
