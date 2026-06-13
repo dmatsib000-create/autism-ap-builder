@@ -2264,7 +2264,16 @@ const CRIT_A={a1:'Deficits in social-emotional reciprocity',a2:'Deficits in nonv
 const CRIT_B={b1:'Stereotyped or repetitive motor movements, use of objects, or speech',b2:'Insistence on sameness, inflexible adherence to routines, or ritualized patterns',b3:'Highly restricted, fixated interests abnormal in intensity or focus',b4:'Hyper- or hyporeactivity to sensory input or unusual sensory interests'};
 
 // ─── EVIDENCE CHIP DATA ───────────────────────────────────────────────────────
-const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',record:'Record review'};
+const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',record:'Record review',self:'Patient self-report'};
+// Patient self-report is a valid DSM-5 evidence source only for patients who can self-report, so
+// it is age-gated to adolescent/young-adult (council 2026-06-12): self-report is clinically primary
+// for later-identified adolescent/adult ASD, where masking makes the patient's own account the only
+// access to some criteria; it is meaningless for toddlers and unreliable for younger children, where
+// insight into one's own social impact is developmentally limited. The other three sources are always
+// shown. No "insufficient alone" guard is needed — validateCriteria() already gates a complete
+// diagnosis on the criteria structure regardless of source. EV_SRC_AGES holds the allowed ageGroups
+// for any gated source; ungated sources are absent from it.
+const EV_SRC_AGES={self:['adolescent','youngAdult']};
 // Each criterion maps to {base:[...universal high-yield...], <ageGroup>:[...age-specific...]}.
 // Age keys match S.ageGroup (toddler/preschool/schoolAge/adolescent/youngAdult). The chip
 // strip shows base + current-age chips only (and a min-verbal cluster); updateEvChips() toggles visibility on render.
@@ -4970,6 +4979,11 @@ function updateEvChips(){
     const langOK=lang!=='verbal'||!mv;
     chip.style.display=(ageOK&&langOK)?'':'none';
   });
+  // Age-gated SOURCE chips (currently just self-report): show only when the current ageGroup is in
+  // the chip's allowed list. Ungated source chips carry no data-src-ages and stay always-on.
+  document.querySelectorAll('.ev-src-chip[data-src-ages]').forEach(chip=>{
+    chip.style.display=chip.dataset.srcAges.split(' ').includes(ag)?'':'none';
+  });
 }
 
 function render(){
@@ -6628,9 +6642,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     // Source label strip — chips insert a "Label: " header into the textarea
     const srcStrip=document.createElement('div');
     srcStrip.className='ev-source-strip';
-    Object.entries(EV_SRC_LABELS).forEach(([,label])=>{
+    Object.entries(EV_SRC_LABELS).forEach(([key,label])=>{
       const chip=document.createElement('span');
       chip.className='ev-src-chip';chip.textContent=label+' ▸';
+      // Age-gated sources (self-report) carry their allowed ageGroups; updateEvChips() toggles them.
+      if(EV_SRC_AGES[key]) chip.dataset.srcAges=EV_SRC_AGES[key].join(' ');
       chip.addEventListener('click',()=>{
         const prefix=label+': ';
         ta.value=ta.value.trim()?ta.value.trimEnd()+'\n'+prefix:prefix;
