@@ -298,6 +298,9 @@ The branches below all read `S.ageGroup` directly or via a helper like `isYoung(
 | Branch | Line | Condition | Effect |
 |---|---|---|---|
 | IEP tab visibility | 3938 | `ageGroup !== 'toddler'` (plus `schoolDoc !== ''`) | Hide IEP tab for toddlers |
+| School-section Part B band in the note | ~3120–3200 | `ageGroup !== 'toddler'` | Toddlers (IDEA Part C) get only the Early Steps bullet ("age under 36 months" + promptness caveat) and a Part C→Part B transition line; the placement / IEP-doc / school-services band, the IEP/504 accommodations, the SLP/OT "school-based vs clinic-based" clauses, and the concurrent-billing note are all suppressed |
+| `syncSchoolSvcFromNeeds()` toddler gate | ~6150 | `ageGroup === 'toddler'` → early return | No Part B school services are auto-populated for toddlers (see [§10.9](#109-psychoeducational-evaluation-auto-recommendation)) |
+| §"School & Educational Supports" form section hidden + dynamic folios | end of `updateAgeBasedVisibility()` | `ageGroup === 'toddler'` | The whole form section (`sh-school`'s `.section` wrapper) is hidden, stale Part B state is torn down (placement, doc, services + DOM controls), and the **visible section folios are resequenced** over the canonical 9-id list so toddlers see a contiguous 1–8. Nothing reads `.sec-folio` (dot/summary logic keys on `sh-*` ids), so the renumber is display-only — keep it that way |
 | NDBI vs FBA prose in ABA letter | 2067–2068 | `isYoung()` → NDBI; `'schoolAge'` → FBA | Letter language shifts |
 | Cognitive-profile tier age gates | 4494, 4505, 4517 | `young` hides ID tier + BIF radios; `older` hides GDD tier | DSM-5/AACAP: ID/BIF require IQ testing (unreliable <5); GDD doesn't apply ≥5. Teardown clears `cogProfile` and calls `bridgeCogProfileToSpecifier('')` to drop the matching specifier |
 | Adolescent/adult safety targets | 2099 | `['adolescent','youngAdult'].includes(ageGroup)` | Add consent education + legal awareness to safety targets |
@@ -1180,7 +1183,7 @@ When state changes re-trigger auto-recommendations, services in `schoolSvcManual
 
 ### 10.9 Psychoeducational-evaluation auto-recommendation
 
-`syncSchoolSvcFromNeeds()` (`autism-ap-builder.html:6098`) holds the full needs→school-service auto-population mapping (it is the source of truth for which need adds which service). The `psychoed` service is auto-recommended from **three** triggers, which the `schoolSvc` Set dedupes to a **single** recommendation regardless of how many fire:
+`syncSchoolSvcFromNeeds()` (`autism-ap-builder.html:6178`) holds the full needs→school-service auto-population mapping (it is the source of truth for which need adds which service). **The whole function early-returns for toddlers** (IDEA Part C — no Part B school services to auto-populate; Unit 7); the per-trigger `ageGroup !== 'toddler'` clause on the academic trigger below is retained as documentation-in-code and defense-in-depth. The `psychoed` service is auto-recommended from **three** triggers, which the `schoolSvc` Set dedupes to a **single** recommendation regardless of how many fire:
 
 1. `S.academic` **for preschool and up** — a flagged academic/learning concern is, for a school-age child, primarily an IDEA matter; its highest-value action is the district's psychoeducational-evaluation request (the 60-school-day obligation). Toddlers are excluded: they are served under Part C (Early Steps), not a Part B psychoed eval.
 2. `comorbid.has('ld_suspected')` — suspected SLD pending evaluation.

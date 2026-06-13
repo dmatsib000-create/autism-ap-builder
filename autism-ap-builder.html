@@ -3046,7 +3046,9 @@ function generateNote() {
         L.push('  • Oral motor and feeding: SLP evaluation targeting oral-motor coordination for safe, functional feeding. Note: oral-motor evaluation for feeding is distinct from oral-motor evaluation for speech and requires a separate clinical feeding assessment. If pharyngeal-phase dysphagia or aspiration risk is suspected (wet/gurgly voice quality, coughing or choking during eating, recurrent aspiration pneumonia), instrumental swallowing evaluation (Modified Barium Swallow Study [MBSS] or Fiberoptic Endoscopic Evaluation of Swallowing [FEES]) is indicated before feeding therapy begins. Texture modification per IDDSI framework if diet modification is needed.');
       }
     }
-    L.push('  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.');
+    // The school-vs-clinic clause is Part B framing — toddlers are served under Part C
+    // (Early Steps), so they keep the frequency guidance without the school clause.
+    L.push('  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available.'+(S.ageGroup!=='toddler'?' School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.':''));
     L.push('');
   }
 
@@ -3082,7 +3084,8 @@ function generateNote() {
     if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) L.push('  • Visual perceptual skills: OT evaluation of visual perception including form constancy, figure-ground discrimination, visual-spatial relations, and visual memory. Visual perceptual deficits affect reading, math, written output, and navigation of the visual classroom environment; treatment integrated with academic and fine motor goals.');
     L.push('  • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.');
     if(S.needsSensory.size) L.push('  • ABA/OT collaboration for sensory-related behavior: Sensory-driven behaviors should be assessed collaboratively by OT (sensory integration framework) and the ABA team (functional behavior analysis). A behavior that appears sensory-driven may have operant functions (escape, attention, access to tangibles) that require behavioral intervention in addition to sensory supports. Coordinated assessment prevents siloed treatment and avoids targeting sensory behaviors without understanding their function.');
-    L.push('  • Service frequency: OT services at a frequency to be determined following formal evaluation, typically 1-2 sessions per week for direct intervention. School-based and clinic-based OT address different goals; concurrent services are appropriate when goals are documented as distinct.');
+    // Same Part B gating as the SLP frequency line above.
+    L.push('  • Service frequency: OT services at a frequency to be determined following formal evaluation, typically 1-2 sessions per week for direct intervention.'+(S.ageGroup!=='toddler'?' School-based and clinic-based OT address different goals; concurrent services are appropriate when goals are documented as distinct.':''));
     L.push('');
   }
 
@@ -3107,10 +3110,27 @@ function generateNote() {
   // School
   const esR=ruleEarlySteps(),fdR=ruleFDLRS();
   const hES=resolveOv('earlySteps',esR),hFD=resolveOv('fdlrs',fdR);
-  if(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size||hES||hFD){
+  // For toddlers, only Early Steps / FDLRS can open this section — stale Part B state
+  // (placement/doc/services set before an age switch, or set directly by a fixture)
+  // must not produce a header whose entire content band is toddler-suppressed below.
+  if(hES||hFD||(S.ageGroup!=='toddler'&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size))){
     L.push(n+++'. SCHOOL / EDUCATIONAL SUPPORTS');
-    if(hES){L.push('  • Early Steps (Florida Part C Early Intervention): Given developmental concerns and age under 34 months, referral to Florida Early Steps is recommended. Provides in-home and clinic-based services including ITDS (Infant/Toddler Developmental Specialist), speech-language therapy, OT, PT, and intensive family coaching in the natural environment under IDEA Part C. Family counseled on rights. Referral to be submitted through Early Steps.');}
+    // "Under 36 months" is the Part C eligibility boundary (Florida Early Steps serves
+    // birth to 36 months); the toddler age bucket is 12-35mo, so the clause is always
+    // true. The ~34-month practical referral cutoff is soft guidance, so the promptness
+    // caveat names no hard number (council 2026-06-02, Unit 7 Q3).
+    if(hES){
+      L.push('  • Early Steps (Florida Part C Early Intervention): Given developmental concerns and age under 36 months, referral to Florida Early Steps is recommended. Provides in-home and clinic-based services including ITDS (Infant/Toddler Developmental Specialist), speech-language therapy, OT, PT, and intensive family coaching in the natural environment under IDEA Part C. Family counseled on rights. Referral to be submitted through Early Steps. Referral should be made promptly, as Part C eligibility must be established before the third birthday.');
+      L.push('  • Part C to Part B transition: Around the third birthday, Early Steps coordinates transition to the local school district for evaluation of Part B (IEP) eligibility; transition planning begins several months before age 3.');
+    }
     if(hFD){L.push('  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.');}
+    // Everything below the Early Steps / FDLRS bullets is IDEA Part B content
+    // (placement, IEP/504 documents, school-based services) — toddlers are served
+    // under Part C, so the whole band is suppressed for them. Belt-and-suspenders
+    // with the syncSchoolSvcFromNeeds toddler gate and the §7 form-section hide:
+    // this output gate is what protects fixtures/state-restoration paths that set
+    // school state directly without the DOM teardown running.
+    if(S.ageGroup!=='toddler'){
     if(S.schoolPlacement==='privateNoIEP'){
       L.push('  • Private school enrollment (no current IEP or district services): Under IDEA, children with disabilities enrolled in private school by their parents retain the right to equitable participation in special education services. The local school district is responsible for conducting a timely evaluation and, if the child is found eligible, providing services through an equitable participation plan. Equitable participation services may differ in scope from what a public school student would receive, but the family has the right to request an evaluation. Family counseled to contact the local district to submit a written evaluation request.');
     } else if(S.schoolPlacement==='privateWithIEP'){
@@ -3137,6 +3157,7 @@ function generateNote() {
         L.push('Recommended school-based services:');S.schoolSvc.forEach(s=>{if(sv[s])L.push('  • '+sv[s]);});
       }
     }
+    } // end Part B band (ageGroup !== 'toddler')
     // Auto-generated IEP/504 accommodations — grouped into three categories
     if(S.ageGroup!=='toddler'){
       // Group 1: Core ASD accommodations (always shown for school-age+)
@@ -3181,7 +3202,8 @@ function generateNote() {
         }
       }
     }
-    L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
+    // Concurrent-billing framing is IEP (Part B) language — suppressed for toddlers.
+    if(S.ageGroup!=='toddler') L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
     L.push('');
   }
 
@@ -5968,6 +5990,40 @@ function updateAgeBasedVisibility(){
       clearIdGddEvidenceFlags();
     }
   }
+  // School & Educational Supports section — hidden for toddlers (served under IDEA
+  // Part C / Early Steps, not Part B school services; the Early Steps note output is
+  // driven by ruleEarlySteps, not this section). Hide the whole .section wrapper, not
+  // just the head, so the body leaves layout and tab order. Teardown mirrors the rows
+  // above: Part B selections are invalid for a toddler, so stale state is cleared
+  // rather than left to silently re-enter output if a gate is ever missed.
+  const schoolHead=document.getElementById('sh-school');
+  if(schoolHead){
+    const schoolWrap=schoolHead.closest('.section');
+    const hideSchool=S.ageGroup==='toddler';
+    if(schoolWrap) schoolWrap.style.display=hideSchool?'none':'';
+    if(hideSchool&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size)){
+      S.schoolPlacement='';S.schoolDoc='';
+      [S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff].forEach(s=>s.clear());
+      document.querySelectorAll('input[name="schoolPlacement"], input[name="schoolDoc"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
+      document.querySelectorAll('input[data-key="schoolSvc"]').forEach(c=>{c.checked=false;});
+      document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
+    }
+  }
+  // Resequence the visible section folios so an age-hidden section leaves no numbering
+  // gap (toddlers see a contiguous 1-8 instead of 1-6, 8-9). The static folio digits in
+  // the HTML are only the initial paint; nothing reads .sec-folio (the dot/summary logic
+  // keys on sh-* ids, and no output or test references a form section by number), so the
+  // renumber is display-only. Iterating the canonical id list (not a DOM query) keeps the
+  // unnumbered utility sections (ABA parameters, Adjust Referrals) out of the count.
+  let folioN=1;
+  ['sh-profile','sh-dxWorkup','sh-dsm5','sh-needs','sh-medflags','sh-comorbid','sh-school','sh-safety','sh-ag'].forEach(id=>{
+    const h=document.getElementById(id);if(!h)return;
+    const w=h.closest('.section');
+    const f=h.querySelector('.sec-folio');
+    if(!w||!f)return;
+    if(w.style.display==='none')return;
+    f.textContent=folioN++;
+  });
 }
 
 // Age-driven cleanup must also clear evidence flags; otherwise stale
@@ -6123,6 +6179,10 @@ function onDxEvalPathChange(){
 
 // keep docs/branching-logic.md §10.9 in sync (school-service auto-recommendation; psychoed deduped from academic/ld_suspected/hyperlexia)
 function syncSchoolSvcFromNeeds(){
+  // Toddlers are served under IDEA Part C (Early Steps), not Part B school services.
+  // Without this gate, any need checkbox auto-populates S.schoolSvc and the suppressed
+  // school-based-services output re-opens downstream despite §7 being hidden.
+  if(S.ageGroup==='toddler') return;
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
     S.schoolSvc.add(t);
