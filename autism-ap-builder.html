@@ -2264,7 +2264,16 @@ const CRIT_A={a1:'Deficits in social-emotional reciprocity',a2:'Deficits in nonv
 const CRIT_B={b1:'Stereotyped or repetitive motor movements, use of objects, or speech',b2:'Insistence on sameness, inflexible adherence to routines, or ritualized patterns',b3:'Highly restricted, fixated interests abnormal in intensity or focus',b4:'Hyper- or hyporeactivity to sensory input or unusual sensory interests'};
 
 // ─── EVIDENCE CHIP DATA ───────────────────────────────────────────────────────
-const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',record:'Record review'};
+const EV_SRC_LABELS={observation:'Direct observation',parent:'Parent report',record:'Record review',self:'Patient self-report'};
+// Patient self-report is a valid DSM-5 evidence source only for patients who can self-report, so
+// it is age-gated to adolescent/young-adult (council 2026-06-12): self-report is clinically primary
+// for later-identified adolescent/adult ASD, where masking makes the patient's own account the only
+// access to some criteria; it is meaningless for toddlers and unreliable for younger children, where
+// insight into one's own social impact is developmentally limited. The other three sources are always
+// shown. No "insufficient alone" guard is needed — validateCriteria() already gates a complete
+// diagnosis on the criteria structure regardless of source. EV_SRC_AGES holds the allowed ageGroups
+// for any gated source; ungated sources are absent from it.
+const EV_SRC_AGES={self:['adolescent','youngAdult']};
 // Each criterion maps to {base:[...universal high-yield...], <ageGroup>:[...age-specific...]}.
 // Age keys match S.ageGroup (toddler/preschool/schoolAge/adolescent/youngAdult). The chip
 // strip shows base + current-age chips only (and a min-verbal cluster); updateEvChips() toggles visibility on render.
@@ -2715,13 +2724,21 @@ function generateNote() {
   // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
   // documented but the suspected-ID gating still demands a formal evaluation recommendation).
   const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
-  const hasDxWorkup=S.teacherMaterials.size>0||S.dxEvalPath||S.priorTesting.size>0||hasSuspectedIDorGDD;
+  // Evaluation-path output survives a Confirmed diagnosis only for the "fairly certain" CARS-2
+  // pathways (certainYoung/certainOlder), which document the supporting instrument and severity
+  // rating on an established diagnosis. The uncertain* / devOnly pathways describe an in-progress
+  // workup and are suppressed once the diagnosis is confirmed (otherwise the note reads as still
+  // pending). This single predicate drives BOTH the section-open test and the content gate, so a
+  // confirmed diagnosis on a suppressed path can no longer leave a bare section header.
+  const dxConfirmed = S.diagStatus==='confirmed';
+  const evalPathShows = S.dxEvalPath && (!dxConfirmed || S.dxEvalPath==='certainYoung' || S.dxEvalPath==='certainOlder');
+  const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasSuspectedIDorGDD;
   if(hasDxWorkup){
-    const onlyPriorTesting=S.priorTesting.size>0&&!S.dxEvalPath&&!S.teacherMaterials.size;
+    const onlyPriorTesting=S.priorTesting.size>0&&!evalPathShows&&!S.teacherMaterials.size;
     // Section header reflects the actual content. When the only workup is the
     // cognitive/adaptive eval referral (suspected ID/GDD with no ASD-side workup),
     // 'DIAGNOSTIC WORKUP & NEXT STEPS' would mislead the reader into expecting ASD content.
-    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !S.dxEvalPath && S.priorTesting.size===0;
+    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !evalPathShows && S.priorTesting.size===0;
     const sectionTitle = onlySuspectedIDWorkup ? 'COGNITIVE / ADAPTIVE EVALUATION' : (onlyPriorTesting ? 'PRIOR TESTING REVIEWED' : 'DIAGNOSTIC WORKUP & NEXT STEPS');
     L.push(n+++'. '+sectionTitle);
     if(S.teacherMaterials.size){
@@ -2739,7 +2756,7 @@ function generateNote() {
       S.teacherMaterials.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
       L.push('Family to provide teacher contact information. Materials to be returned at or before the next visit.');
     }
-    if(S.dxEvalPath&&S.diagStatus!=='confirmed'){
+    if(evalPathShows){
       if(S.teacherMaterials.size) L.push('');
       const cars2HF=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&
         ['conversational','ageAppropriate'].includes(S.langLevel)&&
@@ -2752,18 +2769,25 @@ function generateNote() {
         if(kbitAge||S.ageGroup==='preschool') L.push('  • KBIT-2R (Kaufman Brief Intelligence Test, 2nd ed.): Abbreviated cognitive screening [age 4+].');
         L.push('Results will inform treatment planning and need for further autism-specific evaluation.');
       } else if(S.dxEvalPath==='certainYoung'){
-        L.push('Autism Evaluation: Diagnosis Fairly Certain (age < 5):');
+        // On a confirmed diagnosis the CARS-2 documents/formalizes severity for an established
+        // diagnosis; on a not-yet-confirmed (fairly certain) picture it supports reaching it.
+        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age < 5):':'Autism Evaluation: Diagnosis Fairly Certain (age < 5):');
         if(S.cars2Done){
-          L.push('  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the confirmed diagnosis.');
+          L.push(dxConfirmed
+            ?'  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the confirmed diagnosis.'
+            :'  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the clinical diagnosis.');
+        } else if(dxConfirmed){
+          L.push('  • CARS-2 scheduled with MD: 1-hour assessment appointment. This standardized direct observation instrument formalizes the severity rating and documents support for the confirmed diagnosis.');
+          L.push('  The CARS-2 will provide objective data to formalize the severity level designation for the established diagnosis.');
         } else {
           L.push('  • CARS-2 scheduled with MD: 1-hour assessment appointment. This standardized direct observation instrument provides a severity rating and diagnostic support.');
           L.push('  Given the clinical picture is consistent with ASD, the CARS-2 will provide objective data to support the diagnosis and guide severity level designation.');
         }
       } else if(S.dxEvalPath==='certainOlder'){
-        L.push('Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):');
+        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age ≥ 5):':'Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):');
         L.push('  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
         if(S.cars2Done){
-          L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. Results incorporated; support confirmed diagnosis.');
+          L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. Results incorporated; '+(dxConfirmed?'support confirmed diagnosis.':'support the clinical diagnosis.'));
         } else if(cars2HF){
           L.push('  Step 2: CARS-2-HF (High Functioning) to follow; indicated given age 6 or older, conversational language, and estimated cognitive functioning in average range or above.');
         } else {
@@ -2788,7 +2812,7 @@ function generateNote() {
       }
     }
     if(S.priorTesting.size){
-      if(S.dxEvalPath||S.teacherMaterials.size) L.push('');
+      if(evalPathShows||S.teacherMaterials.size) L.push('');
       const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
       const behavAdaptKeys=new Set(['vineland3','basc3','conners4']);
       const buildLbl=k=>{
@@ -4970,6 +4994,11 @@ function updateEvChips(){
     const langOK=lang!=='verbal'||!mv;
     chip.style.display=(ageOK&&langOK)?'':'none';
   });
+  // Age-gated SOURCE chips (currently just self-report): show only when the current ageGroup is in
+  // the chip's allowed list. Ungated source chips carry no data-src-ages and stay always-on.
+  document.querySelectorAll('.ev-src-chip[data-src-ages]').forEach(chip=>{
+    chip.style.display=chip.dataset.srcAges.split(' ').includes(ag)?'':'none';
+  });
 }
 
 function render(){
@@ -6628,9 +6657,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     // Source label strip — chips insert a "Label: " header into the textarea
     const srcStrip=document.createElement('div');
     srcStrip.className='ev-source-strip';
-    Object.entries(EV_SRC_LABELS).forEach(([,label])=>{
+    Object.entries(EV_SRC_LABELS).forEach(([key,label])=>{
       const chip=document.createElement('span');
       chip.className='ev-src-chip';chip.textContent=label+' ▸';
+      // Age-gated sources (self-report) carry their allowed ageGroups; updateEvChips() toggles them.
+      if(EV_SRC_AGES[key]) chip.dataset.srcAges=EV_SRC_AGES[key].join(' ');
       chip.addEventListener('click',()=>{
         const prefix=label+': ';
         ta.value=ta.value.trim()?ta.value.trimEnd()+'\n'+prefix:prefix;

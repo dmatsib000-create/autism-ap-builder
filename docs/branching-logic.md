@@ -460,6 +460,24 @@ A few criteria toggle other state when set, beyond their own membership:
 
 The `diagStatus` field is the master gate for whether the app is documenting a diagnosis versus an evaluation — many other branches read it.
 
+#### 4.5.1 Evaluation-path output on a confirmed diagnosis
+
+The §2 Diagnostic Workup picker (`S.dxEvalPath`, six radios) describes *how* the diagnosis was/will be reached. Its note output is governed by one predicate, `evalPathShows` (in `generateNote()`), used for **both** the section-open test and the per-path content gate so a confirmed diagnosis can never leave a bare `DIAGNOSTIC WORKUP` header:
+
+```js
+const dxConfirmed = S.diagStatus === 'confirmed';
+const evalPathShows = S.dxEvalPath &&
+  (!dxConfirmed || S.dxEvalPath === 'certainYoung' || S.dxEvalPath === 'certainOlder');
+```
+
+| Path | On suspected / rule-out | On **confirmed** |
+|---|---|---|
+| `certainYoung`, `certainOlder` | shows ("Diagnosis Fairly Certain") | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
+| `devOnly`, `uncertainComp`, `uncertainADOS` | shows | **suppressed** — these describe an in-progress workup that reads wrong once the diagnosis is confirmed |
+| `ritaT` | shows (workup block) | suppressed here; RITA-T support instead appears in the clinical-summary sentence (`generateNote()` body, separate from this block) |
+
+Rationale: the CARS-2-backed "fairly certain" paths carry documentation value on a confirmed note (they name the supporting instrument and severity rating); the "uncertain / referring out" paths do not. Confirmed-case wording is selected via `dxConfirmed` inside the `certainYoung`/`certainOlder` branches. Locked by the `confirmed-certain-young-evalpath` golden fixture.
+
 ### 4.6 What criteria do *not* drive
 
 - ASD severity levels (§3) are orthogonal to criteria — a patient can be Level 3 with 2/3 A and 2/4 B (which would block "complete," but the levels themselves are independent)
@@ -468,6 +486,8 @@ The `diagStatus` field is the master gate for whether the app is documenting a d
 ### 4.7 Evidence chips (age- and language-adaptive)
 
 Under each criterion's evidence textarea sits a strip of clickable chips (`.ev-obs-chip`). Clicking one appends its text to that criterion's textarea and writes back to `S.ev[k]`. They are a data-entry convenience, not state-changing in any other way.
+
+**Two strips, not one.** Above the content chips sits a **source strip** (`.ev-src-chip`, built from `EV_SRC_LABELS`): clicking a source inserts a `"Label: "` header into the textarea (e.g. `Direct observation: `). The four sources are **Direct observation · Parent report · Record review · Patient self-report**. The first three are always shown; **Patient self-report is age-gated to `adolescent` / `youngAdult`** (council 2026-06-12) — it is clinically primary for later-identified adolescent/adult ASD, where masking makes the patient's own account the only access to some criteria, but meaningless for toddlers and unreliable for younger children (insight into one's own social impact is developmentally limited). The gate lives in `EV_SRC_AGES` (`{self:['adolescent','youngAdult']}`): the build loop tags a gated chip with `data-src-ages`, and `updateEvChips()` toggles any `.ev-src-chip[data-src-ages]` by `S.ageGroup` (ungated sources carry no attribute and stay always-on). No "insufficient alone" guard is attached — `validateCriteria()` already gates a *complete* diagnosis on the criteria structure regardless of source. Self-report stays available on all criteria including **C** (early developmental period); retrospective self-report there is weak but not invalid, left to clinician judgment.
 
 The chip catalog is `EV_CHIPS`, keyed `a1, a2, a3, b1, b2, b3, b4, c, d, e`. Each key holds an object of age-group buckets:
 
@@ -495,6 +515,12 @@ a1:{
 A chip is visible only when **both** axes pass. The `lang:'verbal'` tag is applied to chips whose wording assumes spoken conversation (e.g. A1 "One-sided conversation", A2 "Atypical eye contact in conversation", "Gestures not integrated with speech"). The `minVerbal` bucket is the deliberate counterpart: it carries preverbal phrasings shown *only* for older min-verbal patients, where the suppressed conversational chips would otherwise leave a gap. The suppression (`lang:'verbal'`) and the replacement (`minVerbal` bucket) are gated to the same age range so they stay aligned.
 
 A chip entry is either a plain string or `{t:'text', lang:'verbal'}`. The build loop handles both: `const text = typeof entry==='string' ? entry : entry.t`.
+
+### 4.8 Evidence source chips (`EV_SRC_LABELS`, age-gated self-report)
+
+Above the observation chips sits a separate **source strip** (`.ev-src-chip`), built from `EV_SRC_LABELS` (`autism-ap-builder.html:2267`). Clicking a source chip inserts a `"Label: "` header into that criterion's evidence textarea (e.g. `"Parent report: "`) — a documentation-attribution convenience, distinct from the content chips.
+
+Four sources: **Direct observation · Parent report · Record review · Patient self-report**. The first three are always shown. **Patient self-report is age-gated to `adolescent` + `youngAdult`** via `EV_SRC_AGES = {self:['adolescent','youngAdult']}`: the build tags that chip with `data-src-ages`, and `updateEvChips()` toggles `.ev-src-chip[data-src-ages]` by `S.ageGroup` (the same `updateEvChips()` pass that filters the content chips; ungated source chips carry no `data-src-ages` and stay always-on). It is available on **all criteria including C** (a patient's retrospective account of early development is weak but not invalid — clinician judgment governs). No "insufficient alone" guard is attached: `validateCriteria()` already gates a *complete* diagnosis on the criteria structure regardless of source. Council-ratified 2026-06-12 (self-report is clinically primary for later-identified adolescent/adult ASD, where masking makes the patient's own account the only access to some criteria; meaningless/unreliable below adolescence).
 
 ---
 
