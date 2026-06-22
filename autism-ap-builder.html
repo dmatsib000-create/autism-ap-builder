@@ -2856,7 +2856,9 @@ function generateNote() {
   }
 
   // One collaborative-deference lead-in, printed once before the first therapy-recommendation
-  // section (ABA/SLP/OT/PT). First sentence affirms the needs/services are clinically established
+  // section. Every therapy section that can render calls therapyIntro() at its top (ABA, PCIT,
+  // psychotherapy, social skills, SLP, OT, PT); the print-once flag guarantees it leads whichever
+  // one renders first and never repeats. First sentence affirms the needs/services are clinically established
   // (so the medical-necessity framing payers read is preserved); second sentence defers assessment
   // detail, treatment selection, and service intensity to the treating therapist. Council-ratified
   // tone fix (2026-06-22): referral prose must not script another licensed provider's internal
@@ -3016,6 +3018,7 @@ function generateNote() {
 
   // PCIT
   if(resolveOv('pcit',rulePCIT())){
+    therapyIntro();
     L.push(n+++'. PARENT-CHILD INTERACTION THERAPY (PCIT)');
     const i=[];if(S.needsBehavior.has('aggression'))i.push('aggression');if(S.needsBehavior.has('property'))i.push('property destruction');if(S.needsBehavior.has('tantrums'))i.push('tantrums');if(S.needsBehavior.has('noncompliance'))i.push('noncompliance');if(hasADHD())i.push('ADHD');if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('trauma'))i.push('trauma/stress');
     L.push('Recommended for: '+(i.join(', ')||'disruptive behavior concerns')+'.');
@@ -3026,6 +3029,7 @@ function generateNote() {
 
   // Psychotherapy
   if(resolveOv('psychotherapy',rulePsychotherapy())){
+    therapyIntro();
     L.push(n+++'. AUTISM-INFORMED PSYCHOTHERAPY');
     const i=[];if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression/mood');if(S.comorbid.has('ocd'))i.push('OCD');if(S.emotionalReg)i.push('emotional regulation');if(S.needsBehavior.has('boundaryViol'))i.push('boundary safety and social skill development');
     L.push('CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: '+(i.join(', ')||'emotional/coping needs')+'.');
@@ -3037,6 +3041,7 @@ function generateNote() {
 
   // Social skills
   if(resolveOv('socialSkills',ruleSocialSkills())){
+    therapyIntro();
     L.push(n+++'. SOCIAL SKILLS INTERVENTION');
     if(['adolescent','youngAdult'].includes(S.ageGroup)){
       L.push('PEERS (Program for the Education and Enrichment of Relational Skills) or comparable evidence-based program for adolescents/young adults. Generalization to natural settings should be explicitly planned and monitored.');

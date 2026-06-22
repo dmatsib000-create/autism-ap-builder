@@ -19,6 +19,8 @@ PLAN
 
 ── Problem 1: Autism Spectrum Disorder [Level 1 (SC) / Level 1 (RRBs)] (F84.0) ──
 
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
 1. PARENT-CHILD INTERACTION THERAPY (PCIT)
 Recommended for: noncompliance.
 Evidence-based, parent-mediated intervention improving the parent-child relationship while reducing disruptive behaviors. Referral to a PCIT-trained therapist is recommended.
@@ -36,8 +38,6 @@ Structured autism-specific social skills group. Options in the Gainesville area:
 Targets:
   • Peer interaction and friendship skills
   • Social reciprocity and balanced social exchange
-
-The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
 
 4. SPEECH-LANGUAGE PATHOLOGY (SLP)
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
