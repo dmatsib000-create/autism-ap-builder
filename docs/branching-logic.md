@@ -802,6 +802,15 @@ These are inconsistencies or vague thresholds surfaced during the source scan. T
 
 3. **No documented contract for what `reasons` strings should look like.** They're free-form English. `_abaContent` concatenates them with commas; a future rule author who pushes a sentence-cased string with a trailing period will produce ungrammatical letter output.
 
+### 7.8 Allied-referral tone and the collaborative lead-in
+
+The note's therapy-recommendation sections (ABA, SLP, OT, PT, emitted in `generateNote()`) carry a deliberate register, ratified by council 2026-06-22:
+
+- **One collaborative-deference lead-in prints once**, via the `therapyIntro()` print-once helper, immediately before the **first** therapy section that renders (so it appears whether ABA, SLP, OT, or PT is first). Its text affirms that the needs and services are *clinically established* (preserving the medical-necessity framing a payer reads) and then defers *assessment detail, treatment selection, and service intensity* to the treating therapist. Do not duplicate it per section, and do not let it read as "provisional / pending" (that is a denial hook).
+- **Allied-referral prose names the clinical concern (the "what") but does not script the receiving provider's internal practice (the "how").** Name the differential, the affected function, and why the referral matters; defer the assessment tool, treatment method, and care *sequence* to that licensed provider. Concretely: the SLP motor-speech line names CAS as a differential but no longer prescribes a treatment manual; the oral-motor swallowing line flags that an instrumental study "may be warranted prior to" feeding therapy rather than commanding the sequence; the OT visual-perceptual line drops the subtest enumeration. When adding a therapy line, keep the imperative/future-declarative mood ("X will provide", "X is to assess") out of provider-directed text.
+- **The fence:** this softening does **not** apply to the ABA medical-necessity paragraph (the `medically necessary given… exceed what school-based supports can address` block) or the ABA letter ([§9](#9-aba-letter-content-rules)). Those address a *payer*, not a colleague, and their assertive register is load-bearing — see the audience-tailoring guardrail in CLAUDE.md. A golden diff inside `_abaContent` or that paragraph from a "tone" edit is a scope leak.
+- **Test lock:** `tests/fixtures/referral-tone-allied.mjs` is the only fixture exercising the reframed SLP/OT/oral-motor lines and the lead-in-before-SLP (ABA-absent) path; keep it green when editing this prose.
+
 ---
 
 ## 8. Pronoun & verb agreement

@@ -2855,9 +2855,22 @@ function generateNote() {
     L.push('');
   }
 
+  // One collaborative-deference lead-in, printed once before the first therapy-recommendation
+  // section (ABA/SLP/OT/PT). First sentence affirms the needs/services are clinically established
+  // (so the medical-necessity framing payers read is preserved); second sentence defers assessment
+  // detail, treatment selection, and service intensity to the treating therapist. Council-ratified
+  // tone fix (2026-06-22): referral prose must not script another licensed provider's internal
+  // practice. Deliberately does NOT alter the ABA necessity paragraph below, which stays assertive.
+  let therapyIntroShown=false;
+  const therapyIntro=()=>{ if(therapyIntroShown) return; therapyIntroShown=true;
+    L.push('The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.');
+    L.push('');
+  };
+
   // ABA
   const abaR=ruleABA();
   if(resolveOv('aba',abaR)){
+    therapyIntro();
     L.push(n+++'. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY');
     {const sl=therapyStatusLine('aba','ABA');if(sl){L.push(sl);L.push('');}}
     const confirmed=S.diagStatus==='confirmed';
@@ -2975,8 +2988,8 @@ function generateNote() {
         L.push('');
       }
     }
-    L.push('  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services. Parent training sessions will address: understanding the function of target behaviors, implementation of reinforcement strategies in natural routines, generalization of clinic and school skills to home settings, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.');
-    L.push('  • Least restrictive and assent-based practice: Programming will use the least restrictive, most naturalistic procedures appropriate to the individual\'s profile. Patient assent will be sought for all intervention activities as developmentally appropriate; assent withdrawal will be honored and documented. Positive reinforcement-based strategies are the first-line approach; restrictive procedures require documented justification and oversight per BACB ethical standards.');
+    L.push('  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.');
+    L.push('  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child\'s profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.');
     if(S.needsAdaptive.has('commSafety')){
       L.push('  • Community Safety Behavioral Training: Structured ABA programming to address community safety risk. Recommended targets:');
       L.push('    - Emergency stop response: "Stop" on command at curbs, parking lots, and street crossings. Trained via discrete trial teaching in controlled settings, then systematically generalized to real community environments using in-vivo training.');
@@ -3045,6 +3058,7 @@ function generateNote() {
 
   // SLP
   if(resolveOv('slp',ruleSLP())){
+    therapyIntro();
     L.push(n+++'. SPEECH-LANGUAGE PATHOLOGY (SLP)');
     {const sl=therapyStatusLine('slp','SLP');if(sl){L.push(sl);L.push('');}}
     if(S.langLevel==='unclearSLP'){L.push('  • PRIORITY: Comprehensive SLP evaluation to characterize communication profile. Therapy recommendations are provisional pending formal assessment.');}
@@ -3060,14 +3074,14 @@ function generateNote() {
     if(hasSemanticDeficit()){L.push('  • Semantic language therapy targeting literal/figurative language, idioms, multiple meanings, and inference-making to support comprehension in naturalistic and academic contexts.');}
     if(hasAnyArticulation()){
       L.push('  • Articulation and phonological evaluation and treatment'+(hasReducedIntell()?' targeting speech-sound accuracy and intelligibility improvement':' targeting speech-sound accuracy')+'. Standardized assessment (e.g., GFTA-3, KLPA-3) to characterize error pattern and severity.');
-      L.push('  • SLP to assess for motor speech disorder, including childhood apraxia of speech (CAS), if inconsistent errors, articulatory groping, or atypical prosody are noted. CAS requires a distinct treatment approach (e.g., DTTC, Nuffield, ReST) and a provider with motor speech training.');
+      L.push('  • Differential includes motor speech disorder, including childhood apraxia of speech (CAS), if inconsistent errors, articulatory groping, or atypical prosody are noted; assessment and treatment approach rest with the treating SLP.');
     }
     if(S.needsComm.has('oral_motor')){
       const hasFeedingDx=S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected')||S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected');
       if(hasFeedingDx){
-        L.push('  • Oral motor / feeding: SLP evaluation of oral-motor function for both speech and swallowing. Feeding-specific assessment and therapy recommendations are integrated into the feeding disorder problem block below. If pharyngeal-phase dysphagia or aspiration risk is suspected (wet/gurgly voice quality after meals, coughing or choking during eating, recurrent pneumonia), instrumental swallowing evaluation (Modified Barium Swallow Study [MBSS] or FEES) is indicated before feeding therapy begins.');
+        L.push('  • Oral motor / feeding: SLP evaluation of oral-motor function for both speech and swallowing. Feeding-specific assessment and therapy recommendations are integrated into the feeding disorder problem block below. If pharyngeal-phase dysphagia or aspiration risk is suspected (wet/gurgly voice quality after meals, coughing or choking during eating, recurrent pneumonia), instrumental swallowing evaluation (Modified Barium Swallow Study [MBSS] or FEES) may be warranted prior to feeding therapy.');
       } else {
-        L.push('  • Oral motor and feeding: SLP evaluation targeting oral-motor coordination for safe, functional feeding. Note: oral-motor evaluation for feeding is distinct from oral-motor evaluation for speech and requires a separate clinical feeding assessment. If pharyngeal-phase dysphagia or aspiration risk is suspected (wet/gurgly voice quality, coughing or choking during eating, recurrent aspiration pneumonia), instrumental swallowing evaluation (Modified Barium Swallow Study [MBSS] or Fiberoptic Endoscopic Evaluation of Swallowing [FEES]) is indicated before feeding therapy begins. Texture modification per IDDSI framework if diet modification is needed.');
+        L.push('  • Oral motor and feeding: SLP evaluation targeting oral-motor coordination for safe, functional feeding. Note: oral-motor evaluation for feeding is distinct from oral-motor evaluation for speech and requires a separate clinical feeding assessment. If pharyngeal-phase dysphagia or aspiration risk is suspected (wet/gurgly voice quality, coughing or choking during eating, recurrent aspiration pneumonia), instrumental swallowing evaluation (Modified Barium Swallow Study [MBSS] or Fiberoptic Endoscopic Evaluation of Swallowing [FEES]) may be warranted prior to feeding therapy. Texture modification per IDDSI framework if diet modification is needed.');
       }
     }
     // The school-vs-clinic clause is Part B framing — toddlers are served under Part C
@@ -3078,6 +3092,7 @@ function generateNote() {
 
   // OT
   if(resolveOv('ot',ruleOT())){
+    therapyIntro();
     L.push(n+++'. OCCUPATIONAL THERAPY (OT)');
     {const sl=therapyStatusLine('ot','OT');if(sl){L.push(sl);L.push('');}}
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
@@ -3105,7 +3120,7 @@ function generateNote() {
     }
     if(S.needsMotor.has('fine')) L.push('  • Fine motor skill development: Targets include pencil grip and graphomotor control, bilateral hand coordination, scissor skills, in-hand manipulation, eye-hand coordination, and self-care fasteners (buttons, zippers, shoe-tying). Praxis and motor planning deficits evaluated and addressed as contributing factors.');
     if(S.needsMotor.has('handwriting')) L.push('  • Handwriting assessment and intervention (e.g., Handwriting Without Tears).');
-    if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) L.push('  • Visual perceptual skills: OT evaluation of visual perception including form constancy, figure-ground discrimination, visual-spatial relations, and visual memory. Visual perceptual deficits affect reading, math, written output, and navigation of the visual classroom environment; treatment integrated with academic and fine motor goals.');
+    if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) L.push('  • Visual perceptual skills: OT evaluation of visual-perceptual skills, which affect reading, math, written output, and navigation of the visual classroom environment; treatment integrated with academic and fine motor goals.');
     L.push('  • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.');
     if(S.needsSensory.size) L.push('  • ABA/OT collaboration for sensory-related behavior: Sensory-driven behaviors should be assessed collaboratively by OT (sensory integration framework) and the ABA team (functional behavior analysis). A behavior that appears sensory-driven may have operant functions (escape, attention, access to tangibles) that require behavioral intervention in addition to sensory supports. Coordinated assessment prevents siloed treatment and avoids targeting sensory behaviors without understanding their function.');
     // Same Part B gating as the SLP frequency line above.
@@ -3115,6 +3130,7 @@ function generateNote() {
 
   // PT
   if(resolveOv('pt',rulePT())){
+    therapyIntro();
     L.push(n+++'. PHYSICAL THERAPY (PT)');
     {const sl=therapyStatusLine('pt','PT');if(sl){L.push(sl);L.push('');}}
     const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination'))x.push('motor coordination/DCD');
