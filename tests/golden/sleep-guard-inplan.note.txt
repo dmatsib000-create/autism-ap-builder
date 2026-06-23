@@ -22,6 +22,8 @@ PLAN
 
 ── Problem 1: Autism Spectrum Disorder [Level 1 (SC) / Level 1 (RRBs)] (F84.0) ──
 
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
 1. SOCIAL SKILLS INTERVENTION
 Structured autism-specific social skills group. Options in the Gainesville area:
   - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 273-0517) for current group availability and enrollment.
