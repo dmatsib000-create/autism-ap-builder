@@ -1358,6 +1358,28 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           </div>
           <div class="field-hint" style="margin:0 0 4px;font-size:var(--text-11);color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
         </div>
+        <div class="grp-sep">Prenatal exposures</div>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="prenatalAlcohol"> Clinically significant prenatal alcohol exposure documented</label>
+        <div id="paeEvidenceRow" class="sub-options" style="display:none">
+          <span class="sub-label">Evidence (NIAAA consensus categories — check all that apply)</span>
+          <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="quantityFrequency"> Quantified maternal drinking documented</label>
+          <div id="paeQuantityRow" class="sub-options" style="display:none">
+            <span class="sub-label">Pattern detail (each optional)</span>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 4px">
+              <select id="paeDrinksSel" class="outcome-sel"><option value="">— drinks per drinking day —</option><option value="1_2">1–2</option><option value="3_5">3–5</option><option value="6plus">6 or more</option><option value="notQuantified">Not quantified</option></select>
+              <select id="paeFrequencySel" class="outcome-sel"><option value="">— frequency —</option><option value="daily">Daily</option><option value="weeklyPlus">Weekly or more</option><option value="lessWeekly">Less than weekly</option><option value="binge">Episodic binge</option><option value="notDocumented">Not documented</option></select>
+              <select id="paeTimingSel" class="outcome-sel"><option value="">— gestational timing —</option><option value="first">1st trimester</option><option value="second">2nd trimester</option><option value="third">3rd trimester</option><option value="throughout">Throughout pregnancy</option><option value="preRecognition">Before pregnancy recognition only</option><option value="notDocumented">Not documented</option></select>
+            </div>
+          </div>
+          <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="socialLegal"> Alcohol-related social or legal problems proximate to the index pregnancy</label>
+          <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="intoxicationTesting"> Documented intoxication during pregnancy (blood, breath, or urine testing)</label>
+          <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="biomarkers"> Positive validated biomarker(s) (e.g., PEth, FAEE, EtG in maternal hair, fingernails, urine, or blood; placenta; or meconium)</label>
+          <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="screenPositive"> Elevated risk on a validated prenatal screen (e.g., T-ACE, AUDIT)</label>
+          <textarea id="paeDetailField" class="strengths-area" placeholder="Additional exposure detail (optional) — category-level only, appended to the note as its own sentence..." style="min-height:36px;margin-top:5px"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the birth parent" or <code>[NAME]</code>; no names, specific dates, locations/jurisdictions, or case identifiers.</span>
+        </div>
+        <label class="cb-row"><input type="checkbox" data-key="single" value="fasdFeatures"> Features concerning for FASD on exam/history</label>
+        <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">Flagging guide (never note language): at the group level, FASD-related social difficulty tends to spare nonverbal communication (eye contact, gestures, facial expression — DSM-5 A2) and restricted/repetitive behaviors outside the sensory domain. Prominent A2 deficits or strong non-sensory RRBs favor ASD — alone or co-occurring with FASD — rather than FASD alone. Can be flagged with or without documented alcohol exposure.</div>
         <div class="grp-sep">Support Services</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
         <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
@@ -1731,6 +1753,12 @@ const S = {
   behavFreq:{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''},
   seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
   dysmorphism:'', congenitalAnomalies:false, developmentalRegression:false, regressionTiming:'',
+  // Prenatal alcohol exposure / FASD flags. paeEvidence holds NIAAA consensus evidence
+  // categories; the three pae* scalars are the optional pattern detail under
+  // quantityFrequency. All categorical or placeholder-hinted — no dates, names, or
+  // jurisdictions (PHI-free constraint applies to the maternal history too).
+  prenatalAlcohol:false, fasdFeatures:false, paeEvidence:new Set(),
+  paeQuantity:'', paeFrequency:'', paeTiming:'', paeDetail:'',
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
   teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
   priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'', cars2Done:false,
@@ -2107,11 +2135,15 @@ function ruleGenetics() {
   // genetics flag is set. dysmorphism==='suspected' alone is intentionally
   // NOT a trigger — suspected dysmorphology in a non-confirmed dx is too
   // thin a clinical signal to warrant an unsolicited genetics referral.
+  // The FASD flags trigger because an FASD diagnosis requires excluding
+  // genetic phenocopies (NIAAA consensus guidelines).
   return {include:
     S.diagStatus === 'confirmed'
     || (S.diagStatus !== '' && (S.developmentalRegression
                               || S.dysmorphism === 'confirmed'
-                              || S.congenitalAnomalies))
+                              || S.congenitalAnomalies
+                              || S.prenatalAlcohol
+                              || S.fasdFeatures))
   };
 }
 // ruleNeurology fires on developmentalRegression alone without requiring a
@@ -2134,10 +2166,15 @@ function ruleGI() { return {include:S.comorbid.has('gi')||S.feeding||S.comorbid.
 function ruleSleepRef() { return {include:S.sleepStudy}; }
 function ruleAudiology() {
   // Speech-driven audiology referral is restricted to toddler/preschool —
-  // older children are assumed to have a prior screen; hearingScreenFail overrides at any age
+  // older children are assumed to have a prior screen; hearingScreenFail overrides at any age.
+  // FASD flags also trigger (audiologic evaluation is part of the FASD workup). base/fasd are
+  // exposed separately so the output bullet can adapt its rationale to what actually fired —
+  // one bullet always, so a child with both triggers never gets two hearing referrals.
   const youngAge=['toddler','preschool'].includes(S.ageGroup);
   const speechConcern=hasSpeechSoundErrors()||hasReducedIntell()||hasMorphoErrors();
-  return {include:S.hearingScreenFail||(youngAge&&speechConcern)};
+  const base=S.hearingScreenFail||(youngAge&&speechConcern);
+  const fasd=S.prenatalAlcohol||S.fasdFeatures;
+  return {include:base||fasd,base,fasd};
 }
 function ruleQBTest() { return {include:S.comorbid.has('adhd_suspected')&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)}; }
 function ruleEarlySteps() {
@@ -2732,13 +2769,14 @@ function generateNote() {
   // confirmed diagnosis on a suppressed path can no longer leave a bare section header.
   const dxConfirmed = S.diagStatus==='confirmed';
   const evalPathShows = S.dxEvalPath && (!dxConfirmed || S.dxEvalPath==='certainYoung' || S.dxEvalPath==='certainOlder');
-  const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasSuspectedIDorGDD;
+  const hasFASDFlags = S.prenatalAlcohol||S.fasdFeatures;
+  const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasSuspectedIDorGDD||hasFASDFlags;
   if(hasDxWorkup){
-    const onlyPriorTesting=S.priorTesting.size>0&&!evalPathShows&&!S.teacherMaterials.size;
+    const onlyPriorTesting=S.priorTesting.size>0&&!evalPathShows&&!S.teacherMaterials.size&&!hasFASDFlags;
     // Section header reflects the actual content. When the only workup is the
     // cognitive/adaptive eval referral (suspected ID/GDD with no ASD-side workup),
     // 'DIAGNOSTIC WORKUP & NEXT STEPS' would mislead the reader into expecting ASD content.
-    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !evalPathShows && S.priorTesting.size===0;
+    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !evalPathShows && S.priorTesting.size===0 && !hasFASDFlags;
     const sectionTitle = onlySuspectedIDWorkup ? 'COGNITIVE / ADAPTIVE EVALUATION' : (onlyPriorTesting ? 'PRIOR TESTING REVIEWED' : 'DIAGNOSTIC WORKUP & NEXT STEPS');
     L.push(n+++'. '+sectionTitle);
     if(S.teacherMaterials.size){
@@ -2851,6 +2889,59 @@ function generateNote() {
     if((S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'){
       L.push('');
       L.push('Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: (a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite). Formal eligibility for an Intellectual Disability or Global Developmental Delay diagnosis cannot be established until both components are completed.');
+    }
+    // FASD considerations — exposure documentation and the ASD-differential prose
+    // (council-ratified 2026-07-16, criteria-gated evidentiary sentence amended same day).
+    // Lives inside Diagnostic Workup so "evaluated in parallel" sits adjacent to the
+    // workup lines it references (ratified layout criterion). The ABA and IEP letters
+    // are deliberately untouched: differential language in the payer-facing
+    // medical-necessity register is a denial hook.
+    if(hasFASDFlags){
+      if(S.teacherMaterials.size||evalPathShows||S.priorTesting.size||hasSuspectedIDorGDD) L.push('');
+      L.push('Fetal Alcohol Spectrum Disorder (FASD) Considerations:');
+      if(S.prenatalAlcohol){
+        // Fixed iteration order (form order), not Set insertion order — keeps the
+        // sentence stable regardless of the sequence boxes were clicked in.
+        const paeDrinksLbl={'1_2':'1 to 2 drinks per drinking day','3_5':'3 to 5 drinks per drinking day','6plus':'6 or more drinks per drinking day',notQuantified:'amount per occasion not quantified'};
+        const paeFreqLbl={daily:'daily',weeklyPlus:'weekly or more often',lessWeekly:'less than weekly',binge:'in an episodic binge pattern',notDocumented:'frequency not documented'};
+        const paeTimingLbl={first:'during the first trimester',second:'during the second trimester',third:'during the third trimester',throughout:'throughout pregnancy',preRecognition:'before pregnancy recognition only',notDocumented:'gestational timing not documented'};
+        const paePhrases=[];
+        ['quantityFrequency','socialLegal','intoxicationTesting','biomarkers','screenPositive'].forEach(k=>{
+          if(!S.paeEvidence.has(k)) return;
+          if(k==='quantityFrequency'){
+            const det=[paeDrinksLbl[S.paeQuantity],paeFreqLbl[S.paeFrequency],paeTimingLbl[S.paeTiming]].filter(Boolean);
+            paePhrases.push('quantified maternal drinking'+(det.length?' ('+det.join(', ')+')':''));
+          }
+          else if(k==='socialLegal') paePhrases.push('alcohol-related social or legal problems proximate to the index pregnancy');
+          else if(k==='intoxicationTesting') paePhrases.push('documented intoxication during pregnancy on blood, breath, or urine testing');
+          else if(k==='biomarkers') paePhrases.push('positive validated alcohol biomarker(s)');
+          else if(k==='screenPositive') paePhrases.push('elevated risk on a validated prenatal alcohol screen');
+        });
+        let expLine='  • Clinically significant prenatal alcohol exposure documented per NIAAA consensus guidelines'+(paePhrases.length?', via: '+paePhrases.join(', '):'')+'.';
+        const paeDet=S.paeDetail.trim();
+        if(paeDet) expLine+=' '+paeDet+(/[.!?]$/.test(paeDet)?'':'.');
+        L.push(expLine);
+      }
+      if(S.fasdFeatures) L.push('  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history.');
+      if(dxConfirmed){
+        // R6b anchor: subject phrase and verb adapt to which flag(s) fired
+        // ("findings ... warrant" is plural; "exposure ... warrants" is singular).
+        let fasdSubj, fasdVerb;
+        if(S.prenatalAlcohol&&S.fasdFeatures){fasdSubj='Documented prenatal alcohol exposure and examination findings concerning for FASD';fasdVerb='warrant';}
+        else if(S.prenatalAlcohol){fasdSubj='Documented prenatal alcohol exposure';fasdVerb='warrants';}
+        else{fasdSubj='Examination and history findings concerning for a fetal alcohol spectrum disorder';fasdVerb='warrant';}
+        L.push('  The diagnosis of Autism Spectrum Disorder is established based on the DSM-5 criteria documented above. '+fasdSubj+' '+fasdVerb+' additional evaluation for a possible co-occurring fetal alcohol spectrum disorder (FASD). This is a separate diagnostic question; it does not alter the autism diagnosis or the services indicated by it.');
+        // R6c: emitted only when this note itself documents nonverbal-communication
+        // deficits (A2) plus at least one non-sensory RRB (B1-B3). The sentence asserts
+        // only what the note documents; when the gate fails, staying silent avoids
+        // handing a reviewer the exact weak spot of a thinly documented presentation.
+        if(S.criteriaA.has('a2')&&(S.criteriaB.has('b1')||S.criteriaB.has('b2')||S.criteriaB.has('b3'))){
+          L.push('  Notably, the documented presentation includes deficits in nonverbal communicative behaviors and restricted, repetitive behaviors beyond the sensory domain; these features are characteristic of Autism Spectrum Disorder and are not accounted for by prenatal alcohol exposure alone.');
+        }
+      } else {
+        // R6a: parallel-tracks framing, no comparative pattern claims (ratified wording).
+        L.push('  Fetal alcohol spectrum disorder (FASD) is included in the differential diagnosis and is being evaluated in parallel with the autism evaluation. These conditions are not mutually exclusive and can co-occur. Completion of both evaluations is recommended so that each condition is identified and addressed on its own merits; neither evaluation replaces the other.');
+      }
     }
     L.push('');
   }
@@ -3278,9 +3369,27 @@ function generateNote() {
     hN=resolveOv('neurology',ruleNeurology()),hQ=resolveOv('qbtest',ruleQBTest()),
     hP=resolveOv('psychiatry',rulePsychiatry()),hGI=resolveOv('gi',ruleGI()),hS=resolveOv('sleep_ref',ruleSleepRef()),
     hEEG=resolveOv('eeg',ruleEEG());
-  if(hA||hG||hN||hQ||hP||hGI||hS||hEEG||S.socialWork){
+  // Ophthalmology fires only when BOTH FASD flags are set (documented exposure AND
+  // concerning features) — a dilated eye exam is part of the formal FASD workup, not a
+  // screen for exposure alone. Plain plan line, no override key in v1.
+  const hOphtho=S.prenatalAlcohol&&S.fasdFeatures;
+  if(hA||hG||hN||hQ||hP||hGI||hS||hEEG||hOphtho||S.socialWork){
     L.push(n+++'. MEDICAL REFERRALS');
-    if(hA){L.push('  • Audiology: Hearing evaluation recommended given speech/language delay and non-compliant or inconclusive behavioral hearing screen. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.');}
+    if(hA){
+      // Rationale adapts to which trigger(s) fired; the referral itself is always a
+      // single bullet, so FASD-driven and hearing-screen-driven referrals dedupe by
+      // construction. The base-trigger text is unchanged from before the FASD flags
+      // existed (keeps non-FASD notes byte-stable).
+      const aud=ruleAudiology();
+      if(aud.fasd&&!aud.base){
+        L.push('  • Audiology: Audiologic evaluation recommended as part of the workup for a possible fetal alcohol spectrum disorder, per NIAAA consensus guidance. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.');
+      } else if(aud.fasd){
+        L.push('  • Audiology: Hearing evaluation recommended given speech/language delay and non-compliant or inconclusive behavioral hearing screen. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning. This evaluation also serves the workup for a possible fetal alcohol spectrum disorder; no separate referral is needed.');
+      } else {
+        L.push('  • Audiology: Hearing evaluation recommended given speech/language delay and non-compliant or inconclusive behavioral hearing screen. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.');
+      }
+    }
+    if(hOphtho){L.push('  • Ophthalmology: Referral for a dilated eye examination as part of the fetal alcohol spectrum disorder workup, per NIAAA consensus guidance.');}
     if(hG){
       // Genetics referral framed as a referring-physician medical-necessity statement,
       // not as an order set. UF DBP does not perform genetic consent, specimen collection,
@@ -3292,6 +3401,7 @@ function generateNote() {
       if(S.dysmorphism === 'confirmed') gxParts.push('documented dysmorphic features');
       else if(S.dysmorphism === 'suspected') gxParts.push('features suggestive of possible dysmorphology pending formal evaluation');
       if(S.congenitalAnomalies) gxParts.push('congenital anomalies on physical examination');
+      if(S.prenatalAlcohol||S.fasdFeatures) gxParts.push('a clinical picture concerning for fetal alcohol spectrum disorder');
       // Timing-based urgency differentiation is clinical-experience-based; AAP-2025
       // does not explicitly differentiate ongoing vs distant regression. Default
       // (empty timing) routes to the conservative-urgent prose variant.
@@ -3308,7 +3418,7 @@ function generateNote() {
       //   under-evaluation + any other clinical finding → "warrant" lead
       //   override-forced with no flags → clinician-judgment phrasing (no
       //     unsupported "clinical findings" claim)
-      const hasAnyGxFlag = S.developmentalRegression || S.dysmorphism === 'confirmed' || S.dysmorphism === 'suspected' || S.congenitalAnomalies;
+      const hasAnyGxFlag = S.developmentalRegression || S.dysmorphism === 'confirmed' || S.dysmorphism === 'suspected' || S.congenitalAnomalies || S.prenatalAlcohol || S.fasdFeatures;
       let leadSentence;
       if(S.diagStatus === 'confirmed'){
         leadSentence = 'The patient carries a confirmed neurodevelopmental diagnosis';
@@ -3322,6 +3432,10 @@ function generateNote() {
         leadSentence = 'The patient is under evaluation for a neurodevelopmental disorder; genetics input is requested per clinician judgment';
       }
       L.push('  • Genetics: Referral to clinical genetics is medically necessary. '+leadSentence+sevPhrase+addFlags+'. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.');
+      // FASD phenocopy rationale — deliberately its own continuation line rather than a
+      // gxParts clause: it carries guideline attribution (NIAAA by name, per David's call;
+      // the Hoyme citation lives in docs/references.md, not as a superscript here).
+      if(S.prenatalAlcohol||S.fasdFeatures) L.push('      Fetal alcohol spectrum disorder is additionally under consideration; per NIAAA consensus guidelines, dysmorphology evaluation and genetic testing are indicated to exclude genetic conditions whose features can mimic FASD.');
       // 6-space continuation indent (not 4) is intentional: the rich-HTML
       // renderer's bullet-continuation branch matches /^      \S/. Lines with
       // 4-space indent are used elsewhere in the note for sub-bullets and must
@@ -3408,10 +3522,13 @@ function generateNote() {
   const under6=isYoung();
   const behaviorconcern=S.needsBehavior.has('noncompliance')||S.needsBehavior.has('tantrums')||S.needsBehavior.has('aggression')||hasADHD();
   const over5ABA=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&ruleABA().include;
-  const showResources=hCARD||anyTherapyInPlan||under6||behaviorconcern||over5ABA;
+  const showResources=hCARD||anyTherapyInPlan||under6||behaviorconcern||over5ABA||S.prenatalAlcohol||S.fasdFeatures;
   if(showResources){
     L.push(n+++'. FAMILY RESOURCES & NEXT STEPS');
     if(hCARD){L.push('  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517');}
+    // Family self-referral, not a medical referral — hence Family Resources, not Medical
+    // Referrals. Tone per the ratified referral rule: name the resource, defer the process.
+    if(S.prenatalAlcohol||S.fasdFeatures){L.push('  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center\'s FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org');}
     if(anyTherapyInPlan){
       L.push('');L.push('  Finding Therapies / Navigating the System:');
       L.push('    1. Call your insurance company and ask to be assigned a case manager.');
@@ -5581,6 +5698,7 @@ function clearAll(opts){
     diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
     visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     dysmorphism:'',congenitalAnomalies:false,developmentalRegression:false,regressionTiming:'',
+    prenatalAlcohol:false,fasdFeatures:false,paeQuantity:'',paeFrequency:'',paeTiming:'',paeDetail:'',
     teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
     schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
@@ -5588,12 +5706,13 @@ function clearAll(opts){
   [S.langModifiers,S.specifiers,S.criteriaA,S.criteriaB,S.needsComm,S.needsAdaptive,
    S.needsBehavior,S.needsSocial,S.needsSensory,S.needsMotor,
    S.comorbid,S.comorbidInPlan,S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff,S.safety,S.ag,S.teacherMaterials,S.abaSetting,S.abaTargets,S.priorTesting,
-   S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons].forEach(s=>s.clear());
+   S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons,S.paeEvidence].forEach(s=>s.clear());
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
   document.querySelectorAll('input[data-date-key]').forEach(i=>i.value='');
   const am=document.getElementById('ados2ModuleSel');if(am)am.value='';
+  ['paeDrinksSel','paeFrequencySel','paeTimingSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
   Object.keys(S.overrides).forEach(k=>{S.overrides[k]='auto';});
   document.getElementById('levelGroup').style.display='none';
@@ -5613,7 +5732,7 @@ function clearAll(opts){
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
   S.strangerDanger=false;
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow'].forEach(id=>{
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -5675,6 +5794,7 @@ function updateSectionHeaders(){
   const mf=[];
   if(S.feeding||S.sleep||S.hearingScreenFail||S.seizureConcern||S.sleepStudy||S.focalNeuroFindings)mf.push('Work-up');
   if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
+  if(S.prenatalAlcohol||S.fasdFeatures)mf.push('FASD');
   if(S.socialWork)mf.push('Social work');
   setSH('sh-medflags',mf.length>0,mf.join(' · '));
   // 6 Comorbid
@@ -6469,6 +6589,22 @@ document.addEventListener('DOMContentLoaded',()=>{
             document.querySelectorAll('input[name="regressionTiming"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
           }
         }
+        else if(v==='prenatalAlcohol'){
+          S.prenatalAlcohol=inp.checked;
+          const per=document.getElementById('paeEvidenceRow');
+          if(per) per.style.display=inp.checked?'':'none';
+          if(!inp.checked){
+            // Unchecking the parent flag resets the whole evidence sub-tree (Set,
+            // nested pattern-detail selects, free-text) so nothing orphans in S.
+            S.paeEvidence.clear();
+            document.querySelectorAll('[data-key="paeEvidence"]').forEach(c=>{c.checked=false;});
+            S.paeQuantity='';S.paeFrequency='';S.paeTiming='';S.paeDetail='';
+            ['paeDrinksSel','paeFrequencySel','paeTimingSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+            const pd=document.getElementById('paeDetailField');if(pd)pd.value='';
+            const pqr=document.getElementById('paeQuantityRow');if(pqr)pqr.style.display='none';
+          }
+        }
+        else if(v==='fasdFeatures') S.fasdFeatures=inp.checked;
       } else {
         // P3 cleanup: dynamic Set lookup. Looks up S[k] and only dispatches add/delete if
         // it's actually a Set instance. Replaces the prior hardcoded `m={specifiers:S.specifiers,
@@ -6509,6 +6645,15 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(k==='needsBehavior'&&v==='smearing'){
           const r=document.getElementById('smearWorkupRow');if(r)r.style.display=inp.checked?'':'none';
           if(!inp.checked){S.smearWorkup='';document.querySelectorAll('input[name="smearWorkup"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('is-on');});}
+        }
+        // quantityFrequency evidence reveals the pattern-detail selects (the smearing
+        // pattern). On uncheck, clear the three scalars + select values so they can't orphan.
+        if(k==='paeEvidence'&&v==='quantityFrequency'){
+          const r=document.getElementById('paeQuantityRow');if(r)r.style.display=inp.checked?'':'none';
+          if(!inp.checked){
+            S.paeQuantity='';S.paeFrequency='';S.paeTiming='';
+            ['paeDrinksSel','paeFrequencySel','paeTimingSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+          }
         }
         if(k==='needsAdaptive'&&v==='hygiene'){
           updateAgeBasedVisibility();
@@ -6664,6 +6809,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   const ados2ModSel=document.getElementById('ados2ModuleSel');
   if(ados2ModSel) ados2ModSel.addEventListener('change',()=>{S.ados2Module=ados2ModSel.value;render();});
+
+  [['paeDrinksSel','paeQuantity'],['paeFrequencySel','paeFrequency'],['paeTimingSel','paeTiming']].forEach(([id,prop])=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change',()=>{S[prop]=el.value;render();});
+  });
+  const paeDetailTa=document.getElementById('paeDetailField');
+  if(paeDetailTa) paeDetailTa.addEventListener('input',()=>{S.paeDetail=paeDetailTa.value;render();});
 
   const traumaGateCb=document.getElementById('traumaIncludeInIEP');
   if(traumaGateCb) traumaGateCb.addEventListener('change',()=>{S.traumaIncludeInIEP=traumaGateCb.checked;render();});

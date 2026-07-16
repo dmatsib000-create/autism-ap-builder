@@ -21,6 +21,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§5 Comorbidity & medication](#5-comorbidity--medication)
 - [§6 DSM-5 / ICD-10 source documents](#6-dsm-5--icd-10-source-documents)
 - [§7 Epidemiology & population prevalence](#7-epidemiology--population-prevalence)
+- [§8 Fetal alcohol spectrum disorders](#8-fetal-alcohol-spectrum-disorders)
 
 ---
 
@@ -201,6 +202,18 @@ Shaw KA, Williams S, Patrick ME, et al. **Prevalence and Early Identification of
 - **Used for:** archetype-preset design rationale — branching-logic.md §11.17 (council provenance). **Not surfaced in any patient-facing output** (no A&P/ABA/IEP reference line); it grounds a design decision only.
 - **Supports the claim:** ASD prevalence ~1 in 31 among 8-year-olds; co-occurring intellectual disability ~37–40% (IQ ≤70), borderline ~24%, ~3–4:1 male:female. Combined with the Medicaid-population skew toward higher support needs and later diagnosis, this grounds the council's weighting of the six archetype presets toward higher-support and language-delayed early-eval cases rather than the "verbal, no-ID, Level 1" stereotype. Co-occurring ADHD (~40–60%) and minimally-verbal (~25–30%) figures cited alongside it in the council are from the broader ASD-comorbidity literature, not this single source.
 - **Verified:** DM 2026-05-29
+
+---
+
+## 8. Fetal alcohol spectrum disorders
+
+### `[hoyme-2016]` — NIAAA consensus clinical guidelines for diagnosing FASD
+
+Hoyme HE, Kalberg WO, Elliott AJ, et al. **Updated Clinical Guidelines for Diagnosing Fetal Alcohol Spectrum Disorders.** *Pediatrics.* 2016;138(2):e20154256. doi:10.1542/peds.2015-4256 (PMC4960726)
+
+- **Used for:** every "per NIAAA consensus guidelines/guidance" attribution in the A&P note's FASD wiring — the exposure documentation line and genetics phenocopy-exclusion rationale in Diagnostic Workup and Medical Referrals (`autism-ap-builder.html`, FASD Considerations block and genetics referral); the FASD-triggered audiology and ophthalmology plan lines; the five NIAAA evidence categories behind the `paeEvidence` checkboxes; branching-logic.md §7.9. **Attribution convention (David's call): the note names the organization (NIAAA), never the lead author** — this entry is the only place the Hoyme citation lives.
+- **Supports the claim:** NIAAA-supported consensus guidelines defining "clinically significant" documented prenatal alcohol exposure (the five evidence categories), and recommending dysmorphology/genetic evaluation to exclude phenocopies plus audiologic and dilated ophthalmologic examination as part of the FASD workup.
+- **Verified:** bibliographic details confirmed against PMC4960726 on 2026-07-16 (Claude session; David supplied the source URL) — maintainer initials pending
 
 ---
 

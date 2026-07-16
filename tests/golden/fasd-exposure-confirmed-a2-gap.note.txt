@@ -1,0 +1,124 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD), Level 1 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
+
+── Clinical Summary ──
+
+The patient is a school-aged boy who is using simple sentences and multi-word utterances, with cognitive functioning in the average range and mildly impaired adaptive behavior relative to chronological age. He demonstrates a persistent pattern of deficits in social communication and social interaction across 2 of three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including communication, behavior, and social development. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Communication: expressive language
+  • Behavior/interfering: noncompliance/defiance, rigidity/inflexibility
+  • Social/play: peer interaction, social reciprocity
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder [Level 1 (SC) / Level 1 (RRBs)] (F84.0) ──
+
+1. DIAGNOSTIC WORKUP & NEXT STEPS
+Fetal Alcohol Spectrum Disorder (FASD) Considerations:
+  • Clinically significant prenatal alcohol exposure documented per NIAAA consensus guidelines, via: elevated risk on a validated prenatal alcohol screen.
+  The diagnosis of Autism Spectrum Disorder is established based on the DSM-5 criteria documented above. Documented prenatal alcohol exposure warrants additional evaluation for a possible co-occurring fetal alcohol spectrum disorder (FASD). This is a separate diagnostic question; it does not alter the autism diagnosis or the services indicated by it.
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+2. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA therapy is recommended as the primary evidence-based behavioral intervention for him and is medically necessary given his confirmed diagnosis of Autism Spectrum Disorder, Level 1 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors), with the following documented functional impairments establishing medical necessity: severe noncompliance; behavioral rigidity and significant difficulty with transitions; expressive language delays; social skill impairments (peer interaction, social reciprocity); significant adaptive impairment. These impairments substantially limit his ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.
+The documented impairments noted above exceed what can be addressed through school-based supports alone, periodic behavioral consultation, or less intensive outpatient services. Comprehensive ABA services are recommended, incorporating a Functional Behavior Assessment (FBA) to identify the antecedents, functions, and maintaining consequences of the specific behaviors listed above, and to guide individualized treatment planning. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Goals should be functional, meaningful in daily life, and coordinated with the school team.
+
+Supporting References:
+  1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
+  2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
+ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):
+  • Imitation and observational learning: prerequisite for social modeling and generalized skill acquisition; a core early intervention target.
+  • Play skills and peer interaction: social skill deficits documented; play-based ABA programming supports language development, social cognition, and the foundation for peer relationships.
+  • Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.
+
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
+
+3. PARENT-CHILD INTERACTION THERAPY (PCIT)
+Recommended for: noncompliance.
+Evidence-based, parent-mediated intervention improving the parent-child relationship while reducing disruptive behaviors. Referral to a PCIT-trained therapist is recommended.
+  Note: PCIT is clinically distinct from the parent training component of ABA. PCIT targets the parent-child relationship through structured in-session coaching (Child-Directed Interaction and Parent-Directed Interaction phases), with a primary goal of improving relational attunement and consistent, contingent limit-setting. ABA parent training targets caregiver implementation of behavioral reinforcement strategies in naturalistic routines to generalize skill acquisition. When both are in place, goals and billable sessions should be documented as non-overlapping.
+
+4. SOCIAL SKILLS INTERVENTION
+Structured autism-specific social skills group. Options in the Gainesville area:
+  - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 273-0517) for current group availability and enrollment.
+  - Social Thinking (Speech4Kids): Structured social cognition curriculum appropriate for school-age children with ASD. Contact Speech4Kids: (352) 240-3155 | speech4kidsgainesville.com
+  - PEERS for Kids: Manualized, evidence-based social skills training program for school-age children.
+Targets:
+  • Peer interaction and friendship skills
+  • Social reciprocity and balanced social exchange
+
+5. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+6. SCHOOL / EDUCATIONAL SUPPORTS
+IEP in place; recommend review/update to reflect current evaluation findings.
+Recommended IEP updates based on current evaluation findings:
+  • Review current IEP to ensure special education services goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
+  • Review current IEP to ensure speech-language therapy goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
+  • Review current IEP to ensure social skills instruction goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
+  • Review current IEP to ensure visual supports / schedules goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Behavioral and Emotional Accommodations:
+    - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+7. MEDICAL REFERRALS
+  • Audiology: Audiologic evaluation recommended as part of the workup for a possible fetal alcohol spectrum disorder, per NIAAA consensus guidance. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis, a clinical picture concerning for fetal alcohol spectrum disorder. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
+      Fetal alcohol spectrum disorder is additionally under consideration; per NIAAA consensus guidelines, dysmorphology evaluation and genetic testing are indicated to exclude genetic conditions whose features can mimic FASD.
+      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
+      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
+      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
+
+  References (genetics):
+    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
+    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
+
+8. FAMILY RESOURCES & NEXT STEPS
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
+  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center's FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  FAST Behavior Basics (Seattle Children's Hospital):
+  On-demand, self-paced class for parents of children ages 5–12 with challenging behaviors (also relevant for ADHD, autism, anxiety, compliance difficulties). 8 core + 3 bonus skill videos (3–5 min each). Caregiver workbook available.
+  Class: https://www.seattlechildrens.org/health-safety/classes-events/behavior-basics-class/
+  Workbook: https://www.seattlechildrens.org/globalassets/documents/healthcare-professionals/pal/fast/fast-b-caregiver-workbook.pdf
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.
