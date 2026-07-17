@@ -13,7 +13,7 @@ export default {
     S.cogDataSource = 'clinical';
 
     S.diagStatus = 'suspected';
-    S.dxEvalPath = 'comprehensive';
+    S.dxEvalPath = 'uncertainComp';
 
     S.criteriaA.add('a1');
     S.criteriaA.add('a2');
