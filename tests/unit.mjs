@@ -190,6 +190,56 @@ const CASES = [
     setup(S){ S.ageGroup='schoolAge'; },
     check(a){ a.syncSchoolSvcFromNeeds();
               assert.equal(a.S.schoolSvc.has('psychoed'), false, 'psychoed must not auto-fire without a driver'); } },
+
+  // ── evalPathSteps(): the workup-completion resolver ──
+  // Role mapping, completion booleans, and the pendingTesting predicate that drives the
+  // Family Resources ABA-waitlist wording. The ''-status defaults must map 1:1 onto the
+  // retired cars2Done behavior (default-state notes byte-identical across the fold).
+  { name: 'evalPathSteps: certainOlder has both step roles',
+    setup(S){ S.dxEvalPath='certainOlder'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, true); assert.equal(st.hasDx, true); assert.equal(st.dxTodayAllowed, true); } },
+  { name: 'evalPathSteps: certainYoung is dx-only, today allowed',
+    setup(S){ S.dxEvalPath='certainYoung'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, false); assert.equal(st.hasDx, true); assert.equal(st.dxTodayAllowed, true); } },
+  { name: 'evalPathSteps: uncertainComp is dx-only, today NOT allowed (outside report)',
+    setup(S){ S.dxEvalPath='uncertainComp'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, false); assert.equal(st.hasDx, true); assert.equal(st.dxTodayAllowed, false); } },
+  { name: 'evalPathSteps: uncertainADOS has both roles, today deferred to P1',
+    setup(S){ S.dxEvalPath='uncertainADOS'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, true); assert.equal(st.hasDx, true); assert.equal(st.dxTodayAllowed, false); } },
+  { name: 'evalPathSteps: ritaT has no status controls (same-day by construction)',
+    setup(S){ S.dxEvalPath='ritaT'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, false); assert.equal(st.hasDx, false); assert.equal(st.pendingTesting, false); } },
+  { name: 'evalPathSteps: pendingTesting true on scheduled instrument-bearing path (old !cars2Done)',
+    setup(S){ S.dxEvalPath='certainYoung'; },
+    check(a){ assert.equal(a.evalPathSteps().pendingTesting, true); } },
+  { name: 'evalPathSteps: administered today clears pendingTesting (old cars2Done=true)',
+    setup(S){ S.dxEvalPath='certainYoung'; S.evalDxStatus='today'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.dxDone, true); assert.equal(st.pendingTesting, false); } },
+  { name: 'evalPathSteps: completed comprehensive eval clears pendingTesting (new capability)',
+    setup(S){ S.dxEvalPath='uncertainComp'; S.evalDxStatus='done'; S.evalDxOutcome='consistent'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.dxDone, true); assert.equal(st.dxOutcome, 'consistent'); assert.equal(st.pendingTesting, false); } },
+  { name: 'evalPathSteps: devOnly never pends testing; profile completion tracked',
+    setup(S){ S.dxEvalPath='devOnly'; S.evalProfileStatus='done'; },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.pendingTesting, false); assert.equal(st.profileDone, true); assert.equal(st.hasDx, false); } },
+  { name: 'evalPathSteps: statuses ignored on a path without that role (stale-state guard)',
+    setup(S){ S.dxEvalPath='certainYoung'; S.evalProfileStatus='done'; },
+    check(a){ assert.equal(a.evalPathSteps().profileDone, false, 'profile status must not count on a dx-only path'); } },
+  { name: 'evalPathSteps: outcome only reported once the dx step is done',
+    setup(S){ S.dxEvalPath='certainOlder'; S.evalDxOutcome='consistent'; },
+    check(a){ assert.equal(a.evalPathSteps().dxOutcome, '', 'an outcome without a completed step must not surface'); } },
+  { name: 'evalPathSteps: no path selected -> inert',
+    setup(S){ },
+    check(a){ const st=a.evalPathSteps();
+              assert.equal(st.hasProfile, false); assert.equal(st.hasDx, false); assert.equal(st.pendingTesting, false); } },
 ];
 
 let pass = 0;

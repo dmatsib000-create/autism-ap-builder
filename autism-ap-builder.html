@@ -1062,19 +1062,29 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
+      <div id="evalProfileDoneHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Cognitive/developmental testing is complete — update <strong>Cognitive Profile</strong> and its data source in Patient Profile.</div>
+      <div id="evalDxSupportHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Completed testing supports the clinical diagnosis — consider whether <strong>Diagnosis Status</strong> should move to Confirmed.</div>
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
 
       <div class="field-group">
         <span class="field-label">Teacher / External Informant Materials to Request</span>
         <div class="cb-list">
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="uf_classroom"> UF Classroom Observation Form</label>
+          <label class="cb-row" data-tm-returned="uf_classroom" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="uf_classroom"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="vanderbilt_teacher"> Vanderbilt Teacher Rating Scale</label>
+          <label class="cb-row" data-tm-returned="vanderbilt_teacher" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="vanderbilt_teacher"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="dp4_teacher"> DP-4 Teacher Checklist</label>
+          <label class="cb-row" data-tm-returned="dp4_teacher" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="dp4_teacher"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="srs2"> SRS-2 (Social Responsiveness Scale, 2nd ed.)</label>
+          <label class="cb-row" data-tm-returned="srs2" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="srs2"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="scq_current"> SCQ Current (Social Communication Questionnaire)</label>
+          <label class="cb-row" data-tm-returned="scq_current" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="scq_current"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="gars3"> GARS-3 (Gilliam Autism Rating Scale, 3rd ed.)</label>
+          <label class="cb-row" data-tm-returned="gars3" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="gars3"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="assq"> ASSQ (Autism Spectrum Screening Questionnaire)</label>
+          <label class="cb-row" data-tm-returned="assq" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="assq"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="other_teacher"> Other: <input type="text" id="teacherMaterialOtherField" placeholder="specify..." style="margin-left:6px;font-size:var(--text-11);border:1px solid var(--gray-300);border-radius:3px;padding:2px 5px;width:160px;font-family:var(--font)"></label>
+          <label class="cb-row" data-tm-returned="other_teacher" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="other_teacher"> Returned and reviewed</label>
         </div>
       </div>
 
@@ -1089,8 +1099,19 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label id="ritaTRow" class="r-opt" style="width:100%;justify-content:flex-start;display:none"><input type="radio" name="dxEvalPath" value="ritaT">&nbsp;RITA-T (interactive screen, toddler/preschool — payer-accepted pathway)</label>
         </div>
       </div>
-      <div id="cars2DoneRow" style="display:none;margin-top:5px">
-        <label class="cb-row"><input type="checkbox" data-key="single" value="cars2Done"> CARS-2 completed at this visit (results incorporated — note tense will update)</label>
+      <div id="evalStatusRow" style="display:none;margin-top:6px">
+        <span class="field-label" style="display:block;margin-bottom:3px">Step status (update as workup is completed — note tense will update)</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span id="evalProfileStatusWrap" style="display:none;align-items:center;gap:4px">
+            <span class="sub-label">DP-4 / KBIT-2R:</span>
+            <select id="evalProfileStatusSel" class="outcome-sel"><option value="">Scheduled</option><option value="done">Completed — results reviewed</option></select>
+          </span>
+          <span id="evalDxStatusWrap" style="display:none;align-items:center;gap:4px">
+            <span class="sub-label" id="evalDxStatusLabel">CARS-2:</span>
+            <select id="evalDxStatusSel" class="outcome-sel"><option value="">Scheduled / referral placed</option><option value="today">Administered at today's visit</option><option value="done">Completed — results reviewed</option></select>
+            <select id="evalDxOutcomeSel" class="outcome-sel" style="display:none"><option value="">— results reviewed —</option><option value="consistent">Consistent with ASD</option><option value="equivocal">Equivocal</option><option value="notConsistent">Not consistent with ASD</option></select>
+          </span>
+        </div>
       </div>
       <div class="field-group" style="margin-top:8px">
         <button id="priorTestToggleBtn" class="expander-btn" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
@@ -1769,8 +1790,14 @@ const S = {
   prenatalAlcohol:false, fasdFeatures:false, paeEvidence:new Set(), fasdDomains:new Set(),
   paeQuantity:'', paeFrequency:'', paeTiming:'', paeDetail:'',
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
-  teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
-  priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'', cars2Done:false,
+  teacherMaterials:new Set(), teacherMaterialOther:'', teacherMaterialsReturned:new Set(), dxEvalPath:'',
+  // Workup completion statuses (2026-07-16). Two role-based fields cover every eval path:
+  // evalProfileStatus is the DP-4/KBIT-2R step (''=scheduled | 'done'); evalDxStatus is the
+  // diagnostic-instrument step (''=scheduled/referral placed | 'today' | 'done'), with a
+  // categorical outcome. 'today' subsumes the retired cars2Done flag. Statuses reset on any
+  // dxEvalPath change (onDxEvalPathChange) — never trust them across a path switch.
+  evalProfileStatus:'', evalDxStatus:'', evalDxOutcome:'',
+  priorTesting:new Set(), priorTestingOutcome:{}, priorTestingDate:{}, ados2Module:'',
   comorbid:new Set(), comorbidInPlan:new Set(),
   traumaIncludeInIEP:false, // Opt-in disclosure gate; trauma stays in A&P note unless this is on.
   sleepFactors:new Set(), depressionSafety:'', smearWorkup:'',
@@ -2586,6 +2613,29 @@ function therapyStatusLine(svc, label){
 }
 
 // keep docs/branching-logic.md §1.1 in sync (output pipeline; returns {main, assessment, plan})
+// ─── WORKUP COMPLETION MODEL ─────────────────────────────────────────────────
+// keep docs/branching-logic.md §4.5.2 in sync (workup completion statuses)
+// Resolves the selected evaluation path + per-step statuses into what the note and UI
+// need. Two role-based steps cover every path: a profile step (DP-4/KBIT-2R) and a
+// diagnostic-instrument step (CARS-2 / ADOS-2 / comprehensive eval). Pure: reads S,
+// no DOM — exported to the unit lane via tests/harness.mjs.
+function evalPathSteps(){
+  const p=S.dxEvalPath;
+  const hasProfile=['devOnly','certainOlder','uncertainADOS'].includes(p);
+  const hasDx=['certainYoung','certainOlder','uncertainComp','uncertainADOS'].includes(p);
+  // 'today' is limited to the in-clinic CARS-2 paths in v1; the comprehensive eval is an
+  // outside report, and same-day ADOS-2 is deferred (spec P1).
+  const dxTodayAllowed=p==='certainYoung'||p==='certainOlder';
+  const profileDone=hasProfile&&S.evalProfileStatus==='done';
+  const dxStatus=hasDx?S.evalDxStatus:'';
+  const dxDone=dxStatus!=='';
+  // Family Resources ABA-waitlist gating: testing is outstanding on any instrument-bearing
+  // path until the diagnostic step is administered or completed. The ''-status default maps
+  // 1:1 onto the retired !S.cars2Done predicate, so default-state notes are byte-identical.
+  const pendingTesting=!!p&&p!=='devOnly'&&p!=='ritaT'&&!dxDone;
+  return {hasProfile,hasDx,dxTodayAllowed,profileDone,dxStatus,dxDone,dxOutcome:hasDx&&dxDone?S.evalDxOutcome:'',pendingTesting};
+}
+
 function generateNote() {
   const pr=getPron();
   const L=[];
@@ -2770,14 +2820,19 @@ function generateNote() {
   // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
   // documented but the suspected-ID gating still demands a formal evaluation recommendation).
   const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
-  // Evaluation-path output survives a Confirmed diagnosis only for the "fairly certain" CARS-2
-  // pathways (certainYoung/certainOlder), which document the supporting instrument and severity
-  // rating on an established diagnosis. The uncertain* / devOnly pathways describe an in-progress
-  // workup and are suppressed once the diagnosis is confirmed (otherwise the note reads as still
-  // pending). This single predicate drives BOTH the section-open test and the content gate, so a
-  // confirmed diagnosis on a suppressed path can no longer leave a bare section header.
+  // Evaluation-path output survives a Confirmed diagnosis only when it documents SUPPORT for
+  // the established diagnosis rather than an in-progress workup: the "fairly certain" CARS-2
+  // pathways (certainYoung/certainOlder) always qualify, and — approved 2026-07-16, same
+  // rationale — the uncertain* pathways qualify once their diagnostic step is COMPLETED
+  // (a finished ADOS-2/comprehensive eval is standardized diagnostic support, not pending
+  // workup). Still-pending uncertain* and all devOnly output stays suppressed on a confirmed
+  // diagnosis (otherwise the note reads as still pending). This single predicate drives BOTH
+  // the section-open test and the content gate, so a confirmed diagnosis on a suppressed path
+  // can no longer leave a bare section header.
   const dxConfirmed = S.diagStatus==='confirmed';
-  const evalPathShows = S.dxEvalPath && (!dxConfirmed || S.dxEvalPath==='certainYoung' || S.dxEvalPath==='certainOlder');
+  const wkSt = evalPathSteps();
+  const evalPathShows = S.dxEvalPath && (!dxConfirmed || S.dxEvalPath==='certainYoung' || S.dxEvalPath==='certainOlder'
+    || ((S.dxEvalPath==='uncertainComp'||S.dxEvalPath==='uncertainADOS') && wkSt.dxDone));
   const hasFASDFlags = S.prenatalAlcohol||S.fasdFeatures;
   const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasSuspectedIDorGDD||hasFASDFlags;
   if(hasDxWorkup){
@@ -2799,30 +2854,62 @@ function generateNote() {
         assq:'ASSQ (Autism Spectrum Screening Questionnaire) — ASD screening in higher-functioning individuals',
         other_teacher:S.teacherMaterialOther||'Other teacher/informant rating form'
       };
-      L.push('Materials requested from teacher / external informants:');
-      S.teacherMaterials.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
-      L.push('Family to provide teacher contact information. Materials to be returned at or before the next visit.');
+      // Fixed form order (not Set click order) so bullet order is stable across sessions —
+      // the FASD-block convention, adopted here when the returned/awaited split was added.
+      const tmOrder=['uf_classroom','vanderbilt_teacher','dp4_teacher','srs2','scq_current','gars3','assq','other_teacher'];
+      const tmReturned=tmOrder.filter(k=>S.teacherMaterials.has(k)&&S.teacherMaterialsReturned.has(k));
+      const tmAwaited=tmOrder.filter(k=>S.teacherMaterials.has(k)&&!S.teacherMaterialsReturned.has(k));
+      if(tmReturned.length){
+        L.push('Materials returned from teacher / external informants and reviewed:');
+        tmReturned.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
+      }
+      if(tmAwaited.length){
+        L.push(tmReturned.length?'Materials still awaited from teacher / external informants:':'Materials requested from teacher / external informants:');
+        tmAwaited.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
+        // Chase-the-family line only while something is actually outstanding.
+        L.push('Family to provide teacher contact information. Materials to be returned at or before the next visit.');
+      }
     }
     if(evalPathShows){
       if(S.teacherMaterials.size) L.push('');
       const cars2HF=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&
         ['conversational','ageAppropriate'].includes(S.langLevel)&&
         ['average','aboveAverage'].includes(S.cogProfile);
+      // Completed steps render past-tense with the outcome register below; scheduled steps
+      // keep their pre-completion prose byte-for-byte (default-state notes never churn).
+      // Outcome wording deliberately mirrors the prior-testing weighting language — same
+      // note surface, same reader, same claims discipline.
+      const dxOutcomeSentence=o=>o==='consistent'?'Results are consistent with and support the diagnosis of Autism Spectrum Disorder.'
+        :o==='equivocal'?'Results were inconclusive; findings were considered in the overall diagnostic formulation alongside clinical history and direct observation.'
+        :o==='notConsistent'?'Results were not consistent with ASD in isolation; clinical presentation, developmental history, and direct observation were weighted in the overall diagnostic formulation.'
+        :'Results reviewed and incorporated into the diagnostic formulation.';
+      const step1DoneLine='  Step 1 completed: DP-4 and KBIT-2R administered; results reviewed and reflected in the cognitive and developmental profile documented above.';
       if(S.dxEvalPath==='devOnly'){
         L.push('In-Clinic Developmental Assessment:');
-        L.push('  • DP-4 (Developmental Profile 4): Comprehensive developmental assessment to characterize');
-        L.push('    functioning across physical, adaptive, social-emotional, cognitive, and communication domains.');
         const kbitAge=['schoolAge','adolescent','youngAdult','preschool'].includes(S.ageGroup);
-        if(kbitAge||S.ageGroup==='preschool') L.push('  • KBIT-2R (Kaufman Brief Intelligence Test, 2nd ed.): Abbreviated cognitive screening [age 4+].');
-        L.push('Results will inform treatment planning and need for further autism-specific evaluation.');
+        if(wkSt.profileDone){
+          L.push('  • DP-4 (Developmental Profile 4) completed; results reviewed and reflected in the developmental profile documented above.');
+          if(kbitAge) L.push('  • KBIT-2R (Kaufman Brief Intelligence Test, 2nd ed.) completed; results reviewed and reflected in the cognitive profile documented above.');
+          L.push('Results have been incorporated into treatment planning and the assessment of need for further autism-specific evaluation.');
+        } else {
+          L.push('  • DP-4 (Developmental Profile 4): Comprehensive developmental assessment to characterize');
+          L.push('    functioning across physical, adaptive, social-emotional, cognitive, and communication domains.');
+          if(kbitAge) L.push('  • KBIT-2R (Kaufman Brief Intelligence Test, 2nd ed.): Abbreviated cognitive screening [age 4+].');
+          L.push('Results will inform treatment planning and need for further autism-specific evaluation.');
+        }
       } else if(S.dxEvalPath==='certainYoung'){
         // On a confirmed diagnosis the CARS-2 documents/formalizes severity for an established
         // diagnosis; on a not-yet-confirmed (fairly certain) picture it supports reaching it.
         L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age < 5):':'Autism Evaluation: Diagnosis Fairly Certain (age < 5):');
-        if(S.cars2Done){
+        if(wkSt.dxStatus==='today'&&(!wkSt.dxOutcome||wkSt.dxOutcome==='consistent')){
+          // Byte-stable with the retired cars2Done rendering.
           L.push(dxConfirmed
             ?'  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the confirmed diagnosis.'
             :'  CARS-2 administered at today\'s visit. Results incorporated into the diagnostic formulation and support the clinical diagnosis.');
+        } else if(wkSt.dxStatus==='today'){
+          L.push('  CARS-2 administered at today\'s visit. '+dxOutcomeSentence(wkSt.dxOutcome));
+        } else if(wkSt.dxStatus==='done'){
+          L.push('  CARS-2 completed at a prior visit. '+dxOutcomeSentence(wkSt.dxOutcome));
         } else if(dxConfirmed){
           L.push('  • CARS-2 scheduled with MD: 1-hour assessment appointment. This standardized direct observation instrument formalizes the severity rating and documents support for the confirmed diagnosis.');
           L.push('  The CARS-2 will provide objective data to formalize the severity level designation for the established diagnosis.');
@@ -2832,25 +2919,40 @@ function generateNote() {
         }
       } else if(S.dxEvalPath==='certainOlder'){
         L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age ≥ 5):':'Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):');
-        L.push('  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
-        if(S.cars2Done){
+        L.push(wkSt.profileDone?step1DoneLine:'  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
+        if(wkSt.dxStatus==='today'&&(!wkSt.dxOutcome||wkSt.dxOutcome==='consistent')){
           L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. Results incorporated; '+(dxConfirmed?'support confirmed diagnosis.':'support the clinical diagnosis.'));
+        } else if(wkSt.dxStatus==='today'){
+          L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. '+dxOutcomeSentence(wkSt.dxOutcome));
+        } else if(wkSt.dxStatus==='done'){
+          L.push('  Step 2 completed: CARS-2 '+(cars2HF?'HF':'ST')+' administered at a prior visit. '+dxOutcomeSentence(wkSt.dxOutcome));
         } else if(cars2HF){
           L.push('  Step 2: CARS-2-HF (High Functioning) to follow; indicated given age 6 or older, conversational language, and estimated cognitive functioning in average range or above.');
         } else {
           L.push('  Step 2: CARS-2 ST (Standard) to follow; standardized direct observation providing severity rating and diagnostic support.');
         }
       } else if(S.dxEvalPath==='uncertainComp'){
-        L.push('Autism Evaluation: Uncertain (Comprehensive):');
-        L.push('  Referral for comprehensive diagnostic evaluation with the UF CMS evaluation program psychologists, including');
-        L.push('  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration.');
-        L.push('  Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.');
-        L.push('  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.');
+        // The confirmed-title variant is only reachable when the eval is completed
+        // (evalPathShows gates still-pending uncertain paths off confirmed notes).
+        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (Comprehensive):':'Autism Evaluation: Uncertain (Comprehensive):');
+        if(wkSt.dxDone){
+          L.push('  Comprehensive diagnostic evaluation completed with the UF CMS evaluation program psychologists, including');
+          L.push('  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration. Report reviewed. '+dxOutcomeSentence(wkSt.dxOutcome));
+        } else {
+          L.push('  Referral for comprehensive diagnostic evaluation with the UF CMS evaluation program psychologists, including');
+          L.push('  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration.');
+          L.push('  Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.');
+          L.push('  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.');
+        }
       } else if(S.dxEvalPath==='uncertainADOS'){
-        L.push('Autism Evaluation: Uncertain (ADOS-2 Pathway):');
-        L.push('  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
-        L.push('  Step 2: ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) to be administered');
-        L.push('    by ADOS-2-trained physician following cognitive/developmental testing.');
+        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (ADOS-2 Pathway):':'Autism Evaluation: Uncertain (ADOS-2 Pathway):');
+        L.push(wkSt.profileDone?step1DoneLine:'  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
+        if(wkSt.dxDone){
+          L.push('  Step 2 completed: ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administered by ADOS-2-trained physician. '+dxOutcomeSentence(wkSt.dxOutcome));
+        } else {
+          L.push('  Step 2: ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) to be administered');
+          L.push('    by ADOS-2-trained physician following cognitive/developmental testing.');
+        }
       } else if(S.dxEvalPath==='ritaT'){
         L.push('Autism Evaluation: RITA-T Pathway (Toddler/Preschool):');
         L.push('  RITA-T (Rapid Interactive Screening Test for Autism in Toddlers) administered at today\'s visit.');
@@ -3547,7 +3649,7 @@ function generateNote() {
       L.push('');L.push('  Finding Therapies / Navigating the System:');
       L.push('    1. Call your insurance company and ask to be assigned a case manager.');
       L.push('    2. Request a list of all recommended providers.');
-      if(resolveOv('aba',ruleABA())){const pendingTesting=S.dxEvalPath&&S.dxEvalPath!=='devOnly'&&S.dxEvalPath!=='ritaT'&&!S.cars2Done;
+      if(resolveOv('aba',ruleABA())){const pendingTesting=evalPathSteps().pendingTesting;
         if(pendingTesting){L.push('    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously');L.push('       - no matter how long the lists appear.');}
         else{L.push('    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.');}}
       L.push('    4. Use Google Maps to search for nearby providers and call to confirm insurance.');
@@ -5714,20 +5816,24 @@ function clearAll(opts){
     visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
     dysmorphism:'',congenitalAnomalies:false,developmentalRegression:false,regressionTiming:'',
     prenatalAlcohol:false,fasdFeatures:false,paeQuantity:'',paeFrequency:'',paeTiming:'',paeDetail:'',
-    teacherMaterialOther:'',dxEvalPath:'',cars2Done:false,priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
+    teacherMaterialOther:'',dxEvalPath:'',evalProfileStatus:'',evalDxStatus:'',evalDxOutcome:'',priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
     schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
     insuranceType:'',abaHours:'',previewMode:'note'});
   [S.langModifiers,S.specifiers,S.criteriaA,S.criteriaB,S.needsComm,S.needsAdaptive,
    S.needsBehavior,S.needsSocial,S.needsSensory,S.needsMotor,
-   S.comorbid,S.comorbidInPlan,S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff,S.safety,S.ag,S.teacherMaterials,S.abaSetting,S.abaTargets,S.priorTesting,
+   S.comorbid,S.comorbidInPlan,S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff,S.safety,S.ag,S.teacherMaterials,S.teacherMaterialsReturned,S.abaSetting,S.abaTargets,S.priorTesting,
    S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons,S.paeEvidence,S.fasdDomains].forEach(s=>s.clear());
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
   document.querySelectorAll('input[data-date-key]').forEach(i=>i.value='');
   const am=document.getElementById('ados2ModuleSel');if(am)am.value='';
-  ['paeDrinksSel','paeFrequencySel','paeTimingSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['paeDrinksSel','paeFrequencySel','paeTimingSel','evalProfileStatusSel','evalDxStatusSel','evalDxOutcomeSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // The teacher "Other" field is an input[type=text], which the generic textarea sweep
+  // misses — reset it explicitly or the typed text survives Clear All while S is empty.
+  const tmo=document.getElementById('teacherMaterialOtherField');if(tmo)tmo.value='';
+  document.querySelectorAll('label[data-tm-returned]').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
   Object.keys(S.overrides).forEach(k=>{S.overrides[k]='auto';});
   document.getElementById('levelGroup').style.display='none';
@@ -5857,8 +5963,28 @@ function updateSectionHeaders(){
   // Visit type highlight when unset
   const vtRow=document.getElementById('visitTypeRow');
   if(vtRow)vtRow.classList.toggle('vt-unset',!S.visitType&&!!S.diagStatus);
-  const c2dRow=document.getElementById('cars2DoneRow');
-  if(c2dRow)c2dRow.style.display=(S.dxEvalPath==='certainYoung'||S.dxEvalPath==='certainOlder')?'':'none';
+  // Workup completion controls — visibility and per-path adaptation. The status row
+  // replaced the retired cars2DoneRow; statuses reset on every path change
+  // (onDxEvalPathChange), so a stale status can't leak across paths.
+  const wcSt=evalPathSteps();
+  const esRow=document.getElementById('evalStatusRow');
+  if(esRow)esRow.style.display=(wcSt.hasProfile||wcSt.hasDx)?'':'none';
+  const epsWrap=document.getElementById('evalProfileStatusWrap');
+  if(epsWrap)epsWrap.style.display=wcSt.hasProfile?'':'none';
+  const edsWrap=document.getElementById('evalDxStatusWrap');
+  if(edsWrap)edsWrap.style.display=wcSt.hasDx?'':'none';
+  const edsLbl=document.getElementById('evalDxStatusLabel');
+  if(edsLbl)edsLbl.textContent=S.dxEvalPath==='uncertainComp'?'Comprehensive eval:':S.dxEvalPath==='uncertainADOS'?'ADOS-2:':'CARS-2:';
+  const edsSel=document.getElementById('evalDxStatusSel');
+  if(edsSel){const tOpt=edsSel.querySelector('option[value="today"]');if(tOpt)tOpt.disabled=!wcSt.dxTodayAllowed;}
+  const edsOut=document.getElementById('evalDxOutcomeSel');
+  if(edsOut)edsOut.style.display=wcSt.dxDone?'':'none';
+  // Completion prompts — suggest, never auto-set (the archetype-preset invariant applies
+  // here too: nothing moves diagStatus or cogProfile but the clinician).
+  const epdHint=document.getElementById('evalProfileDoneHint');
+  if(epdHint)epdHint.style.display=(wcSt.profileDone&&(!S.cogProfile||S.cogProfile==='unknown'))?'':'none';
+  const edsHint=document.getElementById('evalDxSupportHint');
+  if(edsHint)edsHint.style.display=(wcSt.dxOutcome==='consistent'&&S.diagStatus==='suspected')?'':'none';
   // 8 Safety
   const sf=S.safety.size;setSH('sh-safety',sf>0,sf>0?sf+' item'+(sf>1?'s':''):'');
   // 9 AG
@@ -6094,6 +6220,9 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=ritaTRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+      // Route through the shared handler so step statuses reset and headers refresh
+      // (this branch previously skipped the header refresh the certainYoung twin had).
+      onDxEvalPathChange();
     }
   }
   // certainYoung only valid for toddler/preschool (age < 5)
@@ -6104,7 +6233,7 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=certainYoungRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
-      updateSectionHeaders();
+      onDxEvalPathChange();
     }
   }
   const idRows=document.getElementById('spec-id-rows');
@@ -6359,6 +6488,12 @@ function onDxEvalPathChange(){
   // Section-header summary depends on dxEvalPath, so refresh on both change AND
   // deselect. The change handler previously omitted this call (deselect had it) —
   // the asymmetry was unintentional and is fixed by routing both through here.
+  // Every path change/deselect also resets the step statuses: a stale
+  // "administered today" from a previous path would otherwise leak into the
+  // Family Resources waitlist wording (the retired cars2Done flag had exactly
+  // this bug — it survived path switches invisibly once its row was hidden).
+  S.evalProfileStatus='';S.evalDxStatus='';S.evalDxOutcome='';
+  ['evalProfileStatusSel','evalDxStatusSel','evalDxOutcomeSel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateSectionHeaders();
 }
 
@@ -6593,7 +6728,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         else if(v==='highlyMotivated') S.highlyMotivated=inp.checked;
         else if(v==='strangerDanger') S.strangerDanger=inp.checked;
         else if(v==='sleepStudy') S.sleepStudy=inp.checked;
-        else if(v==='cars2Done') S.cars2Done=inp.checked;
         else if(v==='congenitalAnomalies') S.congenitalAnomalies=inp.checked;
         else if(v==='developmentalRegression'){
           S.developmentalRegression=inp.checked;
@@ -6665,6 +6799,17 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(k==='needsBehavior'&&v==='smearing'){
           const r=document.getElementById('smearWorkupRow');if(r)r.style.display=inp.checked?'':'none';
           if(!inp.checked){S.smearWorkup='';document.querySelectorAll('input[name="smearWorkup"]').forEach(r2=>{r2.checked=false;r2.closest('.r-opt').classList.remove('is-on');});}
+        }
+        // Requesting a teacher material reveals its "returned and reviewed" toggle; unchecking
+        // the request clears the returned state so a returned mark can't orphan invisibly.
+        if(k==='teacherMaterials'){
+          const rr=document.querySelector('label[data-tm-returned="'+v+'"]');
+          if(rr) rr.style.display=inp.checked?'':'none';
+          if(!inp.checked){
+            S.teacherMaterialsReturned.delete(v);
+            const rc=document.querySelector('input[data-key="teacherMaterialsReturned"][value="'+v+'"]');
+            if(rc) rc.checked=false;
+          }
         }
         // quantityFrequency evidence reveals the pattern-detail selects (the smearing
         // pattern). On uncheck, clear the three scalars + select values so they can't orphan.
@@ -6836,6 +6981,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   const paeDetailTa=document.getElementById('paeDetailField');
   if(paeDetailTa) paeDetailTa.addEventListener('input',()=>{S.paeDetail=paeDetailTa.value;render();});
+
+  const evalProfileSel=document.getElementById('evalProfileStatusSel');
+  if(evalProfileSel) evalProfileSel.addEventListener('change',()=>{S.evalProfileStatus=evalProfileSel.value;render();});
+  const evalDxSel=document.getElementById('evalDxStatusSel');
+  if(evalDxSel) evalDxSel.addEventListener('change',()=>{
+    S.evalDxStatus=evalDxSel.value;
+    // Back to scheduled → the outcome no longer describes anything; clear it so a stale
+    // outcome can't re-apply silently when the step is completed again later.
+    if(!evalDxSel.value){S.evalDxOutcome='';const o=document.getElementById('evalDxOutcomeSel');if(o)o.value='';}
+    render();
+  });
+  const evalDxOutSel=document.getElementById('evalDxOutcomeSel');
+  if(evalDxOutSel) evalDxOutSel.addEventListener('change',()=>{S.evalDxOutcome=evalDxOutSel.value;render();});
 
   const traumaGateCb=document.getElementById('traumaIncludeInIEP');
   if(traumaGateCb) traumaGateCb.addEventListener('change',()=>{S.traumaIncludeInIEP=traumaGateCb.checked;render();});

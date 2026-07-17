@@ -29,9 +29,9 @@ export default {
     S.criteriaD = true;
     S.criteriaE = true;
 
-    // The eval path under test: "fairly certain", young child, CARS-2 not yet done.
+    // The eval path under test: "fairly certain", young child, CARS-2 not yet done
+    // (evalDxStatus stays at its scheduled default — the retired cars2Done=false).
     S.dxEvalPath = 'certainYoung';
-    S.cars2Done = false;
 
     S.needsComm.add('expressive');
     S.needsSocial.add('reciprocity');
