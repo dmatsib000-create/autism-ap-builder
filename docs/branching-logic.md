@@ -155,6 +155,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `prenatalAlcohol` | boolean — §7.9 (FASD flag 1: workup prose, genetics/audiology triggers, ophthalmology with `fasdFeatures`, Florida Center line) |
 | `fasdFeatures` | boolean — §7.9 (FASD flag 2, independent of exposure; same wiring) |
 | `paeEvidence` (Set) | §7.9 — NIAAA evidence categories composed into the exposure documentation line |
+| `fasdDomains` (Set) | §7.9 — optional Hoyme/NIAAA diagnostic domains under `fasdFeatures`; enrich the features line only |
 | `paeQuantity` / `paeFrequency` / `paeTiming` | strings — §7.9 optional pattern detail under the `quantityFrequency` evidence category |
 | `paeDetail` | string — §7.9 optional free-text sentence appended to the exposure line (PHI-hinted) |
 
@@ -251,6 +252,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `dxEvalPath` | string | [§1.2](#12-the-s-object--property-reference) |
 | `dysmorphism` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `ev` | object | [§4](#4-dsm-5-criteria-mapping) |
+| `fasdDomains` | Set | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `fasdFeatures` | boolean | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `focalNeuroFindings` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `insuranceType` | string | [§1.2](#12-the-s-object--property-reference) |
@@ -825,14 +827,14 @@ The note's therapy-recommendation sections (ABA, SLP, OT, PT, emitted in `genera
 
 Two independent flags in the Medical & Referral Flags section, under the **"Prenatal exposures"** group separator (named so other exposures can join later; ratified spec 2026-07-16, R6 prose council-ratified same day). Sourced to `[hoyme-2016]` (docs/references.md §8); the note attributes the organization (NIAAA), never the lead author.
 
-**Form and state.** `prenatalAlcohol` ("Clinically significant prenatal alcohol exposure documented") reveals a sub-options row (the `socialWorkReasons` pattern) with the `paeEvidence` Set — one checkbox per NIAAA evidence category: `quantityFrequency`, `socialLegal`, `intoxicationTesting`, `biomarkers`, `screenPositive`. Checking `quantityFrequency` reveals three **optional** id-bound selects (the `ados2ModuleSel` pattern) writing `paeQuantity` / `paeFrequency` / `paeTiming`. An optional `paeDetail` textarea carries the standard PHI hint (category-level only; no names, dates, or jurisdictions — the PHI-free constraint applies to the maternal history too). `fasdFeatures` ("Features concerning for FASD on exam/history") is a plain boolean, settable with or without documented exposure. Unchecking `prenatalAlcohol` resets the whole evidence sub-tree; both reveal rows and all seven fields are covered in `clearAll`.
+**Form and state.** `prenatalAlcohol` ("Clinically significant prenatal alcohol exposure documented") reveals a sub-options row (the `socialWorkReasons` pattern) with the `paeEvidence` Set — one checkbox per NIAAA evidence category: `quantityFrequency`, `socialLegal`, `intoxicationTesting`, `biomarkers`, `screenPositive`. A field hint above the reveal states the NIAAA operational threshold (6+ drinks/week for 2+ weeks, or 3+ drinks per occasion on 2+ occasions, or any one other evidence category — wording approved by David 2026-07-16, sourced to `[hoyme-2016]` Table 2). Checking `quantityFrequency` reveals three **optional** id-bound selects (the `ados2ModuleSel` pattern) writing `paeQuantity` / `paeFrequency` / `paeTiming`. An optional `paeDetail` textarea carries the standard PHI hint (category-level only; no names, dates, or jurisdictions — the PHI-free constraint applies to the maternal history too). `fasdFeatures` ("Features concerning for FASD on exam/history") is settable with or without documented exposure; checking it reveals the **optional** `fasdDomains` sub-select — the four Hoyme/NIAAA diagnostic domains (`facial`, `growth`, `brain`, `neurobehavioral`). Unchecking either parent flag resets its whole sub-tree; all reveal rows and fields are covered in `clearAll`.
 
 **The relocated pattern-teaching hint (council-ratified).** The clinician-education content — at the group level, FASD tends to spare nonverbal communication (DSM-5 A2) and non-sensory restricted/repetitive behaviors — lives ONLY in the `fasdFeatures` field hint, never in per-patient note prose. It guides the flagging decision without being quotable against any individual patient. Do not move it into an output generator.
 
 **Note output — the FASD Considerations block.** Either flag ORs into `hasDxWorkup`, so the block renders inside DIAGNOSTIC WORKUP & NEXT STEPS (the `onlyPriorTesting` / `onlySuspectedIDWorkup` title predicates exclude the FASD flags so section titles stay honest). Contents, in order:
 
 1. **Exposure line (R4):** "Clinically significant prenatal alcohol exposure documented per NIAAA consensus guidelines, via: [category phrases, comma-joined]." Categories iterate in fixed form order (not Set insertion order) so prose is click-order-stable; `quantityFrequency` folds the three pattern-detail selections into a parenthetical; `paeDetail` appends as its own sentence.
-2. **Features line** when `fasdFeatures` is set.
+2. **Features line** when `fasdFeatures` is set; selected `fasdDomains` append "in the following domains: …" in fixed Hoyme-domain order (facial, growth, brain, neurobehavioral). The domains enrich this line ONLY — R6 prose, the genetics rationale, and all referral wiring are unchanged by domain selection (David's call, 2026-07-16: no re-council needed because the ratified prose is untouched).
 3. **Differential prose (R6, council-ratified 2026-07-16, amended same day):**
    - **Not confirmed** → parallel-tracks paragraph: FASD is in the differential, evaluated in parallel; conditions can co-occur; neither evaluation replaces the other. No comparative pattern claims.
    - **Confirmed** → anchor: diagnosis established per the DSM-5 criteria documented above; [adaptive subject] warrants/warrant additional evaluation for possible co-occurring FASD; separate diagnostic question, does not alter the autism diagnosis or its services. The subject phrase AND verb adapt to which flag(s) fired ("exposure … warrants" is singular; "findings … warrant" is plural).
@@ -847,9 +849,11 @@ Two independent flags in the Medical & Referral Flags section, under the **"Pren
 
 **The letter fence.** FASD content never reaches the ABA or IEP letters — differential language in the payer-facing medical-necessity register is a denial hook (same fence as §7.8). This is diff-visible in the repo: `tests/fixtures/fasd-both-flags-confirmed.mjs` composes `confirmed-asd-school-age`'s exact state plus the flags, so its `.aba.txt` and `.iep.txt` goldens must remain **byte-identical** to `confirmed-asd-school-age`'s.
 
-**Test lock:** `fasd-both-flags-confirmed` (full wiring, R6b + R6c firing, letter fence), `fasd-features-only-suspected` (exposure-independent path, R6a, no ophthalmology), `fasd-exposure-confirmed-a2-gap` (R6c gate staying silent on an a2 documentation gap).
+**Social-work reason.** `fasd_support` ("FASD family resources") is a manual `socialWorkReasons` entry — checking a FASD flag never auto-checks social work. It lives in all three SW parity tables the invariants lane guards (`SW_REASON_LABELS`, the note's `swLbls` copy, the HTML checkboxes).
 
-**Deferred (P1/P2, ratified spec):** feature-domain sub-select under `fasdFeatures`; NIAAA threshold hint under the exposure flag; `fasd_support` social-work reason (touches the three SW parity tables); FASD comorbid rows (Q86.0 / ND-PAE) once a receiving evaluation returns; criteria-aware prose beyond the R6c gate; other prenatal exposure flags under the same group separator.
+**Test lock:** `fasd-both-flags-confirmed` (full wiring, R6b + R6c firing, letter fence, enriched features line, `fasd_support` reason), `fasd-features-only-suspected` (exposure-independent path, R6a, no ophthalmology, domain-less features line), `fasd-exposure-confirmed-a2-gap` (R6c gate staying silent on an a2 documentation gap).
+
+**Deferred (P2, ratified spec):** FASD comorbid rows (Q86.0 / ND-PAE) once a receiving evaluation returns; criteria-aware prose beyond the R6c gate; other prenatal exposure flags under the same group separator. (The former P1 items — domain sub-select, threshold hint, `fasd_support` — shipped 2026-07-16.)
 
 ---
 
