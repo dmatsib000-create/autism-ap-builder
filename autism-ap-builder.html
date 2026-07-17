@@ -2884,6 +2884,13 @@ function generateNote() {
         :o==='notConsistent'?'Results were not consistent with ASD in isolation; clinical presentation, developmental history, and direct observation were weighted in the overall diagnostic formulation.'
         :'Results reviewed and incorporated into the diagnostic formulation.';
       const step1DoneLine='  Step 1 completed: DP-4 and KBIT-2R administered; results reviewed and reflected in the cognitive and developmental profile documented above.';
+      // Note headings name the pathway by its instrument, never the form's certainty
+      // labels ("Fairly certain" / "Uncertain" are the clinician's decision guide, not
+      // chart language — David 2026-07-17). The "Standardized Diagnostic Support"
+      // heading is claimed only when the completed result actually supports the
+      // confirmed diagnosis (or testing is still pending severity-formalization);
+      // an equivocal or not-consistent result downshifts to the neutral pathway name.
+      const evalTitle=(supportLbl,neutralLbl)=>dxConfirmed&&(!wkSt.dxDone||!wkSt.dxOutcome||wkSt.dxOutcome==='consistent')?supportLbl:neutralLbl;
       if(S.dxEvalPath==='devOnly'){
         L.push('In-Clinic Developmental Assessment:');
         const kbitAge=['schoolAge','adolescent','youngAdult','preschool'].includes(S.ageGroup);
@@ -2900,7 +2907,7 @@ function generateNote() {
       } else if(S.dxEvalPath==='certainYoung'){
         // On a confirmed diagnosis the CARS-2 documents/formalizes severity for an established
         // diagnosis; on a not-yet-confirmed (fairly certain) picture it supports reaching it.
-        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age < 5):':'Autism Evaluation: Diagnosis Fairly Certain (age < 5):');
+        L.push(evalTitle('Autism Evaluation: Standardized Diagnostic Support (age < 5):','Autism Evaluation: CARS-2 Pathway (age < 5):'));
         if(wkSt.dxStatus==='today'&&(!wkSt.dxOutcome||wkSt.dxOutcome==='consistent')){
           // Byte-stable with the retired cars2Done rendering.
           L.push(dxConfirmed
@@ -2918,7 +2925,7 @@ function generateNote() {
           L.push('  Given the clinical picture is consistent with ASD, the CARS-2 will provide objective data to support the diagnosis and guide severity level designation.');
         }
       } else if(S.dxEvalPath==='certainOlder'){
-        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (age ≥ 5):':'Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):');
+        L.push(evalTitle('Autism Evaluation: Standardized Diagnostic Support (age ≥ 5):','Autism Evaluation: CARS-2 Pathway (age ≥ 5):'));
         L.push(wkSt.profileDone?step1DoneLine:'  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
         if(wkSt.dxStatus==='today'&&(!wkSt.dxOutcome||wkSt.dxOutcome==='consistent')){
           L.push('  Step 2: CARS-2 '+(cars2HF?'HF':'ST')+' administered at today\'s visit. Results incorporated; '+(dxConfirmed?'support confirmed diagnosis.':'support the clinical diagnosis.'));
@@ -2934,7 +2941,7 @@ function generateNote() {
       } else if(S.dxEvalPath==='uncertainComp'){
         // The confirmed-title variant is only reachable when the eval is completed
         // (evalPathShows gates still-pending uncertain paths off confirmed notes).
-        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (Comprehensive):':'Autism Evaluation: Uncertain (Comprehensive):');
+        L.push(evalTitle('Autism Evaluation: Standardized Diagnostic Support (Comprehensive):','Autism Evaluation: Comprehensive Evaluation Pathway:'));
         if(wkSt.dxDone){
           L.push('  Comprehensive diagnostic evaluation completed with the UF CMS evaluation program psychologists, including');
           L.push('  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration. Report reviewed. '+dxOutcomeSentence(wkSt.dxOutcome));
@@ -2945,7 +2952,7 @@ function generateNote() {
           L.push('  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.');
         }
       } else if(S.dxEvalPath==='uncertainADOS'){
-        L.push(dxConfirmed?'Autism Evaluation: Standardized Diagnostic Support (ADOS-2 Pathway):':'Autism Evaluation: Uncertain (ADOS-2 Pathway):');
+        L.push(evalTitle('Autism Evaluation: Standardized Diagnostic Support (ADOS-2 Pathway):','Autism Evaluation: ADOS-2 Pathway:'));
         L.push(wkSt.profileDone?step1DoneLine:'  Step 1: DP-4 and KBIT-2R scheduled to establish cognitive and developmental profile.');
         if(wkSt.dxDone){
           L.push('  Step 2 completed: ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administered by ADOS-2-trained physician. '+dxOutcomeSentence(wkSt.dxOutcome));

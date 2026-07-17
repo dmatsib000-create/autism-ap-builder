@@ -19,7 +19,7 @@ PLAN
 ── Problem 1: Autism Spectrum Disorder — under evaluation (F84.0) ──
 
 1. DIAGNOSTIC WORKUP & NEXT STEPS
-Autism Evaluation: Diagnosis Fairly Certain (age ≥ 5):
+Autism Evaluation: CARS-2 Pathway (age ≥ 5):
   Step 1 completed: DP-4 and KBIT-2R administered; results reviewed and reflected in the cognitive and developmental profile documented above.
   Step 2: CARS-2 ST (Standard) to follow; standardized direct observation providing severity rating and diagnostic support.
 

@@ -490,12 +490,14 @@ const evalPathShows = S.dxEvalPath && (!dxConfirmed
 
 | Path | On suspected / rule-out | On **confirmed** |
 |---|---|---|
-| `certainYoung`, `certainOlder` | shows ("Diagnosis Fairly Certain") | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
+| `certainYoung`, `certainOlder` | shows (neutral "CARS-2 Pathway" heading) | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
 | `uncertainComp`, `uncertainADOS` | shows | **shows only when the diagnostic step is completed** (§4.5.2; approved 2026-07-16, same rationale as the CARS-2 exception) — the title reframes to "Standardized Diagnostic Support"; still-pending uncertain paths stay suppressed |
 | `devOnly` | shows | **suppressed** — profile testing is not diagnostic support |
 | `ritaT` | shows (workup block) | suppressed here; RITA-T support instead appears in the clinical-summary sentence (`generateNote()` body, separate from this block) |
 
 Rationale: what survives a confirmed diagnosis is *support documentation* (an instrument, administered, with results), not in-progress workup. Confirmed-case wording is selected via `dxConfirmed` inside the path branches. Locked by the `confirmed-certain-young-evalpath` and `evalpath-all-done-confirmed` golden fixtures.
+
+**Heading language rule (David, 2026-07-17):** the form's certainty labels ("Fairly certain", "Uncertain") are the clinician's decision guide and never appear in note output — note headings name the pathway by its instrument ("CARS-2 Pathway (age < 5)", "Comprehensive Evaluation Pathway", "ADOS-2 Pathway"). The `evalTitle()` helper additionally claims "Standardized Diagnostic Support" on a confirmed note only when the completed result is consistent (or no outcome is recorded / testing still pending severity-formalization); an equivocal or not-consistent result downshifts the heading to the neutral pathway name so the heading never asserts support the data don't back.
 
 #### 4.5.2 Workup completion statuses (`evalPathSteps()`)
 
