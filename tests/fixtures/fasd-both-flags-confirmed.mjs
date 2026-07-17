@@ -8,6 +8,9 @@
 // (a2 + b1/b2 documented), genetics FASD clause + phenocopy continuation line,
 // FASD-only audiology variant (school-age, no hearing-screen fail), ophthalmology
 // (both flags), and the Florida Center self-referral line.
+// P1 additions: the feature-domain sub-select (enriched features line, fixed
+// Hoyme-domain order) and the fasd_support social-work reason. The domain-less
+// features line stays locked by fasd-features-only-suspected.
 import base from './confirmed-asd-school-age.mjs';
 
 export default {
@@ -25,5 +28,11 @@ export default {
     S.paeDetail = 'Exposure history corroborated across obstetric records and caregiver report';
 
     S.fasdFeatures = true;
+    // All four domains selected so every domain phrase is golden-locked (a typo in
+    // any one would otherwise pass the suite unseen).
+    ['facial', 'growth', 'brain', 'neurobehavioral'].forEach(k => S.fasdDomains.add(k));
+
+    S.socialWork = true;
+    S.socialWorkReasons.add('fasd_support');
   },
 };

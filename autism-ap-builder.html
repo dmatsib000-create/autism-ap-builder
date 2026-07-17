@@ -1360,6 +1360,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
         <div class="grp-sep">Prenatal exposures</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="prenatalAlcohol"> Clinically significant prenatal alcohol exposure documented</label>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">NIAAA threshold for clinically significant exposure: 6+ drinks/week for 2+ weeks during pregnancy, or 3+ drinks per occasion on 2+ occasions — or any ONE of the other evidence categories below (social/legal problems, documented intoxication, positive biomarker, positive screen).</div>
         <div id="paeEvidenceRow" class="sub-options" style="display:none">
           <span class="sub-label">Evidence (NIAAA consensus categories — check all that apply)</span>
           <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="quantityFrequency"> Quantified maternal drinking documented</label>
@@ -1379,6 +1380,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <span class="phi-hint">PHI-free zone — type "the birth parent" or <code>[NAME]</code>; no names, specific dates, locations/jurisdictions, or case identifiers.</span>
         </div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="fasdFeatures"> Features concerning for FASD on exam/history</label>
+        <div id="fasdDomainsRow" class="sub-options" style="display:none">
+          <span class="sub-label">Domain(s) of concern (optional — Hoyme/NIAAA diagnostic domains)</span>
+          <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="facial"> Sentinel facial features (short palpebral fissures, thin vermilion border, smooth philtrum)</label>
+          <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="growth"> Growth deficiency (height and/or weight)</label>
+          <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="brain"> Deficient brain growth (microcephaly), structural brain anomaly, or recurrent nonfebrile seizures</label>
+          <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="neurobehavioral"> Neurobehavioral impairment (cognition, executive function, learning, memory, mood/behavioral regulation, attention, impulse control)</label>
+        </div>
         <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">Flagging guide (never note language): at the group level, FASD-related social difficulty tends to spare nonverbal communication (eye contact, gestures, facial expression — DSM-5 A2) and restricted/repetitive behaviors outside the sensory domain. Prominent A2 deficits or strong non-sensory RRBs favor ASD — alone or co-occurring with FASD — rather than FASD alone. Can be flagged with or without documented alcohol exposure.</div>
         <div class="grp-sep">Support Services</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
@@ -1390,6 +1398,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="community_nav"> Community resource navigation</label>
           <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_support"> Family support coordination</label>
           <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="family_safety"> Family safety concerns</label>
+          <label class="cb-row"><input type="checkbox" data-key="socialWorkReasons" value="fasd_support"> FASD family resources</label>
         </div>
       </div>
     </div>
@@ -1757,7 +1766,7 @@ const S = {
   // categories; the three pae* scalars are the optional pattern detail under
   // quantityFrequency. All categorical or placeholder-hinted — no dates, names, or
   // jurisdictions (PHI-free constraint applies to the maternal history too).
-  prenatalAlcohol:false, fasdFeatures:false, paeEvidence:new Set(),
+  prenatalAlcohol:false, fasdFeatures:false, paeEvidence:new Set(), fasdDomains:new Set(),
   paeQuantity:'', paeFrequency:'', paeTiming:'', paeDetail:'',
   therapyStatus:{slp:'',ot:'',aba:'',pt:''},
   teacherMaterials:new Set(), teacherMaterialOther:'', dxEvalPath:'',
@@ -2922,7 +2931,12 @@ function generateNote() {
         if(paeDet) expLine+=' '+paeDet+(/[.!?]$/.test(paeDet)?'':'.');
         L.push(expLine);
       }
-      if(S.fasdFeatures) L.push('  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history.');
+      if(S.fasdFeatures){
+        // Domain phrases iterate in fixed Hoyme-domain order, not Set insertion order.
+        const fasdDomLbls={facial:'sentinel facial features',growth:'growth deficiency',brain:'deficient brain growth or structural brain findings',neurobehavioral:'neurobehavioral impairment'};
+        const domList=['facial','growth','brain','neurobehavioral'].filter(k=>S.fasdDomains.has(k)).map(k=>fasdDomLbls[k]);
+        L.push('  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history'+(domList.length?', in the following domains: '+domList.join(', ')+'.':'.'));
+      }
       if(dxConfirmed){
         // R6b anchor: subject phrase and verb adapt to which flag(s) fired
         // ("findings ... warrant" is plural; "exposure ... warrants" is singular).
@@ -3478,7 +3492,7 @@ function generateNote() {
     }
     if(hS){L.push('  • Diagnostic Sleep Study (Polysomnography): Referral for PSG given clinical suspicion for sleep-disordered breathing / obstructive sleep apnea. Results will guide further management including ENT evaluation if indicated.');}
     if(S.socialWork){
-      const swLbls={apd_waiver:'APD/Medicaid waiver application assistance',financial:'financial resource counseling',caregiver_support:'caregiver support and mental health',community_nav:'community resource navigation',family_support:'family support coordination',family_safety:'family safety concerns'};
+      const swLbls={apd_waiver:'APD/Medicaid waiver application assistance',financial:'financial resource counseling',caregiver_support:'caregiver support and mental health',community_nav:'community resource navigation',family_support:'family support coordination',family_safety:'family safety concerns',fasd_support:'FASD family resources and support navigation'};
       const swList=[...S.socialWorkReasons].map(k=>swLbls[k]).filter(Boolean);
       const swText=swList.length?swList.join(', '):'{specify reason for referral}';
       L.push('  • Social Work: Referral placed for social work consultation to assist with '+swText+'. Social worker will contact family to schedule.');
@@ -5293,7 +5307,8 @@ const SW_REASON_LABELS = {
   caregiver_support: 'Caregiver support and mental health',
   community_nav: 'Community resource navigation',
   family_support: 'Family support coordination',
-  family_safety: 'Family safety concerns'
+  family_safety: 'Family safety concerns',
+  fasd_support: 'FASD family resources'
 };
 
 function renderOverrides(){
@@ -5706,7 +5721,7 @@ function clearAll(opts){
   [S.langModifiers,S.specifiers,S.criteriaA,S.criteriaB,S.needsComm,S.needsAdaptive,
    S.needsBehavior,S.needsSocial,S.needsSensory,S.needsMotor,
    S.comorbid,S.comorbidInPlan,S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff,S.safety,S.ag,S.teacherMaterials,S.abaSetting,S.abaTargets,S.priorTesting,
-   S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons,S.paeEvidence].forEach(s=>s.clear());
+   S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons,S.paeEvidence,S.fasdDomains].forEach(s=>s.clear());
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
@@ -5732,7 +5747,7 @@ function clearAll(opts){
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
   S.strangerDanger=false;
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow'].forEach(id=>{
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -6604,7 +6619,12 @@ document.addEventListener('DOMContentLoaded',()=>{
             const pqr=document.getElementById('paeQuantityRow');if(pqr)pqr.style.display='none';
           }
         }
-        else if(v==='fasdFeatures') S.fasdFeatures=inp.checked;
+        else if(v==='fasdFeatures'){
+          S.fasdFeatures=inp.checked;
+          const fdr=document.getElementById('fasdDomainsRow');
+          if(fdr) fdr.style.display=inp.checked?'':'none';
+          if(!inp.checked){S.fasdDomains.clear();document.querySelectorAll('[data-key="fasdDomains"]').forEach(c=>{c.checked=false;});}
+        }
       } else {
         // P3 cleanup: dynamic Set lookup. Looks up S[k] and only dispatches add/delete if
         // it's actually a Set instance. Replaces the prior hardcoded `m={specifiers:S.specifiers,
