@@ -28,7 +28,9 @@ export default {
     S.paeDetail = 'Exposure history corroborated across obstetric records and caregiver report';
 
     S.fasdFeatures = true;
-    ['facial', 'growth', 'neurobehavioral'].forEach(k => S.fasdDomains.add(k));
+    // All four domains selected so every domain phrase is golden-locked (a typo in
+    // any one would otherwise pass the suite unseen).
+    ['facial', 'growth', 'brain', 'neurobehavioral'].forEach(k => S.fasdDomains.add(k));
 
     S.socialWork = true;
     S.socialWorkReasons.add('fasd_support');

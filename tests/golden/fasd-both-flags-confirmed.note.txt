@@ -23,7 +23,7 @@ PLAN
 1. DIAGNOSTIC WORKUP & NEXT STEPS
 Fetal Alcohol Spectrum Disorder (FASD) Considerations:
   • Clinically significant prenatal alcohol exposure documented per NIAAA consensus guidelines, via: quantified maternal drinking (3 to 5 drinks per drinking day, weekly or more often, throughout pregnancy), alcohol-related social or legal problems proximate to the index pregnancy, positive validated alcohol biomarker(s). Exposure history corroborated across obstetric records and caregiver report.
-  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history, in the following domains: sentinel facial features, growth deficiency, neurobehavioral impairment.
+  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history, in the following domains: sentinel facial features, growth deficiency, deficient brain growth or structural brain findings, neurobehavioral impairment.
   The diagnosis of Autism Spectrum Disorder is established based on the DSM-5 criteria documented above. Documented prenatal alcohol exposure and examination findings concerning for FASD warrant additional evaluation for a possible co-occurring fetal alcohol spectrum disorder (FASD). This is a separate diagnostic question; it does not alter the autism diagnosis or the services indicated by it.
   Notably, the documented presentation includes deficits in nonverbal communicative behaviors and restricted, repetitive behaviors beyond the sensory domain; these features are characteristic of Autism Spectrum Disorder and are not accounted for by prenatal alcohol exposure alone.
 
