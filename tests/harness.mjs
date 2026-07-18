@@ -37,6 +37,9 @@ const EXPORTS = [
   // See tests/README.md "Two test lanes".
   'bifSpecifierAllowed',
   'currentClinicalPathway',
+  // Workup-completion resolver: pure read of S.dxEvalPath + the eval*Status fields into
+  // step roles, completion booleans, and the Family Resources pendingTesting predicate.
+  'evalPathSteps',
   // DOM wrapper whose gate-cleanup branch (delete unsupported withBIF) is exercised
   // by the unit lane via an injected querySelector (see makeStubs opts) — the one
   // wrapper the unit lane drives directly rather than through its pure core.

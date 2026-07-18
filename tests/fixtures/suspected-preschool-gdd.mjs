@@ -16,7 +16,7 @@ export default {
     S.adaptProfile = 'moderatelyImpaired';
 
     S.diagStatus = 'suspected';
-    S.dxEvalPath = 'comprehensive';
+    S.dxEvalPath = 'uncertainComp';
     S.specifiers.add('withSuspectedGDD');
     S.specifiersManuallySet.add('withSuspectedGDD');
 

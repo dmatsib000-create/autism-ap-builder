@@ -1,0 +1,70 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD) — under evaluation
+ICD-10-CM: Z03.89
+
+── Clinical Summary ──
+
+The patient is a school-aged boy who is using simple sentences and multi-word utterances, with cognitive functioning not yet formally assessed and mildly impaired adaptive behavior relative to chronological age. He shows developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+
+── Functional Needs Identified ──
+  • Communication: expressive language
+  • Behavior/interfering: rigidity/inflexibility
+  • Social/play: social reciprocity
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder — under evaluation (F84.0) ──
+
+1. DIAGNOSTIC WORKUP & NEXT STEPS
+Autism Evaluation: CARS-2 Pathway (age ≥ 5):
+  Step 1 completed: DP-4 and KBIT-2R administered; results reviewed and reflected in the cognitive and developmental profile documented above.
+  Step 2: CARS-2 ST (Standard) to follow; standardized direct observation providing severity rating and diagnostic support.
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+2. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA/behavioral support is recommended based on the following documented functional impairments: behavioral rigidity and significant difficulty with transitions; expressive language delays; social skill impairments (social reciprocity); significant adaptive impairment. Functional Behavior Assessment (FBA) recommended to identify the functions of specific target behaviors and guide individualized programming. Goals should be functional, meaningful in daily life, and coordinated with the school team.
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
+
+3. SOCIAL SKILLS INTERVENTION
+Structured autism-specific social skills group. Options in the Gainesville area:
+  - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 273-0517) for current group availability and enrollment.
+  - Social Thinking (Speech4Kids): Structured social cognition curriculum appropriate for school-age children with ASD. Contact Speech4Kids: (352) 240-3155 | speech4kidsgainesville.com
+  - PEERS for Kids: Manualized, evidence-based social skills training program for school-age children.
+Targets:
+  • Social reciprocity and balanced social exchange
+
+4. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+5. FAMILY RESOURCES & NEXT STEPS
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously
+       - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+RETURN TO CLINIC
+Return to clinic in 3 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

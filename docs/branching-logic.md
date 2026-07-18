@@ -171,6 +171,8 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `schoolSvcAuto` / `schoolSvcManualOff` | Sets — tracks which services were auto-recommended vs manually toggled off |
 | `priorTesting` (Set) | Instrument names with `priorTestingOutcome[k]` and `priorTestingDate[k]` — cited in letters |
 | `teacherMaterials` (Set) | School-supplied artifacts that informed assessment |
+| `teacherMaterialsReturned` (Set) | Subset of `teacherMaterials` marked returned and reviewed — §4.5.2 (returned/awaited note split) |
+| `evalProfileStatus` / `evalDxStatus` / `evalDxOutcome` | strings — §4.5.2 workup completion statuses (resolved by `evalPathSteps()`; reset on every `dxEvalPath` change) |
 
 **ABA-specific:**
 
@@ -249,7 +251,8 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `criteriaC` / `criteriaD` / `criteriaE` | boolean | [§4](#4-dsm-5-criteria-mapping) |
 | `developmentalRegression` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `diagStatus` | string | [§4.5](#45-confirmed-vs-suspected-diagnosis-paths), [§5.2](#52-the-aba-hard-gate) |
-| `dxEvalPath` | string | [§1.2](#12-the-s-object--property-reference) |
+| `dxEvalPath` | string | [§1.2](#12-the-s-object--property-reference), [§4.5.1](#451-evaluation-path-output-on-a-confirmed-diagnosis) |
+| `evalProfileStatus` / `evalDxStatus` / `evalDxOutcome` | string | [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `dysmorphism` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `ev` | object | [§4](#4-dsm-5-criteria-mapping) |
 | `fasdDomains` | Set | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
@@ -283,7 +286,8 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `sleepStudy` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
 | `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.7](#107-specifier-edge-cases) |
 | `strengths` | string | [§1.2](#12-the-s-object--property-reference) |
-| `teacherMaterials` | Set | [§1.2](#12-the-s-object--property-reference) |
+| `teacherMaterials` | Set | [§1.2](#12-the-s-object--property-reference), [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
+| `teacherMaterialsReturned` | Set | [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `therapyStatus` | object | [§1.2](#12-the-s-object--property-reference) |
 | `traumaIncludeInIEP` | boolean | [§6.4](#64-the-trauma-iep-gate), [§10.3](#103-trauma-opt-in-gate) |
 | `unevenCog` / `unevenCogDesc` | boolean / string | [§1.2](#12-the-s-object--property-reference) |
@@ -478,17 +482,43 @@ The §2 Diagnostic Workup picker (`S.dxEvalPath`, six radios) describes *how* th
 
 ```js
 const dxConfirmed = S.diagStatus === 'confirmed';
-const evalPathShows = S.dxEvalPath &&
-  (!dxConfirmed || S.dxEvalPath === 'certainYoung' || S.dxEvalPath === 'certainOlder');
+const wkSt = evalPathSteps();
+const evalPathShows = S.dxEvalPath && (!dxConfirmed
+  || S.dxEvalPath === 'certainYoung' || S.dxEvalPath === 'certainOlder'
+  || ((S.dxEvalPath === 'uncertainComp' || S.dxEvalPath === 'uncertainADOS') && wkSt.dxDone));
 ```
 
 | Path | On suspected / rule-out | On **confirmed** |
 |---|---|---|
-| `certainYoung`, `certainOlder` | shows ("Diagnosis Fairly Certain") | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
-| `devOnly`, `uncertainComp`, `uncertainADOS` | shows | **suppressed** — these describe an in-progress workup that reads wrong once the diagnosis is confirmed |
+| `certainYoung`, `certainOlder` | shows (neutral "CARS-2 Pathway" heading) | **shows**, reframed: header becomes "Standardized Diagnostic Support", CARS-2 text documents/formalizes severity for the *established* diagnosis |
+| `uncertainComp`, `uncertainADOS` | shows | **shows only when the diagnostic step is completed** (§4.5.2; approved 2026-07-16, same rationale as the CARS-2 exception) — the title reframes to "Standardized Diagnostic Support"; still-pending uncertain paths stay suppressed |
+| `devOnly` | shows | **suppressed** — profile testing is not diagnostic support |
 | `ritaT` | shows (workup block) | suppressed here; RITA-T support instead appears in the clinical-summary sentence (`generateNote()` body, separate from this block) |
 
-Rationale: the CARS-2-backed "fairly certain" paths carry documentation value on a confirmed note (they name the supporting instrument and severity rating); the "uncertain / referring out" paths do not. Confirmed-case wording is selected via `dxConfirmed` inside the `certainYoung`/`certainOlder` branches. Locked by the `confirmed-certain-young-evalpath` golden fixture.
+Rationale: what survives a confirmed diagnosis is *support documentation* (an instrument, administered, with results), not in-progress workup. Confirmed-case wording is selected via `dxConfirmed` inside the path branches. Locked by the `confirmed-certain-young-evalpath` and `evalpath-all-done-confirmed` golden fixtures.
+
+**Heading language rule (David, 2026-07-17):** the form's certainty labels ("Fairly certain", "Uncertain") are the clinician's decision guide and never appear in note output — note headings name the pathway by its instrument ("CARS-2 Pathway (age < 5)", "Comprehensive Evaluation Pathway", "ADOS-2 Pathway"). The `evalTitle()` helper additionally claims "Standardized Diagnostic Support" on a confirmed note only when the completed result is consistent (or no outcome is recorded / testing still pending severity-formalization); an equivocal or not-consistent result downshifts the heading to the neutral pathway name so the heading never asserts support the data don't back.
+
+#### 4.5.2 Workup completion statuses (`evalPathSteps()`)
+
+The tool is often used at the visit where the workup ordered last time has come back, so every schedulable step carries a completion status. Two role-based state fields cover all six paths — there is no per-path bookkeeping:
+
+| Field | Applies to | Values |
+|---|---|---|
+| `S.evalProfileStatus` | the DP-4/KBIT-2R step (`devOnly`, `certainOlder`, `uncertainADOS`) | `''` scheduled · `'done'` completed, results reviewed |
+| `S.evalDxStatus` | the diagnostic instrument (`certainYoung`/`certainOlder` CARS-2, `uncertainADOS` ADOS-2, `uncertainComp` comprehensive eval) | `''` scheduled/referral placed · `'today'` administered at today's visit (CARS-2 paths only in v1) · `'done'` completed previously |
+| `S.evalDxOutcome` | the diagnostic instrument once its status is non-empty | `''` results reviewed (neutral) · `consistent` · `equivocal` · `notConsistent` |
+
+The pure resolver `evalPathSteps()` (top of the generators, exported to the unit lane) maps path + statuses to step roles, completion booleans, and `pendingTesting` — the predicate behind the Family Resources ABA-waitlist wording ("Once testing results are available…" vs immediate sign-up). Behavior rules:
+
+- **`'today'` subsumes the retired `S.cars2Done` checkbox** (removed 2026-07-16). The `''` defaults map 1:1 onto the old `cars2Done === false` behavior, so default-state notes are byte-identical across the fold.
+- **Statuses reset on every `dxEvalPath` change or deselect** (`onDxEvalPathChange`, also routed from the age-based path clears in `updateAgeBasedVisibility`). This kills the old stale-`cars2Done` bug, where a hidden leftover checkmark silently flipped the waitlist wording on another path.
+- **Completed steps render past-tense** with the outcome register (deliberately mirroring the prior-testing weighting language: consistent → supports the diagnosis; equivocal → "considered in the overall diagnostic formulation"; not consistent → "weighted in the overall diagnostic formulation"); the DP-4/KBIT-2R step never takes an outcome — its line cross-references the profile "documented above" (one home per fact; the profile lives in Patient Profile). Scheduled steps keep their pre-completion prose byte-for-byte.
+- **Prompts, never auto-set** (the archetype-preset invariant): profile step completed while `cogProfile` is empty/unknown → amber hint to update Patient Profile; diagnostic outcome `consistent` while still suspected → amber hint to consider Confirmed. Both toggle in `updateSectionHeaders` (`evalProfileDoneHint` / `evalDxSupportHint`); nothing writes `diagStatus` or `cogProfile`.
+- **Teacher materials completion** is the same idea on the informant side: `S.teacherMaterialsReturned` (subset of `teacherMaterials`, per-form "Returned and reviewed" toggles revealed under checked forms). The note renders "returned and reviewed" vs "still awaited" lists in fixed form order (the FASD-block convention — not Set click order), and the "Family to provide teacher contact information…" chase line prints only while something is outstanding. Unchecking a request clears its returned mark.
+- **Letters never read any of these fields** — locked diff-visibly by `evalpath-all-done-confirmed`, whose `.aba.txt`/`.iep.txt` goldens are byte-identical to `confirmed-asd-school-age`'s.
+
+Test locks: `certainolder-step1-done` (mid-path split rendering, pendingTesting still true), `evalpath-all-done-confirmed` (no scheduling language, immediate-waitlist wording, letters fence), `teacher-materials-partial-return` (two-list rendering + conditional chase line), and the `evalPathSteps` unit-lane block (role mapping, stale-status guards, pendingTesting 1:1 mapping).
 
 ### 4.6 What criteria do *not* drive
 

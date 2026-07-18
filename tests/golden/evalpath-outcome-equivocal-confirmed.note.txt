@@ -1,38 +1,40 @@
 ASSESSMENT
 ════════════════════════════════════════════════════════
 
-Autism Spectrum Disorder (ASD) — under evaluation
-ICD-10-CM: Z03.89
+Autism Spectrum Disorder (ASD), Level 2 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
 
 ── Clinical Summary ──
 
-The patient is a preschool-aged girl (3–5 years), with cognitive functioning not yet formally assessed and mildly impaired adaptive behavior relative to chronological age. She shows developmental concerns in social communication and interaction that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+The patient is a preschool-aged girl (3–5 years) who is using simple sentences and multi-word utterances, with cognitive functioning in the average range and mildly impaired adaptive behavior relative to chronological age. She demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including communication, behavior, and social development. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
 
 ── Functional Needs Identified ──
   • Communication: expressive language
+  • Behavior/interfering: rigidity/inflexibility
   • Social/play: social reciprocity
 
 PLAN
 ════════════════════════════════════════════════════════
 
-── Problem 1: Autism Spectrum Disorder — under evaluation (F84.0) ──
+── Problem 1: Autism Spectrum Disorder [Level 2 (SC) / Level 1 (RRBs)] (F84.0) ──
 
 1. DIAGNOSTIC WORKUP & NEXT STEPS
-Autism Evaluation: Comprehensive Evaluation Pathway:
-  Referral for comprehensive diagnostic evaluation with the UF CMS evaluation program psychologists, including
-  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration.
-  Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.
-  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.
-
-Fetal Alcohol Spectrum Disorder (FASD) Considerations:
-  • Features concerning for fetal alcohol spectrum disorder noted on examination and/or history.
-  Fetal alcohol spectrum disorder (FASD) is included in the differential diagnosis and is being evaluated in parallel with the autism evaluation. These conditions are not mutually exclusive and can co-occur. Completion of both evaluations is recommended so that each condition is identified and addressed on its own merits; neither evaluation replaces the other.
+Autism Evaluation: CARS-2 Pathway (age < 5):
+  CARS-2 administered at today's visit. Results were inconclusive; findings were considered in the overall diagnostic formulation alongside clinical history and direct observation.
 
 The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
 
 2. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
-Early behavioral intervention is recommended given her age and the following documented developmental impairments: expressive language delays; social skill impairments (social reciprocity); significant adaptive impairment. ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.
-Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intervention when accessible.
+ABA therapy is recommended as the primary evidence-based behavioral intervention for her and is medically necessary given her confirmed diagnosis of Autism Spectrum Disorder, Level 2 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors), with the following documented functional impairments establishing medical necessity: behavioral rigidity and significant difficulty with transitions; expressive language delays; social skill impairments (social reciprocity); significant adaptive impairment. These impairments substantially limit her ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.
+Early Intensive Behavioral Intervention (EIBI) - a structured, comprehensive ABA-based program - is indicated for children under age 6. A Cochrane systematic review³ demonstrates robust improvement in language, cognitive, and adaptive behavior outcomes with EIBI. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Services should span home, clinic, and natural-environment settings; caregiver coaching is a core component of effective early intervention.
+Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA (embedding behavioral principles within naturalistic, relationship-focused, and play-based interactions) carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intensive intervention when accessible.
+
+Supporting References:
+  1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
+  2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
+  3. Reichow B, Hume K, Barton EE, Boyd BA. Early intensive behavioral intervention (EIBI) for young children with autism spectrum disorders (ASD). Cochrane Database Syst Rev. 2018;(5):CD009260. doi:10.1002/14651858.CD009260.pub3
   • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
   • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
 
@@ -60,9 +62,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
   Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
 
 6. MEDICAL REFERRALS
-  • Audiology: Audiologic evaluation recommended as part of the workup for a possible fetal alcohol spectrum disorder, per NIAAA consensus guidance. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.
-  • Genetics: Referral to clinical genetics is medically necessary. The patient is under evaluation for a neurodevelopmental disorder, with clinical findings that warrant genetics input during the diagnostic workup, a clinical picture concerning for fetal alcohol spectrum disorder. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
-      Fetal alcohol spectrum disorder is additionally under consideration; per NIAAA consensus guidelines, dysmorphology evaluation and genetic testing are indicated to exclude genetic conditions whose features can mimic FASD.
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
       Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
       Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
       Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
@@ -72,14 +72,15 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
 
 7. FAMILY RESOURCES & NEXT STEPS
-  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center's FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
 
   Finding Therapies / Navigating the System:
     1. Call your insurance company and ask to be assigned a case manager.
     2. Request a list of all recommended providers.
-    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously
-       - no matter how long the lists appear.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
     4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
     6. Follow up with providers every 3 weeks until a spot is secured;
        consider appearing in person if phone calls go unanswered.
     7. When a spot is obtained, notify other waitlists so another child may benefit.
@@ -96,7 +97,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     • How to Know If You're Getting Good ABA
 
 RETURN TO CLINIC
-Return to clinic in 3 months.
+Return to clinic in 6 months.
 
 ────────────────────────────────────────────────────────
 Note generated by DBP Autism A&P Builder.

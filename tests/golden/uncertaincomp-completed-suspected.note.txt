@@ -6,14 +6,11 @@ ICD-10-CM: Z03.89
 
 ── Clinical Summary ──
 
-The patient is a toddler girl (12–35 months) who is communicating primarily with single words, with cognitive functioning not yet formally assessed. She shows developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
-
-── DSM-5 Diagnostic Criteria ──
+The patient is a preschool-aged child (3–5 years), with cognitive functioning not yet formally assessed. They show developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
 
 ── Functional Needs Identified ──
-  • Communication: expressive language, receptive language
+  • Communication: expressive language
   • Behavior/interfering: tantrums/meltdowns
-  • Social/play: social reciprocity
 
 PLAN
 ════════════════════════════════════════════════════════
@@ -22,15 +19,13 @@ PLAN
 
 1. DIAGNOSTIC WORKUP & NEXT STEPS
 Autism Evaluation: Comprehensive Evaluation Pathway:
-  Referral for comprehensive diagnostic evaluation with the UF CMS evaluation program psychologists, including
-  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration.
-  Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.
-  ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.
+  Comprehensive diagnostic evaluation completed with the UF CMS evaluation program psychologists, including
+  ADOS-2 (Autism Diagnostic Observation Schedule, 2nd ed.) administration. Report reviewed. Results reviewed and incorporated into the diagnostic formulation.
 
 The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
 
 2. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
-Early behavioral intervention is recommended given her age and the following documented developmental impairments: tantrums/meltdowns; expressive language delays; receptive language delays; social skill impairments (social reciprocity). ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.
+Early behavioral intervention is recommended given their age and the following documented developmental impairments: tantrums/meltdowns; expressive language delays. ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.
 Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intervention when accessible.
   • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
   • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
@@ -41,24 +36,26 @@ Evidence-based, parent-mediated intervention improving the parent-child relation
   Note: PCIT is clinically distinct from the parent training component of ABA. PCIT targets the parent-child relationship through structured in-session coaching (Child-Directed Interaction and Parent-Directed Interaction phases), with a primary goal of improving relational attunement and consistent, contingent limit-setting. ABA parent training targets caregiver implementation of behavioral reinforcement strategies in naturalistic routines to generalize skill acquisition. When both are in place, goals and billable sessions should be documented as non-overlapping.
 
 4. SPEECH-LANGUAGE PATHOLOGY (SLP)
-  • AAC Evaluation and Implementation (PRIORITY): Formal AAC evaluation by an SLP with AAC specialization is recommended to determine the optimal system(s) for this child. AAC systems span two tiers:
-    - Low-tech AAC: Core vocabulary boards, PODD (Pragmatic Organization Dynamic Display) communication books, and symbol-based communication boards (PCS/SymbolStix). Low-tech systems are high-evidence, immediately implementable, and appropriate as a primary or supplementary communication modality at any age.
-    - High-tech AAC (speech-generating devices): Evaluation for systems such as LAMP WFL (Language Acquisition through Motor Planning), TouchChat, Proloquo2Go, or Snap Core First. Device selection is individualized; funding requires an SLP-generated AAC report establishing medical necessity.
-    Research consistently demonstrates that AAC facilitates, rather than inhibits, speech development; implementation should not be delayed pending speech progress. All selected AAC systems must be implemented consistently across all settings and by all communication partners.
   • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
-  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available.
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
 5. SCHOOL / EDUCATIONAL SUPPORTS
-  • Early Steps (Florida Part C Early Intervention): Given developmental concerns and age under 36 months, referral to Florida Early Steps is recommended. Provides in-home and clinic-based services including ITDS (Infant/Toddler Developmental Specialist), speech-language therapy, OT, PT, and intensive family coaching in the natural environment under IDEA Part C. Family counseled on rights. Referral to be submitted through Early Steps. Referral should be made promptly, as Part C eligibility must be established before the third birthday.
-  • Part C to Part B transition: Around the third birthday, Early Steps coordinates transition to the local school district for evaluation of Part B (IEP) eligibility; transition planning begins several months before age 3.
+  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Behavioral and Emotional Accommodations:
+    - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
 
 6. FAMILY RESOURCES & NEXT STEPS
 
   Finding Therapies / Navigating the System:
     1. Call your insurance company and ask to be assigned a case manager.
     2. Request a list of all recommended providers.
-    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously
-       - no matter how long the lists appear.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
     4. Use Google Maps to search for nearby providers and call to confirm insurance.
     6. Follow up with providers every 3 weeks until a spot is secured;
        consider appearing in person if phone calls go unanswered.
@@ -73,6 +70,11 @@ Evidence-based, parent-mediated intervention improving the parent-child relation
   Pocket PCIT
   Free online resource based on Parent-Child Interaction Therapy (PCIT) for children ages 2–7 with behavior challenges. Video demonstrations and guidance on building the parent-child relationship (Child-Directed Interaction) and consistent limit-setting (Parent-Directed Interaction).
   https://www.pocketpcit.com
+
+  FAST Behavior Basics (Seattle Children's Hospital):
+  On-demand, self-paced class for parents of children ages 5–12 with challenging behaviors (also relevant for ADHD, autism, anxiety, compliance difficulties). 8 core + 3 bonus skill videos (3–5 min each). Caregiver workbook available.
+  Class: https://www.seattlechildrens.org/health-safety/classes-events/behavior-basics-class/
+  Workbook: https://www.seattlechildrens.org/globalassets/documents/healthcare-professionals/pal/fast/fast-b-caregiver-workbook.pdf
 
   Recommended Reading: Understanding ABA
     • What Is Applied Behavior Analysis?
