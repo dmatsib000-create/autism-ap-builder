@@ -3063,22 +3063,28 @@ function generateNote() {
       // tiers (ID/BIF school-age and up, GDD toddler/preschool), and the specifier is the
       // thing the prose is actually about. Both specifiers set at once is not reachable
       // through the UI mutex but is reachable in state, so it degrades to naming both.
+      // The REQUIREMENT differs by tier too, not just the instruments. ID requires both a
+      // cognitive and an adaptive measure (DSM-5/AAIDD: deficits in both are criterial).
+      // GDD does not: a comprehensive developmental battery alone establishes it (PR-G R2.1,
+      // docs section 11.14 — adaptive is informative but not strictly required per
+      // DSM-5-TR/AACAP, and instruments like the Bayley-4 already carry adaptive subscales).
+      // The earlier shared paragraph asserted "both components" for GDD as well, which
+      // contradicted the app's own confirmableGdd rule and could read to a receiving
+      // evaluator as blocking the diagnosis pending a test that is not actually required.
       const gddTier=S.specifiers.has('withSuspectedGDD'), idTier=S.specifiers.has('withSuspectedID');
-      const devComponent='(a) comprehensive standardized developmental assessment (e.g., the Bayley-4, the Battelle Developmental Inventory 3rd ed., the Mullen Scales of Early Learning, or Griffiths III; brief developmental screeners such as the ASQ-3 or SWYC are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, or SIB-R)';
+      const devComponent='a comprehensive standardized developmental assessment (e.g., the Bayley-4, the Battelle Developmental Inventory 3rd ed., the Mullen Scales of Early Learning, or Griffiths III; brief developmental screeners such as the ASQ-3 or SWYC are not sufficient for formal diagnosis)';
       const iqComponent='(a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite)';
-      let components,eligibility;
-      if(gddTier&&idTier){
-        components=iqComponent+'. For a child in the developmental-assessment age range, a comprehensive developmental instrument (e.g., the Bayley-4 or the Battelle Developmental Inventory 3rd ed.) satisfies component (a) in place of a cognitive battery';
-        eligibility='Formal eligibility for an Intellectual Disability or Global Developmental Delay diagnosis';
-      } else if(gddTier){
-        components=devComponent;
-        eligibility='Formal eligibility for a Global Developmental Delay diagnosis';
+      if(gddTier&&!idTier){
+        L.push('');
+        L.push('Comprehensive developmental evaluation recommended to formally characterize the developmental profile. Required component: '+devComponent+'. Formal eligibility for a Global Developmental Delay diagnosis cannot be established until this evaluation is completed.');
       } else {
-        components=iqComponent;
-        eligibility='Formal eligibility for an Intellectual Disability diagnosis';
+        // ID tier, or the both-set state (unreachable through the UI mutex but reachable in
+        // state) which degrades to the ID requirement plus an age-appropriate instrument note.
+        const extra=idTier&&gddTier?' For a child in the developmental-assessment age range, a comprehensive developmental instrument (e.g., the Bayley-4 or the Battelle Developmental Inventory 3rd ed.) satisfies component (a) in place of a cognitive battery.':'';
+        const eligibility=idTier&&gddTier?'an Intellectual Disability or Global Developmental Delay':'an Intellectual Disability';
+        L.push('');
+        L.push('Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: '+iqComponent+'.'+extra+' Formal eligibility for '+eligibility+' diagnosis cannot be established until both components are completed.');
       }
-      L.push('');
-      L.push('Comprehensive psychological evaluation recommended to formally characterize '+(gddTier&&!idTier?'developmental and adaptive':'cognitive and adaptive')+' profiles. Required components: '+components+'. '+eligibility+' cannot be established until both components are completed.');
     } else if(bifIdRisk()){
       // Same referral, different justification: nothing here asserts suspected ID.
       // The clause names both routes by which ID can still be the answer (a
