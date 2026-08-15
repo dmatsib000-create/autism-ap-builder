@@ -2298,6 +2298,49 @@ function withBifSourceQualifier(k,label){
   if(S.cogDataSource==='priorExternal') return label+' (per prior outside evaluation; supporting records not available for direct review at this visit)';
   return label;
 }
+// ID-risk state: a borderline call resting on a brief screener or a clinical
+// impression has NOT excluded intellectual disability. Comprehensive testing can
+// still land under 70 (ID), and even a confirmed-borderline IQ can support ID when
+// a standardized adaptive measure is impaired (DSM-5-TR reads the 70-75 band with
+// its measurement error, and weights adaptive functioning). So the tool treats
+// screener/clinical borderline as "ID not yet excluded", not as established BIF.
+//
+// Deliberately NOT a specifier and NOT a bridge target: docs/branching-logic.md
+// section 11.7 forbids auto-bridging withBIF and forbids a withSuspectedBIF key
+// (Greenspan 2017 - a "suspected" variant weakens an already-contested category).
+// This is a derived predicate only: it qualifies prose and opens the existing
+// confirmatory-evaluation referral. currentClinicalPathway() still returns
+// specKey:null for borderline, and nothing here touches S.specifiers.
+function bifIdRisk(){
+  return S.cogProfile==='borderline' && (S.cogDataSource==='screener'||S.cogDataSource==='clinical');
+}
+// Clinical-summary clause for a borderline profile, qualified by how the call was
+// reached. Previously one unqualified string ("in the borderline intellectual
+// functioning (BIF) range") rendered identically whether it came from a KBIT-2R
+// screener or a WISC-V, which read as an established BIF determination on screening
+// data. Mirrors withBifSourceQualifier()'s four-branch shape (docs 11.15: every
+// cogDataSource value gets its own branch, no bare fallthrough) but is worded for
+// running summary prose rather than a specifier parenthetical.
+// The clause stays SHORT because the opening sentence composes it with the adaptive
+// clause ("<cog> and <adaptive>"); a long qualifier here produces a garden-path
+// sentence. The ID-not-excluded caveat is emitted as its own sentence instead, by
+// bifIdRiskSentence() below.
+function bifSummaryClause(){
+  const base='with cognitive functioning in the borderline range';
+  if(S.cogDataSource==='screener') return base+' on brief cognitive screening';
+  if(S.cogDataSource==='clinical') return base+' by clinical impression';
+  if(S.cogDataSource==='priorExternal') return base+' per prior outside evaluation (supporting records not available for direct review at this visit)';
+  if(S.cogDataSource==='comprehensive') return 'with cognitive functioning in the borderline intellectual functioning (BIF) range on comprehensive testing';
+  // No data source recorded: state the finding without implying how it was reached.
+  return base;
+}
+// Follow-on sentence for the ID-risk state, kept separate from the opening clause
+// so the summary reads as prose. Empty string when the state does not apply.
+function bifIdRiskSentence(){
+  if(!bifIdRisk()) return '';
+  const basis=S.cogDataSource==='screener'?'This screening-level estimate':'This clinical estimate';
+  return ' '+basis+' does not exclude an intellectual disability; formal determination is pending comprehensive cognitive and adaptive assessment.';
+}
 // Low-average qualifier: a "low average" cognitive profile in a toddler or
 // preschool patient cannot rest on a comprehensive source under the current
 // model (cogDataSource is not exposed for non-impairment profiles, and
@@ -2452,7 +2495,7 @@ function generateClinicalSummary(){
   const langDesc=getLangDescription();
   const cogShort={
     id_severe:'with severe intellectual disability',id_moderate:'with moderate intellectual disability',
-    id_mild:'with mild intellectual disability',borderline:'with cognitive functioning in the borderline intellectual functioning (BIF) range',
+    id_mild:'with mild intellectual disability',borderline:bifSummaryClause(),
     lowAverage:'with cognitive functioning in the low-average range',
     average:'with cognitive functioning in the average range',aboveAverage:'with cognitive functioning in the high-average range (110–119)',superior:'with superior cognitive functioning (120–129)',verySuperior:'with very superior / gifted cognitive functioning (130+)',
     gdd:'with global developmental delays',
@@ -2498,6 +2541,7 @@ function generateClinicalSummary(){
       opening+=`, with ${adaptShort}`;
     }
     opening+='.';
+    opening+=bifIdRiskSentence();
     if(S.visitType){
       const vtMap={initial:'initial autism evaluation',reeval:'diagnostic re-evaluation',followup:'follow-up visit'};
       if(vtMap[S.visitType]) opening+=` ${pr.cap} ${v3('presents')} for ${vtMap[S.visitType]}.`;
@@ -2820,6 +2864,10 @@ function generateNote() {
   // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
   // documented but the suspected-ID gating still demands a formal evaluation recommendation).
   const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
+  // Screener/clinical borderline routes to the SAME confirmatory-evaluation referral
+  // (ID is not yet excluded), without asserting suspected ID. bifIdRisk() already
+  // excludes priorExternal, so no extra source guard is needed here.
+  const hasCogEvalReferral = hasSuspectedIDorGDD || bifIdRisk();
   // Evaluation-path output survives a Confirmed diagnosis only when it documents SUPPORT for
   // the established diagnosis rather than an in-progress workup: the "fairly certain" CARS-2
   // pathways (certainYoung/certainOlder) always qualify, and — approved 2026-07-16, same
@@ -2834,13 +2882,13 @@ function generateNote() {
   const evalPathShows = S.dxEvalPath && (!dxConfirmed || S.dxEvalPath==='certainYoung' || S.dxEvalPath==='certainOlder'
     || ((S.dxEvalPath==='uncertainComp'||S.dxEvalPath==='uncertainADOS') && wkSt.dxDone));
   const hasFASDFlags = S.prenatalAlcohol||S.fasdFeatures;
-  const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasSuspectedIDorGDD||hasFASDFlags;
+  const hasDxWorkup=S.teacherMaterials.size>0||evalPathShows||S.priorTesting.size>0||hasCogEvalReferral||hasFASDFlags;
   if(hasDxWorkup){
     const onlyPriorTesting=S.priorTesting.size>0&&!evalPathShows&&!S.teacherMaterials.size&&!hasFASDFlags;
     // Section header reflects the actual content. When the only workup is the
     // cognitive/adaptive eval referral (suspected ID/GDD with no ASD-side workup),
     // 'DIAGNOSTIC WORKUP & NEXT STEPS' would mislead the reader into expecting ASD content.
-    const onlySuspectedIDWorkup = hasSuspectedIDorGDD && !S.teacherMaterials.size && !evalPathShows && S.priorTesting.size===0 && !hasFASDFlags;
+    const onlySuspectedIDWorkup = hasCogEvalReferral && !S.teacherMaterials.size && !evalPathShows && S.priorTesting.size===0 && !hasFASDFlags;
     const sectionTitle = onlySuspectedIDWorkup ? 'COGNITIVE / ADAPTIVE EVALUATION' : (onlyPriorTesting ? 'PRIOR TESTING REVIEWED' : 'DIAGNOSTIC WORKUP & NEXT STEPS');
     L.push(n+++'. '+sectionTitle);
     if(S.teacherMaterials.size){
@@ -3007,6 +3055,16 @@ function generateNote() {
     if((S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'){
       L.push('');
       L.push('Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: (a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite). Formal eligibility for an Intellectual Disability or Global Developmental Delay diagnosis cannot be established until both components are completed.');
+    } else if(bifIdRisk()){
+      // Same referral, different justification: nothing here asserts suspected ID.
+      // The clause names both routes by which ID can still be the answer (a
+      // comprehensive score below the ID range, or a confirmed borderline score
+      // paired with impaired adaptive functioning), which is why the adaptive
+      // measure is not optional. Kept as its own paragraph rather than sharing the
+      // suspected-ID string: different clinical claim, different reader takeaway.
+      const bifBasis=S.cogDataSource==='screener'?'Brief cognitive screening':'The current clinical impression';
+      L.push('');
+      L.push(bifBasis+' places cognitive functioning in the borderline range. This does not exclude an intellectual disability: comprehensive testing may place cognitive functioning within the intellectual disability range, and a confirmed borderline score accompanied by impaired adaptive functioning may still support that diagnosis. Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: (a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite). Until both components are completed, the borderline finding is preliminary and neither an intellectual disability nor borderline intellectual functioning can be formally established.');
     }
     // FASD considerations — exposure documentation and the ASD-differential prose
     // (council-ratified 2026-07-16, criteria-gated evidentiary sentence amended same day).
