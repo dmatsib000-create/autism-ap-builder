@@ -47,6 +47,37 @@ const CASES = [
     setup(S){ S.cogProfile=''; S.cogDataSource='comprehensive'; },
     check(a){ assert.equal(a.bifSpecifierAllowed(), false); } },
 
+  // ── bifIdRisk(): "ID not yet excluded" ──
+  // Borderline reached by a brief screener or clinical impression has NOT excluded
+  // intellectual disability (comprehensive testing may land in the ID range, and a
+  // confirmed borderline score plus impaired adaptive functioning can still support
+  // ID). Drives the summary qualifier and the confirmatory-evaluation referral.
+  // Derived only — it must never assert a specifier (see the invariant case below).
+  { name: 'ID risk: borderline + screener -> true (the KBIT-2R case)',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource='screener'; },
+    check(a){ assert.equal(a.bifIdRisk(), true); } },
+  { name: 'ID risk: borderline + clinical impression -> true',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource='clinical'; },
+    check(a){ assert.equal(a.bifIdRisk(), true); } },
+  { name: 'ID risk: borderline + comprehensive -> false (nothing left to confirm)',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource='comprehensive'; },
+    check(a){ assert.equal(a.bifIdRisk(), false); } },
+  { name: 'ID risk: borderline + prior outside eval -> false (own attribution path)',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource='priorExternal'; },
+    check(a){ assert.equal(a.bifIdRisk(), false); } },
+  { name: 'ID risk: borderline with no source -> false (nothing to qualify yet)',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource=''; },
+    check(a){ assert.equal(a.bifIdRisk(), false); } },
+  { name: 'ID risk: low-average + screener -> false (borderline only, not adjacent tiers)',
+    setup(S){ S.cogProfile='lowAverage'; S.cogDataSource='screener'; },
+    check(a){ assert.equal(a.bifIdRisk(), false); } },
+  { name: 'ID risk never asserts a specifier (derived-only invariant)',
+    setup(S){ S.cogProfile='borderline'; S.cogDataSource='screener'; },
+    check(a){ a.bifIdRisk();
+              assert.equal(a.S.specifiers.has('withSuspectedID'), false, 'ID risk must not set withSuspectedID');
+              assert.equal(a.S.specifiers.has('withBIF'), false, 'ID risk must not auto-assert withBIF');
+              assert.equal(a.currentClinicalPathway().specKey, null, 'borderline must stay un-bridged'); } },
+
   // ── currentClinicalPathway().specKey: the auto-bridge decision ──
   // Borderline is NEVER auto-bridged (specKey:null), gate open or closed
   // (Greenspan 2017) — the clinician checks withBIF manually.

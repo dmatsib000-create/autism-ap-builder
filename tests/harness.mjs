@@ -36,6 +36,10 @@ const EXPORTS = [
   // bridgeCogProfileToSpecifier) don't with the default null DOM.
   // See tests/README.md "Two test lanes".
   'bifSpecifierAllowed',
+  // Derived ID-risk predicate: borderline reached by screener/clinical impression
+  // has not excluded ID. Pure (reads S only) and deliberately NOT a specifier, so
+  // the unit lane is the only place its gating can be asserted directly.
+  'bifIdRisk',
   'currentClinicalPathway',
   // Workup-completion resolver: pure read of S.dxEvalPath + the eval*Status fields into
   // step roles, completion booleans, and the Family Resources pendingTesting predicate.
