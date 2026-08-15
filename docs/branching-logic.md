@@ -1424,7 +1424,15 @@ The `confirmable` predicate at [autism-ap-builder.html:4559](../autism-ap-builde
 
 Provenance: PR-G.
 
-**Maintainer note**: do not collapse `confirmableId` and `confirmableGdd` back into a single `confirmable`. The asymmetry is load-bearing. If a future change adds a third tier (e.g. `confirmableBif`), follow the pattern — extract the predicate, name it explicitly, route the cogVal branch through it.
+**The evaluation-referral prose is tiered the same way (fixed 2026-07-20).** The comprehensive-evaluation paragraph in Diagnostic Workup names the instruments the receiving evaluator should use, and it now branches on which specifier fired:
+
+- `withSuspectedGDD` → **developmental** tier: "comprehensive standardized developmental assessment (e.g., the Bayley-4, the Battelle Developmental Inventory 3rd ed., the Mullen Scales of Early Learning, or Griffiths III)", with the ASQ-3 / SWYC named as the insufficient screeners, adaptive measure narrowed to Vineland-3 / ABAS-3 / SIB-R (dropping the age-inappropriate DABS), and eligibility phrased for GDD alone.
+- `withSuspectedID` → **IQ** tier, unchanged: WISC-V / WPPSI-IV / DAS-II / SB-5, KBIT-2R as the insufficient screener, eligibility phrased for ID alone.
+- Both set at once is not reachable through the UI mutex but is reachable in state, so it degrades to the IQ text plus a sentence noting a developmental instrument satisfies component (a) in the younger age range.
+
+The bug this fixed: one shared paragraph asked for an IQ battery and named the KBIT-2R even when the child was a toddler or preschooler screened with an ASQ-3 — clinically wrong instruments for the age, and it contradicted the tier vocabulary the rest of the app already used (form labels, data-source popovers, the IQ/dev tier-transition guard). Tier follows the **specifier**, not `ageGroup`: the UI already age-gates the cogProfile tiers, and the specifier is what the prose is about. Locked by `suspected-preschool-gdd` (developmental) and `suspected-id-school-age` (IQ) — the latter added with this fix, because no fixture previously set `withSuspectedID` at all and the IQ arm was silently unpinned.
+
+**Maintainer note**: do not collapse `confirmableId` and `confirmableGdd` back into a single `confirmable`, and do not re-merge the two referral instrument lists. The asymmetry is load-bearing. If a future change adds a third tier (e.g. `confirmableBif`), follow the pattern — extract the predicate, name it explicitly, route the cogVal branch through it.
 
 ### 11.15 BIF priorExternal attribution
 

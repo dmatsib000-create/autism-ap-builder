@@ -31,7 +31,7 @@ Autism Evaluation: Comprehensive Evaluation Pathway:
   Referral placed. Insurance authorization required; family counseled to verify coverage and contact the UF CMS program office to initiate scheduling.
   ADOS-2 provides standardized, gold-standard observational data to inform diagnosis.
 
-Comprehensive psychological evaluation recommended to formally characterize cognitive and adaptive profiles. Required components: (a) comprehensive standardized cognitive battery (e.g., WISC-V, WPPSI-IV, DAS-II, or SB-5; brief screeners such as the KBIT-2R are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or the BASC-3 adaptive composite). Formal eligibility for an Intellectual Disability or Global Developmental Delay diagnosis cannot be established until both components are completed.
+Comprehensive psychological evaluation recommended to formally characterize developmental and adaptive profiles. Required components: (a) comprehensive standardized developmental assessment (e.g., the Bayley-4, the Battelle Developmental Inventory 3rd ed., the Mullen Scales of Early Learning, or Griffiths III; brief developmental screeners such as the ASQ-3 or SWYC are not sufficient for formal diagnosis); (b) standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, or SIB-R). Formal eligibility for a Global Developmental Delay diagnosis cannot be established until both components are completed.
 
 The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
 
