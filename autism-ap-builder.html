@@ -5050,6 +5050,13 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_suspected')&&!S.comorbid.has('ld_reading')&&!S.comorbid.has('ld_math')&&!S.comorbid.has('ld_written'))
     accomAcad.push('Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time on assessments and chunked assignments may be appropriate.');
 
+  // Do NOT re-add a legal citation to the strengths sentence. On 2026-08-21 that
+  // sentence was changed to say the IEP Team is "required to consider" strengths under
+  // Florida Rule 6A-6.03028(3)(g)1. The maintainer rejected it outright and it was
+  // reverted the same day: it is the one warm, child-centred line in the letter, and
+  // turning it into a compliance obligation cost more in tone than the leverage was
+  // worth. The rule does say the Team must consider student strengths; the letter
+  // deliberately does not say so.
   // Request-section prose for rule-out letters. Centralized here rather than written
   // out three times because all three letter surfaces print it identically; only the
   // diagnosis paragraph genuinely differs per surface (pronoun vs. name placeholder).
@@ -5119,7 +5126,7 @@ function generateIEPLetterHTML(){
     c.impacts.forEach(i=>h+=`<li>${e(i)}</li>`);
     h+=`</ul>`;
   }
-  if(S.strengths) h+=`<p>It is also important to note ${ph('{Student Name}')}'s identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${e(S.strengths)}.</p>`;
+  if(S.strengths) h+=`<p>It is also important to note ${ph('{Student Name}')}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
 
   if(S.schoolDoc==='iep'){
     h+=`<div class="aba-sec">Request for IEP Team Meeting</div>`;
@@ -5224,7 +5231,7 @@ function generateIEPLetterPlain(){
     c.impacts.forEach(i=>t+='  • '+i+'\n');
     t+='\n';
   }
-  if(S.strengths) t+=`It is also important to note ${pPoss} identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${S.strengths}.\n\n`;
+  if(S.strengths) t+=`It is also important to note ${pPoss} identified strengths, which should inform the IEP team's instructional approach: ${S.strengths}.\n\n`;
   if(S.schoolDoc==='iep'){
     t+=sep+'\nREQUEST FOR IEP TEAM MEETING\n'+sep+'\n';
     t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nUnder IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
@@ -5325,7 +5332,7 @@ async function copyIEPLetter(format){
         c.impacts.forEach(i=>h+=`<li style="margin-bottom:4px">${e(i)}</li>`);
         h+=`</ul>`;
       }
-      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note ${wph('{Student Name}')}'s identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${e(S.strengths)}.</p>`;
+      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note ${wph('{Student Name}')}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
       if(S.schoolDoc==='iep'){
         h+=`<p style="${secSt}">Request for IEP Team Meeting</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
