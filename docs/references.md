@@ -242,7 +242,7 @@ U.S. Department of Education. **Assistance to States for the Education of Childr
   - **§300.306(c)(1)(i)** — in interpreting evaluation data the agency must draw on information from a variety of sources, expressly including "information about the child's physical condition, social or cultural background, and adaptive behavior." Consumed by `ruleOutDxRest`.
   - **§300.324(b)(1)(ii)(C)** — the IEP Team must revise the IEP as appropriate to address "information about the child provided to, or by, the parents." Consumed by the `schoolDoc === 'iep'` branch.
 - **Supports the claim:** that IDEA eligibility rests on an educationally-defined disability category plus a resulting need for special education, not on any particular medical diagnosis — the load-bearing argument of the ASD-ruled-out letter.
-- **Verified:** Claude 2026-08-21, each section read in full on eCFR. Maintainer confirmation still recommended before first clinical use.
+- **Verified:** DM 2026-08-21. Read in full on eCFR by Claude the same day; maintainer reviewed and confirmed. Cleared for clinical use.
 
 **Three citation errors were found and corrected on 2026-08-21.** All three predated the ruled-out work and affected confirmed and suspected letters too:
 
@@ -280,7 +280,7 @@ Independent cross-check: the introductory text of 6A-6.0331 itself enumerates th
 - **(3)(g)1.** — the Team must consider "The strengths of the student and the concerns of the parents for enhancing the education of their student." The letter has always listed strengths; this is the rule that obliges the team to do something with them.
 
 - **Supports the claim:** the Florida-specific eligibility and procedural hooks a district in this region actually applies. Florida splits the single federal "speech or language impairment" category into two separate eligibilities (6A-6.03012 and 6A-6.030121) with different criteria and different evaluators, which is why the letter can list both.
-- **Verified:** Claude 2026-08-21 against the official rule text at flrules.org, cross-checked on Cornell LII.
+- **Verified:** DM 2026-08-21. Checked against the adopted rule text at flrules.org and cross-checked on Cornell LII by Claude the same day; maintainer reviewed and confirmed. Cleared for clinical use.
 
 **A consequential error was found and corrected on 2026-08-21.** The tool cited "Florida Rule 6A-6.0331(3)(d)" for a "60 **school** day" initial-evaluation timeline. Both halves were wrong:
 
@@ -302,7 +302,7 @@ Section 504 of the Rehabilitation Act of 1973, 29 U.S.C. §794; implementing reg
 
 - **Used for:** referenced by name, not by section number, in the `schoolDoc === '504'` branch, which argues a 504 accommodation plan may be insufficient to provide FAPE and asks the team to evaluate IEP eligibility.
 - **Supports the claim:** that a 504 plan and an IEP are different instruments with different scope and enforceability. The 504 disability definition is functional rather than diagnosis-dependent — 34 C.F.R. §104.3(j)(1) covers a person who "has a physical or mental impairment which substantially limits one or more major life activities," and §104.3(j)(2)(ii) lists learning among those activities. Part 104 still uses the term "handicapped person"; the tool does not reproduce that term.
-- **Verified:** Claude 2026-08-21, §104.3 read in full on eCFR.
+- **Verified:** DM 2026-08-21. §104.3 read in full on eCFR by Claude the same day; maintainer reviewed and confirmed. Cleared for clinical use.
 
 ---
 

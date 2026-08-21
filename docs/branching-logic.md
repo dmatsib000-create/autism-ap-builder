@@ -1311,6 +1311,12 @@ voice and attributes the district-level duty to the introductory text of Rule 6A
 is where Florida actually puts it. Note that duty sits in the rule's unnumbered preamble, so it
 is cited without a subsection number.
 
+**The suspected-diagnosis wording is a deliberate keep.** On a suspected letter the diagnosis
+sentence reads "has received a diagnosis of Autism Spectrum Disorder (ASD), suspected". This was
+raised with the maintainer on 2026-08-21 as arguably overstating certainty to a school reader, and
+the maintainer's decision was to keep it unchanged. A comment at the `dxStr` site says the same.
+Do not rewrite it to "is under evaluation for" in a cleanup pass; it reads as a defect and is not one.
+
 **Case law is deliberately absent.** CourtListener was searched during the audit. A physician
 recommendation letter argues from the regulations; citing litigation in it would misrepresent
 what the document is and invite the district to read it as a threat.

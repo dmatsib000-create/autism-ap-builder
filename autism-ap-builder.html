@@ -4669,6 +4669,12 @@ function _iepLetterContent(){
     ?'Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)'
     :'Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)';
 
+  // The suspected label reads "has received a diagnosis of Autism Spectrum Disorder
+  // (ASD), suspected" once the surfaces wrap it in their sentence. That phrasing was
+  // raised with the maintainer on 2026-08-21 as arguably overstating certainty, and
+  // the maintainer's decision was to KEEP IT AS IS. Do not "fix" this to "is under
+  // evaluation for" or similar in a cleanup pass — it reads as a defect and is not one.
+  // Reopen only if the maintainer asks.
   const dxStr=S.diagStatus==='confirmed'?'Autism Spectrum Disorder (ASD)':
     S.diagStatus==='suspected'?'Autism Spectrum Disorder (ASD), suspected':
     'concerns consistent with a neurodevelopmental condition requiring further evaluation';
