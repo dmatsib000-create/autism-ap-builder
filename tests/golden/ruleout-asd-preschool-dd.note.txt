@@ -1,0 +1,91 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Rule out Autism Spectrum Disorder
+ICD-10-CM: Z03.89
+
+Co-occurring conditions:
+  • Global Developmental Delay — provisional, formal evaluation underway (F88)
+
+── Clinical Summary ──
+
+The patient is a preschool-aged girl (3–5 years) who is using 2–3 word phrase-level communication, with cognitive functioning not yet formally assessed and mildly impaired adaptive behavior relative to chronological age. She was referred for evaluation prompting consideration of Autism Spectrum Disorder. Current findings do not meet full DSM-5 criteria for ASD; the presenting features are better accounted for by alternative explanations that are under active consideration. These findings were discussed with the family at today's visit.
+
+── Functional Needs Identified ──
+  • Communication: expressive language, receptive language
+  • Adaptive/self-care: toilet training
+  • Motor: gross motor
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Rule out Autism Spectrum Disorder (Z03.89) ──
+
+1. COGNITIVE / ADAPTIVE EVALUATION
+
+Comprehensive developmental evaluation recommended to formally characterize the developmental profile. Required component: a comprehensive standardized developmental assessment (e.g., the Bayley-4, the Battelle Developmental Inventory 3rd ed., the Mullen Scales of Early Learning, or Griffiths III; brief developmental screeners such as the ASQ-3 or SWYC are not sufficient for formal diagnosis). Formal eligibility for a Global Developmental Delay diagnosis cannot be established until this evaluation is completed.
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+2. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+Early behavioral intervention is recommended given her age and the following documented developmental impairments: expressive language delays; receptive language delays; adaptive skill impairments (toileting); motor skill impairments affecting daily functioning. ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.
+Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intervention when accessible.
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+
+3. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+4. OCCUPATIONAL THERAPY (OT)
+  • ADL training: toilet training, using task analysis and visual supports.
+  • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.
+  • Service frequency: OT services at a frequency to be determined following formal evaluation, typically 1-2 sessions per week for direct intervention. School-based and clinic-based OT address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+5. PHYSICAL THERAPY (PT)
+Evaluation and treatment targeting: gross motor skill development. Goal: improve participation in PE, playground activities, and daily physical function.
+
+6. SCHOOL / EDUCATIONAL SUPPORTS
+No IEP or 504 Plan in place. Given identified needs, IDEA evaluation recommended. Family counseled on right to submit written evaluation request to district.
+Recommended school-based services:
+  • Speech-language therapy
+  • Occupational therapy
+  • Psychoeducational evaluation recommended: comprehensive evaluation including cognitive, academic achievement, and processing domains. Family may submit written request to the school district; under IDEA, the district must evaluate within 60 days of written parental consent.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+    - Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted PE referral if indicated
+  Behavioral and Emotional Accommodations:
+    - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+7. FAMILY RESOURCES & NEXT STEPS
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  OPT-In-Early (Online Parent Training in Early Intervention)
+  Free, comprehensive, self-guided online program from the University of Connecticut for families of young children with signs of autism or other developmental concerns, including those awaiting a diagnosis. Covers 14 modules: communication, social skills, behavior, daily routines, and more. Grounded in ABA and naturalistic developmental principles. Optional modules for picky eating and toilet training.
+  https://parenttraining.chip.uconn.edu
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+RETURN TO CLINIC
+Return to clinic in 3 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

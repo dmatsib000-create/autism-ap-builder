@@ -1,0 +1,92 @@
+NOTE: This letter is a physician recommendation to be submitted by the family as supporting
+documentation for their written request. Under IDEA, the parent/guardian must also submit
+a brief separate written request to the school district.
+────────────────────────────────────────────────────────────
+
+PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
+504 Review / IEP Eligibility Request
+
+Date: {Date}
+
+{Principal / Special Education Coordinator Name}
+{School Name}
+{School Address}
+
+Re: {Student Name} | Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)
+
+Dear {Principal / Special Education Coordinator Name}:
+
+I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
+
+He was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; adaptive functioning; motor development. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document a specific learning disability in reading (dyslexia), which independently affects educational performance. Ruling out autism does not diminish the functional impairments described below, which were directly observed at this evaluation and stand independent of diagnostic labeling. Under IDEA, eligibility turns on whether the district's evaluation identifies one of the disability categories defined at 34 C.F.R. §300.8 and whether, by reason of that disability, the student needs special education and related services. A specific medical diagnosis is neither required for nor sufficient to establish eligibility. In making that determination the team must draw on information from a variety of sources, expressly including information about the student's physical condition and adaptive behavior (34 C.F.R. §300.306(c)(1)(i)), and the evaluation must be sufficiently comprehensive to identify all special education and related services needs, whether or not those needs are commonly linked to the disability category in which the student is classified (34 C.F.R. §300.304(c)(6)).
+
+Speech-language pathology, occupational therapy, and physical therapy are related services available under any IDEA eligibility category (34 C.F.R. §300.34). The communication and motor findings described in this letter support those services regardless of which category the team determines; they are not themselves eligibility categories, and the absence of an autism diagnosis does not bear on them.
+
+────────────────────────────────────────────────────────────
+EDUCATIONAL IMPACT
+────────────────────────────────────────────────────────────
+These conditions result in the following challenges that require specialized support in the educational setting:
+  • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
+  • Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.
+  • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
+  • Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.
+
+────────────────────────────────────────────────────────────
+REQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW
+────────────────────────────────────────────────────────────
+I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.
+
+Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. Autism has been ruled out at this evaluation, but IDEA eligibility does not turn on any particular medical diagnosis, and the functional impairments documented above are unchanged. I recommend the team evaluate IEP eligibility under the categories identified below.
+
+────────────────────────────────────────────────────────────
+ELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER
+────────────────────────────────────────────────────────────
+To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is a clinical steer, not a conclusion about eligibility.
+
+  • Language Impaired (Florida Rule 6A-6.030121): documented receptive and/or expressive language needs affecting access to instruction. Florida evaluates language and speech eligibility separately under the single federal category of speech or language impairment (34 C.F.R. §300.8(c)(11)).
+  • Speech Impaired (Florida Rule 6A-6.03012): documented speech-sound production and/or intelligibility needs, evaluated separately from language eligibility (34 C.F.R. §300.8(c)(11)).
+  • Specific Learning Disability (Florida Rule 6A-6.03018): documented learning disability affecting one or more academic domains (34 C.F.R. §300.8(c)(10)).
+  • Intellectual Disability (Florida Rule 6A-6.03011): cognitive and adaptive findings documented at this evaluation warrant the district's own eligibility determination (34 C.F.R. §300.8(c)(6)).
+
+────────────────────────────────────────────────────────────
+RECOMMENDED SERVICES
+────────────────────────────────────────────────────────────
+If eligible for special education services, I recommend the IEP include the following:
+
+Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
+
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: sentence formulation, topic maintenance, and narrative organization; speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness.
+
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output; adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED ACCOMMODATIONS
+────────────────────────────────────────────────────────────
+I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
+
+Structure and Predictability Accommodations:
+The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student's developmental level and individual presentation.
+  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation for students with communication, attention, and self-regulation needs
+
+Individually Indicated Accommodations Based on Evaluation Findings:
+  • Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated
+
+Behavioral and Emotional Accommodations:
+  • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+
+Academic Accommodations:
+  • Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option
+
+────────────────────────────────────────────────────────────
+Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+
+Sincerely,
+
+
+___________________________________
+{Physician Name}, MD
+UF Behavior and Development Clinic
+{Phone Number}
+
+Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

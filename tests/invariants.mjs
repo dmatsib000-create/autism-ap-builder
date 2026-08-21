@@ -241,6 +241,12 @@ check('ABA targets (sync add() targets a real checkbox)',
 // Add a field here whenever `_iepLetterContent()` returns something all three
 // surfaces must print. Fields legitimately used by only some surfaces (e.g.
 // `dxStr`, which the rule-out branch bypasses) are intentionally NOT listed.
+//
+// Known limit, same shape as the other lanes here: this is a text lint, so it
+// proves the field is MENTIONED in each surface, not that it reaches output. A
+// render line deleted but left behind as a comment would still pass. The golden
+// lane covers actual rendering for the plain surface; the preview and Word
+// surfaces have no output test, which is why presence is worth checking at all.
 const IEP_SHARED_FIELDS = [
   'ruleOutReferralTail', 'ruleOutDxRest', 'ruleOutRelatedSvcNote',
   'eligibilityCandidates', 'eligibilityLead', 'eligibilityFallback',
