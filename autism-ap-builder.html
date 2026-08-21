@@ -5048,7 +5048,7 @@ function _iepLetterContent(){
   // out three times because all three letter surfaces print it identically; only the
   // diagnosis paragraph genuinely differs per surface (pronoun vs. name placeholder).
   const ruleOutEvalRequest='{Student Name} presents with documented functional impairments that adversely affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. Under IDEA\'s child find requirement, all children with disabilities who are in need of special education and related services must be identified, located, and evaluated, expressly including children suspected of having a disability even though they are advancing from grade to grade (34 C.F.R. §300.111(a)(1)(i) and (c)(1)). Florida implements that requirement through the school districts, which the introductory text of Florida Rule 6A-6.0331 makes responsible for ensuring that all students in need of exceptional student education are identified, located, and evaluated. No medical diagnosis is required to trigger that obligation, and either a parent or the district may initiate a request for an initial evaluation (34 C.F.R. §300.301(b)). I am requesting a comprehensive multidisciplinary evaluation to determine educational eligibility and appropriate services.';
-  const ruleOutAsk504='Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. Autism has been ruled out at this evaluation, but IDEA eligibility does not turn on any particular medical diagnosis, and the functional impairments documented above are unchanged. I recommend the team evaluate IEP eligibility under the categories identified below.';
+  const ruleOutAsk504='Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). Autism has been ruled out at this evaluation, but IDEA eligibility does not turn on any particular medical diagnosis, and the functional impairments documented above are unchanged. I recommend the team evaluate IEP eligibility under the categories identified below.';
   // For a student who already holds an IEP under the Autism category when autism is
   // ruled out. The risk this sentence exists to prevent is a district treating the
   // changed diagnosis as grounds to drop eligibility rather than to re-categorize it.
@@ -5113,19 +5113,19 @@ function generateIEPLetterHTML(){
     c.impacts.forEach(i=>h+=`<li>${e(i)}</li>`);
     h+=`</ul>`;
   }
-  if(S.strengths) h+=`<p>It is also important to note ${ph('{Student Name}')}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
+  if(S.strengths) h+=`<p>It is also important to note ${ph('{Student Name}')}'s identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${e(S.strengths)}.</p>`;
 
   if(S.schoolDoc==='iep'){
     h+=`<div class="aba-sec">Request for IEP Team Meeting</div>`;
     h+=`<p>I understand that ${ph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
-    h+=`<p>Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)), the IEP team must revise the IEP as appropriate to address information about the child provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+    h+=`<p>Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
     if(c.ruledOut) h+=`<p>${ph(e(c.ruleOutIEPCategoryReview))}</p>`;
   } else if(S.schoolDoc==='504'){
     h+=`<div class="aba-sec">Request for IEP Eligibility Evaluation and/or 504 Review</div>`;
     h+=`<p>I understand that ${ph('{Student Name}')} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether ${ph('{Student Name}')} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.</p>`;
     h+=(c.ruledOut
       ?`<p>${e(c.ruleOutAsk504)}</p>`
-      :`<p>Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate ${ph('{Student Name}')}'s eligibility for special education services under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
+      :`<p>Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend that the school evaluate ${ph('{Student Name}')}'s eligibility for special education services under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
   } else {
     h+=`<div class="aba-sec">Request for Special Education Evaluation</div>`;
     // The 60-school-day timeline, FBA, and psychoeducational paragraphs below apply to
@@ -5218,15 +5218,15 @@ function generateIEPLetterPlain(){
     c.impacts.forEach(i=>t+='  • '+i+'\n');
     t+='\n';
   }
-  if(S.strengths) t+=`It is also important to note ${pPoss} identified strengths, which should inform the IEP team's instructional approach: ${S.strengths}.\n\n`;
+  if(S.strengths) t+=`It is also important to note ${pPoss} identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${S.strengths}.\n\n`;
   if(S.schoolDoc==='iep'){
     t+=sep+'\nREQUEST FOR IEP TEAM MEETING\n'+sep+'\n';
-    t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nUnder IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)), the IEP team must revise the IEP as appropriate to address information about the child provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
+    t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nUnder IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
     if(c.ruledOut) t+=c.ruleOutIEPCategoryReview+'\n\n';
   } else if(S.schoolDoc==='504'){
     t+=sep+'\nREQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW\n'+sep+'\n';
     t+=`I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.\n\n`;
-    t+=(c.ruledOut?c.ruleOutAsk504:`Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).`)+'\n\n';
+    t+=(c.ruledOut?c.ruleOutAsk504:`Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend that the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).`)+'\n\n';
   } else {
     t+=sep+'\nREQUEST FOR SPECIAL EDUCATION EVALUATION\n'+sep+'\n';
     // The 60-school-day timeline, FBA, and psychoeducational paragraphs apply to
@@ -5319,18 +5319,18 @@ async function copyIEPLetter(format){
         c.impacts.forEach(i=>h+=`<li style="margin-bottom:4px">${e(i)}</li>`);
         h+=`</ul>`;
       }
-      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note ${wph('{Student Name}')}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
+      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note ${wph('{Student Name}')}'s identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: ${e(S.strengths)}.</p>`;
       if(S.schoolDoc==='iep'){
         h+=`<p style="${secSt}">Request for IEP Team Meeting</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
-        h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)), the IEP team must revise the IEP as appropriate to address information about the child provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+        h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
         if(c.ruledOut) h+=`<p style="margin-bottom:10px">${wph(e(c.ruleOutIEPCategoryReview))}</p>`;
       } else if(S.schoolDoc==='504'){
         h+=`<p style="${secSt}">Request for IEP Eligibility Evaluation and/or 504 Review</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether ${wph('{Student Name}')} meets eligibility for an IEP under IDEA, which provides more comprehensive and legally enforceable services than a 504 accommodation plan.</p>`;
         h+=(c.ruledOut
           ?`<p style="margin-bottom:10px">${e(c.ruleOutAsk504)}</p>`
-          :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend the school evaluate ${wph('{Student Name}')}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
+          :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend the school evaluate ${wph('{Student Name}')}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
       } else {
         h+=`<p style="${secSt}">Request for Special Education Evaluation</p>`;
         h+=(c.ruledOut

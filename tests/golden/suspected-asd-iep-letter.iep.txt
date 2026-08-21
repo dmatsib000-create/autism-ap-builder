@@ -4,7 +4,7 @@ a brief separate written request to the school district.
 ────────────────────────────────────────────────────────────
 
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
-IEP Review Request
+Initial Special Education Evaluation Request
 
 Date: {Date}
 
@@ -12,13 +12,13 @@ Date: {Date}
 {School Name}
 {School Address}
 
-Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 1 (requiring support)
+Re: {Student Name} | Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)
 
 Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-They have received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 1 (requiring support) (with borderline intellectual functioning (BIF) (per prior outside evaluation; supporting records not available for direct review at this visit)), confirmed at the evaluation referenced above.
+They have received a diagnosis of Autism Spectrum Disorder (ASD), suspected (ICD-10-CM: Z03.89), as documented at the evaluation referenced above.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
@@ -26,24 +26,31 @@ EDUCATIONAL IMPACT
 These conditions result in the following challenges that require specialized support in the educational setting:
   • Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.
   • Behavior: Inflexibility with routine changes and transitions that causes significant distress and limits engagement with non-preferred tasks.
+  • Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.
+
+It is also important to note their identified strengths, which the IEP Team is required to consider under Florida Rule 6A-6.03028(3)(g)1. and which should inform the team's instructional approach: strong visual memory, persistence with preferred tasks, and kindness toward younger children.
 
 ────────────────────────────────────────────────────────────
-REQUEST FOR IEP TEAM MEETING
+REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
-I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
+Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+Under IDEA (34 C.F.R. §300.301(c)(1)) and Florida Rule 6A-6.0331(3)(g), the school district must complete the initial evaluation within 60 calendar days of receiving written parental consent, excluding the periods the Florida rule specifies (school holidays and breaks, summer vacation, and student absences beyond eight school days). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
+
+A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
 ────────────────────────────────────────────────────────────
-I recommend the following updates to the current IEP:
+If eligible for special education services, I recommend the IEP include the following:
 
 Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
 
-Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: sentence formulation, topic maintenance, and narrative organization; social-pragmatic language: conversational turn-taking, perspective-taking in academic discussion, and understanding classroom social discourse.
-
 Counseling and Social-Emotional Support Services: School-based counseling is recommended to address the social-emotional and behavioral regulation needs documented above. Goals: coping skills for flexibility and transition management; social skill generalization in the school environment, reinforcing goals targeted in specialized social skills instruction.
+
+Visual Supports and Visual Schedules: Visual supports are a research-supported, ASD-specific accommodation that significantly improve predictability, independence, and behavioral regulation. Recommended visual supports include: a daily visual schedule (individual desk copy and classroom display), visual task sequences for multi-step activities, visual transition warnings (timer with visual cue), and visual rules and expectations posted in the classroom. Visual supports should be developed in collaboration with the SLP and/or OT and implemented consistently across all school settings including specials, lunch, and recess.
+
+Functional Behavior Assessment (FBA): An FBA is recommended to identify the function (purpose) of interfering behaviors and to develop an individualized, function-based Behavior Intervention Plan (BIP). Behaviors warranting FBA: rigidity and difficulty with transitions. I recommend that the FBA be conducted by a Board-Certified Behavior Analyst (BCBA) or a school-based behavior specialist with documented training in functional behavior assessment, and include direct observation, ABC data collection, and structured interviews with caregivers and teachers. The resulting BIP should be implemented consistently by all school staff and reviewed regularly by the IEP team based on collected data, with formal review recommended at minimum every quarter.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -54,6 +61,9 @@ Core ASD-Related Accommodations:
 The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
+
+Individually Indicated Accommodations Based on Evaluation Findings:
+  • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
 
 Behavioral and Emotional Accommodations:
   • Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)

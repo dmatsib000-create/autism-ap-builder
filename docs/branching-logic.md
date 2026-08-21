@@ -1287,6 +1287,13 @@ suspected letters as well:
 
 The Autism-category ask now also carries Florida Rule 6A-6.03023 alongside §300.8(c)(1).
 
+**Florida Rule 6A-6.03028 was added 2026-08-21**, after the maintainer asked whether it applied. It does, and
+it had been missing: it is the Florida rule governing FAPE and IEP development, which is the letter's whole
+subject. Three provisions are now cited — `(1)` entitlement to FAPE (which expressly reaches a student who is
+advancing from grade to grade), `(3)(j)2.c.` the Team's duty to revise the IEP to address information provided
+by the parents, and `(3)(g)1.` the Team's duty to consider student strengths and parent concerns. Each was
+chosen because it turns something the letter asks for into something the district owes.
+
 **Adopted text only.** Every Florida rule cited was read from the document linked under its
 flrules.org "Latest version of the final adopted rule presented in Florida Administrative Code"
 header, never from a Notice of Proposed Rule, and each carries a recorded effective date
