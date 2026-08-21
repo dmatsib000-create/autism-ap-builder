@@ -265,6 +265,7 @@ Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-
 | 6A-6.03012 | 7/1/2010 | ESE Eligibility for Students with Speech Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Speech Services | Speech Impaired candidate |
 | 6A-6.030121 | 1/7/2016 | ESE Eligibility for Students with Language Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Language Services | Language Impaired candidate |
 | 6A-6.030152 | 12/15/2009 | ESE Eligibility for Students with Other Health Impairment | Other Health Impaired candidate |
+| 6A-6.03016 | 12/15/2009 | ESE Eligibility for Students with Emotional/Behavioral Disabilities | Emotional/Behavioral Disability candidate |
 | 6A-6.03018 | 1/7/2016 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
 | 6A-6.03023 | 4/1/2015 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
 | 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate |
@@ -272,6 +273,8 @@ Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-
 | 6A-1.0943 | 7/14/2021 | Statewide Assessment for Students with Disabilities | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
 
 Independent cross-check: the introductory text of 6A-6.0331 itself enumerates the ESE eligibility rules by number, and every rule number this tool cites appears in that list.
+
+**Citation density was deliberately reduced on 2026-08-21.** A ruled-out letter carried 17 legal citations against 2 in a confirmed-autism letter. The maintainer's direction was to cite "as a pediatrician would and not a lawyer, in a way that increases likelihood of collaboration." In-prose citations were cut to the few that carry real weight and reframed in a collaborative register; category citations now appear only in the eligibility list, where they route a referral rather than argue a case, and each carries its Florida rule alone since that is the one a Florida district operates under. The letter now carries 10. Several federal sections remain verified and documented here but are no longer surfaced in the letter — that is intentional, not drift.
 
 **6A-6.03028 was added on 2026-08-21 after the maintainer asked whether it was relevant.** It was not cited before, and it should have been: it is the Florida rule that governs FAPE and IEP development, which is the entire subject of this letter. Three provisions now carry citations, each chosen because it converts something the letter merely asks for into something the district owes:
 

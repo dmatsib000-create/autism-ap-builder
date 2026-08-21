@@ -18,6 +18,17 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
+────────────────────────────────────────────────────────────
+WHAT I AM ASKING THE TEAM TO CONSIDER
+────────────────────────────────────────────────────────────
+In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.
+
+  • Complete a comprehensive multidisciplinary evaluation to determine eligibility for special education services.
+  • Consider the services and accommodations described below, to the extent the team's own evaluation supports them.
+  • Note the Florida evaluation timeline: 60 calendar days from written parental consent, with the exclusions the rule allows.
+
+Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.
+
 They have received a diagnosis of Autism Spectrum Disorder (ASD), suspected (ICD-10-CM: Z03.89), as documented at the evaluation referenced above.
 
 ────────────────────────────────────────────────────────────
@@ -35,7 +46,7 @@ REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
 Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Under IDEA (34 C.F.R. §300.301(c)(1)) and Florida Rule 6A-6.0331(3)(g), the school district must complete the initial evaluation within 60 calendar days of receiving written parental consent, excluding the periods the Florida rule specifies (school holidays and breaks, summer vacation, and student absences beyond eight school days). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
+For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).
 
@@ -69,7 +80,7 @@ Behavioral and Emotional Accommodations:
   • Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.
 
 Sincerely,
 

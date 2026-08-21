@@ -4730,7 +4730,7 @@ function _iepLetterContent(){
     : coDxs.length===1
     ? ` The evaluation did, however, document ${coDxs[0]}, which independently affects educational performance.`
     : ` The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: ${coDxs.join('; ')}.`;
-  ruleOutDxRest+=' Ruling out autism does not diminish the functional impairments described below, which were directly observed at this evaluation and stand independent of diagnostic labeling. Under IDEA, eligibility turns on whether the district\'s evaluation identifies one of the disability categories defined at 34 C.F.R. §300.8 and whether, by reason of that disability, the student needs special education and related services. A specific medical diagnosis is neither required for nor sufficient to establish eligibility. In making that determination the team must draw on information from a variety of sources, expressly including information about the student\'s physical condition and adaptive behavior (34 C.F.R. §300.306(c)(1)(i)), and the evaluation must be sufficiently comprehensive to identify all special education and related services needs, whether or not those needs are commonly linked to the disability category in which the student is classified (34 C.F.R. §300.304(c)(6)).';
+  ruleOutDxRest+=' I want to be clear that ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district\'s evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school\'s own observations of this student across the day.';
 
   // Related-services note (SLP/OT/PT council amendment). Once autism is off the table,
   // sensory, motor, and communication findings are routinely dismissed by teams on the
@@ -4744,7 +4744,7 @@ function _iepLetterContent(){
     ? roRelatedDomains.slice(0,-1).join(', ')+' and '+roRelatedDomains[roRelatedDomains.length-1]
     : roRelatedDomains[0];
   const ruleOutRelatedSvcNote=ruledOut&&roRelatedDomains.length
-    ? `Speech-language pathology, occupational therapy, and physical therapy are related services available under any IDEA eligibility category (34 C.F.R. §300.34). The ${roRelatedDomainStr} findings described in this letter support those services regardless of which category the team determines; they are not themselves eligibility categories, and the absence of an autism diagnosis does not bear on them.`
+    ? `One point I would not want lost: speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The ${roRelatedDomainStr} findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.`
     : '';
 
   // ─── Candidate IDEA eligibility categories (rule-out letters only) ─────────
@@ -4759,23 +4759,25 @@ function _iepLetterContent(){
   const eligibilityCandidates=[];
   if(ruledOut){
     if(S.comorbid.has('language_disorder')||S.needsComm.has('expressive')||S.needsComm.has('receptive')||S.needsComm.has('functional_aac')||['nonverbal','singleWord','phrase'].includes(S.langLevel))
-      eligibilityCandidates.push('Language Impaired (Florida Rule 6A-6.030121): documented receptive and/or expressive language needs affecting access to instruction. Florida evaluates language and speech eligibility separately under the single federal category of speech or language impairment (34 C.F.R. §300.8(c)(11)).');
+      eligibilityCandidates.push('Language Impaired (Florida Rule 6A-6.030121): documented receptive and/or expressive language needs affecting access to instruction. Florida evaluates language and speech eligibility separately, so both may be worth considering.');
     // Speech and language eligibility are evaluated separately, by different personnel
     // and against different criteria; a student can qualify for one and not the other.
     if(S.needsComm.has('oral_motor')||hasSpeechSoundErrors()||hasReducedIntell())
-      eligibilityCandidates.push('Speech Impaired (Florida Rule 6A-6.03012): documented speech-sound production and/or intelligibility needs, evaluated separately from language eligibility (34 C.F.R. §300.8(c)(11)).');
+      eligibilityCandidates.push('Speech Impaired (Florida Rule 6A-6.03012): documented speech-sound production and/or intelligibility needs, evaluated separately from language eligibility.');
     if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('epilepsy')||S.comorbid.has('sleep_disorder'))
-      eligibilityCandidates.push('Other Health Impaired (Florida Rule 6A-6.030152): limited strength, vitality, or alertness with respect to the educational environment, due to a chronic or acute health condition documented at this evaluation, that adversely affects educational performance. The federal definition names attention deficit hyperactivity disorder and epilepsy among qualifying conditions (34 C.F.R. §300.8(c)(9)).');
+      eligibilityCandidates.push('Other Health Impaired (Florida Rule 6A-6.030152): limited strength, vitality, or alertness with respect to the educational environment, due to a chronic or acute health condition documented at this evaluation, that adversely affects educational performance. Attention-deficit/hyperactivity disorder and epilepsy are named among qualifying conditions in this category.');
     if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_math')||S.comorbid.has('ld_written'))
-      eligibilityCandidates.push('Specific Learning Disability (Florida Rule 6A-6.03018): documented learning disability affecting one or more academic domains (34 C.F.R. §300.8(c)(10)).');
+      eligibilityCandidates.push('Specific Learning Disability (Florida Rule 6A-6.03018): documented learning disability affecting one or more academic domains.');
     else if(S.comorbid.has('ld_suspected'))
-      eligibilityCandidates.push('Specific Learning Disability, suspected (Florida Rule 6A-6.03018): the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility (34 C.F.R. §300.8(c)(10)).');
+      eligibilityCandidates.push('Specific Learning Disability, suspected (Florida Rule 6A-6.03018): the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility.');
     if(hasID()||S.specifiers.has('withID'))
-      eligibilityCandidates.push('Intellectual Disability (Florida Rule 6A-6.03011): cognitive and adaptive findings documented at this evaluation warrant the district\'s own eligibility determination (34 C.F.R. §300.8(c)(6)).');
+      eligibilityCandidates.push('Intellectual Disability (Florida Rule 6A-6.03011): cognitive and adaptive findings documented at this evaluation warrant the district\'s own eligibility determination.');
     // Florida caps developmental delay at completion of grade 2 (Rule 6A-6.03027), which the
     // ageGroup buckets cannot see. The candidate states the limit so the team applies it.
+    if((S.comorbid.has('anxiety')||S.comorbid.has('depression'))&&(S.emotionalReg||S.needsBehavior.size))
+      eligibilityCandidates.push('Emotional/Behavioral Disability (Florida Rule 6A-6.03016): documented internalizing symptoms alongside difficulty with emotional regulation in the school setting. Whether these have persisted over a long enough period and to a marked enough degree to meet this category is the team\'s determination, not a conclusion of this evaluation.');
     if(S.ageGroup==='preschool'||S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD'))
-      eligibilityCandidates.push('Developmental Delay (Florida Rule 6A-6.03027): Florida makes this category available for children ages three through nine, or through completion of grade 2, whichever occurs first (34 C.F.R. §300.8(b)).');
+      eligibilityCandidates.push('Developmental Delay (Florida Rule 6A-6.03027): Florida makes this category available for children ages three through nine, or through completion of grade 2, whichever occurs first.');
   }
   const eligibilityLead=eligibilityCandidates.length
     ? 'To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is a clinical steer, not a conclusion about eligibility.'
@@ -5060,12 +5062,25 @@ function _iepLetterContent(){
   // Request-section prose for rule-out letters. Centralized here rather than written
   // out three times because all three letter surfaces print it identically; only the
   // diagnosis paragraph genuinely differs per surface (pronoun vs. name placeholder).
-  const ruleOutEvalRequest='{Student Name} presents with documented functional impairments that adversely affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. Under IDEA\'s child find requirement, all children with disabilities who are in need of special education and related services must be identified, located, and evaluated, expressly including children suspected of having a disability even though they are advancing from grade to grade (34 C.F.R. §300.111(a)(1)(i) and (c)(1)). Florida implements that requirement through the school districts, which the introductory text of Florida Rule 6A-6.0331 makes responsible for ensuring that all students in need of exceptional student education are identified, located, and evaluated. No medical diagnosis is required to trigger that obligation, and either a parent or the district may initiate a request for an initial evaluation (34 C.F.R. §300.301(b)). I am requesting a comprehensive multidisciplinary evaluation to determine educational eligibility and appropriate services.';
+  const ruleOutEvalRequest='{Student Name} presents with documented functional impairments that affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. I am asking the team to complete a comprehensive multidisciplinary evaluation to determine eligibility and appropriate services. It may help to note that IDEA\'s child find requirement reaches a student suspected of having a disability even when that student is advancing from grade to grade (34 C.F.R. §300.111(c)(1)), so passing grades need not delay the evaluation.';
   const ruleOutAsk504='Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). Autism has been ruled out at this evaluation, but IDEA eligibility does not turn on any particular medical diagnosis, and the functional impairments documented above are unchanged. I recommend the team evaluate IEP eligibility under the categories identified below.';
   // For a student who already holds an IEP under the Autism category when autism is
   // ruled out. The risk this sentence exists to prevent is a district treating the
   // changed diagnosis as grounds to drop eligibility rather than to re-categorize it.
   const ruleOutIEPCategoryReview='If {Student Name}\'s current eligibility is held under the Autism category, the team should review whether a different category better reflects the present findings. Services should continue on the basis of documented need while that review is underway; a change in diagnostic conclusion is not a basis for reducing or discontinuing supports the student still requires.';
+
+  const askLines=[];
+  if(S.schoolDoc==='iep') askLines.push('Convene the IEP Team to review and update the current IEP in light of the findings below.');
+  else if(S.schoolDoc==='504') askLines.push('Review the current 504 Plan, and consider whether this student now meets eligibility for an IEP.');
+  else askLines.push('Complete a comprehensive multidisciplinary evaluation to determine eligibility for special education services.');
+  if(ruledOut&&(eligibilityCandidates.length||eligibilityFallback)) askLines.push('Consider the eligibility categories listed below, which this evaluation supports looking at. Autism is not among them.');
+  if(S.schoolSvc.size) askLines.push('Consider the services and accommodations described below, to the extent the team\'s own evaluation supports them.');
+  if(S.schoolDoc!=='iep') askLines.push('Note the Florida evaluation timeline: 60 calendar days from written parental consent, with the exclusions the rule allows.');
+  const askLead='In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.';
+  // Never promises the physician's attendance -- the office triages and the
+  // physician decides case by case. Promising presence the clinic cannot deliver
+  // costs more credibility over repeated letters than the offer gains on one.
+  const contactLine='Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.';
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
@@ -5075,7 +5090,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,askLines,askLead,contactLine,
     ruleOutReferralTail,ruleOutDxRest,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
@@ -5104,6 +5119,13 @@ function generateIEPLetterHTML(){
   h+=`<p style="margin:12px 0 8px">Dear ${ph('{Principal / Special Education Coordinator Name}')}:</p>`;
   h+=`<p>I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${ph('{Student Name}')} on ${ph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
 
+  if(c.askLines.length){
+    h+=`<div class="aba-sec">What I Am Asking the Team to Consider</div>`;
+    h+=`<p>${e(c.askLead)}</p><ul>`;
+    c.askLines.forEach(a=>h+=`<li>${e(a)}</li>`);
+    h+=`</ul><p>${ph(e(c.contactLine))}</p>`;
+  }
+
   let dxPara;
   if(c.ruledOut){
     dxPara=`${ph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
@@ -5131,7 +5153,7 @@ function generateIEPLetterHTML(){
   if(S.schoolDoc==='iep'){
     h+=`<div class="aba-sec">Request for IEP Team Meeting</div>`;
     h+=`<p>I understand that ${ph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
-    h+=`<p>Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+    h+=`<p>Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
     if(c.ruledOut) h+=`<p>${ph(e(c.ruleOutIEPCategoryReview))}</p>`;
   } else if(S.schoolDoc==='504'){
     h+=`<div class="aba-sec">Request for IEP Eligibility Evaluation and/or 504 Review</div>`;
@@ -5147,7 +5169,7 @@ function generateIEPLetterHTML(){
     h+=(c.ruledOut
       ?`<p>${ph(e(c.ruleOutEvalRequest))}</p>`
       :`<p>Based on the above diagnosis and identified educational impact, I strongly recommend that ${ph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
-    h+=`<p>Under IDEA (34 C.F.R. §300.301(c)(1)) and Florida Rule 6A-6.0331(3)(g), the school district must complete the initial evaluation within 60 calendar days of receiving written parental consent, excluding the periods the Florida rule specifies (school holidays and breaks, summer vacation, and student absences beyond eight school days). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+    h+=`<p>For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
     if(S.schoolSvc.has('fba')) h+=`<p>A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${ph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
     if(S.schoolSvc.has('psychoed')) h+=`<p>A comprehensive psychoeducational evaluation is recommended to characterize ${ph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
   }
@@ -5181,7 +5203,7 @@ function generateIEPLetterHTML(){
     if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul>`;c.accomAcad.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
   }
 
-  h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if the team believes my participation would be helpful. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
+  h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
   h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${ph('{Phone Number}')}</div>`;
   h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review and signature before submission. Complete all {placeholder} fields before sending.</p>`;
   h+=`<p class="aba-caveat">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${ph('{Date of Evaluation}')}</p>`;
@@ -5210,6 +5232,12 @@ function generateIEPLetterPlain(){
   t+=`Re: {Student Name} | ${c.reLineLabel}\n\n`;
   t+=`Dear {Principal / Special Education Coordinator Name}:\n\n`;
   t+=`I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
+  if(c.askLines.length){
+    t+=sep+'\nWHAT I AM ASKING THE TEAM TO CONSIDER\n'+sep+'\n';
+    t+=c.askLead+'\n\n';
+    c.askLines.forEach(a=>t+='  • '+a+'\n');
+    t+='\n'+c.contactLine+'\n\n';
+  }
   let dxPara;
   if(c.ruledOut){
     dxPara=`${pCap} ${v3('was')}${c.ruleOutReferralTail} ${c.ruleOutDxRest}`;
@@ -5234,7 +5262,7 @@ function generateIEPLetterPlain(){
   if(S.strengths) t+=`It is also important to note ${pPoss} identified strengths, which should inform the IEP team's instructional approach: ${S.strengths}.\n\n`;
   if(S.schoolDoc==='iep'){
     t+=sep+'\nREQUEST FOR IEP TEAM MEETING\n'+sep+'\n';
-    t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nUnder IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
+    t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nFlorida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
     if(c.ruledOut) t+=c.ruleOutIEPCategoryReview+'\n\n';
   } else if(S.schoolDoc==='504'){
     t+=sep+'\nREQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW\n'+sep+'\n';
@@ -5245,7 +5273,7 @@ function generateIEPLetterPlain(){
     // The 60-school-day timeline, FBA, and psychoeducational paragraphs apply to
     // rule-out letters too — procedural asks, not diagnosis-dependent claims.
     t+=(c.ruledOut?c.ruleOutEvalRequest:`Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.`)+'\n\n';
-    t+=`Under IDEA (34 C.F.R. §300.301(c)(1)) and Florida Rule 6A-6.0331(3)(g), the school district must complete the initial evaluation within 60 calendar days of receiving written parental consent, excluding the periods the Florida rule specifies (school holidays and breaks, summer vacation, and student absences beyond eight school days). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.\n\n`;
+    t+=`For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.\n\n`;
     if(S.schoolSvc.has('fba')) t+=`A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).\n\n`;
     if(S.schoolSvc.has('psychoed')) t+=`A comprehensive psychoeducational evaluation is recommended to characterize {Student Name}'s academic achievement and cognitive processing profile.\n\n`;
   }
@@ -5277,7 +5305,7 @@ function generateIEPLetterPlain(){
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
   }
   t+=sep+'\n';
-  t+=`Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
+  t+=`Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
   return t;
 }
 
@@ -5311,6 +5339,12 @@ async function copyIEPLetter(format){
       h+=`<p style="margin:0 0 4px">${wph('{Principal / Special Education Coordinator Name}')}<br>${wph('{School Name}')}<br>${wph('{School Address}')}</p>`;
       h+=`<p style="margin:14px 0 8px">Dear ${wph('{Principal / Special Education Coordinator Name}')}:</p>`;
       h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
+      if(c.askLines.length){
+        h+=`<p style="${secSt}">What I Am Asking the Team to Consider</p>`;
+        h+=`<p style="margin-bottom:8px">${e(c.askLead)}</p><ul style="margin:4px 0 4px 20px">`;
+        c.askLines.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);
+        h+=`</ul><p style="margin-bottom:10px">${wph(e(c.contactLine))}</p>`;
+      }
       let dxPara;
       if(c.ruledOut){
         dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
@@ -5336,7 +5370,7 @@ async function copyIEPLetter(format){
       if(S.schoolDoc==='iep'){
         h+=`<p style="${secSt}">Request for IEP Team Meeting</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
-        h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+        h+=`<p style="margin-bottom:10px">Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
         if(c.ruledOut) h+=`<p style="margin-bottom:10px">${wph(e(c.ruleOutIEPCategoryReview))}</p>`;
       } else if(S.schoolDoc==='504'){
         h+=`<p style="${secSt}">Request for IEP Eligibility Evaluation and/or 504 Review</p>`;
@@ -5349,7 +5383,7 @@ async function copyIEPLetter(format){
         h+=(c.ruledOut
           ?`<p style="margin-bottom:10px">${wph(e(c.ruleOutEvalRequest))}</p>`
           :`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that ${wph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
-        h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §300.301(c)(1)) and Florida Rule 6A-6.0331(3)(g), the school district must complete the initial evaluation within 60 calendar days of receiving written parental consent, excluding the periods the Florida rule specifies (school holidays and breaks, summer vacation, and student absences beyond eight school days). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+        h+=`<p style="margin-bottom:10px">For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
         if(S.schoolSvc.has('fba')) h+=`<p style="margin-bottom:10px">A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${wph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
         if(S.schoolSvc.has('psychoed')) h+=`<p style="margin-bottom:10px">A comprehensive psychoeducational evaluation is recommended to characterize ${wph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
       }
@@ -5379,7 +5413,7 @@ async function copyIEPLetter(format){
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
-      h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
+      h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
       h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${wph('{Phone Number}')}</div>`;
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;

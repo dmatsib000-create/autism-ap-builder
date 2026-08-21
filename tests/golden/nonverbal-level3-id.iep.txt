@@ -18,6 +18,16 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
+────────────────────────────────────────────────────────────
+WHAT I AM ASKING THE TEAM TO CONSIDER
+────────────────────────────────────────────────────────────
+In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.
+
+  • Convene the IEP Team to review and update the current IEP in light of the findings below.
+  • Consider the services and accommodations described below, to the extent the team's own evaluation supports them.
+
+Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.
+
 She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 3 (requiring very substantial support) (with accompanying intellectual disability), confirmed at the evaluation referenced above.
 
 [Note to clinician: The "with intellectual disability" specifier is checked but no ID severity (Mild, Moderate, Severe) is selected in the Cognitive Profile section of the tool. Please select a severity so accommodation recommendations specific to the level of intellectual disability render correctly in this letter.]
@@ -36,7 +46,7 @@ REQUEST FOR IEP TEAM MEETING
 ────────────────────────────────────────────────────────────
 I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
 
-Under IDEA (34 C.F.R. §300.324(b)(1)(ii)(C)) and Florida Rule 6A-6.03028(3)(j)2.c., the IEP Team must revise the IEP as appropriate to address information about the student provided by the parents, which includes the evaluation enclosed with this letter. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
@@ -77,7 +87,7 @@ Behavioral and Emotional Accommodations:
   • Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that food selectivity in ASD is sensory-based and not volitional
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.
 
 Sincerely,
 
