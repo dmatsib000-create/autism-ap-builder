@@ -221,42 +221,71 @@ Hoyme HE, Kalberg WO, Elliott AJ, et al. **Updated Clinical Guidelines for Diagn
 
 ## 9. Education law — IDEA and Florida ESE rules
 
-These are the regulatory citations the IEP letter puts in front of a school district. They are not clinical literature, but they carry the same do-not-invent rule and the same consequence for being wrong: a district that checks a citation and finds it does not say what the letter implies discounts the whole letter. Every citation below is surfaced by section number and subject only — the tool never paraphrases regulatory text as if quoting it.
+These are the regulatory citations the IEP letter puts in front of a school district. They are not clinical literature, but they carry the same do-not-invent rule and a sharper consequence for being wrong: a district that checks a citation and finds it does not say what the letter implies discounts the whole letter. Every citation is surfaced by section number and subject only — the tool never paraphrases regulatory text as if quoting it.
 
-All `Verified:` fields in this section are blank. **These citations surfaced in a Claude session and have not been confirmed by the maintainer against the current C.F.R. and Florida Administrative Code text.** Confirm before signing a letter that carries them.
+**Verification method.** Each federal section below was read in full on eCFR (the official, continuously updated C.F.R.) on 2026-08-21, against Title 34 as amended through 7/24/2026. The Florida rules were read from the official rule text published by the Florida Department of State at flrules.org and cross-checked against Cornell LII. Case law was searched on CourtListener and deliberately **not** cited: a physician recommendation letter argues from the regulations, and citing litigation in it would misrepresent what the document is.
 
 ### `[idea-34cfr300]` — IDEA Part B implementing regulations
 
-U.S. Department of Education. **Assistance to States for the Education of Children with Disabilities**, 34 C.F.R. Part 300.
+U.S. Department of Education. **Assistance to States for the Education of Children with Disabilities**, 34 C.F.R. Part 300. Read at <https://www.ecfr.gov/current/title-34/subtitle-B/chapter-III/part-300>.
 
 - **Used for**, by section:
-  - **§300.8** — definition of "child with a disability" and the eligibility categories. Subsections used: `(b)` Developmental Delay (ages 3 through 9, at State and district discretion), `(c)(1)` Autism, `(c)(6)` Intellectual Disability, `(c)(9)` Other Health Impairment, `(c)(10)` Specific Learning Disability, `(c)(11)` Speech or Language Impairment. Consumed by the derived eligibility candidates and the Autism-category ask in `_iepLetterContent()` and all three IEP letter surfaces.
-  - **§300.34** — related services. Consumed by the rule-out related-services note (`ruleOutRelatedSvcNote`), which tells a district that SLP, OT, and PT are available under any eligibility category.
-  - **§300.111** — child find. Consumed by `ruleOutEvalRequest`.
-  - **§§300.301–302** — initial evaluations and timelines. Consumed by the evaluation-request paragraph on every letter other than the `schoolDoc === 'iep'` branch.
-  - **§300.304(c)(6)** — the evaluation must be sufficiently comprehensive to identify all special education and related services needs, whether or not commonly linked to the disability category. Consumed by the rule-out diagnosis paragraph (`ruleOutDxRest`).
-  - **§300.324(b)(1)** — parent may request an IEP team meeting to review and revise the IEP. Consumed by the `schoolDoc === 'iep'` branch.
-- **Supports the claim:** that IDEA eligibility rests on a documented disability adversely affecting educational performance rather than on any particular medical diagnosis — the load-bearing argument of the ASD-ruled-out letter — and that the district owes an evaluation and a categorized eligibility determination regardless of what the physician did or did not diagnose. See [branching-logic.md §10.3](branching-logic.md#103-asd-ruled-out-framing).
-- **Verified:**
+  - **§300.8(a)(1)** — "child with a disability" means a child evaluated as having one of the listed impairments "and who, by reason thereof, needs special education and related services." Both prongs. Consumed by the rule-out diagnosis paragraph (`ruleOutDxRest`).
+  - **§300.8(b)** — developmental delay, ages three through nine or a subset, subject to §300.111(b). Consumed by the Developmental Delay eligibility candidate.
+  - **§300.8(c)(1)** Autism, **(c)(6)** Intellectual disability, **(c)(9)** Other health impairment, **(c)(10)** Specific learning disability, **(c)(11)** Speech or language impairment. Consumed by the eligibility candidates and the Autism-category ask.
+  - **§300.34(a)** — related services expressly include "speech-language pathology and audiology services... physical and occupational therapy." Consumed by `ruleOutRelatedSvcNote`.
+  - **§300.111(a)(1)(i) and (c)(1)** — child find; (c)(1) expressly reaches children suspected of having a disability "even though they are advancing from grade to grade." Consumed by `ruleOutEvalRequest`.
+  - **§300.301(b)** — either a parent or the public agency may request an initial evaluation. **§300.301(c)(1)** — the 60-day evaluation timeline, or the State's timeframe where the State sets one. Consumed by `ruleOutEvalRequest` and the evaluation-timeline paragraph.
+  - **§300.304(c)(6)** — the evaluation must be "sufficiently comprehensive to identify all of the child's special education and related services needs, whether or not commonly linked to the disability category in which the child has been classified." Consumed by `ruleOutDxRest`.
+  - **§300.306(c)(1)(i)** — in interpreting evaluation data the agency must draw on information from a variety of sources, expressly including "information about the child's physical condition, social or cultural background, and adaptive behavior." Consumed by `ruleOutDxRest`.
+  - **§300.324(b)(1)(ii)(C)** — the IEP Team must revise the IEP as appropriate to address "information about the child provided to, or by, the parents." Consumed by the `schoolDoc === 'iep'` branch.
+- **Supports the claim:** that IDEA eligibility rests on an educationally-defined disability category plus a resulting need for special education, not on any particular medical diagnosis — the load-bearing argument of the ASD-ruled-out letter.
+- **Verified:** Claude 2026-08-21, each section read in full on eCFR. Maintainer confirmation still recommended before first clinical use.
+
+**Three citation errors were found and corrected on 2026-08-21.** All three predated the ruled-out work and affected confirmed and suspected letters too:
+
+| Was | Problem | Now |
+|---|---|---|
+| `34 C.F.R. §§300.301–302` for the evaluation timeline | §300.302 is "Screening for instructional purposes is not evaluation." It says nothing about timelines. | `34 C.F.R. §300.301(c)(1)` |
+| `34 C.F.R. §300.324(b)(1)` for "a parent may request an IEP team meeting at any time" | §300.324(b)(1) does not say that. It obligates the team to review at least annually and to revise the IEP to address enumerated matters. The proposition is real but lives in OSEP commentary, not in this section. | `34 C.F.R. §300.324(b)(1)(ii)(C)`, with the sentence rewritten to the team's obligation to address information provided by the parents — accurate, and a stronger hook for an enclosed evaluation |
+| "limited alertness to educational stimuli" for OHI | Inverts the definition. The regulation reads "limited strength, vitality, or alertness, including a heightened alertness to environmental stimuli, that results in limited alertness with respect to the educational environment." | Wording now tracks §300.8(c)(9), and notes that ADHD and epilepsy are named in the regulation itself |
 
 ### `[fl-ese-rules]` — Florida State Board of Education ESE rules
 
-Florida Administrative Code, Rule Chapter 6A-6 (Special Programs) and Rule 6A-1.0943 (Statewide Assessment for Students with Disabilities).
+Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-1.0943. Read at <https://www.flrules.org>.
 
-- **Used for:**
-  - **Rule 6A-6.03018** — Specific Learning Disabilities eligibility. Consumed by the suspected-SLD educational-impact bullet, the `psychoed` service block, and the SLD eligibility candidate.
-  - **Rule 6A-6.0331(3)(d)** — 60-school-day initial evaluation timeline. Consumed by the evaluation-request paragraph.
-  - **Rule 6A-1.0943** — Florida Alternate Assessment. Consumed by the `sped` service block and `accomIDMod`, both gated on confirmed intellectual disability.
-- **Supports the claim:** the Florida-specific procedural and eligibility hooks a district in this region will actually apply. These are the only state-law citations in the tool. The eligibility-category candidates deliberately cite the federal definitions instead, because the maintainer does not have the Florida rule number for every category in hand and the do-not-invent rule forbids guessing them.
-- **Verified:**
+| Rule | Title | Used for |
+|---|---|---|
+| 6A-6.0331(3)(g) | General Education Intervention Procedures, Evaluation, Determination of Eligibility, Reevaluation and the Provision of Exceptional Student Education Services | Initial-evaluation timeline. Current version effective 9/23/2025. |
+| 6A-6.03011 | ESE Eligibility for Students with Intellectual Disabilities | Intellectual Disability candidate |
+| 6A-6.03012 | ESE Eligibility for Students with Speech Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Speech Services | Speech Impaired candidate |
+| 6A-6.030121 | ESE Eligibility for Students with Language Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Language Services | Language Impaired candidate |
+| 6A-6.030152 | ESE Eligibility for Students with Other Health Impairment | Other Health Impaired candidate |
+| 6A-6.03018 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
+| 6A-6.03023 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
+| 6A-6.03027 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate |
+| 6A-1.0943 | Statewide Assessment for Students with Disabilities (effective 7/14/2021) | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
+
+- **Supports the claim:** the Florida-specific eligibility and procedural hooks a district in this region actually applies. Florida splits the single federal "speech or language impairment" category into two separate eligibilities (6A-6.03012 and 6A-6.030121) with different criteria and different evaluators, which is why the letter can list both.
+- **Verified:** Claude 2026-08-21 against the official rule text at flrules.org, cross-checked on Cornell LII.
+
+**A consequential error was found and corrected on 2026-08-21.** The tool cited "Florida Rule 6A-6.0331(3)(d)" for a "60 **school** day" initial-evaluation timeline. Both halves were wrong:
+
+- **(3)(d)** is the general-education-intervention documentation requirement, not a timeline.
+- **(3)(f)** does carry a 60-school-day rule, but only for consent signed **on or before June 30, 2015**. It is a legacy provision.
+- **(3)(g)** is the operative rule: initial evaluations must be completed within **sixty (60) calendar days** of the district's receipt of parent consent, excluding school holidays and breaks, summer vacation, and student absences beyond eight school days, with a limited extension for district closure due to inclement weather or natural disaster (added effective 9/23/2025).
+
+Sixty school days is roughly three calendar months; sixty calendar days is about two. Every evaluation-request letter the tool produced before this fix handed the district a month it does not have.
+
+**Watch item:** a rule development notice for **6A-6.030121** (Language Impairments) published 3/16/2026 (Vol. 52/51) proposes amendments. Not effective as of 2026-08-21. Re-check that rule number before relying on it long-term.
 
 ### `[section-504]` — Section 504 of the Rehabilitation Act
 
 Section 504 of the Rehabilitation Act of 1973, 29 U.S.C. §794; implementing regulations at 34 C.F.R. Part 104.
 
-- **Used for:** referenced by name (not by section number) in the `schoolDoc === '504'` branch of the IEP letter, which argues a 504 accommodation plan may be insufficient to provide FAPE and asks the team to evaluate IEP eligibility.
-- **Supports the claim:** that a 504 plan and an IEP are different instruments with different scope and enforceability, which is the premise of the 504-branch ask.
-- **Verified:**
+- **Used for:** referenced by name, not by section number, in the `schoolDoc === '504'` branch, which argues a 504 accommodation plan may be insufficient to provide FAPE and asks the team to evaluate IEP eligibility.
+- **Supports the claim:** that a 504 plan and an IEP are different instruments with different scope and enforceability. The 504 disability definition is functional rather than diagnosis-dependent — 34 C.F.R. §104.3(j)(1) covers a person who "has a physical or mental impairment which substantially limits one or more major life activities," and §104.3(j)(2)(ii) lists learning among those activities. Part 104 still uses the term "handicapped person"; the tool does not reproduce that term.
+- **Verified:** Claude 2026-08-21, §104.3 read in full on eCFR.
 
 ---
 

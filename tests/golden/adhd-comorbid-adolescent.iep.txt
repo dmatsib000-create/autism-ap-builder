@@ -32,7 +32,7 @@ REQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW
 ────────────────────────────────────────────────────────────
 I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.
 
-Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).
+Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
