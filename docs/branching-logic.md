@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `1e44b43`
+> **Last verified against commit:** `4bcf228`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -218,7 +218,7 @@ This doc primarily describes how state on `S` shapes output. When you need to **
 3. Add the key + ICD code to the per-comorbid mapping inside `_iepLetterContent()` (look for the comorbidity-phrase loop near line 3362)
 4. Add a row to the A&P note's co-occurring conditions builder
 5. If the comorbidity should fire a therapy rule, add the trigger condition inside the relevant `rule*()` (e.g., add `S.comorbid.has('newKey')` to `rulePsychiatry`'s OR-chain)
-6. If it warrants IEP-letter accommodations, add an entry to the `accomBeh` table (§10.6) via the per-comorbid switch
+6. If it warrants IEP-letter accommodations, add an entry to the `accomBeh` table (§10.8) via the per-comorbid switch
 7. Update [§6.1 reference table](#61-comorbidity-reference-table) in this doc
 8. Bump the "Last verified against commit" SHA
 
@@ -231,7 +231,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `abaHours` | string | [§1.2](#12-the-s-object--property-reference), [§9.6](#96-settings-and-hours) |
 | `abaSetting` | Set | [§9.6](#96-settings-and-hours) |
 | `abaTargets` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds) |
-| `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.9](#109-psychoeducational-evaluation-auto-recommendation) |
+| `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.15](#1015-psychoeducational-evaluation-auto-recommendation) |
 | `adaptiveStandardized` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `adaptProfile` | string | [§1.2](#12-the-s-object--property-reference) |
 | `ag` | Set | [§1.2](#12-the-s-object--property-reference) |
@@ -280,16 +280,16 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `safety` | Set | [§9.5](#95-safety-urgency-clause), [§7.2](#72-the-18-rules-at-a-glance) |
 | `schoolDoc` | string | [§5.3](#53-the-iep-hard-gates) |
 | `schoolPlacement` | string | [§1.2](#12-the-s-object--property-reference) |
-| `schoolSvc` | Set | [§10.5](#105-service-rationale-blocks) |
-| `schoolSvcAuto` / `schoolSvcManualOff` | Set | [§10.8](#108-the-schoolsvcauto--schoolsvcmanualoff-tracking) |
+| `schoolSvc` | Set | [§10.11](#1011-service-rationale-blocks) |
+| `schoolSvcAuto` / `schoolSvcManualOff` | Set | [§10.14](#1014-the-schoolsvcauto--schoolsvcmanualoff-tracking) |
 | `seizureConcern` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
 | `sleepStudy` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
-| `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.7](#107-specifier-edge-cases) |
+| `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.13](#1013-specifier-edge-cases) |
 | `strengths` | string | [§1.2](#12-the-s-object--property-reference) |
 | `teacherMaterials` | Set | [§1.2](#12-the-s-object--property-reference), [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `teacherMaterialsReturned` | Set | [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `therapyStatus` | object | [§1.2](#12-the-s-object--property-reference) |
-| `traumaIncludeInIEP` | boolean | [§6.4](#64-the-trauma-iep-gate), [§10.3](#103-trauma-opt-in-gate) |
+| `traumaIncludeInIEP` | boolean | [§6.4](#64-the-trauma-iep-gate), [§10.9](#109-trauma-opt-in-gate) |
 | `unevenCog` / `unevenCogDesc` | boolean / string | [§1.2](#12-the-s-object--property-reference) |
 | `visitType` | string | [§1.2](#12-the-s-object--property-reference) |
 
@@ -315,7 +315,7 @@ The branches below all read `S.ageGroup` directly or via a helper like `isYoung(
 |---|---|---|---|
 | IEP tab visibility | 3938 | `ageGroup !== 'toddler'` (plus `schoolDoc !== ''`) | Hide IEP tab for toddlers |
 | School-section Part B band in the note | ~3120–3200 | `ageGroup !== 'toddler'` | Toddlers (IDEA Part C) get only the Early Steps bullet ("age under 36 months" + promptness caveat) and a Part C→Part B transition line; the placement / IEP-doc / school-services band, the IEP/504 accommodations, the SLP/OT "school-based vs clinic-based" clauses, and the concurrent-billing note are all suppressed |
-| `syncSchoolSvcFromNeeds()` toddler gate | ~6150 | `ageGroup === 'toddler'` → early return | No Part B school services are auto-populated for toddlers (see [§10.9](#109-psychoeducational-evaluation-auto-recommendation)) |
+| `syncSchoolSvcFromNeeds()` toddler gate | ~6150 | `ageGroup === 'toddler'` → early return | No Part B school services are auto-populated for toddlers (see [§10.15](#1015-psychoeducational-evaluation-auto-recommendation)) |
 | §"School & Educational Supports" form section hidden + dynamic folios | end of `updateAgeBasedVisibility()` | `ageGroup === 'toddler'` | The whole form section (`sh-school`'s `.section` wrapper) is hidden, stale Part B state is torn down (placement, doc, services + DOM controls), and the **visible section folios are resequenced** over the canonical 9-id list so toddlers see a contiguous 1–8. Nothing reads `.sec-folio` (dot/summary logic keys on `sh-*` ids), so the renumber is display-only — keep it that way |
 | NDBI vs FBA prose in ABA letter | 2067–2068 | `isYoung()` → NDBI; `'schoolAge'` → FBA | Letter language shifts |
 | Cognitive-profile tier age gates | 4494, 4505, 4517 | `young` hides ID tier + BIF radios; `older` hides GDD tier | DSM-5/AACAP: ID/BIF require IQ testing (unreliable <5); GDD doesn't apply ≥5. Teardown clears `cogProfile` and calls `bridgeCogProfileToSpecifier('')` to drop the matching specifier |
@@ -679,8 +679,8 @@ The medical-necessity paragraph's `reasons` array remains unchanged by adding AD
 **Step 5 — IEP letter** (if visible):
 
 - Diagnosis label paragraph appends ADHD per §10.2.
-- Educational impact bullets (§10.4) may add ADHD-specific framing.
-- `accomBeh` (§10.6) adds: *extended time, preferential seating, chunked assignments*.
+- Educational impact bullets (§10.6) may add ADHD-specific framing.
+- `accomBeh` (§10.8) adds: *extended time, preferential seating, chunked assignments*.
 
 **Step 6 — Removing the comorbidity:**
 
@@ -1047,7 +1047,7 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `functional_comm` | `needsComm.has('expressive') \|\| needsComm.has('receptive') \|\| needsComm.has('functional_aac')` |
 | `safety_skills` | `needsAdaptive.has('commSafety') \|\| needsAdaptive.has('commIndependence')` |
 | `menstrual_care` | `needsAdaptive.has('menstrualCare')` |
-| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA). For school-age and up, the academic *concern* instead routes to the `psychoed` school eval — see [§10.9](#109-psychoeducational-evaluation-auto-recommendation) |
+| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA). For school-age and up, the academic *concern* instead routes to the `psychoed` school eval — see [§10.15](#1015-psychoeducational-evaluation-auto-recommendation) |
 | `joint_attention` + `imitation` | `isYoung() && (needsSocial.size > 0 \|\| needsComm.size > 0)` |
 | `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` — gated to the repetitive-movement/speech criterion or disruptive vocalizations only. The former `needsBehavior.size > 0` catch-all was removed (council 2026-06-02, §4 review Unit 1 D2): it made *any* interfering behavior (aggression, elopement, SIB, noncompliance) add a stereotypy-reduction target. `vocalDisruption`'s function (stereotypy vs. communicative/attention-maintained) is an FBA determination. |
 | `reduce_pica` | `needsBehavior.has('pica')` |
@@ -1168,16 +1168,267 @@ const reLineLabel = S.diagStatus === 'confirmed'
   ? 'Autism Spectrum Disorder (ICD-10: F84.0)' + (levelLabel ? ' — ' + levelLabel : '')
   : S.diagStatus === 'suspected'
   ? 'Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)'
-  : 'Neurodevelopmental evaluation (ICD-10: Z03.89)';
+  : 'Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)';
 ```
 
 | `S.diagStatus` | Code | Label |
 |---|---|---|
 | `'confirmed'` | F84.0 | "Autism Spectrum Disorder (ICD-10: F84.0) — Level X (...)" |
 | `'suspected'` | Z03.89 | "Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)" |
-| `'ruleOut'` | Z03.89 | "Neurodevelopmental evaluation (ICD-10: Z03.89)" |
+| `'ruleOut'` | Z03.89 | "Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)" |
 
-### 10.3 Trauma opt-in gate
+On rule-out letters the preview HTML also drops the `Diagnosis:` prefix from the `Re:` line — the label there records that no diagnosis was assigned, and "Diagnosis: ... not diagnosed" reads as a contradiction.
+
+### 10.3 ASD-ruled-out framing
+
+Everything in this subsection is gated on one local flag at the top of `_iepLetterContent()`:
+
+```javascript
+const ruledOut = S.diagStatus === 'ruleOut';
+```
+
+The problem it solves: before this gate existed, a rule-out letter asserted autism in
+several places (the "Core ASD-Related Accommodations" heading, the ASD-specific social
+skills and visual-supports service blocks, the ESY regression argument, the feeding
+accommodation) while its own diagnosis paragraph said a diagnosis was still pending. The
+A&P note (`autism-ap-builder.html`, the `ruleOut` branch of the clinical summary) says the
+opposite — that full DSM-5 criteria are not met — so the letter contradicted both itself
+and the chart. Council review 2026-08-21 (clinical psychology / ESE / SLP / OT / PT): a
+district team reading "diagnosis pending" defers and waits for a diagnosis that will never
+arrive. State the negative plainly and once, then pivot to the functional findings.
+
+**Diagnosis paragraph.** Built from two pieces so all three letter surfaces render the same
+prose: `ruleOutReferralTail` (the subject-dependent opening — the plain-text surface prefixes
+a pronoun through `v3()`, HTML and Word prefix the `{Student Name}` placeholder) and
+`ruleOutDxRest` (subject-free sentences). The rest carries, in order: criteria formally
+considered and not met **at this evaluation** (time-anchored so the chart does not foreclose
+re-evaluation); the co-occurring diagnoses `coDxs` — which the pre-gate code silently dropped
+on rule-out letters, losing the letter's strongest documented anchor; and the pivot to IDEA,
+which conditions eligibility on an educationally-defined category plus a resulting need for
+special education, not on any particular medical diagnosis (34 C.F.R. §§300.8(a)(1),
+300.304(c)(6), 300.306(c)(1)(i)).
+
+**Related-services note** (`ruleOutRelatedSvcNote`). Fires when communication, sensory, or
+motor findings are present; the domain list in the sentence is built from which of those
+actually fired, so the letter never claims a motor finding it does not have. It exists
+because SLP/OT/PT needs are routinely dismissed once autism is off the table on the grounds
+that none of them names an eligibility category. They do not have to: therapy is a related
+service under any category (34 C.F.R. §300.34).
+
+**Candidate eligibility categories** (`eligibilityCandidates`). Rule-out letters only; renders
+as its own "Eligibility Categories for the Team to Consider" section after the request section
+in all three surfaces. Replaces a bracketed clinician instruction that pushed the work back
+onto the clinician.
+
+| Candidate | Derived from | Cite |
+|---|---|---|
+| Language Impaired | `comorbid.has('language_disorder')`, any `needsComm` expressive/receptive/AAC, or `langLevel` in nonverbal/singleWord/phrase | §300.8(c)(11); Fla. Rule 6A-6.030121 |
+| Speech Impaired | `needsComm.has('oral_motor')`, `hasSpeechSoundErrors()`, `hasReducedIntell()` | §300.8(c)(11); Fla. Rule 6A-6.03012 |
+| Other Health Impaired | `hasConfirmedADHD()`, `adhd_suspected`, `epilepsy`, `sleep_disorder` | §300.8(c)(9); Fla. Rule 6A-6.030152 |
+| Specific Learning Disability | confirmed `ld_reading`/`ld_math`/`ld_written`; else `ld_suspected` renders the suspected variant | §300.8(c)(10); Fla. Rule 6A-6.03018 |
+| Intellectual Disability | `hasID()` or `specifiers.has('withID')` | §300.8(c)(6); Fla. Rule 6A-6.03011 |
+| Emotional/Behavioral Disability | (`anxiety` or `depression`) **and** (`S.emotionalReg` or any `needsBehavior`) | Fla. Rule 6A-6.03016 |
+| Developmental Delay | `ageGroup === 'preschool'`, `withGDD`, or `withSuspectedGDD` | §300.8(b); Fla. Rule 6A-6.03027 |
+
+Speech Impaired and Language Impaired are listed separately because **Florida** splits the single
+federal "speech or language impairment" category (§300.8(c)(11)) into two eligibilities with
+different criteria and different evaluators; a student can qualify for one and not the other.
+
+The Developmental Delay candidate states Florida's ceiling — ages three through nine **or through
+completion of grade 2, whichever occurs first** — quoted from the adopted 9/20/2022 text of Rule
+6A-6.03027 (the amendment that widened the rule from three-through-five and renamed it). The `ageGroup` buckets cannot
+see grade level, so the limit is stated in the letter for the team to apply rather than gated in
+code. Note also that under §300.111(b) it is the *State* that adopts the term and its age range;
+an LEA may not adopt it independently. Florida has adopted it.
+
+**Emotional/Behavioral Disability is derived, as of 2026-08-21.** It was originally omitted on the
+reasoning that districts weight physician language heavily and an EBD determination carries
+placement and disciplinary consequences. The maintainer overrode that: the category is valid and
+should be available. It is derived conservatively — an anxiety or depression diagnosis alone does
+not fire it, because the category turns on duration and degree this tool does not capture. It
+fires only when an internalizing diagnosis coexists with documented dysregulation or interfering
+behaviour, and the entry says plainly that duration and degree are the team's determination
+rather than a conclusion of the evaluation. Autism is still never listed — the letter just ruled
+it out.
+
+**Fallback.** When nothing derives, `eligibilityFallback` renders a clinician bracket instead, so
+the letter is never silent on category.
+
+**Request-section variants.** Three centralized strings, printed identically by all three surfaces:
+
+| String | Fires when | Replaces |
+|---|---|---|
+| `ruleOutEvalRequest` | `schoolDoc` is `iep_needed` or `neither` | The "diagnosis pending" paragraph; anchors on child find, including §300.111(c)(1)'s express reach to children "advancing from grade to grade" — the usual ground a district uses to decline a passing student — plus §300.301(b) on who may request an evaluation |
+| `ruleOutAsk504` | `schoolDoc === '504'` | The Autism-category eligibility ask |
+| `ruleOutIEPCategoryReview` | `schoolDoc === 'iep'` | Nothing — new. Tells the team to re-categorize an existing Autism-category IEP rather than treat the changed diagnosis as grounds to drop eligibility |
+
+The 60-school-day timeline paragraph and the FBA and psychoeducational paragraphs now print on
+rule-out letters too. They are procedural asks, not diagnosis-dependent claims, and the pre-gate
+code withheld them from rule-out letters for no defensible reason.
+
+**Service-block variants.** `social_skills_school` drops "autism-specific"; `esy` re-anchors the
+regression argument to documented level of need rather than to ASD; `visual` describes visual
+supports as research-supported for students with communication, attention, and self-regulation
+needs rather than as ASD-specific; the `language_disorder` SLP goal drops its "distinct from
+ASD" contrast; and the generic feeding accommodation drops "in ASD" from its explanation of
+sensory-based selectivity. Each is a one-line ternary at the point of use — the ask survives
+unchanged, only the claim about autism is removed.
+
+### 10.4 The opening request paragraph
+
+Council review 2026-08-21 found the letter buried its ask: a reader met the title, a dense
+diagnosis paragraph and the whole educational-impact section before reaching the request at line
+35 of 105. `requestPara` now states the request as an ordinary second opening paragraph, in all
+three surfaces, immediately after the salutation.
+
+**It was first built as a bulleted block headed "What I Am Asking the Team to Consider", and the
+maintainer rejected that on sight.** The reasons are worth keeping, because they generalise to any
+future addition to this letter: every other heading here is a noun phrase, so a first-person
+sentence heading broke the register; the lead line narrated the document to its own reader, which
+a consultant letter does not do; and the bullets were imperatives — *Complete… Consider… Note the…*
+— which is a physician issuing instructions to a school team, the precise opposite of the
+collaborative tone the rest of this work was aiming at. Prose, no heading, no bullets.
+
+The closing clause is assembled as `reqTailStr` rather than a comma-joined list, so the sentence
+stays grammatical whichever combination fires: a bare full stop, "together with X", or "together
+with X and Y". The first attempt produced a run-on with no conjunction, and made the
+IEP-already-in-place branch say "described below" twice in consecutive sentences.
+
+Contact routing lives in the closing paragraph only, and routes to the **practice**, never to the
+individual physician, and never promises attendance. The maintainer's instruction was that the team
+reach out to the office and the physician decides case by case from there. The council's ESE
+director had reached the same place from the other direction: an offer of presence the clinic
+cannot honour costs more credibility across repeated letters than it gains on any one.
+
+### 10.5 Repetition control: which surface owns an ask
+
+A ruled-out letter was once asking for the same thing many times over: the FBA eight times, the
+psychoeducational evaluation seven, visual supports five, and both the evaluation request and the
+60-day timeline twice each. Repetition does not read as thoroughness to a district team; it trains
+them to skim, which costs the asks that appear only once.
+
+Two rules now decide who owns an ask, and the distinction between them is the important part:
+
+**Accommodation versus accommodation — the fuller one wins.** `needsBehavior.has('rigidity')`
+suppresses the short `schedItem` core accommodation, because the detailed "Transition supports"
+bullet in `accomBeh` says everything it says and more. Safe because both land on the *same*
+accommodations page of the IEP, so nothing is lost in transcription. This applies to every letter,
+not only ruled-out ones.
+
+**Service versus accommodation — both render, deliberately.** A suppression keyed on
+`schoolSvc.has('visual')` / `has('sensory')` was built and then **reverted on 2026-08-21 at the
+maintainer's direction.** Services and accommodations land on *different pages* of an IEP and are
+decided in different parts of the meeting; the general-education teacher who implements day to day
+may only ever read the accommodations page. An ask that exists solely inside a services paragraph
+can be lost in transcription, and that failure is more expensive than the repetition. Do not
+re-introduce that suppression.
+
+Genuine duplicates were removed instead: the request section no longer restates the ask or the
+timeline (the opening paragraph carries both), and its FBA and psychoeducational paragraphs are
+gone because they fired on conditions identical to their Recommended Services blocks. The
+suspected-SLD educational-impact bullet states impact only; its recommendation lives in Services.
+
+### 10.6 Assessment Results (free-text instrument summaries)
+
+`S.iepInstruments` is a single free-text field in the School section, rendered verbatim as an
+"Assessment Results" section **between the diagnosis paragraph and Educational Impact** — evidence,
+then interpretation. IEP letter only: it does not touch the A&P note or the ABA letter.
+
+**Free text was chosen deliberately over structured entry.** Instruments vary enormously (WISC-V
+indices, Vineland domains, BASC scales, CTOPP, WIAT), a form covering them would be large to build
+and worse to fill in at the end of a clinic day, and the resulting data-entry burden was the
+maintainer's stated concern. One box, clinician-structured. Do not "improve" this into a structured
+capture without asking.
+
+Interior line breaks are preserved — the clinician's own layout is the point of a free-text field —
+so the HTML and Word surfaces convert `
+` to `<br>` after escaping, and the plain surface inserts
+the text as-is. The value is trimmed so a trailing newline from a paste does not render an empty
+paragraph.
+
+The field carries the standard PHI hint plus a **year-only** reminder for test dates, since an exact
+administration date is the obvious thing to paste in and is PHI under this project's rules.
+
+It is independent of `priorTestingCite`: that sentence names ASD screeners the clinician marked
+"consistent" and is suppressed on ruled-out letters, whereas this is whatever the clinician chose to
+report. Both may appear on the same letter without conflict.
+
+The IEP signature block no longer emits `{Phone Number}` — the clinician pastes a signature line
+that already carries it (maintainer, 2026-08-21). The ABA letter never had one.
+
+### 10.7 Citation register: pediatrician, not lawyer
+
+A ruled-out letter carried 17 legal citations; a confirmed-autism letter carried 2. The maintainer's
+direction was to cite "as a pediatrician would and not a lawyer, in a way that increases likelihood
+of collaboration." The letter now carries 10.
+
+Kept: the eligibility pivot (one citation, not three), child find reaching a student advancing from
+grade to grade, related services under any category, and the Florida evaluation timeline. Each
+establishes something a team may not already know. Dropped: parallel federal citations for duties
+already cited under a Florida rule, procedural citations aimed at the school rather than the family,
+and the federal category definitions inside eligibility entries — those entries now carry their
+Florida rule alone, which is the one a Florida district operates under.
+
+The survivors were also reframed. "The district must" became "it may help to note." The sections
+remain verified in [references.md §9](references.md#9-education-law--idea-and-florida-ese-rules)
+even where the letter no longer surfaces them: dropping a citation from the prose is not retiring it.
+
+### 10.8 Citation audit (2026-08-21)
+
+Every regulatory citation in the IEP letter was read against the official source on 2026-08-21 —
+federal sections on eCFR, Florida rules on flrules.org cross-checked against Cornell LII. Full
+record in [references.md §9](references.md#9-education-law--idea-and-florida-ese-rules). Four
+errors were found; three of them predated the ruled-out work and were reaching confirmed and
+suspected letters as well:
+
+| Was | Now | Why it mattered |
+|---|---|---|
+| `Fla. Rule 6A-6.0331(3)(d)`, "60 **school** days" | `6A-6.0331(3)(g)`, "60 **calendar** days" | (3)(d) is the general-education-intervention requirement, not a timeline. The 60-school-day rule is (3)(f) and applies only to consent signed on or before 6/30/2015. Sixty school days is ~3 calendar months against the real ~2 — the letter was handing districts a month they do not have. |
+| `34 C.F.R. §§300.301–302` | `§300.301(c)(1)` | §300.302 is "Screening for instructional purposes is not evaluation" and says nothing about timelines. |
+| `§300.324(b)(1)` for "a parent may request an IEP team meeting at any time" | `§300.324(b)(1)(ii)(C)`, sentence rewritten | The section does not say that. It obligates the team to revise the IEP to address information provided by the parents — accurate, and a stronger hook for an enclosed evaluation. |
+| OHI candidate: "limited alertness to educational stimuli" | Tracks §300.8(c)(9) | The original inverted the definition, which is limited strength/vitality/alertness *with respect to the educational environment*. |
+
+The Autism-category ask now also carries Florida Rule 6A-6.03023 alongside §300.8(c)(1).
+
+**Florida Rule 6A-6.03028 was added 2026-08-21**, after the maintainer asked whether it applied. It does, and
+it had been missing: it is the Florida rule governing FAPE and IEP development, which is the letter's whole
+subject. Two provisions are cited — `(1)` entitlement to FAPE (which expressly reaches a student who is advancing from
+grade to grade), and `(3)(j)2.c.` the Team's duty to revise the IEP to address information provided by the
+parents. Both were chosen because they turn something the letter asks for into something the district owes.
+
+A third, `(3)(g)1.` (the Team must consider student strengths), was briefly added to the strengths sentence and
+**reverted the same day at the maintainer's direction**. The strengths sentence is the one warm, child-centred
+line in a letter that already carries 17 legal citations, and turning it into a compliance obligation cost more
+in tone than the leverage was worth. Do not re-add it.
+
+**Adopted text only.** Every Florida rule cited was read from the document linked under its
+flrules.org "Latest version of the final adopted rule presented in Florida Administrative Code"
+header, never from a Notice of Proposed Rule, and each carries a recorded effective date
+(references.md §9). Federal sections were read on eCFR, whose Recent Changes view shows no
+amendment to 34 C.F.R. Part 300 since 8/10/2017.
+
+A multi-rule **Notice of Rule Development** published 3/16/2026 touches 6A-6.030121,
+6A-6.03018, and 6A-6.0331. It is development-stage — not proposed, not adopted, not effective —
+and nothing from it is cited here. Florida rulemaking runs Development, then Proposed, then
+Final; only a Final notice changes what this tool should say.
+
+One wording consequence of reading the text closely: §300.111(a)(1) is framed as a **State**
+obligation, not a district one. `ruleOutEvalRequest` therefore states child find in the passive
+voice and attributes the district-level duty to the introductory text of Rule 6A-6.0331, which
+is where Florida actually puts it. Note that duty sits in the rule's unnumbered preamble, so it
+is cited without a subsection number.
+
+**The suspected-diagnosis wording is a deliberate keep.** On a suspected letter the diagnosis
+sentence reads "has received a diagnosis of Autism Spectrum Disorder (ASD), suspected". This was
+raised with the maintainer on 2026-08-21 as arguably overstating certainty to a school reader, and
+the maintainer's decision was to keep it unchanged. A comment at the `dxStr` site says the same.
+Do not rewrite it to "is under evaluation for" in a cleanup pass; it reads as a defect and is not one.
+
+**Case law is deliberately absent.** CourtListener was searched during the audit. A physician
+recommendation letter argues from the regulations; citing litigation in it would misrepresent
+what the document is and invite the district to read it as a threat.
+
+### 10.9 Trauma opt-in gate
 
 `autism-ap-builder.html:3384, 3636`:
 
@@ -1189,7 +1440,7 @@ if (S.comorbid.has('trauma') && S.traumaIncludeInIEP) {
 
 Default behavior: trauma is **omitted** from the IEP letter even when present in `S.comorbid`. The clinician must check `traumaIncludeInIEP` to include it. When included, the IEP letter preview displays a banner at the top warning that trauma content is present in the educational record (`autism-ap-builder.html:3636–3638`). See [§6.4](#64-the-trauma-iep-gate) for the rationale.
 
-### 10.4 Educational impact bullets
+### 10.10 Educational impact bullets
 
 `autism-ap-builder.html:3388–3416` builds an array of impact bullets, each gated on a different domain. The bullets become the "Educational Impact" section of the letter.
 
@@ -1204,7 +1455,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | SLD (confirmed) | `comorbid.has('ld_reading' \| 'ld_math' \| 'ld_written')` | Domain-specific SLD impact |
 | SLD (suspected) | `comorbid.has('ld_suspected')` + no confirmed domains | Recommend psychoed eval to characterize domain |
 
-### 10.5 Service rationale blocks
+### 10.11 Service rationale blocks
 
 `autism-ap-builder.html:3437–3544` builds the `svContent` object, with one block per service the IEP letter recommends. Each block fires when its membership condition holds in `schoolSvc`.
 
@@ -1214,25 +1465,41 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care |
 | Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
-| Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult) |
+| Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
 | 1:1 Paraprofessional | `aide` | Elopement risk + behavior safety + communication access + adaptive deficits |
-| Extended School Year | `esy` | Regression risk over long breaks |
+| Extended School Year | `esy` | Regression risk over long breaks. When `ruledOut`, the argument re-anchors to documented level of need rather than to ASD |
 | Low Student-to-Teacher Ratio | `lowRatio` | Sensory regulation + individualized pacing + behavioral consistency |
 | Sensory accommodations | `sensory` | Developed with OT; noise-canceling, sensory breaks, calm space |
-| Visual supports | `visual` | Schedules, task sequences, transition warnings |
+| Visual supports | `visual` | Schedules, task sequences, transition warnings. When `ruledOut`, described as research-supported for students with communication, attention, and self-regulation needs rather than as ASD-specific |
 | Functional Behavior Assessment | `fba` | Conducted by BCBA; lists behavioral concerns by type |
 | Psychoeducational evaluation | `psychoed` | IQ + academic achievement + SLD eligibility determination |
 | Specialized academic instruction | `sped` | Calibrated to present level; **if `hasID() && specifiers.has('withID')`**: append "consider modified curriculum, FAA (Florida Alternate Assessment), transition planning" |
 
 The recommendations are coordinated — checking `aide` for a child with `safety.has('elopement_counsel')` produces a paragraph that explicitly cites the elopement risk as the rationale.
 
-### 10.6 Accommodations
+### 10.12 Accommodations
 
 Four accommodation groups, each populated conditionally:
 
-**`accomCore`** (`autism-ap-builder.html:3558–3560`) — Universal ASD-specific. Every IEP letter includes these unless the clinician explicitly removes them:
-- Predictable daily schedule with advance notice
-- Visual supports calibrated to developmental level
+**`accomCore`** — two items: a predictable daily schedule with advance transition notice, and visual supports calibrated to developmental level. **Their gating depends on diagnostic conclusion.**
+
+On confirmed and suspected-ASD letters they fire unconditionally, under the heading "Core ASD-Related Accommodations": the evidence for them spans the spectrum, so the diagnosis alone justifies the ask.
+
+On rule-out letters the diagnosis is gone, so they behave like every other accommodation in the letter — heading becomes "Structure and Predictability Accommodations", and each item fires only on a supporting finding:
+
+| Item | Fires on (rule-out only) |
+|---|---|
+| Predictable schedule / advance transition notice | `needsSensory.size`, `S.emotionalReg`, `comorbid.has('anxiety')`, `hasConfirmedADHD()`, `adhd_suspected`, `hasID()` |
+| Visual supports | `needsComm.size`, `comorbid.has('language_disorder')`, `langLevel` in nonverbal/singleWord/phrase, `hasID()` |
+
+`needsBehavior.has('rigidity')` is deliberately **not** a trigger for the schedule item. Rigidity already produces the far more detailed "Transition supports" bullet in `accomBeh` (advance warning, visual schedule at desk and board, first-then board, extended transition time), and firing both puts the same ask in the letter twice. One version of each ask, never two.
+
+The heading and lead sentence are carried on the content object as `accomCoreHeading` and
+`accomCoreLead` so all three letter surfaces stay in sync. That parity is now enforced by the
+invariants lane (`IEP_SHARED_FIELDS`) rather than by convention: `accomCoreLead` originally reached
+only the on-screen preview, so the rule-out rationale never appeared in the plain text the clinician
+pastes into Epic, and no lane could see it because the golden lane snapshots only that plain
+surface.
 
 **`accomIndividual`** (`autism-ap-builder.html:3561–3564`) — Triggered by specific need or comorbidity findings. Sensory accommodations, motor accommodations, language-specific accommodations.
 
@@ -1258,7 +1525,7 @@ The double gate is important: suspected ID alone (`withSuspectedID`) does not pr
 | `needsBehavior.has('pica')` | Environmental safety audit, direct supervision, emergency action plan |
 | `needsBehavior.has('smearing')` | Toileting and hygiene support: private routine, scheduled breaks, matter-of-fact staff response, coordination with the medical bowel plan. **Discreet by audience** — framed as toileting/hygiene with no graphic label in the school record (the A&P note and ABA letter name it clinically; the IEP letter does not). |
 | `needsBehavior.has('vocalDisruption')` | Individualized BSP, preferential seating, communication alternatives |
-| `S.behavFreq.emotionalReg` | Calm-down space, break pass, de-escalation plan |
+| `S.emotionalReg` | Calm-down space, break pass, de-escalation plan |
 | `needsBehavior.has('boundaryViol')` | Structured peer activities, greeting procedures, BCBA consultation |
 | `needsAdaptive.has('menstrualCare')` | Private location, proactive check-ins, task sequence, visual supports, staff training |
 | `needsBehavior.has('rigidity')` | Advance warnings, visual schedule, first-then board, early dismissal |
@@ -1272,7 +1539,7 @@ The double gate is important: suspected ID alone (`withSuspectedID`) does not pr
 | `comorbid.has('ld_math')` | Calculator, manipulatives, graph paper |
 | `comorbid.has('ld_suspected')` | Interim extended time + chunking pending eval results |
 
-### 10.7 Specifier edge cases
+### 10.13 Specifier edge cases
 
 **`suspectedIDNote`** (`autism-ap-builder.html:3587–3592`): If `specifiers.has('withSuspectedID')` or `withSuspectedGDD` AND `cogDataSource !== 'priorExternal'`, the letter appends:
 
@@ -1282,7 +1549,7 @@ This protects against schools assigning ID eligibility based on a "suspected" cl
 
 **`idDocPrompt`**: If `specifiers.has('withID')` is true but `hasID() === false` (no severity selected in `cogProfile`), the letter shows an in-letter prompt to the clinician to select severity before sending. This catches the failure mode where the clinician checked the specifier checkbox but didn't complete the severity dropdown.
 
-### 10.8 The `schoolSvcAuto` / `schoolSvcManualOff` tracking
+### 10.14 The `schoolSvcAuto` / `schoolSvcManualOff` tracking
 
 These two Sets track *provenance* of each service:
 - `schoolSvcAuto` — services the app auto-recommended
@@ -1290,7 +1557,7 @@ These two Sets track *provenance* of each service:
 
 When state changes re-trigger auto-recommendations, services in `schoolSvcManualOff` are *not* re-added even if their auto-recommendation condition still holds. This mirrors the §9 `syncABATargetsFromNeeds()` add-only philosophy: respect clinician curation over recomputed defaults.
 
-### 10.9 Psychoeducational-evaluation auto-recommendation
+### 10.15 Psychoeducational-evaluation auto-recommendation
 
 `syncSchoolSvcFromNeeds()` (`autism-ap-builder.html:6178`) holds the full needs→school-service auto-population mapping (it is the source of truth for which need adds which service). **The whole function early-returns for toddlers** (IDEA Part C — no Part B school services to auto-populate; Unit 7); the per-trigger `ageGroup !== 'toddler'` clause on the academic trigger below is retained as documentation-in-code and defense-in-depth. The `psychoed` service is auto-recommended from **three** triggers, which the `schoolSvc` Set dedupes to a **single** recommendation regardless of how many fire:
 
@@ -1298,7 +1565,7 @@ When state changes re-trigger auto-recommendations, services in `schoolSvcManual
 2. `comorbid.has('ld_suspected')` — suspected SLD pending evaluation.
 3. School-age-and-up with hyperlexia (`hasHyperlexia()`).
 
-The single `schoolSvc.psychoed` entry then drives the recommendation in both the note (School / Educational Supports block) and the IEP letter (eval-request paragraph + the §10.5 `psychoed` service block) with no per-surface duplication.
+The single `schoolSvc.psychoed` entry then drives the recommendation in both the note (School / Educational Supports block) and the IEP letter (eval-request paragraph + the §10.7 `psychoed` service block) with no per-surface duplication.
 
 The `S.academic` trigger is **distinct from** the `'academics'` ABA-target FAPE gate (§9.2), which stays toddler/preschool-only: the academic *concern* drives a school evaluation, never a school-age medical-ABA target (academic instruction is the district's FAPE obligation, not billable medical ABA).
 

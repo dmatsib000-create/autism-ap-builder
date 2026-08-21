@@ -1,8 +1,3 @@
-NOTE: This letter is a physician recommendation to be submitted by the family as supporting
-documentation for their written request. Under IDEA, the parent/guardian must also submit
-a brief separate written request to the school district.
-────────────────────────────────────────────────────────────
-
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
 Initial Special Education Evaluation Request
 
@@ -18,16 +13,16 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
+Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the services and accommodations I recommend.
+
 She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 1 (requiring support), confirmed at the evaluation referenced above.
 
 ────────────────────────────────────────────────────────────
 REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
-Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.
+Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
-
-A comprehensive psychoeducational evaluation is recommended to characterize {Student Name}'s academic achievement and cognitive processing profile.
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
@@ -41,12 +36,13 @@ RECOMMENDED ACCOMMODATIONS
 ────────────────────────────────────────────────────────────
 I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
 
-Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):
+Core ASD-Related Accommodations:
+The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
 
 Sincerely,
 
@@ -54,6 +50,5 @@ Sincerely,
 ___________________________________
 {Physician Name}, MD
 UF Behavior and Development Clinic
-{Phone Number}
 
 Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

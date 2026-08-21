@@ -1,0 +1,100 @@
+PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
+Initial Special Education Evaluation Request
+
+Date: {Date}
+
+{Principal / Special Education Coordinator Name}
+{School Name}
+{School Address}
+
+Re: {Student Name} | Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)
+
+Dear {Principal / Special Education Coordinator Name}:
+
+I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
+
+Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
+
+She was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder; a specific learning disability (suspected, pending psychoeducational evaluation); a language disorder.
+
+Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
+
+Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
+
+────────────────────────────────────────────────────────────
+EDUCATIONAL IMPACT
+────────────────────────────────────────────────────────────
+The findings below affect educational performance and require specialized support in the school setting:
+  • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
+  • Behavior: Difficulty with emotional regulation and behavioral compliance that interrupts instruction for this student and peers.
+  • Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.
+  • Academic learning: Concerns for a suspected specific learning disability affecting academic functioning, with the affected domain (reading, mathematics, written expression, or a combination) not yet characterized.
+
+────────────────────────────────────────────────────────────
+REQUEST FOR SPECIAL EDUCATION EVALUATION
+────────────────────────────────────────────────────────────
+{Student Name} presents with documented functional impairments that affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. IDEA's child find requirement reaches a student suspected of having a disability even when that student is advancing from grade to grade (34 C.F.R. §300.111(c)(1)), so passing grades need not delay the evaluation.
+
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
+
+────────────────────────────────────────────────────────────
+ELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER
+────────────────────────────────────────────────────────────
+To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is clinical input, not a conclusion about eligibility.
+
+  • Language Impaired (Florida Rule 6A-6.030121): documented receptive and/or expressive language needs affecting access to instruction. Florida evaluates language and speech eligibility separately, so both may be worth considering.
+  • Other Health Impaired (Florida Rule 6A-6.030152): limited strength, vitality, or alertness with respect to the educational environment, due to a chronic or acute health condition documented at this evaluation, that adversely affects educational performance. Attention-deficit/hyperactivity disorder and epilepsy are named among qualifying conditions in this category.
+  • Specific Learning Disability, suspected (Florida Rule 6A-6.03018): the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility.
+  • Emotional/Behavioral Disability (Florida Rule 6A-6.03016): documented internalizing symptoms alongside difficulty with emotional regulation in the school setting. Whether these have persisted over a long enough period and to a marked enough degree to meet this category is the team's determination, not a conclusion of this evaluation.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED SERVICES
+────────────────────────────────────────────────────────────
+If eligible for special education services, I recommend the IEP include the following:
+
+Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
+
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: sentence formulation, topic maintenance, and narrative organization; receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary; language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting academic comprehension and classroom participation, addressed as a diagnosis in its own right.
+
+Counseling and Social-Emotional Support Services: School-based counseling is recommended to address the social-emotional and behavioral regulation needs documented above. Goals: anxiety management strategies (graduated exposure, relaxation techniques, cognitive coping) adapted for the school setting; social skill generalization in the school environment, reinforcing goals targeted in specialized social skills instruction.
+
+Visual Supports and Visual Schedules: Visual supports are a research-supported accommodation for students with communication, attention, and self-regulation needs that significantly improve predictability, independence, and behavioral regulation. Recommended visual supports include: a daily visual schedule (individual desk copy and classroom display), visual task sequences for multi-step activities, visual transition warnings (timer with visual cue), and visual rules and expectations posted in the classroom. Visual supports should be developed in collaboration with the SLP and/or OT and implemented consistently across all school settings including specials, lunch, and recess.
+
+Functional Behavior Assessment (FBA): An FBA is recommended to identify the function (purpose) of interfering behaviors and to develop an individualized, function-based Behavior Intervention Plan (BIP). Behaviors warranting FBA: task refusal and noncompliance. I recommend that the FBA be conducted by a Board-Certified Behavior Analyst (BCBA) or a school-based behavior specialist with documented training in functional behavior assessment, and include direct observation, ABC data collection, and structured interviews with caregivers and teachers. The resulting BIP should be implemented consistently by all school staff and reviewed regularly by the IEP team based on collected data, with formal review recommended at minimum every quarter.
+
+Psychoeducational Evaluation: A comprehensive psychoeducational evaluation is recommended to fully characterize the academic achievement and cognitive processing profile. The evaluation should include: cognitive assessment (IQ and index scores), academic achievement testing across reading, mathematics, and written expression (WIAT-4 or equivalent), phonological processing assessment (CTOPP-2 if reading concerns are present), working memory and processing speed indices, and a Specific Learning Disability (SLD) eligibility determination per Florida Rule 6A-6.03018. Results will directly inform IEP goal development and eligibility determination.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED ACCOMMODATIONS
+────────────────────────────────────────────────────────────
+I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
+
+Structure and Predictability Accommodations:
+The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student's developmental level and individual presentation.
+  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation for students with communication, attention, and self-regulation needs
+
+Individually Indicated Accommodations:
+  • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
+
+Behavioral and Emotional Accommodations:
+  • Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks
+  • Anxiety: graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance
+  • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  • Language: simplified verbal instructions, extended response time
+  • Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes
+
+Academic Accommodations:
+  • Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time on assessments and chunked assignments may be appropriate.
+
+────────────────────────────────────────────────────────────
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
+
+Sincerely,
+
+
+___________________________________
+{Physician Name}, MD
+UF Behavior and Development Clinic
+
+Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

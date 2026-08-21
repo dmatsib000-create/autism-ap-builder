@@ -1,8 +1,3 @@
-NOTE: This letter is a physician recommendation to be submitted by the family as supporting
-documentation for their written request. Under IDEA, the parent/guardian must also submit
-a brief separate written request to the school district.
-────────────────────────────────────────────────────────────
-
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
 504 Review / IEP Eligibility Request
 
@@ -18,6 +13,8 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
+Specifically, I am requesting that the team review the current 504 Plan and consider whether {Student Name} now meets eligibility for an Individualized Education Program under IDEA. The findings supporting that request are set out below, together with the services and accommodations I recommend.
+
 They have received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support), confirmed at the evaluation referenced above. In addition, they carry the following co-occurring diagnoses, each of which contributes to the educational challenges described below: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder.
 
 ────────────────────────────────────────────────────────────
@@ -32,7 +29,7 @@ REQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW
 ────────────────────────────────────────────────────────────
 I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.
 
-Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).
+Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend that the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
@@ -48,7 +45,8 @@ RECOMMENDED ACCOMMODATIONS
 ────────────────────────────────────────────────────────────
 I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
 
-Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):
+Core ASD-Related Accommodations:
+The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
@@ -57,7 +55,7 @@ Behavioral and Emotional Accommodations:
   • Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. I am available to participate in the IEP team meeting by telephone if helpful.
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
 
 Sincerely,
 
@@ -65,6 +63,5 @@ Sincerely,
 ___________________________________
 {Physician Name}, MD
 UF Behavior and Development Clinic
-{Phone Number}
 
 Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}
