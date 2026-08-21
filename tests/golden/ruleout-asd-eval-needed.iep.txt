@@ -20,34 +20,30 @@ I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Stud
 
 Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
 
-She was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder; a specific learning disability (suspected, pending psychoeducational evaluation); a language disorder. I want to be clear that ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
+She was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder; a specific learning disability (suspected, pending psychoeducational evaluation); a language disorder. Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
 
-One point I would not want lost: speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
+Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
-These conditions result in the following challenges that require specialized support in the educational setting:
+The findings below affect educational performance and require specialized support in the school setting:
   • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
   • Behavior: Difficulty with emotional regulation and behavioral compliance that interrupts instruction for this student and peers.
   • Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.
-  • Academic learning: Concerns for a suspected specific learning disability affecting academic functioning; school psychoeducational evaluation is recommended to characterize the affected domain (reading, mathematics, written expression, or a combination) and determine eligibility under Florida Rule 6A-6.03018.
+  • Academic learning: Concerns for a suspected specific learning disability affecting academic functioning, with the affected domain (reading, mathematics, written expression, or a combination) not yet characterized.
 
 ────────────────────────────────────────────────────────────
 REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
-{Student Name} presents with documented functional impairments that affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. I am asking the team to complete a comprehensive multidisciplinary evaluation to determine eligibility and appropriate services. It may help to note that IDEA's child find requirement reaches a student suspected of having a disability even when that student is advancing from grade to grade (34 C.F.R. §300.111(c)(1)), so passing grades need not delay the evaluation.
+{Student Name} presents with documented functional impairments that affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. IDEA's child find requirement reaches a student suspected of having a disability even when that student is advancing from grade to grade (34 C.F.R. §300.111(c)(1)), so passing grades need not delay the evaluation.
 
-For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
-
-A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).
-
-A comprehensive psychoeducational evaluation is recommended to characterize {Student Name}'s academic achievement and cognitive processing profile.
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 ELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER
 ────────────────────────────────────────────────────────────
-To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is a clinical steer, not a conclusion about eligibility.
+To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is clinical input, not a conclusion about eligibility.
 
   • Language Impaired (Florida Rule 6A-6.030121): documented receptive and/or expressive language needs affecting access to instruction. Florida evaluates language and speech eligibility separately, so both may be worth considering.
   • Other Health Impaired (Florida Rule 6A-6.030152): limited strength, vitality, or alertness with respect to the educational environment, due to a chronic or acute health condition documented at this evaluation, that adversely affects educational performance. Attention-deficit/hyperactivity disorder and epilepsy are named among qualifying conditions in this category.
@@ -79,16 +75,15 @@ I recommend that the IEP team consider the following accommodations, calibrated 
 Structure and Predictability Accommodations:
 The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student's developmental level and individual presentation.
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
-  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation for students with communication, attention, and self-regulation needs
 
 Individually Indicated Accommodations Based on Evaluation Findings:
   • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
 
 Behavioral and Emotional Accommodations:
   • Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks
-  • Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
+  • Anxiety: graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance
   • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
-  • Language: simplified verbal instructions, written directions provided alongside verbal, extended response time
+  • Language: simplified verbal instructions, extended response time
   • Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes
 
 Academic Accommodations:

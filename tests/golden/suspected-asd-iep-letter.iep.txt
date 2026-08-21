@@ -37,9 +37,7 @@ REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
 Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-For the family's planning as much as the team's, the evaluation timeline in Florida is 60 calendar days from written parental consent, excluding school holidays and breaks, summer vacation, and absences beyond eight school days (Florida Rule 6A-6.0331(3)(g)). This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
-
-A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
@@ -58,11 +56,6 @@ Functional Behavior Assessment (FBA): An FBA is recommended to identify the func
 RECOMMENDED ACCOMMODATIONS
 ────────────────────────────────────────────────────────────
 I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
-
-Core ASD-Related Accommodations:
-The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.
-  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
-  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
 Individually Indicated Accommodations Based on Evaluation Findings:
   • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)

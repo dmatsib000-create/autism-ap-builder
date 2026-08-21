@@ -20,14 +20,14 @@ I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Stud
 
 Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
 
-They were referred to this clinic for evaluation of concerns in behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document an anxiety disorder, which independently affects educational performance. I want to be clear that ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
+They were referred to this clinic for evaluation of concerns in behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document an anxiety disorder, which independently affects educational performance. Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
 
-One point I would not want lost: speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
+Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
-These conditions result in the following challenges that require specialized support in the educational setting:
+The findings below affect educational performance and require specialized support in the school setting:
   • Behavior: Difficulty with emotional regulation and behavioral compliance that interrupts instruction for this student and peers; inflexibility with routine changes and transitions that causes significant distress and limits engagement with non-preferred tasks.
   • Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.
 
@@ -43,7 +43,7 @@ If {Student Name}'s current eligibility is held under the Autism category, the t
 ────────────────────────────────────────────────────────────
 ELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER
 ────────────────────────────────────────────────────────────
-To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is a clinical steer, not a conclusion about eligibility.
+To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is clinical input, not a conclusion about eligibility.
 
   • Emotional/Behavioral Disability (Florida Rule 6A-6.03016): documented internalizing symptoms alongside difficulty with emotional regulation in the school setting. Whether these have persisted over a long enough period and to a marked enough degree to meet this category is the team's determination, not a conclusion of this evaluation.
 
@@ -67,15 +67,8 @@ RECOMMENDED ACCOMMODATIONS
 ────────────────────────────────────────────────────────────
 I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
 
-Structure and Predictability Accommodations:
-The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student's developmental level and individual presentation.
-  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
-
-Individually Indicated Accommodations Based on Evaluation Findings:
-  • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
-
 Behavioral and Emotional Accommodations:
-  • Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
+  • Anxiety: graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance
   • Emotional regulation: access to a designated calm-down space with sensory tools; break pass for self-initiated regulation breaks (no penalty); de-escalation plan documented in IEP and accessible to all staff; staff trained in recognizing early signs of dysregulation; flexible pacing and reduced pressure during high-dysregulation periods; advance notice of schedule changes
   • Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)
 
