@@ -1374,7 +1374,12 @@ On rule-out letters the diagnosis is gone, so they behave like every other accom
 
 `needsBehavior.has('rigidity')` is deliberately **not** a trigger for the schedule item. Rigidity already produces the far more detailed "Transition supports" bullet in `accomBeh` (advance warning, visual schedule at desk and board, first-then board, extended transition time), and firing both puts the same ask in the letter twice. One version of each ask, never two.
 
-The heading and lead sentence are carried on the content object as `accomCoreHeading` and `accomCoreLead` so all three letter surfaces stay in sync.
+The heading and lead sentence are carried on the content object as `accomCoreHeading` and
+`accomCoreLead` so all three letter surfaces stay in sync. That parity is now enforced by the
+invariants lane (`IEP_SHARED_FIELDS`) rather than by convention: `accomCoreLead` originally reached
+only the on-screen preview, so the rule-out rationale never appeared in the plain text the clinician
+pastes into Epic, and no lane could see it because the golden lane snapshots only that plain
+surface.
 
 **`accomIndividual`** (`autism-ap-builder.html:3561–3564`) — Triggered by specific need or comorbidity findings. Sensory accommodations, motor accommodations, language-specific accommodations.
 

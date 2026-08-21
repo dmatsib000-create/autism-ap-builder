@@ -5257,7 +5257,7 @@ function generateIEPLetterPlain(){
   if(anyAccom){
     t+=sep+'\nRECOMMENDED ACCOMMODATIONS\n'+sep+'\n';
     t+='I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team\'s selection should reflect what the evaluation supports.\n\n';
-    if(c.accomCore.length){t+=c.accomCoreHeading+' (implementation calibrated to developmental level and individual presentation):\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomCore.length){t+=c.accomCoreHeading+':\n'+c.accomCoreLead+'\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomIndividual.length){t+='Individually Indicated Accommodations Based on Evaluation Findings:\n';c.accomIndividual.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomIDMod.length){t+='Curriculum and Assessment Modifications (based on documented intellectual disability; required for FAPE under IDEA):\n';c.accomIDMod.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomBeh.length){t+='Behavioral and Emotional Accommodations:\n';c.accomBeh.forEach(a=>t+='  • '+a+'\n');t+='\n';}
@@ -5360,7 +5360,7 @@ async function copyIEPLetter(format){
       if(anyA){
         h+=`<p style="${secSt}">Recommended Accommodations</p>`;
         h+=`<p style="margin-bottom:8px">I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.</p>`;
-        if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> Implementation calibrated to developmental level and individual presentation.</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> ${e(c.accomCoreLead)}</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomIndividual.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications</strong> (based on documented intellectual disability):<br></p><ul style="margin:4px 0 4px 20px">`;c.accomIDMod.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}

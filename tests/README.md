@@ -6,6 +6,25 @@ plain text against a committed golden file. If a code change alters output, the
 diff shows up here so it can be reviewed as an intentional change, not shipped by
 accident.
 
+### IEP letter surface parity (invariants lane)
+
+The IEP letter has three renderers fed by one `_iepLetterContent()` object:
+`generateIEPLetterHTML` (on-screen preview), `generateIEPLetterPlain` (the text
+the clinician pastes into Epic), and the rich branch inside `copyIEPLetter` (the
+formatted Word paste). **The golden lane snapshots only the plain one.** A field
+wired into two of the three and forgotten in the third therefore ships with every
+test green — which is exactly how `accomCoreLead` shipped with the rule-out
+rationale reaching the preview but not the letter the school receives.
+
+`IEP_SHARED_FIELDS` in `invariants.mjs` lists the fields all three must print.
+When you add a field to `_iepLetterContent()` that every surface should render,
+add it to that list in the same commit. Fields that are legitimately
+surface-specific or branch-specific (e.g. `dxStr`, which the rule-out branch
+bypasses) are intentionally absent from the list.
+
+Formatting may differ freely between the three — they have different conventions
+for headings and emphasis. Presence may not.
+
 ## Test lanes
 
 `npm test` runs all four:

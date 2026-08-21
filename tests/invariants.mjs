@@ -224,13 +224,65 @@ check('ABA targets (TARGET_RATIONALE keys are real targets)',
 check('ABA targets (sync add() targets a real checkbox)',
   subset('sync add()', abaSyncAddKeys, 'checkboxes', abaCheckboxKeys));
 
+// ── E. IEP letter: three surfaces must consume the same content fields ───────
+// The IEP letter is rendered THREE times from one `_iepLetterContent()` object:
+// the on-screen preview (generateIEPLetterHTML), the plain text the clinician
+// pastes into Epic (generateIEPLetterPlain), and the formatted Word paste inside
+// copyIEPLetter's rich branch. The golden lane snapshots only the PLAIN one, so a
+// field wired into two surfaces and forgotten in the third ships silently — which
+// is exactly what happened to `accomCoreLead`: the rule-out rationale reached the
+// preview but not the letter the school actually receives.
+//
+// Unlike the prose (which is deliberately NOT shared across the note/ABA/IEP
+// audiences, per CLAUDE.md), these three are the SAME letter to the SAME reader in
+// three formats. Every field below must be consumed by all three. Formatting may
+// differ freely; presence may not.
+//
+// Add a field here whenever `_iepLetterContent()` returns something all three
+// surfaces must print. Fields legitimately used by only some surfaces (e.g.
+// `dxStr`, which the rule-out branch bypasses) are intentionally NOT listed.
+const IEP_SHARED_FIELDS = [
+  'ruleOutReferralTail', 'ruleOutDxRest', 'ruleOutRelatedSvcNote',
+  'eligibilityCandidates', 'eligibilityLead', 'eligibilityFallback',
+  'ruleOutEvalRequest', 'ruleOutAsk504', 'ruleOutIEPCategoryReview',
+  'accomCoreHeading', 'accomCoreLead',
+];
+const sliceBetween = (startMarker, endMarker) => {
+  const a = html.indexOf(startMarker);
+  if (a < 0) throw new Error(
+    `invariants.mjs: could not find "${startMarker}" — if that renderer was renamed, update this test.`
+  );
+  const b = html.indexOf(endMarker, a);
+  if (b < 0) throw new Error(
+    `invariants.mjs: could not find "${endMarker}" after "${startMarker}" — update this test.`
+  );
+  return html.slice(a, b);
+};
+const iepSurfaces = {
+  'preview HTML': sliceBetween('function generateIEPLetterHTML(){', 'function generateIEPLetterPlain(){'),
+  'plain text': sliceBetween('function generateIEPLetterPlain(){', 'async function copyIEPLetter(format){'),
+  'Word paste': sliceBetween('async function copyIEPLetter(format){', 'function setPreviewMode(mode){'),
+};
+for (const field of IEP_SHARED_FIELDS) {
+  // Word-boundary the field name so `accomCore` cannot match `accomCoreHeading`.
+  const re = new RegExp(`\\bc\\.${field}\\b`);
+  const absent = Object.entries(iepSurfaces).filter(([, src]) => !re.test(src)).map(([n]) => n);
+  if (absent.length) {
+    failures.push(
+      `IEP letter surfaces: c.${field} is not consumed by ${absent.join(' / ')} — ` +
+      `all three renderers must print it, or remove it from IEP_SHARED_FIELDS with a reason.`
+    );
+  }
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
   `invariants: SW reasons ${swLabelKeys.length} keys; ` +
   `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
-  `boundary pins ${PIN_TOKENS.length} guarded theme-independent`
+  `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
+  `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');
