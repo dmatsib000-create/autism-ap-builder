@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `4bcf228`
+> **Last verified against commit:** `e304c0f`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -1330,7 +1330,7 @@ suspected-SLD educational-impact bullet states impact only; its recommendation l
 
 ### 10.6 Assessment Results (free-text instrument summaries)
 
-`S.iepInstruments` is a single free-text field in the School section, rendered verbatim as an
+`S.iepInstruments` is a single free-text field in **§2 Diagnostic Workup, Testing & Next Steps**, rendered verbatim as an
 "Assessment Results" section **between the diagnosis paragraph and Educational Impact** — evidence,
 then interpretation. IEP letter only: it does not touch the A&P note or the ABA letter.
 
@@ -1348,6 +1348,16 @@ paragraph.
 
 The field carries the standard PHI hint plus a **year-only** reminder for test dates, since an exact
 administration date is the obvious thing to paste in and is PHI under this project's rules.
+
+**It was first placed in §7 School & Educational Supports and moved on 2026-08-21**, because the
+maintainer could not find it. It had been filed by where its text comes *out* — it feeds the IEP
+letter, so it went with the school inputs — rather than by what the clinician is *doing*, which is
+recording test results. At ~8,500px down a 10,600px form it sat five sections away from the
+prior-testing block, the form's only other testing content. It is now at ~2,300px, directly above
+that block. The general rule, worth keeping: **place an input where the task lives, not where its
+output goes.** It sits deliberately outside the collapsed prior-testing disclosure — an open
+textarea is the one control that advertises itself without being clicked, which is what this field
+needed and did not have.
 
 It is independent of `priorTestingCite`: that sentence names ASD screeners the clinician marked
 "consistent" and is suppressed on ruled-out letters, whereas this is whatever the clinician chose to
