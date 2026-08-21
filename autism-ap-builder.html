@@ -5069,18 +5069,23 @@ function _iepLetterContent(){
   // changed diagnosis as grounds to drop eligibility rather than to re-categorize it.
   const ruleOutIEPCategoryReview='If {Student Name}\'s current eligibility is held under the Autism category, the team should review whether a different category better reflects the present findings. Services should continue on the basis of documented need while that review is underway; a change in diagnostic conclusion is not a basis for reducing or discontinuing supports the student still requires.';
 
-  const askLines=[];
-  if(S.schoolDoc==='iep') askLines.push('Convene the IEP Team to review and update the current IEP in light of the findings below.');
-  else if(S.schoolDoc==='504') askLines.push('Review the current 504 Plan, and consider whether this student now meets eligibility for an IEP.');
-  else askLines.push('Complete a comprehensive multidisciplinary evaluation to determine eligibility for special education services.');
-  if(ruledOut&&(eligibilityCandidates.length||eligibilityFallback)) askLines.push('Consider the eligibility categories listed below, which this evaluation supports looking at. Autism is not among them.');
-  if(S.schoolSvc.size) askLines.push('Consider the services and accommodations described below, to the extent the team\'s own evaluation supports them.');
-  if(S.schoolDoc!=='iep') askLines.push('Note the Florida evaluation timeline: 60 calendar days from written parental consent, with the exclusions the rule allows.');
-  const askLead='In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.';
-  // Never promises the physician's attendance -- the office triages and the
-  // physician decides case by case. Promising presence the clinic cannot deliver
-  // costs more credibility over repeated letters than the offer gains on one.
-  const contactLine='Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.';
+  // Second opening paragraph: the request, stated plainly, before the reader meets
+  // the diagnosis narrative. Prose rather than a bulleted block -- see the note above.
+  // Built as one closing clause rather than a list so the sentence stays grammatical
+  // whichever combination fires: a bare full stop, or "together with X", or
+  // "together with X and Y". A comma-joined list here produced a run-on with no
+  // conjunction, and the IEP-in-place branch said "described below" twice.
+  const reqTail=[];
+  if(ruledOut&&(eligibilityCandidates.length||eligibilityFallback)) reqTail.push('the eligibility categories I would ask the team to consider');
+  if(S.schoolSvc.size) reqTail.push('the services and accommodations I recommend');
+  const reqTailStr=reqTail.length?' , together with '.replace(' ,',',')+reqTail.join(' and ')+'.':'.';
+  let requestPara;
+  if(S.schoolDoc==='iep')
+    requestPara='Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below'+reqTailStr;
+  else if(S.schoolDoc==='504')
+    requestPara='Specifically, I am requesting that the team review the current 504 Plan and consider whether {Student Name} now meets eligibility for an Individualized Education Program under IDEA. The findings supporting that request are set out below'+reqTailStr;
+  else
+    requestPara='Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below'+reqTailStr;
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
@@ -5090,7 +5095,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,askLines,askLead,contactLine,
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,
     ruleOutReferralTail,ruleOutDxRest,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
@@ -5119,12 +5124,7 @@ function generateIEPLetterHTML(){
   h+=`<p style="margin:12px 0 8px">Dear ${ph('{Principal / Special Education Coordinator Name}')}:</p>`;
   h+=`<p>I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${ph('{Student Name}')} on ${ph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
 
-  if(c.askLines.length){
-    h+=`<div class="aba-sec">What I Am Asking the Team to Consider</div>`;
-    h+=`<p>${e(c.askLead)}</p><ul>`;
-    c.askLines.forEach(a=>h+=`<li>${e(a)}</li>`);
-    h+=`</ul><p>${ph(e(c.contactLine))}</p>`;
-  }
+  h+=`<p>${ph(e(c.requestPara))}</p>`;
 
   let dxPara;
   if(c.ruledOut){
@@ -5203,7 +5203,7 @@ function generateIEPLetterHTML(){
     if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul>`;c.accomAcad.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
   }
 
-  h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
+  h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
   h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${ph('{Phone Number}')}</div>`;
   h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review and signature before submission. Complete all {placeholder} fields before sending.</p>`;
   h+=`<p class="aba-caveat">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${ph('{Date of Evaluation}')}</p>`;
@@ -5232,12 +5232,7 @@ function generateIEPLetterPlain(){
   t+=`Re: {Student Name} | ${c.reLineLabel}\n\n`;
   t+=`Dear {Principal / Special Education Coordinator Name}:\n\n`;
   t+=`I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
-  if(c.askLines.length){
-    t+=sep+'\nWHAT I AM ASKING THE TEAM TO CONSIDER\n'+sep+'\n';
-    t+=c.askLead+'\n\n';
-    c.askLines.forEach(a=>t+='  • '+a+'\n');
-    t+='\n'+c.contactLine+'\n\n';
-  }
+  t+=c.requestPara+'\n\n';
   let dxPara;
   if(c.ruledOut){
     dxPara=`${pCap} ${v3('was')}${c.ruleOutReferralTail} ${c.ruleOutDxRest}`;
@@ -5305,7 +5300,7 @@ function generateIEPLetterPlain(){
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
   }
   t+=sep+'\n';
-  t+=`Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
+  t+=`Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
   return t;
 }
 
@@ -5339,12 +5334,8 @@ async function copyIEPLetter(format){
       h+=`<p style="margin:0 0 4px">${wph('{Principal / Special Education Coordinator Name}')}<br>${wph('{School Name}')}<br>${wph('{School Address}')}</p>`;
       h+=`<p style="margin:14px 0 8px">Dear ${wph('{Principal / Special Education Coordinator Name}')}:</p>`;
       h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
-      if(c.askLines.length){
-        h+=`<p style="${secSt}">What I Am Asking the Team to Consider</p>`;
-        h+=`<p style="margin-bottom:8px">${e(c.askLead)}</p><ul style="margin:4px 0 4px 20px">`;
-        c.askLines.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);
-        h+=`</ul><p style="margin-bottom:10px">${wph(e(c.contactLine))}</p>`;
-      }
+      h+=`<p style="margin-bottom:10px">${wph(e(c.requestPara))}</p>`;
+
       let dxPara;
       if(c.ruledOut){
         dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
@@ -5413,7 +5404,7 @@ async function copyIEPLetter(format){
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
-      h+=`<p style="margin-top:14px">Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
+      h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
       h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${wph('{Phone Number}')}</div>`;
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;

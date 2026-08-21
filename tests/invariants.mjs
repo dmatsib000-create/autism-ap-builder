@@ -252,7 +252,7 @@ const IEP_SHARED_FIELDS = [
   'eligibilityCandidates', 'eligibilityLead', 'eligibilityFallback',
   'ruleOutEvalRequest', 'ruleOutAsk504', 'ruleOutIEPCategoryReview',
   'accomCoreHeading', 'accomCoreLead',
-  'askLines', 'askLead', 'contactLine',
+  'requestPara',
 ];
 const sliceBetween = (startMarker, endMarker) => {
   const a = html.indexOf(startMarker);

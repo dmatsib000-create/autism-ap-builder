@@ -1274,25 +1274,31 @@ ASD" contrast; and the generic feeding accommodation drops "in ASD" from its exp
 sensory-based selectivity. Each is a one-line ternary at the point of use — the ask survives
 unchanged, only the claim about autism is removed.
 
-### 10.4 The top-of-letter request block
+### 10.4 The opening request paragraph
 
 Council review 2026-08-21 found the letter buried its ask: a reader met the title, a dense
-diagnosis paragraph, and the whole educational-impact section before reaching the request at line
-35 of 105. `askLines` / `askLead` / `contactLine` now render a short block immediately after the
-salutation, in all three surfaces.
+diagnosis paragraph and the whole educational-impact section before reaching the request at line
+35 of 105. `requestPara` now states the request as an ordinary second opening paragraph, in all
+three surfaces, immediately after the salutation.
 
-It carries **requests only** — no findings, no conclusions — and points at the sections rather than
-restating them, so it cannot drift out of agreement with the body. Lines are branch-derived: the
-primary ask varies by `schoolDoc`; the eligibility line appears only on ruled-out letters; the
-services line only when `schoolSvc` is non-empty; the timeline line on everything except an IEP
-already in place.
+**It was first built as a bulleted block headed "What I Am Asking the Team to Consider", and the
+maintainer rejected that on sight.** The reasons are worth keeping, because they generalise to any
+future addition to this letter: every other heading here is a noun phrase, so a first-person
+sentence heading broke the register; the lead line narrated the document to its own reader, which
+a consultant letter does not do; and the bullets were imperatives — *Complete… Consider… Note the…*
+— which is a physician issuing instructions to a school team, the precise opposite of the
+collaborative tone the rest of this work was aiming at. Prose, no heading, no bullets.
 
-`contactLine` routes questions to the **practice**, never to the individual physician, and never
-promises attendance. The maintainer's instruction was that the team reach out to the office and the
-physician decides case by case from there. The council's ESE director had reached the same place
-from the other direction: an offer of presence the clinic cannot honour costs more credibility
-across repeated letters than it gains on any one. The closing sentence that previously read "I am
-available to participate in the IEP team meeting by telephone" was replaced for the same reason.
+The closing clause is assembled as `reqTailStr` rather than a comma-joined list, so the sentence
+stays grammatical whichever combination fires: a bare full stop, "together with X", or "together
+with X and Y". The first attempt produced a run-on with no conjunction, and made the
+IEP-already-in-place branch say "described below" twice in consecutive sentences.
+
+Contact routing lives in the closing paragraph only, and routes to the **practice**, never to the
+individual physician, and never promises attendance. The maintainer's instruction was that the team
+reach out to the office and the physician decides case by case from there. The council's ESE
+director had reached the same place from the other direction: an offer of presence the clinic
+cannot honour costs more credibility across repeated letters than it gains on any one.
 
 ### 10.5 Citation register: pediatrician, not lawyer
 

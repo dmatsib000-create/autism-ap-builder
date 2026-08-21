@@ -18,16 +18,7 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-────────────────────────────────────────────────────────────
-WHAT I AM ASKING THE TEAM TO CONSIDER
-────────────────────────────────────────────────────────────
-In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.
-
-  • Convene the IEP Team to review and update the current IEP in light of the findings below.
-  • Consider the eligibility categories listed below, which this evaluation supports looking at. Autism is not among them.
-  • Consider the services and accommodations described below, to the extent the team's own evaluation supports them.
-
-Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.
+Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
 
 They were referred to this clinic for evaluation of concerns in behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document an anxiety disorder, which independently affects educational performance. I want to be clear that ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
 
@@ -89,7 +80,7 @@ Behavioral and Emotional Accommodations:
   • Transition supports: individual advance warning before all transitions (verbal cue plus visual timer, minimum 5 minutes prior); visual schedule available at desk and on classroom board showing the full day sequence, with notation of any deviations from routine; first-then board or transition object to support predictability during activity changes; extended transition time built into schedule between high-demand activities; designated consistent staff greeter at morning arrival to establish routine and support regulation at the start of the school day; structured and consistent arrival and dismissal routine (same staff, same location, same sequence each day); early release from class before hallway crowding at dismissal to reduce sensory and transition load; parent-school daily communication system to flag morning home state that may affect school regulation (e.g., brief arrival note, communication app, or teacher check-in at drop-off)
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
 
 Sincerely,
 

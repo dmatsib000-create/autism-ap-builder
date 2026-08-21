@@ -18,16 +18,7 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-────────────────────────────────────────────────────────────
-WHAT I AM ASKING THE TEAM TO CONSIDER
-────────────────────────────────────────────────────────────
-In brief, I am asking the team to do the following. The rest of this letter is the evaluation that supports it.
-
-  • Review the current 504 Plan, and consider whether this student now meets eligibility for an IEP.
-  • Consider the services and accommodations described below, to the extent the team's own evaluation supports them.
-  • Note the Florida evaluation timeline: 60 calendar days from written parental consent, with the exclusions the rule allows.
-
-Questions about this evaluation or these recommendations are welcome and may be directed to our office at {Phone Number}. If the team would find physician input at the IEP meeting helpful, please make that request through the office and we will arrange what we can.
+Specifically, I am requesting that the team review the current 504 Plan and consider whether {Student Name} now meets eligibility for an Individualized Education Program under IDEA. The findings supporting that request are set out below, together with the services and accommodations I recommend.
 
 They have received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support), confirmed at the evaluation referenced above. In addition, they carry the following co-occurring diagnoses, each of which contributes to the educational challenges described below: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder.
 
@@ -69,7 +60,7 @@ Behavioral and Emotional Accommodations:
   • Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
 
 ────────────────────────────────────────────────────────────
-Please do not hesitate to contact our office with any questions. Requests for physician input at the IEP meeting are welcome through our office.
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
 
 Sincerely,
 
