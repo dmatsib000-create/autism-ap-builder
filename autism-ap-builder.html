@@ -1525,6 +1525,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
       </div>
       <div class="field-group">
+        <span class="field-label">Assessment Results for the IEP Letter <span style="font-weight:400;opacity:.7;font-size:var(--text-9)">(optional, free text)</span></span>
+        <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries and results as you want them to appear, e.g.&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
+        <span class="phi-hint">PHI-free zone — no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)"). Renders verbatim in the IEP Letter, after the diagnosis paragraph. Not used in the A&amp;P note or ABA letter.</span>
+      </div>
+      <div class="field-group">
         <span class="field-label">School-Based Services to Request</span>
         <div class="cb-list">
           <label id="svcLbl_sped" class="cb-row"><input type="checkbox" data-key="schoolSvc" value="sped"> Special education services</label>
@@ -1804,7 +1809,7 @@ const S = {
   pfdDomains:new Set(),
   arfidMechanism:new Set(), arfidImpact:new Set(),
   socialWorkReasons:new Set(),
-  schoolPlacement:'', schoolDoc:'', schoolSvc:new Set(), schoolSvcAuto:new Set(), schoolSvcManualOff:new Set(),
+  schoolPlacement:'', schoolDoc:'', iepInstruments:'', schoolSvc:new Set(), schoolSvcAuto:new Set(), schoolSvcManualOff:new Set(),
   strangerDanger:false,
   safety:new Set(), ag:new Set(), showDSMTable:true, showDSMLines:false,
   insuranceType:'', abaHours:'', abaSetting:new Set(), abaTargets:new Set(),
@@ -5087,6 +5092,11 @@ function _iepLetterContent(){
   else
     requestPara='Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below'+reqTailStr;
 
+  // Deliberately independent of priorTestingCite above: that sentence names ASD
+  // screeners the clinician marked "consistent" and is suppressed on ruled-out
+  // letters, whereas this is whatever the clinician chose to report, verbatim.
+  const instruments=(S.iepInstruments||'').trim();
+
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
   // Prior testing citation for diagnosis paragraph
@@ -5095,7 +5105,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instruments,
     ruleOutReferralTail,ruleOutDxRest,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
@@ -5141,6 +5151,11 @@ function generateIEPLetterHTML(){
   if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-top:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
   if(c.idDocPrompt) h+=`<p style="margin-top:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
   if(c.suspectedIDNote) h+=`<p style="margin-top:10px"><em>${e(c.suspectedIDNote)}</em></p>`;
+
+  if(c.instruments){
+    h+=`<div class="aba-sec">Assessment Results</div>`;
+    h+=`<p>${e(c.instruments).replace(/\n/g,'<br>')}</p>`;
+  }
 
   if(c.impacts.length){
     h+=`<div class="aba-sec">Educational Impact</div>`;
@@ -5204,7 +5219,7 @@ function generateIEPLetterHTML(){
   }
 
   h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to ${ph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
-  h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${ph('{Phone Number}')}</div>`;
+  h+=`<div class="aba-sig">Sincerely,<br><br><br>___________________________________<br>${ph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic</div>`;
   h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review and signature before submission. Complete all {placeholder} fields before sending.</p>`;
   h+=`<p class="aba-caveat">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${ph('{Date of Evaluation}')}</p>`;
   h+=`</div>`;
@@ -5248,6 +5263,10 @@ function generateIEPLetterPlain(){
   if(c.ruleOutRelatedSvcNote) t+=c.ruleOutRelatedSvcNote+'\n\n';
   if(c.idDocPrompt) t+='['+c.idDocPrompt+']\n\n';
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
+  if(c.instruments){
+    t+=sep+'\nASSESSMENT RESULTS\n'+sep+'\n';
+    t+=c.instruments+'\n\n';
+  }
   if(c.impacts.length){
     t+=sep+'\nEDUCATIONAL IMPACT\n'+sep+'\n';
     t+='These conditions result in the following challenges that require specialized support in the educational setting:\n';
@@ -5300,7 +5319,7 @@ function generateIEPLetterPlain(){
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
   }
   t+=sep+'\n';
-  t+=`Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n{Phone Number}\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
+  t+=`Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.\n\nSincerely,\n\n\n___________________________________\n{Physician Name}, MD\nUF Behavior and Development Clinic\n\nEnclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}\n`;
   return t;
 }
 
@@ -5351,6 +5370,10 @@ async function copyIEPLetter(format){
       if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-bottom:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
       if(c.idDocPrompt) h+=`<p style="margin-bottom:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
+      if(c.instruments){
+        h+=`<p style="${secSt}">Assessment Results</p>`;
+        h+=`<p style="margin-bottom:10px">${e(c.instruments).replace(/\n/g,'<br>')}</p>`;
+      }
       if(c.impacts.length){
         h+=`<p style="${secSt}">Educational Impact</p>`;
         h+=`<p>These conditions result in the following challenges that require specialized support in the educational setting:</p><ul style="margin:4px 0 4px 20px">`;
@@ -5405,7 +5428,7 @@ async function copyIEPLetter(format){
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
       h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
-      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic<br>${wph('{Phone Number}')}</div>`;
+      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic</div>`;
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;
       await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
@@ -6112,7 +6135,7 @@ function clearAll(opts){
     dysmorphism:'',congenitalAnomalies:false,developmentalRegression:false,regressionTiming:'',
     prenatalAlcohol:false,fasdFeatures:false,paeQuantity:'',paeFrequency:'',paeTiming:'',paeDetail:'',
     teacherMaterialOther:'',dxEvalPath:'',evalProfileStatus:'',evalDxStatus:'',evalDxOutcome:'',priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
-    schoolPlacement:'',schoolDoc:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
+    schoolPlacement:'',schoolDoc:'',iepInstruments:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
     ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
     insuranceType:'',abaHours:'',previewMode:'note'});
   [S.langModifiers,S.specifiers,S.criteriaA,S.criteriaB,S.needsComm,S.needsAdaptive,
@@ -7351,6 +7374,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     inp.addEventListener('input',()=>{S.behavFreq[inp.dataset.freqkey]=inp.value.trim();render();});
   });
   document.getElementById('strengthsField').addEventListener('input',function(){S.strengths=this.value;syncStrengthChips();render();});
+  document.getElementById('iepInstrumentsField').addEventListener('input',function(){S.iepInstruments=this.value;render();});
   document.getElementById('levelJustificationSCField').addEventListener('input',function(){S.asdLevelJustificationSC=this.value;render();});
   document.getElementById('levelJustificationRRBField').addEventListener('input',function(){S.asdLevelJustificationRRB=this.value;render();});
   document.getElementById('teacherMaterialOtherField').addEventListener('input',function(){S.teacherMaterialOther=this.value;render();});

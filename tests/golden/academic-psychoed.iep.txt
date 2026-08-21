@@ -57,6 +57,5 @@ Sincerely,
 ___________________________________
 {Physician Name}, MD
 UF Behavior and Development Clinic
-{Phone Number}
 
 Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

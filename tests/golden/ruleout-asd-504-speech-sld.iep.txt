@@ -25,6 +25,14 @@ He was referred to this clinic for evaluation of concerns in the following areas
 One point I would not want lost: speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and motor findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
 
 ────────────────────────────────────────────────────────────
+ASSESSMENT RESULTS
+────────────────────────────────────────────────────────────
+WISC-V (2026): FSIQ 68; VCI 72, VSI 70, FRI 69, WMI 65, PSI 71.
+WIAT-4 (2026): Word Reading 65, Reading Comprehension 70, Pseudoword Decoding 62.
+Vineland-3 (2026), caregiver form: ABC 71; Communication 68, Daily Living 74, Socialization 70.
+GFTA-3 (2026): standard score 74; intelligibility to unfamiliar listeners reduced in connected speech.
+
+────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
 These conditions result in the following challenges that require specialized support in the educational setting:
@@ -89,6 +97,5 @@ Sincerely,
 ___________________________________
 {Physician Name}, MD
 UF Behavior and Development Clinic
-{Phone Number}
 
 Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}
