@@ -907,7 +907,7 @@ flowchart LR
     <section id="s10">
       <h1><span class="num">10</span>What goes into the IEP Letter, and the trauma opt-in</h1>
 
-      <p class="lede">The IEP Letter is written to the school team to support an Individualized Education Program (or 504 plan, depending on placement). Unlike the ABA letter, it does not require a confirmed diagnosis — it can fire for suspected ASD too, using "under evaluation" framing. Its content is organized around educational impact: how the patient's profile affects learning, what services the school should provide, and what accommodations belong in the IEP.</p>
+      <p class="lede">The IEP Letter is written to the school team to support an Individualized Education Program (or 504 plan, depending on placement). Unlike the ABA letter, it does not require a confirmed diagnosis — it works for suspected ASD, and it works when you have ruled autism out. Its content is organized around educational impact: how the patient's profile affects learning, what services the school should provide, and what accommodations belong in the IEP.</p>
 
       <h2>The diagnosis label</h2>
 
@@ -916,10 +916,30 @@ flowchart LR
       <ul>
         <li><strong>Confirmed</strong> → "Autism Spectrum Disorder (ICD-10: F84.0)" plus the severity level</li>
         <li><strong>Suspected</strong> → "Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)"</li>
-        <li><strong>Rule-out</strong> → "Neurodevelopmental evaluation (ICD-10: Z03.89)"</li>
+        <li><strong>Rule-out</strong> → "Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)"</li>
       </ul>
 
-      <p>The Z03.89 code (encounter for observation for suspected disease, ruled out) is the right placeholder for not-yet-confirmed cases; the school team can interpret the framing appropriately.</p>
+      <p>The Z03.89 code (encounter for observation for suspected disease, ruled out) is the right placeholder for not-yet-confirmed and ruled-out cases alike. On a rule-out letter the tool also drops the word "Diagnosis:" from the Re: line, since the line records that no diagnosis was assigned.</p>
+
+      <h2>When you have ruled autism out</h2>
+
+      <p>This is the case the letter used to handle badly. It would say a diagnosis was "pending further evaluation" while, elsewhere on the same page, describing autism-specific accommodations — and your A&amp;P note for the same visit said something different again, that criteria were not met. A school team reading "pending" does the sensible thing and waits for the diagnosis to arrive. It never does, and the child waits with it.</p>
+
+      <p>Selecting <em>Rule out ASD</em> now changes the letter in six ways.</p>
+
+      <p><strong>It states the finding once, plainly, and then moves on.</strong> The letter says autism was formally considered and full criteria are not met <em>at this evaluation</em>, then pivots: ruling autism out does not diminish the impairments documented below, and under IDEA a child qualifies on the basis of a documented disability that affects educational performance, not on the basis of any particular medical diagnosis. The time-anchoring is deliberate — it does not foreclose re-evaluating later.</p>
+
+      <p><strong>It carries your co-occurring diagnoses forward.</strong> Previously, a rule-out letter dropped them entirely, which meant a child with confirmed ADHD and a language disorder got a letter that named neither. Those diagnoses are now stated in the same paragraph as the rule-out, so the school reads the two together.</p>
+
+      <p><strong>It names the eligibility categories the school should evaluate under.</strong> Instead of a bracket asking you to fill one in, the tool derives candidates from what you actually documented: language findings suggest Language Impaired, speech-sound and intelligibility findings suggest Speech Impaired (listed separately, because they are different evaluations), ADHD or epilepsy or a sleep disorder suggests Other Health Impaired, a documented or suspected learning disability suggests Specific Learning Disability, cognitive and adaptive findings suggest Intellectual Disability, and a preschool-age or GDD profile suggests Developmental Delay. Each carries its federal citation so the district can check it. If nothing derives, you get the fill-in bracket instead — the letter never goes out silent on category.</p>
+
+      <p>Two categories are handled deliberately. <strong>Autism is never listed</strong>, because the letter just ruled it out. <strong>Emotional/Behavioral Disability is never auto-suggested</strong>, even when you have documented anxiety or depression. Districts weight physician language heavily, an EBD determination carries placement and disciplinary consequences, anxiety and depression in this population are frequently secondary to the neurodevelopmental picture, and the tool does not capture the chronicity and severity data that category requires. If you want it, write it into the bracket yourself.</p>
+
+      <p><strong>It protects therapy that has nothing to do with autism.</strong> When you have documented communication, sensory, or motor needs, the letter adds a paragraph explaining that speech, occupational, and physical therapy are related services available under <em>any</em> eligibility category — they are not categories of their own, and the absence of an autism diagnosis does not bear on them. This exists because those needs are routinely dismissed once autism is off the table.</p>
+
+      <p><strong>It stops claiming autism everywhere else.</strong> The social skills block drops "autism-specific," the extended-school-year argument re-anchors to your documented level of need rather than to ASD, visual supports are described as research-supported for students with communication, attention, and self-regulation needs, and the feeding accommodation drops "in ASD" from its explanation of sensory-based food selectivity. In every case the request itself is unchanged — only the claim about autism is removed.</p>
+
+      <p><strong>It handles a child who already has an autism-category IEP.</strong> If you select <em>IEP in place</em> alongside a rule-out, the letter adds a paragraph telling the team to review whether a different category better fits the current findings, and stating that services should continue on the basis of documented need while that review happens. A changed diagnostic conclusion is not a reason to reduce supports the child still requires.</p>
 
       <h2>What the letter contains</h2>
 
@@ -930,7 +950,7 @@ flowchart LR
       <p><strong>An accommodations section</strong> with four sub-categories:</p>
 
       <ol>
-        <li><strong>Core accommodations</strong> — universal ASD-friendly supports that every student receives unless explicitly excluded (predictable schedule, visual supports calibrated to developmental level)</li>
+        <li><strong>Core accommodations</strong> — a predictable schedule with advance transition notice, and visual supports calibrated to developmental level. On confirmed and suspected-ASD letters these appear on every letter, under the heading "Core ASD-Related Accommodations." On a rule-out letter the heading becomes "Structure and Predictability Accommodations" and each item appears only when something supports it: the schedule item on sensory needs, emotional dysregulation, anxiety, ADHD, or intellectual disability; the visual-supports item on communication needs, a language disorder, limited spoken language, or intellectual disability. Rigidity deliberately does <em>not</em> trigger the short schedule item, because it already produces a much more detailed transition-supports bullet further down — one version of each request, never two.</li>
         <li><strong>Individual accommodations</strong> — sensory, motor, and language-specific supports triggered by the needs categories you've checked</li>
         <li><strong>ID-modification accommodations</strong> — modified curriculum and alternate assessment, included only when intellectual disability is <em>confirmed</em> (not suspected) and the "with ID" specifier is set</li>
         <li><strong>Behavioral, emotional, and feeding accommodations</strong> — comorbidity-driven supports (anxiety calm-down spaces, ADHD extended time, ARFID safe-food protocols, epilepsy seizure plans, etc.)</li>

@@ -22,6 +22,8 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§6 DSM-5 / ICD-10 source documents](#6-dsm-5--icd-10-source-documents)
 - [§7 Epidemiology & population prevalence](#7-epidemiology--population-prevalence)
 - [§8 Fetal alcohol spectrum disorders](#8-fetal-alcohol-spectrum-disorders)
+- [§9 Education law — IDEA and Florida ESE rules](#9-education-law--idea-and-florida-ese-rules)
+- [§9 Education law — IDEA and Florida ESE rules](#9-education-law--idea-and-florida-ese-rules)
 
 ---
 
@@ -214,6 +216,47 @@ Hoyme HE, Kalberg WO, Elliott AJ, et al. **Updated Clinical Guidelines for Diagn
 - **Used for:** every "per NIAAA consensus guidelines/guidance" attribution in the A&P note's FASD wiring — the exposure documentation line and genetics phenocopy-exclusion rationale in Diagnostic Workup and Medical Referrals (`autism-ap-builder.html`, FASD Considerations block and genetics referral); the FASD-triggered audiology and ophthalmology plan lines; the five NIAAA evidence categories behind the `paeEvidence` checkboxes; the exposure-threshold field hint (Table 2 operational definition) and the four-domain `fasdDomains` sub-select (facial / growth / brain / neurobehavioral); branching-logic.md §7.9. **Attribution convention (David's call): the note names the organization (NIAAA), never the lead author** — this entry is the only place the Hoyme citation lives.
 - **Supports the claim:** NIAAA-supported consensus guidelines defining "clinically significant" documented prenatal alcohol exposure (the five evidence categories), and recommending dysmorphology/genetic evaluation to exclude phenocopies plus audiologic and dilated ophthalmologic examination as part of the FASD workup.
 - **Verified:** bibliographic details confirmed against PMC4960726 on 2026-07-16 (Claude session; David supplied the source URL) — maintainer initials pending
+
+---
+
+## 9. Education law — IDEA and Florida ESE rules
+
+These are the regulatory citations the IEP letter puts in front of a school district. They are not clinical literature, but they carry the same do-not-invent rule and the same consequence for being wrong: a district that checks a citation and finds it does not say what the letter implies discounts the whole letter. Every citation below is surfaced by section number and subject only — the tool never paraphrases regulatory text as if quoting it.
+
+All `Verified:` fields in this section are blank. **These citations surfaced in a Claude session and have not been confirmed by the maintainer against the current C.F.R. and Florida Administrative Code text.** Confirm before signing a letter that carries them.
+
+### `[idea-34cfr300]` — IDEA Part B implementing regulations
+
+U.S. Department of Education. **Assistance to States for the Education of Children with Disabilities**, 34 C.F.R. Part 300.
+
+- **Used for**, by section:
+  - **§300.8** — definition of "child with a disability" and the eligibility categories. Subsections used: `(b)` Developmental Delay (ages 3 through 9, at State and district discretion), `(c)(1)` Autism, `(c)(6)` Intellectual Disability, `(c)(9)` Other Health Impairment, `(c)(10)` Specific Learning Disability, `(c)(11)` Speech or Language Impairment. Consumed by the derived eligibility candidates and the Autism-category ask in `_iepLetterContent()` and all three IEP letter surfaces.
+  - **§300.34** — related services. Consumed by the rule-out related-services note (`ruleOutRelatedSvcNote`), which tells a district that SLP, OT, and PT are available under any eligibility category.
+  - **§300.111** — child find. Consumed by `ruleOutEvalRequest`.
+  - **§§300.301–302** — initial evaluations and timelines. Consumed by the evaluation-request paragraph on every letter other than the `schoolDoc === 'iep'` branch.
+  - **§300.304(c)(6)** — the evaluation must be sufficiently comprehensive to identify all special education and related services needs, whether or not commonly linked to the disability category. Consumed by the rule-out diagnosis paragraph (`ruleOutDxRest`).
+  - **§300.324(b)(1)** — parent may request an IEP team meeting to review and revise the IEP. Consumed by the `schoolDoc === 'iep'` branch.
+- **Supports the claim:** that IDEA eligibility rests on a documented disability adversely affecting educational performance rather than on any particular medical diagnosis — the load-bearing argument of the ASD-ruled-out letter — and that the district owes an evaluation and a categorized eligibility determination regardless of what the physician did or did not diagnose. See [branching-logic.md §10.3](branching-logic.md#103-asd-ruled-out-framing).
+- **Verified:**
+
+### `[fl-ese-rules]` — Florida State Board of Education ESE rules
+
+Florida Administrative Code, Rule Chapter 6A-6 (Special Programs) and Rule 6A-1.0943 (Statewide Assessment for Students with Disabilities).
+
+- **Used for:**
+  - **Rule 6A-6.03018** — Specific Learning Disabilities eligibility. Consumed by the suspected-SLD educational-impact bullet, the `psychoed` service block, and the SLD eligibility candidate.
+  - **Rule 6A-6.0331(3)(d)** — 60-school-day initial evaluation timeline. Consumed by the evaluation-request paragraph.
+  - **Rule 6A-1.0943** — Florida Alternate Assessment. Consumed by the `sped` service block and `accomIDMod`, both gated on confirmed intellectual disability.
+- **Supports the claim:** the Florida-specific procedural and eligibility hooks a district in this region will actually apply. These are the only state-law citations in the tool. The eligibility-category candidates deliberately cite the federal definitions instead, because the maintainer does not have the Florida rule number for every category in hand and the do-not-invent rule forbids guessing them.
+- **Verified:**
+
+### `[section-504]` — Section 504 of the Rehabilitation Act
+
+Section 504 of the Rehabilitation Act of 1973, 29 U.S.C. §794; implementing regulations at 34 C.F.R. Part 104.
+
+- **Used for:** referenced by name (not by section number) in the `schoolDoc === '504'` branch of the IEP letter, which argues a 504 accommodation plan may be insufficient to provide FAPE and asks the team to evaluate IEP eligibility.
+- **Supports the claim:** that a 504 plan and an IEP are different instruments with different scope and enforceability, which is the premise of the 504-branch ask.
+- **Verified:**
 
 ---
 

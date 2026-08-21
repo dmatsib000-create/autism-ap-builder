@@ -1,0 +1,118 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Rule out Autism Spectrum Disorder
+ICD-10-CM: Z03.89
+
+Co-occurring conditions:
+  • ADHD, Combined presentation (F90.2)
+  • Anxiety disorder (F41.9)
+  • Language disorder (F80.9)
+  • Specific learning disorder, suspected — pending psychoeducational evaluation (F81.9)
+
+── Co-occurring Condition Notes ──
+
+ADHD (Combined presentation): Attention and impulse control deficits contribute to functional impairment. Diagnosis and treatment should proceed per standard guidelines; consider ASD evaluation as a contributing factor to symptom presentation.
+Anxiety Disorder: Clinically significant anxiety confirmed as a clinically distinct co-occurring condition. Presentation is likely atypical in the context of ASD (increased rigidity, somatic complaints, behavioral dysregulation rather than verbalized worry). {Describe predominant anxiety features observed in this patient.}
+
+── Clinical Summary ──
+
+The patient is a school-aged girl who is using simple sentences and multi-word utterances, with cognitive functioning in the average range and mildly impaired adaptive behavior relative to chronological age. She was referred for evaluation with concerns in social communication prompting consideration of Autism Spectrum Disorder. Current findings do not meet full DSM-5 criteria for ASD; the presenting features are better accounted for by alternative explanations that are under active consideration. These findings were discussed with the family at today's visit.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Communication: expressive language, receptive language
+  • Behavior/interfering: noncompliance/defiance
+  • Sensory: hypersensitivity
+  • Additional concerns: emotional regulation
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Rule out Autism Spectrum Disorder (Z03.89) ──
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+1. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA/behavioral support is recommended based on the following documented functional impairments: severe noncompliance; emotional dysregulation; expressive language delays; receptive language delays; sensory processing difficulties impacting regulation and participation; significant adaptive impairment. Functional Behavior Assessment (FBA) recommended to identify the functions of specific target behaviors and guide individualized programming. Goals should be functional, meaningful in daily life, and coordinated with the school team.
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
+
+2. PARENT-CHILD INTERACTION THERAPY (PCIT)
+Recommended for: noncompliance, ADHD, anxiety.
+Evidence-based, parent-mediated intervention improving the parent-child relationship while reducing disruptive behaviors. Referral to a PCIT-trained therapist is recommended.
+  Note: PCIT is clinically distinct from the parent training component of ABA. PCIT targets the parent-child relationship through structured in-session coaching (Child-Directed Interaction and Parent-Directed Interaction phases), with a primary goal of improving relational attunement and consistent, contingent limit-setting. ABA parent training targets caregiver implementation of behavioral reinforcement strategies in naturalistic routines to generalize skill acquisition. When both are in place, goals and billable sessions should be documented as non-overlapping.
+
+3. AUTISM-INFORMED PSYCHOTHERAPY
+CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: anxiety, emotional regulation.
+Therapist with ASD-specific training required. Approaches must account for her communication profile, cognitive style, and sensory differences.
+
+4. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+5. OCCUPATIONAL THERAPY (OT)
+  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: hypersensitivity.
+  • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.
+  • ABA/OT collaboration for sensory-related behavior: Sensory-driven behaviors should be assessed collaboratively by OT (sensory integration framework) and the ABA team (functional behavior analysis). A behavior that appears sensory-driven may have operant functions (escape, attention, access to tangibles) that require behavioral intervention in addition to sensory supports. Coordinated assessment prevents siloed treatment and avoids targeting sensory behaviors without understanding their function.
+  • Service frequency: OT services at a frequency to be determined following formal evaluation, typically 1-2 sessions per week for direct intervention. School-based and clinic-based OT address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+6. SCHOOL / EDUCATIONAL SUPPORTS
+IEP evaluation recommended. Under IDEA, district must evaluate within 60 days of written parental consent. Autism eligibility category should be pursued.
+Recommended school-based services:
+  • Special education services
+  • Speech-language therapy
+  • Counseling / social-emotional support
+  • Psychoeducational evaluation recommended: comprehensive evaluation including cognitive, academic achievement, and processing domains. Family may submit written request to the school district; under IDEA, the district must evaluate within 60 days of written parental consent.
+  • Functional Behavior Assessment (FBA) recommended: clinician recommends the school conduct a formal FBA to identify antecedents, behaviors, and consequences driving interfering behaviors. FBA findings should directly inform development of a Behavior Intervention Plan (BIP). Parent may submit written request under IDEA.
+  • Visual supports / schedules
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+    - Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
+  Behavioral and Emotional Accommodations:
+    - Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks
+    - Anxiety: designated calm-down space, graduated support for anxiety triggers, flexible deadlines for anxiety-driven avoidance, advance notice before schedule changes
+    - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+    - Language: simplified verbal instructions, written directions provided alongside verbal, extended response time
+    - Emotional regulation: designated calm-down space; break pass for self-initiated regulation breaks; de-escalation plan on file with all staff; advance notice of schedule changes
+  Academic Accommodations:
+    - Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time and chunked assignments may be appropriate.
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+7. MEDICAL REFERRALS
+  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: ADHD, anxiety. Behavioral strategies should be maximized prior to and concurrent with any medication.
+
+8. FAMILY RESOURCES & NEXT STEPS
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  FAST Behavior Basics (Seattle Children's Hospital):
+  On-demand, self-paced class for parents of children ages 5–12 with challenging behaviors (also relevant for ADHD, autism, anxiety, compliance difficulties). 8 core + 3 bonus skill videos (3–5 min each). Caregiver workbook available.
+  Class: https://www.seattlechildrens.org/health-safety/classes-events/behavior-basics-class/
+  Workbook: https://www.seattlechildrens.org/globalassets/documents/healthcare-professionals/pal/fast/fast-b-caregiver-workbook.pdf
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

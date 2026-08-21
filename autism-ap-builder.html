@@ -4643,8 +4643,19 @@ async function copyABALetter(format){
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
-// keep docs/branching-logic.md §10 in sync (IEP letter content; schoolDoc+ageGroup tab gate, F84.0 vs Z03.89, trauma opt-in, 13 service blocks, 4 accommodation categories)
+// keep docs/branching-logic.md §10 in sync (IEP letter content; schoolDoc+ageGroup tab gate, F84.0 vs Z03.89,
+// ASD-ruled-out framing + derived eligibility candidates, trauma opt-in, 13 service blocks, 4 accommodation categories)
 function _iepLetterContent(){
+  // ASD-ruled-out framing. When the evaluation excludes autism, the letter still has
+  // to make a coherent ask, so `ruledOut` gates every place the letter would otherwise
+  // assert autism or defer to a diagnosis that is not coming. IDEA eligibility turns on
+  // a documented disability that adversely affects educational performance, not on any
+  // particular medical diagnosis (34 C.F.R. §§300.8, 300.304(c)(6)), so the functional
+  // findings carry the request on their own. Council review 2026-08-21 (clinical
+  // psychology / ESE / SLP / OT / PT): state the negative plainly and once, then pivot.
+  // An ambiguous "diagnosis pending" letter gets set aside by district teams waiting on
+  // a diagnosis that will never arrive.
+  const ruledOut=S.diagStatus==='ruleOut';
   const levelNumMap={1:'Level 1 (requiring support)',2:'Level 2 (requiring substantial support)',3:'Level 3 (requiring very substantial support)'};
   const scLvl=parseInt(S.asdLevelSC)||0;
   const rrbLvl=parseInt(S.asdLevelRRB)||0;
@@ -4656,7 +4667,7 @@ function _iepLetterContent(){
     ?('Autism Spectrum Disorder (ICD-10: F84.0)'+(levelLabel?' — '+levelLabel:''))
     :S.diagStatus==='suspected'
     ?'Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)'
-    :'Neurodevelopmental evaluation (ICD-10: Z03.89)';
+    :'Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)';
 
   const dxStr=S.diagStatus==='confirmed'?'Autism Spectrum Disorder (ASD)':
     S.diagStatus==='suspected'?'Autism Spectrum Disorder (ASD), suspected':
@@ -4687,6 +4698,84 @@ function _iepLetterContent(){
     if(k==='trauma' && !S.traumaIncludeInIEP) return;
     coDxs.push(coLabels[k]);
   });
+
+  // ─── Rule-out diagnosis paragraph ──────────────────────────────────────────
+  // Split into a subject-dependent opening tail plus subject-free sentences so all
+  // three letter surfaces (preview HTML, plain text, Word paste) render the same
+  // prose. The plain-text surface opens with a pronoun and needs v3(); the HTML and
+  // Word surfaces open with the {Student Name} placeholder.
+  const roConcernParts=[];
+  if(S.criteriaA.size||S.needsSocial.size||S.needsComm.size) roConcernParts.push('social communication and interaction');
+  if(S.criteriaB.size||S.needsBehavior.size||S.needsSensory.size) roConcernParts.push('behavioral regulation and sensory processing');
+  if(S.needsAdaptive.size) roConcernParts.push('adaptive functioning');
+  if(S.needsMotor&&S.needsMotor.size) roConcernParts.push('motor development');
+  // Semicolons rather than commas for the multi-item case: each domain phrase already
+  // contains its own "and", so a comma list reads as one run-on clause.
+  const ruleOutReferralTail=!roConcernParts.length
+    ? ' referred to this clinic for a developmental and behavioral evaluation.'
+    : roConcernParts.length===1
+    ? ` referred to this clinic for evaluation of concerns in ${roConcernParts[0]}.`
+    : ` referred to this clinic for evaluation of concerns in the following areas: ${roConcernParts.join('; ')}.`;
+  // "not met at this evaluation" rather than a timeless negative: developmental
+  // presentations change, and the chart should not foreclose a later re-evaluation.
+  let ruleOutDxRest='A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned.';
+  ruleOutDxRest+=!coDxs.length
+    ? ' A single unifying medical diagnosis has not been established.'
+    : coDxs.length===1
+    ? ` The evaluation did, however, document ${coDxs[0]}, which independently affects educational performance.`
+    : ` The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: ${coDxs.join('; ')}.`;
+  ruleOutDxRest+=' Ruling out autism does not diminish the functional impairments described below, which were directly observed at this evaluation and stand independent of diagnostic labeling. Under IDEA, a child qualifies for special education on the basis of a documented disability that adversely affects educational performance; a specific medical diagnosis is neither required for nor sufficient to establish eligibility, and the district\'s evaluation must be sufficiently comprehensive to identify all special education and related services needs, whether or not those needs are commonly linked to a single disability category (34 C.F.R. §§300.8, 300.304(c)(6)).';
+
+  // Related-services note (SLP/OT/PT council amendment). Once autism is off the table,
+  // sensory, motor, and communication findings are routinely dismissed by teams on the
+  // grounds that none of them names an IDEA eligibility category. They do not need to:
+  // therapy is a related service available under whichever category the team determines.
+  const roRelatedDomains=[];
+  if(S.needsComm.size) roRelatedDomains.push('communication');
+  if(S.needsSensory.size) roRelatedDomains.push('sensory');
+  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) roRelatedDomains.push('motor');
+  const roRelatedDomainStr=roRelatedDomains.length>1
+    ? roRelatedDomains.slice(0,-1).join(', ')+' and '+roRelatedDomains[roRelatedDomains.length-1]
+    : roRelatedDomains[0];
+  const ruleOutRelatedSvcNote=ruledOut&&roRelatedDomains.length
+    ? `Speech-language pathology, occupational therapy, and physical therapy are related services available under any IDEA eligibility category (34 C.F.R. §300.34). The ${roRelatedDomainStr} findings described in this letter support those services regardless of which category the team determines; they are not themselves eligibility categories, and the absence of an autism diagnosis does not bear on them.`
+    : '';
+
+  // ─── Candidate IDEA eligibility categories (rule-out letters only) ─────────
+  // Derived from what this evaluation actually documented, so the district routes the
+  // referral to the right evaluators instead of defaulting to whoever is available.
+  // Emotional/Behavioral Disability is deliberately NOT auto-derived: districts weight
+  // physician language heavily, an EBD determination carries placement and disciplinary
+  // consequences, anxiety and depression in this population are frequently secondary to
+  // the neurodevelopmental profile, and this tool captures none of the chronicity and
+  // severity data that category requires. A clinician who wants it writes it into the
+  // fill-in bracket. Autism is never listed here — the letter just ruled it out.
+  const eligibilityCandidates=[];
+  if(ruledOut){
+    if(S.comorbid.has('language_disorder')||S.needsComm.has('expressive')||S.needsComm.has('receptive')||S.needsComm.has('functional_aac')||['nonverbal','singleWord','phrase'].includes(S.langLevel))
+      eligibilityCandidates.push('Language Impaired: documented receptive and/or expressive language needs affecting access to instruction (34 C.F.R. §300.8(c)(11)).');
+    // Speech and language eligibility are evaluated separately, by different personnel
+    // and against different criteria; a student can qualify for one and not the other.
+    if(S.needsComm.has('oral_motor')||hasSpeechSoundErrors()||hasReducedIntell())
+      eligibilityCandidates.push('Speech Impaired: documented speech-sound production and/or intelligibility needs, evaluated separately from language eligibility (34 C.F.R. §300.8(c)(11)).');
+    if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('epilepsy')||S.comorbid.has('sleep_disorder'))
+      eligibilityCandidates.push('Other Health Impaired: limited alertness to educational stimuli arising from a chronic or acute health condition documented at this evaluation (34 C.F.R. §300.8(c)(9)).');
+    if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_math')||S.comorbid.has('ld_written'))
+      eligibilityCandidates.push('Specific Learning Disability: documented learning disability affecting one or more academic domains (34 C.F.R. §300.8(c)(10); Florida Rule 6A-6.03018).');
+    else if(S.comorbid.has('ld_suspected'))
+      eligibilityCandidates.push('Specific Learning Disability, suspected: the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility (34 C.F.R. §300.8(c)(10); Florida Rule 6A-6.03018).');
+    if(hasID()||S.specifiers.has('withID'))
+      eligibilityCandidates.push('Intellectual Disability: cognitive and adaptive findings documented at this evaluation warrant the district\'s own eligibility determination (34 C.F.R. §300.8(c)(6)).');
+    if(S.ageGroup==='preschool'||S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD'))
+      eligibilityCandidates.push('Developmental Delay, where the district\'s adopted age range applies: IDEA permits this category for children ages 3 through 9 at State and district discretion (34 C.F.R. §300.8(b)).');
+  }
+  const eligibilityLead=eligibilityCandidates.length
+    ? 'To help the district assign the right evaluators, the following eligibility categories are the ones this evaluation supports considering. The determination itself belongs to the team; this is a clinical steer, not a conclusion about eligibility.'
+    : '';
+  // Fallback when nothing derives — the letter must not go out silent on category.
+  const eligibilityFallback=(ruledOut&&!eligibilityCandidates.length)
+    ? '[Clinician: name the eligibility category or categories the district should evaluate under, based on the presenting profile. Autism eligibility should not be requested on this letter.]'
+    : '';
 
   const impacts=[];
   if(S.needsComm.size) impacts.push('Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.');
@@ -4755,7 +4844,10 @@ function _iepLetterContent(){
     if(S.langModifiers&&(S.langModifiers.has('speechSound')||S.langModifiers.has('reducedIntell')))
       goals.push('speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness');
     if(S.comorbid.has('language_disorder'))
-      goals.push('language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting academic comprehension and classroom participation, addressed as a diagnosis distinct from ASD-related social communication impairment');
+      // The "distinct from ASD" contrast only means something on a letter that asserts
+      // ASD. On a rule-out letter the language disorder is the standing diagnosis.
+      goals.push('language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting academic comprehension and classroom participation'
+        +(ruledOut?', addressed as a diagnosis in its own right':', addressed as a diagnosis distinct from ASD-related social communication impairment'));
     if(goals.length) s+=' Recommended goals include: '+goals.join('; ')+'.';
     svContent.slp_school=s;
   }
@@ -4795,7 +4887,8 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('social_skills_school')){
-    let s='Social Skills Instruction: Structured, autism-specific social skills instruction within the school setting is recommended. Goals: peer interaction initiation, conversational reciprocity, cooperative work skills, and understanding and navigating social expectations in group academic and recess settings.';
+    // Rule-out letters drop "autism-specific" — the ask survives, the claim does not.
+    let s='Social Skills Instruction: Structured'+(ruledOut?'':', autism-specific')+' social skills instruction within the school setting is recommended. Goals: peer interaction initiation, conversational reciprocity, cooperative work skills, and understanding and navigating social expectations in group academic and recess settings.';
     if(S.ageGroup==='adolescent'||S.ageGroup==='youngAdult') s+=' At this developmental stage, goals should also address social communication in vocational and community contexts.';
     svContent.social_skills_school=s;
   }
@@ -4813,7 +4906,13 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('esy')){
-    svContent.esy='Extended School Year (ESY): ESY services are recommended based on the documented risk of significant skill regression during extended breaks from school. Students with ASD at this level of need are at elevated risk for regression in communication, behavioral regulation, and adaptive skills during summer break, with evidence of disproportionate recovery time upon return to the school year. ESY eligibility and services should be formally determined by the IEP team based on documented regression data; this clinical evaluation supports the team\'s consideration of ESY services.';
+    // The regression-risk argument is about level of support need, not about autism, so
+    // the rule-out variant re-anchors it to the documented needs rather than the diagnosis.
+    svContent.esy='Extended School Year (ESY): ESY services are recommended based on the documented risk of significant skill regression during extended breaks from school. '
+      +(ruledOut
+        ? 'Students with this level of documented need in communication, behavioral regulation, and adaptive skills are at elevated risk for regression during summer break, with disproportionate recovery time upon return to the school year.'
+        : 'Students with ASD at this level of need are at elevated risk for regression in communication, behavioral regulation, and adaptive skills during summer break, with evidence of disproportionate recovery time upon return to the school year.')
+      +' ESY eligibility and services should be formally determined by the IEP team based on documented regression data; this clinical evaluation supports the team\'s consideration of ESY services.';
   }
 
   if(S.schoolSvc.has('lowRatio')){
@@ -4825,7 +4924,9 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('visual')){
-    svContent.visual='Visual Supports and Visual Schedules: Visual supports are a research-supported, ASD-specific accommodation that significantly improve predictability, independence, and behavioral regulation. Recommended visual supports include: a daily visual schedule (individual desk copy and classroom display), visual task sequences for multi-step activities, visual transition warnings (timer with visual cue), and visual rules and expectations posted in the classroom. Visual supports should be developed in collaboration with the SLP and/or OT and implemented consistently across all school settings including specials, lunch, and recess.';
+    svContent.visual='Visual Supports and Visual Schedules: Visual supports are a research-supported'
+      +(ruledOut?' accommodation for students with communication, attention, and self-regulation needs':', ASD-specific accommodation')
+      +' that significantly improve predictability, independence, and behavioral regulation. Recommended visual supports include: a daily visual schedule (individual desk copy and classroom display), visual task sequences for multi-step activities, visual transition warnings (timer with visual cue), and visual rules and expectations posted in the classroom. Visual supports should be developed in collaboration with the SLP and/or OT and implemented consistently across all school settings including specials, lunch, and recess.';
   }
 
   if(S.schoolSvc.has('fba')){
@@ -4859,10 +4960,30 @@ function _iepLetterContent(){
     svContent.sped=spedText;
   }
 
-  // Core ASD accommodations — near-universal, calibrated to developmental level
+  // Core ASD accommodations — near-universal, calibrated to developmental level.
+  // On a confirmed or suspected-ASD letter these fire unconditionally: the evidence
+  // for them spans the spectrum, so the diagnosis alone justifies the ask. On a
+  // rule-out letter the diagnosis is gone, so they behave like every other
+  // accommodation in this letter and fire only on a supporting finding.
   const accomCore=[];
-  accomCore.push('Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)');
-  accomCore.push('Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum');
+  const accomCoreHeading=ruledOut?'Structure and Predictability Accommodations':'Core ASD-Related Accommodations';
+  const accomCoreLead=ruledOut
+    ? 'The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student\'s developmental level and individual presentation.'
+    : 'The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student\'s developmental level and individual presentation.';
+  const schedItem='Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)';
+  const visualItem='Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation'
+    +(ruledOut?' for students with communication, attention, and self-regulation needs':' across the autism spectrum');
+  if(!ruledOut){
+    accomCore.push(schedItem);
+    accomCore.push(visualItem);
+  } else {
+    // needsBehavior 'rigidity' is deliberately NOT a trigger for the schedule item: it
+    // already produces the far more detailed "Transition supports" bullet in accomBeh
+    // below, and printing both puts the same ask in the letter twice. One version of
+    // each ask, never two.
+    if(S.needsSensory.size||S.emotionalReg||S.comorbid.has('anxiety')||hasConfirmedADHD()||S.comorbid.has('adhd_suspected')||hasID()) accomCore.push(schedItem);
+    if(S.needsComm.size||S.comorbid.has('language_disorder')||['nonverbal','singleWord','phrase'].includes(S.langLevel)||hasID()) accomCore.push(visualItem);
+  }
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
@@ -4906,7 +5027,7 @@ function _iepLetterContent(){
   if(S.comorbid.has('arfid')) accomBeh.push('ARFID: permission to bring safe foods from home for all meals and snacks; no staff pressure to eat school-provided foods; cafeteria seating accommodation away from aversive food stimuli; school nurse and 504 coordinator awareness of dietary restrictions and emergency contacts');
   const hasPFD=S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute')||S.comorbid.has('pfd_suspected');
   if(hasPFD) accomBeh.push('Pediatric Feeding Disorder: extended mealtime duration to accommodate oral-motor processing; adaptive utensils or positioning supports as recommended by feeding therapy team; permission to bring foods prepared to tolerated texture or presentation; staff awareness that mealtime difficulty is medical and developmental, not behavioral non-compliance; nurse health plan documenting any dysphagia precautions or choking risk protocols; SLP and/or OT feeding consultation to guide school mealtime support');
-  if(!hasPFD&&!S.comorbid.has('arfid')&&(S.feeding||S.needsAdaptive.has('feeding_adl'))) accomBeh.push('Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that food selectivity in ASD is sensory-based and not volitional');
+  if(!hasPFD&&!S.comorbid.has('arfid')&&(S.feeding||S.needsAdaptive.has('feeding_adl'))) accomBeh.push('Feeding and mealtime: permission to bring preferred foods from home; no staff pressure to try unfamiliar or non-preferred foods; extended mealtime time to accommodate selectivity or slow intake; cafeteria seating away from high-noise areas where possible; teacher awareness that '+(ruledOut?'this pattern of food selectivity is sensory-based and not volitional':'food selectivity in ASD is sensory-based and not volitional'));
   if(S.needsBehavior.has('pica')) accomBeh.push('Pica safety: environmental safety audit of all classrooms, hallways, and areas the student accesses; non-food items secured or removed from reach; direct staff supervision during all transitions, unstructured periods, and mealtimes; school nurse notified with emergency action plan for suspected ingestion; cafeteria staff briefed; mouthing or ingestion incidents documented and reported to family same-day');
   if(S.needsBehavior.has('smearing')) accomBeh.push('Toileting and hygiene support: a consistent, private toileting and clean-up routine with visual step-by-step supports; proactively scheduled bathroom breaks rather than waiting for requests; staff trained to respond calmly, matter-of-factly, and without drawing peer attention; coordination with the student\'s medical bowel-management plan; a behavior support plan addressing the function identified through functional behavior assessment; incidents handled discreetly and communicated with the family to preserve the student\'s dignity');
   if(S.needsBehavior.has('vocalDisruption')) accomBeh.push('Disruptive vocalizations: individualized behavior support plan (BSP) addressing antecedents and function of vocalizations; preferential seating to minimize acoustic disruption to peers; access to communication tools or fidgets as possible alternatives to vocal stimming; staff trained in non-punitive response protocols; reduced group size or separate testing environment during high-disruption periods');
@@ -4921,6 +5042,16 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_suspected')&&!S.comorbid.has('ld_reading')&&!S.comorbid.has('ld_math')&&!S.comorbid.has('ld_written'))
     accomAcad.push('Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time on assessments and chunked assignments may be appropriate.');
 
+  // Request-section prose for rule-out letters. Centralized here rather than written
+  // out three times because all three letter surfaces print it identically; only the
+  // diagnosis paragraph genuinely differs per surface (pronoun vs. name placeholder).
+  const ruleOutEvalRequest='{Student Name} presents with documented functional impairments that adversely affect educational performance, described in the Educational Impact section above. Autism has been ruled out; the need for evaluation has not. Under IDEA\'s child find obligation, a district must identify, locate, and evaluate any child suspected of having a disability and needing special education, whether or not a medical diagnosis has been made (34 C.F.R. §§300.111, 300.301). I am requesting a comprehensive multidisciplinary evaluation to determine educational eligibility and appropriate services.';
+  const ruleOutAsk504='Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. Autism has been ruled out at this evaluation, but IDEA eligibility does not turn on any particular medical diagnosis, and the functional impairments documented above are unchanged. I recommend the team evaluate IEP eligibility under the categories identified below.';
+  // For a student who already holds an IEP under the Autism category when autism is
+  // ruled out. The risk this sentence exists to prevent is a district treating the
+  // changed diagnosis as grounds to drop eligibility rather than to re-categorize it.
+  const ruleOutIEPCategoryReview='If {Student Name}\'s current eligibility is held under the Autism category, the team should review whether a different category better reflects the present findings. Services should continue on the basis of documented need while that review is underway; a change in diagnostic conclusion is not a basis for reducing or discontinuing supports the student still requires.';
+
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
   // Prior testing citation for diagnosis paragraph
@@ -4929,7 +5060,8 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt};
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,
+    ruleOutReferralTail,ruleOutDxRest,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
 function generateIEPLetterHTML(){
@@ -4950,14 +5082,16 @@ function generateIEPLetterHTML(){
   h+=`<h3>PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES</h3>`;
   h+=`<div class="aba-subtitle">${e(c.letterTypeLabel)}</div>`;
   h+=`<p class="aba-meta"><strong>Date:</strong> ${ph('{Date}')}</p>`;
-  h+=`<p class="aba-meta"><strong>Re:</strong> ${ph('{Student Name}')} &nbsp;|&nbsp; <strong>Diagnosis:</strong> ${e(c.reLineLabel)}</p>`;
+  // "Diagnosis:" is dropped on rule-out letters — the label there records that no
+  // diagnosis was assigned, and "Diagnosis: ... not diagnosed" reads as a contradiction.
+  h+=`<p class="aba-meta"><strong>Re:</strong> ${ph('{Student Name}')} &nbsp;|&nbsp; ${c.ruledOut?'':'<strong>Diagnosis:</strong> '}${e(c.reLineLabel)}</p>`;
   h+=`<p style="margin:14px 0 4px">${ph('{Principal / Special Education Coordinator Name}')}<br>${ph('{School Name}')}<br>${ph('{School Address}')}</p>`;
   h+=`<p style="margin:12px 0 8px">Dear ${ph('{Principal / Special Education Coordinator Name}')}:</p>`;
   h+=`<p>I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${ph('{Student Name}')} on ${ph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
 
   let dxPara;
-  if(S.diagStatus==='ruleOut'){
-    dxPara=`${ph('{Student Name}')} is being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
+  if(c.ruledOut){
+    dxPara=`${ph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
   } else {
     dxPara=`${ph('{Student Name}')} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
     if(c.levelLabel) dxPara+=`, classified as ${e(c.levelLabel)}`;
@@ -4967,6 +5101,7 @@ function generateIEPLetterHTML(){
     if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
   }
   h+=`<p>${dxPara}</p>`;
+  if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-top:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
   if(c.idDocPrompt) h+=`<p style="margin-top:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
   if(c.suspectedIDNote) h+=`<p style="margin-top:10px"><em>${e(c.suspectedIDNote)}</em></p>`;
 
@@ -4982,21 +5117,31 @@ function generateIEPLetterHTML(){
     h+=`<div class="aba-sec">Request for IEP Team Meeting</div>`;
     h+=`<p>I understand that ${ph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
     h+=`<p>Under IDEA (34 C.F.R. §300.324(b)(1)), a parent may request an IEP team meeting at any time to review and revise the IEP. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+    if(c.ruledOut) h+=`<p>${ph(e(c.ruleOutIEPCategoryReview))}</p>`;
   } else if(S.schoolDoc==='504'){
     h+=`<div class="aba-sec">Request for IEP Eligibility Evaluation and/or 504 Review</div>`;
     h+=`<p>I understand that ${ph('{Student Name}')} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether ${ph('{Student Name}')} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.</p>`;
-    h+=`<p>Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate ${ph('{Student Name}')}'s eligibility for special education services under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).</p>`;
+    h+=(c.ruledOut
+      ?`<p>${e(c.ruleOutAsk504)}</p>`
+      :`<p>Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate ${ph('{Student Name}')}'s eligibility for special education services under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).</p>`);
   } else {
     h+=`<div class="aba-sec">Request for Special Education Evaluation</div>`;
-    if(S.diagStatus==='ruleOut'){
-      h+=`<p>${ph('{Student Name}')} presents with neurodevelopmental concerns that have significant educational implications. A definitive diagnosis is pending further evaluation; however, IDEA requires school districts to evaluate any child suspected of having a disability affecting educational performance, regardless of whether a specific medical diagnosis has been confirmed (34 C.F.R. §300.301). I am requesting a comprehensive multidisciplinary evaluation to determine appropriate educational eligibility and services.</p>`;
-      h+=`<p>[Clinician: specify the most likely educational eligibility category — Other Health Impaired (OHI), Developmental Delay (for ages 3–9), or other — based on the presenting profile. Do not default to Autism eligibility if the diagnosis is under active consideration.]</p>`;
-    } else {
-      h+=`<p>Based on the above diagnosis and identified educational impact, I strongly recommend that ${ph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.</p>`;
-      h+=`<p>Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
-      if(S.schoolSvc.has('fba')) h+=`<p>A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${ph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
-      if(S.schoolSvc.has('psychoed')) h+=`<p>A comprehensive psychoeducational evaluation is recommended to characterize ${ph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
-    }
+    // The 60-school-day timeline, FBA, and psychoeducational paragraphs below apply to
+    // rule-out letters too — they are procedural asks, not diagnosis-dependent claims.
+    // Only the opening request paragraph differs by diagnostic conclusion.
+    h+=(c.ruledOut
+      ?`<p>${ph(e(c.ruleOutEvalRequest))}</p>`
+      :`<p>Based on the above diagnosis and identified educational impact, I strongly recommend that ${ph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.</p>`);
+    h+=`<p>Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+    if(S.schoolSvc.has('fba')) h+=`<p>A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${ph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
+    if(S.schoolSvc.has('psychoed')) h+=`<p>A comprehensive psychoeducational evaluation is recommended to characterize ${ph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
+  }
+
+  if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
+    h+=`<div class="aba-sec">Eligibility Categories for the Team to Consider</div>`;
+    if(c.eligibilityLead) h+=`<p>${e(c.eligibilityLead)}</p>`;
+    if(c.eligibilityCandidates.length){h+=`<ul>`;c.eligibilityCandidates.forEach(x=>h+=`<li>${e(x)}</li>`);h+=`</ul>`;}
+    if(c.eligibilityFallback) h+=`<p><span class="iep-ph">${e(c.eligibilityFallback)}</span></p>`;
   }
 
   const svcOrder=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
@@ -5014,7 +5159,7 @@ function generateIEPLetterHTML(){
   if(anyAccom){
     h+=`<div class="aba-sec">Recommended Accommodations</div>`;
     h+=`<p>I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.</p>`;
-    if(c.accomCore.length){h+=`<p><strong>Core ASD-Related Accommodations:</strong> The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.</p><ul>`;c.accomCore.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
+    if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> ${e(c.accomCoreLead)}</p><ul>`;c.accomCore.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong> The following accommodations are recommended based on specific needs documented in this evaluation.</p><ul>`;c.accomIndividual.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications:</strong> The following modifications are recommended based on the documented co-occurring intellectual disability and are required for FAPE under IDEA.</p><ul>`;c.accomIDMod.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul>`;c.accomBeh.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
@@ -5051,8 +5196,8 @@ function generateIEPLetterPlain(){
   t+=`Dear {Principal / Special Education Coordinator Name}:\n\n`;
   t+=`I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).\n\n`;
   let dxPara;
-  if(S.diagStatus==='ruleOut'){
-    dxPara=`${pCap} ${v3('is')} being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
+  if(c.ruledOut){
+    dxPara=`${pCap} ${v3('was')}${c.ruleOutReferralTail} ${c.ruleOutDxRest}`;
   } else {
     dxPara=`${pCap} ${v3('has')} received a diagnosis of ${c.dxStr} (ICD-10-CM: ${c.dxCode})`;
     if(c.levelLabel) dxPara+=`, classified as ${c.levelLabel}`;
@@ -5062,6 +5207,7 @@ function generateIEPLetterPlain(){
     if(c.priorTestingCite) dxPara+=c.priorTestingCite;
   }
   t+=dxPara+'\n\n';
+  if(c.ruleOutRelatedSvcNote) t+=c.ruleOutRelatedSvcNote+'\n\n';
   if(c.idDocPrompt) t+='['+c.idDocPrompt+']\n\n';
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.impacts.length){
@@ -5074,19 +5220,26 @@ function generateIEPLetterPlain(){
   if(S.schoolDoc==='iep'){
     t+=sep+'\nREQUEST FOR IEP TEAM MEETING\n'+sep+'\n';
     t+=`I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.\n\nUnder IDEA (34 C.F.R. §300.324(b)(1)), a parent may request an IEP team meeting at any time to review and revise the IEP. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.\n\n`;
+    if(c.ruledOut) t+=c.ruleOutIEPCategoryReview+'\n\n';
   } else if(S.schoolDoc==='504'){
     t+=sep+'\nREQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW\n'+sep+'\n';
-    t+=`I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.\n\nGiven the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).\n\n`;
+    t+=`I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.\n\n`;
+    t+=(c.ruledOut?c.ruleOutAsk504:`Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend that the school evaluate {Student Name}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).`)+'\n\n';
   } else {
     t+=sep+'\nREQUEST FOR SPECIAL EDUCATION EVALUATION\n'+sep+'\n';
-    if(S.diagStatus==='ruleOut'){
-      t+=`{Student Name} presents with neurodevelopmental concerns that have significant educational implications. A definitive diagnosis is pending further evaluation; however, IDEA requires school districts to evaluate any child suspected of having a disability affecting educational performance, regardless of whether a specific medical diagnosis has been confirmed (34 C.F.R. §300.301). I am requesting a comprehensive multidisciplinary evaluation to determine appropriate educational eligibility and services.\n\n`;
-      t+=`[Clinician: specify the most likely educational eligibility category, such as Other Health Impaired (OHI), Developmental Delay (for ages 3-9), or other, based on the presenting profile. Do not default to Autism eligibility if the diagnosis is under active consideration.]\n\n`;
-    } else {
-      t+=`Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.\n\nUnder IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.\n\n`;
-      if(S.schoolSvc.has('fba')) t+=`A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).\n\n`;
-      if(S.schoolSvc.has('psychoed')) t+=`A comprehensive psychoeducational evaluation is recommended to characterize {Student Name}'s academic achievement and cognitive processing profile.\n\n`;
-    }
+    // The 60-school-day timeline, FBA, and psychoeducational paragraphs apply to
+    // rule-out letters too — procedural asks, not diagnosis-dependent claims.
+    t+=(c.ruledOut?c.ruleOutEvalRequest:`Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.`)+'\n\n';
+    t+=`Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.\n\n`;
+    if(S.schoolSvc.has('fba')) t+=`A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting {Student Name}'s educational access and to inform development of a Behavior Intervention Plan (BIP).\n\n`;
+    if(S.schoolSvc.has('psychoed')) t+=`A comprehensive psychoeducational evaluation is recommended to characterize {Student Name}'s academic achievement and cognitive processing profile.\n\n`;
+  }
+  if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
+    t+=sep+'\nELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER\n'+sep+'\n';
+    if(c.eligibilityLead) t+=c.eligibilityLead+'\n\n';
+    c.eligibilityCandidates.forEach(x=>t+='  • '+x+'\n');
+    if(c.eligibilityCandidates.length) t+='\n';
+    if(c.eligibilityFallback) t+=c.eligibilityFallback+'\n\n';
   }
   const svcOrder=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
   const hasSvc=svcOrder.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
@@ -5102,7 +5255,7 @@ function generateIEPLetterPlain(){
   if(anyAccom){
     t+=sep+'\nRECOMMENDED ACCOMMODATIONS\n'+sep+'\n';
     t+='I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team\'s selection should reflect what the evaluation supports.\n\n';
-    if(c.accomCore.length){t+='Core ASD-Related Accommodations (implementation calibrated to developmental level and individual presentation):\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomCore.length){t+=c.accomCoreHeading+' (implementation calibrated to developmental level and individual presentation):\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomIndividual.length){t+='Individually Indicated Accommodations Based on Evaluation Findings:\n';c.accomIndividual.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomIDMod.length){t+='Curriculum and Assessment Modifications (based on documented intellectual disability; required for FAPE under IDEA):\n';c.accomIDMod.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomBeh.length){t+='Behavioral and Emotional Accommodations:\n';c.accomBeh.forEach(a=>t+='  • '+a+'\n');t+='\n';}
@@ -5144,8 +5297,8 @@ async function copyIEPLetter(format){
       h+=`<p style="margin:14px 0 8px">Dear ${wph('{Principal / Special Education Coordinator Name}')}:</p>`;
       h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
       let dxPara;
-      if(S.diagStatus==='ruleOut'){
-        dxPara=`${wph('{Student Name}')} is being evaluated for neurodevelopmental concerns; a definitive diagnosis has not yet been established as of this evaluation. The presenting profile is consistent with neurodevelopmental differences that have significant educational implications, as described in the Educational Impact section below.`;
+      if(c.ruledOut){
+        dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
       } else {
         dxPara=`${wph('{Student Name}')} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
         if(c.levelLabel) dxPara+=`, classified as ${e(c.levelLabel)}`;
@@ -5155,6 +5308,7 @@ async function copyIEPLetter(format){
         if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
       }
       h+=`<p style="margin-bottom:10px">${dxPara}</p>`;
+      if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-bottom:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
       if(c.idDocPrompt) h+=`<p style="margin-bottom:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.impacts.length){
@@ -5168,21 +5322,27 @@ async function copyIEPLetter(format){
         h+=`<p style="${secSt}">Request for IEP Team Meeting</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
         h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §300.324(b)(1)), a parent may request an IEP team meeting at any time to review and revise the IEP. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
+        if(c.ruledOut) h+=`<p style="margin-bottom:10px">${wph(e(c.ruleOutIEPCategoryReview))}</p>`;
       } else if(S.schoolDoc==='504'){
         h+=`<p style="${secSt}">Request for IEP Eligibility Evaluation and/or 504 Review</p>`;
         h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether ${wph('{Student Name}')} meets eligibility for an IEP under IDEA, which provides more comprehensive and legally enforceable services than a 504 accommodation plan.</p>`;
-        h+=`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend the school evaluate ${wph('{Student Name}')}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).</p>`;
+        h+=(c.ruledOut
+          ?`<p style="margin-bottom:10px">${e(c.ruleOutAsk504)}</p>`
+          :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA. I recommend the school evaluate ${wph('{Student Name}')}'s eligibility under the Autism eligibility category (34 C.F.R. §300.8(c)(1)).</p>`);
       } else {
         h+=`<p style="${secSt}">Request for Special Education Evaluation</p>`;
-        if(S.diagStatus==='ruleOut'){
-          h+=`<p style="margin-bottom:10px">${wph('{Student Name}')} presents with neurodevelopmental concerns that have significant educational implications. A definitive diagnosis is pending further evaluation; however, IDEA requires school districts to evaluate any child suspected of having a disability affecting educational performance, regardless of whether a specific medical diagnosis has been confirmed (34 C.F.R. §300.301). I am requesting a comprehensive multidisciplinary evaluation to determine appropriate educational eligibility and services.</p>`;
-          h+=`<p style="margin-bottom:10px">[Clinician: specify the most likely educational eligibility category, such as Other Health Impaired (OHI), Developmental Delay (for ages 3–9), or other, based on the presenting profile. Do not default to Autism eligibility if the diagnosis is under active consideration.]</p>`;
-        } else {
-          h+=`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that ${wph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.</p>`;
-          h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
-          if(S.schoolSvc.has('fba')) h+=`<p style="margin-bottom:10px">A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${wph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
-          if(S.schoolSvc.has('psychoed')) h+=`<p style="margin-bottom:10px">A comprehensive psychoeducational evaluation is recommended to characterize ${wph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
-        }
+        h+=(c.ruledOut
+          ?`<p style="margin-bottom:10px">${wph(e(c.ruleOutEvalRequest))}</p>`
+          :`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that ${wph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism eligibility category (34 C.F.R. §300.8(c)(1)) and any additional eligibility categories supported by the evaluation results.</p>`);
+        h+=`<p style="margin-bottom:10px">Under IDEA (34 C.F.R. §§300.301–302) and Florida Rule 6A-6.0331(3)(d), the school district is required to complete the initial evaluation within 60 school days of receiving written parental consent and determination that an evaluation is needed. This evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+        if(S.schoolSvc.has('fba')) h+=`<p style="margin-bottom:10px">A Functional Behavior Assessment (FBA) is specifically recommended to identify the behavioral antecedents, behaviors, and consequences affecting ${wph('{Student Name}')}'s educational access and to inform development of a Behavior Intervention Plan (BIP).</p>`;
+        if(S.schoolSvc.has('psychoed')) h+=`<p style="margin-bottom:10px">A comprehensive psychoeducational evaluation is recommended to characterize ${wph('{Student Name}')}'s academic achievement and cognitive processing profile.</p>`;
+      }
+      if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
+        h+=`<p style="${secSt}">Eligibility Categories for the Team to Consider</p>`;
+        if(c.eligibilityLead) h+=`<p style="margin-bottom:8px">${e(c.eligibilityLead)}</p>`;
+        if(c.eligibilityCandidates.length){h+=`<ul style="margin:4px 0 4px 20px">`;c.eligibilityCandidates.forEach(x=>h+=`<li style="margin-bottom:3px">${e(x)}</li>`);h+=`</ul>`;}
+        if(c.eligibilityFallback) h+=`<p style="margin-bottom:10px"><span style="${phSt}">${e(c.eligibilityFallback)}</span></p>`;
       }
       const svcOrder2=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
       const hasSvc2=svcOrder2.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
@@ -5198,7 +5358,7 @@ async function copyIEPLetter(format){
       if(anyA){
         h+=`<p style="${secSt}">Recommended Accommodations</p>`;
         h+=`<p style="margin-bottom:8px">I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.</p>`;
-        if(c.accomCore.length){h+=`<p><strong>Core ASD-Related Accommodations:</strong> Implementation calibrated to developmental level and individual presentation.</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> Implementation calibrated to developmental level and individual presentation.</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomIndividual.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications</strong> (based on documented intellectual disability):<br></p><ul style="margin:4px 0 4px 20px">`;c.accomIDMod.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
@@ -6592,7 +6752,7 @@ function onDxEvalPathChange(){
   updateSectionHeaders();
 }
 
-// keep docs/branching-logic.md §10.9 in sync (school-service auto-recommendation; psychoed deduped from academic/ld_suspected/hyperlexia)
+// keep docs/branching-logic.md §10.10 in sync (school-service auto-recommendation; psychoed deduped from academic/ld_suspected/hyperlexia)
 function syncSchoolSvcFromNeeds(){
   // Toddlers are served under IDEA Part C (Early Steps), not Part B school services.
   // Without this gate, any need checkbox auto-populates S.schoolSvc and the suppressed
