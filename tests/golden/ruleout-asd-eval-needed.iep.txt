@@ -1,8 +1,3 @@
-NOTE: This letter is a physician recommendation to be submitted by the family as supporting
-documentation for their written request. Under IDEA, the parent/guardian must also submit
-a brief separate written request to the school district.
-────────────────────────────────────────────────────────────
-
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
 Initial Special Education Evaluation Request
 
@@ -20,7 +15,9 @@ I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Stud
 
 Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
 
-She was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder; a specific learning disability (suspected, pending psychoeducational evaluation); a language disorder. Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
+She was referred to this clinic for evaluation of concerns in the following areas: social communication and interaction; behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: Attention-Deficit/Hyperactivity Disorder, combined presentation (ADHD); an anxiety disorder; a specific learning disability (suspected, pending psychoeducational evaluation); a language disorder.
+
+Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
 
 Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
 
@@ -75,8 +72,9 @@ I recommend that the IEP team consider the following accommodations, calibrated 
 Structure and Predictability Accommodations:
 The following accommodations are supported by the specific findings documented in this evaluation. Implementation should be calibrated to this student's developmental level and individual presentation.
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation for students with communication, attention, and self-regulation needs
 
-Individually Indicated Accommodations Based on Evaluation Findings:
+Individually Indicated Accommodations:
   • Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)
 
 Behavioral and Emotional Accommodations:

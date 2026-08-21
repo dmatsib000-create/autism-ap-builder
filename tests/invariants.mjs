@@ -248,7 +248,7 @@ check('ABA targets (sync add() targets a real checkbox)',
 // lane covers actual rendering for the plain surface; the preview and Word
 // surfaces have no output test, which is why presence is worth checking at all.
 const IEP_SHARED_FIELDS = [
-  'ruleOutReferralTail', 'ruleOutDxRest', 'ruleOutRelatedSvcNote',
+  'ruleOutReferralTail', 'ruleOutDxRest', 'ruleOutDxPivot', 'ruleOutRelatedSvcNote',
   'eligibilityCandidates', 'eligibilityLead', 'eligibilityFallback',
   'ruleOutEvalRequest', 'ruleOutAsk504', 'ruleOutIEPCategoryReview',
   'accomCoreHeading', 'accomCoreLead',

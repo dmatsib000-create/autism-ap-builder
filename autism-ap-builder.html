@@ -4735,7 +4735,7 @@ function _iepLetterContent(){
     : coDxs.length===1
     ? ` The evaluation did, however, document ${coDxs[0]}, which independently affects educational performance.`
     : ` The evaluation did, however, document the following diagnoses, each of which independently affects educational performance: ${coDxs.join('; ')}.`;
-  ruleOutDxRest+=' Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district\'s evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school\'s own observations of this student across the day.';
+  const ruleOutDxPivot='Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district\'s evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school\'s own observations of this student across the day.';
 
   // Related-services note (SLP/OT/PT council amendment). Once autism is off the table,
   // sensory, motor, and communication findings are routinely dismissed by teams on the
@@ -4998,20 +4998,22 @@ function _iepLetterContent(){
   //    accomBeh below, which says everything schedItem says and more;
   //  - a requested 'visual' service block already carries the visual-supports ask at
   //    greater length, so the short accommodation restating it is dropped.
+  // rigidity already produces the far more detailed "Transition supports" bullet in
+  // accomBeh below, which says everything schedItem says and more. Both sit on the
+  // accommodations page, so dropping the shorter one costs nothing.
   const schedCoveredElsewhere=S.needsBehavior.has('rigidity');
-  const visualCoveredElsewhere=S.schoolSvc.has('visual');
   if(!ruledOut){
     if(!schedCoveredElsewhere) accomCore.push(schedItem);
-    if(!visualCoveredElsewhere) accomCore.push(visualItem);
+    accomCore.push(visualItem);
   } else {
     // On a ruled-out letter the diagnosis no longer carries these on its own, so each
     // additionally requires a supporting finding.
     if(!schedCoveredElsewhere&&(S.needsSensory.size||S.emotionalReg||S.comorbid.has('anxiety')||hasConfirmedADHD()||S.comorbid.has('adhd_suspected')||hasID())) accomCore.push(schedItem);
-    if(!visualCoveredElsewhere&&(S.needsComm.size||S.comorbid.has('language_disorder')||['nonverbal','singleWord','phrase'].includes(S.langLevel)||hasID())) accomCore.push(visualItem);
+    if(S.needsComm.size||S.comorbid.has('language_disorder')||['nonverbal','singleWord','phrase'].includes(S.langLevel)||hasID()) accomCore.push(visualItem);
   }
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
-  if(S.needsSensory.size&&!S.schoolSvc.has('sensory')) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
+  if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
   if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
   // Curriculum and assessment modifications — only when intellectual disability is confirmed
   // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
@@ -5118,7 +5120,7 @@ function _iepLetterContent(){
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
   return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instruments,impactLead,
-    ruleOutReferralTail,ruleOutDxRest,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
+    ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
 function generateIEPLetterHTML(){
@@ -5135,7 +5137,7 @@ function generateIEPLetterHTML(){
     h+=`<div style="background:#fef3c7;border-left:4px solid #d97706;padding:10px 14px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:12px;color:#92400e;line-height:1.5">⚠️ This letter includes trauma context. Confirm the family has consented to share this with the school district before sending.</div>`;
   }
   h+=`<div class="aba-doc">`;
-  h+=`<div class="iep-notice">This is a physician recommendation letter to be submitted by the family as supporting documentation for their written request. Under IDEA, the parent/guardian must also submit a brief separate written request to the school district.</div>`;
+  h+=`<div class="iep-notice">On-screen reminder, not part of the letter: this is supporting documentation the family submits alongside their own written request. Under IDEA the parent or guardian must also send the district a brief separate written request. This notice does not appear in the copied or pasted versions.</div>`;
   h+=`<h3>PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES</h3>`;
   h+=`<div class="aba-subtitle">${e(c.letterTypeLabel)}</div>`;
   h+=`<p class="aba-meta"><strong>Date:</strong> ${ph('{Date}')}</p>`;
@@ -5150,7 +5152,7 @@ function generateIEPLetterHTML(){
 
   let dxPara;
   if(c.ruledOut){
-    dxPara=`${ph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
+    dxPara=`${ph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}</p><p>${e(c.ruleOutDxPivot)}`;
   } else {
     dxPara=`${ph('{Student Name}')} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
     if(c.levelLabel) dxPara+=`, classified as ${e(c.levelLabel)}`;
@@ -5222,7 +5224,7 @@ function generateIEPLetterHTML(){
     h+=`<div class="aba-sec">Recommended Accommodations</div>`;
     h+=`<p>I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.</p>`;
     if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> ${e(c.accomCoreLead)}</p><ul>`;c.accomCore.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
-    if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong> The following accommodations are recommended based on specific needs documented in this evaluation.</p><ul>`;c.accomIndividual.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
+    if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations:</strong> The following accommodations are recommended based on specific needs documented in this evaluation.</p><ul>`;c.accomIndividual.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications:</strong> The following modifications are recommended based on the documented co-occurring intellectual disability and are required for FAPE under IDEA.</p><ul>`;c.accomIDMod.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul>`;c.accomBeh.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
     if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul>`;c.accomAcad.forEach(a=>h+=`<li>${e(a)}</li>`);h+=`</ul>`;}
@@ -5247,11 +5249,7 @@ function generateIEPLetterPlain(){
   const pPossCap=pPoss.charAt(0).toUpperCase()+pPoss.slice(1);
   // v3() is module-scope (defined just after getPron); see V3_MAP for the verb list.
   const sep='─'.repeat(60);
-  let t='NOTE: This letter is a physician recommendation to be submitted by the family as supporting\n';
-  t+='documentation for their written request. Under IDEA, the parent/guardian must also submit\n';
-  t+='a brief separate written request to the school district.\n';
-  t+=sep+'\n\n';
-  t+=`PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES\n${c.letterTypeLabel}\n\n`;
+  let t=`PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES\n${c.letterTypeLabel}\n\n`;
   t+=`Date: {Date}\n\n`;
   t+=`{Principal / Special Education Coordinator Name}\n{School Name}\n{School Address}\n\n`;
   t+=`Re: {Student Name} | ${c.reLineLabel}\n\n`;
@@ -5260,7 +5258,7 @@ function generateIEPLetterPlain(){
   t+=c.requestPara+'\n\n';
   let dxPara;
   if(c.ruledOut){
-    dxPara=`${pCap} ${v3('was')}${c.ruleOutReferralTail} ${c.ruleOutDxRest}`;
+    dxPara=`${pCap} ${v3('was')}${c.ruleOutReferralTail} ${c.ruleOutDxRest}\n\n${c.ruleOutDxPivot}`;
   } else {
     dxPara=`${pCap} ${v3('has')} received a diagnosis of ${c.dxStr} (ICD-10-CM: ${c.dxCode})`;
     if(c.levelLabel) dxPara+=`, classified as ${c.levelLabel}`;
@@ -5321,7 +5319,7 @@ function generateIEPLetterPlain(){
     t+=sep+'\nRECOMMENDED ACCOMMODATIONS\n'+sep+'\n';
     t+='I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team\'s selection should reflect what the evaluation supports.\n\n';
     if(c.accomCore.length){t+=c.accomCoreHeading+':\n'+c.accomCoreLead+'\n';c.accomCore.forEach(a=>t+='  • '+a+'\n');t+='\n';}
-    if(c.accomIndividual.length){t+='Individually Indicated Accommodations Based on Evaluation Findings:\n';c.accomIndividual.forEach(a=>t+='  • '+a+'\n');t+='\n';}
+    if(c.accomIndividual.length){t+='Individually Indicated Accommodations:\n';c.accomIndividual.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomIDMod.length){t+='Curriculum and Assessment Modifications (based on documented intellectual disability; required for FAPE under IDEA):\n';c.accomIDMod.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomBeh.length){t+='Behavioral and Emotional Accommodations:\n';c.accomBeh.forEach(a=>t+='  • '+a+'\n');t+='\n';}
     if(c.accomAcad.length){t+='Academic Accommodations:\n';c.accomAcad.forEach(a=>t+='  • '+a+'\n');t+='\n';}
@@ -5353,7 +5351,6 @@ async function copyIEPLetter(format){
       const ss='font-family:Georgia,"Times New Roman",serif;font-size:11pt;line-height:1.85;color:#1a1a2e;max-width:700px';
       const secSt='font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:#1d4ed8;border-bottom:1.5px solid #dbeafe;padding-bottom:2px;margin:20px 0 8px';
       let h=`<div style="${ss}">`;
-      h+=`<p style="font-style:italic;font-size:9pt;color:#6b7280;border:1px solid #e5e7eb;padding:8px;margin-bottom:16px">NOTE: This is a physician recommendation letter. The parent/guardian must also submit a brief separate written request to the school district under IDEA.</p>`;
       h+=`<p style="font-size:14pt;font-weight:bold;text-align:center;margin-bottom:4px">PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES</p>`;
       h+=`<p style="text-align:center;font-size:10pt;color:#6b7280;margin-bottom:22px;font-style:italic">${e(c.letterTypeLabel)}</p>`;
       h+=`<p style="margin-bottom:4px"><strong>Date:</strong> ${wph('{Date}')}</p>`;
@@ -5365,7 +5362,7 @@ async function copyIEPLetter(format){
 
       let dxPara;
       if(c.ruledOut){
-        dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}`;
+        dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}</p><p style="margin-bottom:10px">${e(c.ruleOutDxPivot)}`;
       } else {
         dxPara=`${wph('{Student Name}')} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
         if(c.levelLabel) dxPara+=`, classified as ${e(c.levelLabel)}`;
@@ -5428,7 +5425,7 @@ async function copyIEPLetter(format){
         h+=`<p style="${secSt}">Recommended Accommodations</p>`;
         h+=`<p style="margin-bottom:8px">I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.</p>`;
         if(c.accomCore.length){h+=`<p><strong>${e(c.accomCoreHeading)}:</strong> ${e(c.accomCoreLead)}</p><ul style="margin:4px 0 4px 20px">`;c.accomCore.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
-        if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations Based on Evaluation Findings:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomIndividual.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
+        if(c.accomIndividual.length){h+=`<p><strong>Individually Indicated Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomIndividual.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomIDMod.length){h+=`<p><strong>Curriculum and Assessment Modifications</strong> (based on documented intellectual disability):<br></p><ul style="margin:4px 0 4px 20px">`;c.accomIDMod.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}

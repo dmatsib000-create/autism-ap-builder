@@ -231,7 +231,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `abaHours` | string | [§1.2](#12-the-s-object--property-reference), [§9.6](#96-settings-and-hours) |
 | `abaSetting` | Set | [§9.6](#96-settings-and-hours) |
 | `abaTargets` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds) |
-| `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.14](#1014-psychoeducational-evaluation-auto-recommendation) |
+| `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.15](#1015-psychoeducational-evaluation-auto-recommendation) |
 | `adaptiveStandardized` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `adaptProfile` | string | [§1.2](#12-the-s-object--property-reference) |
 | `ag` | Set | [§1.2](#12-the-s-object--property-reference) |
@@ -280,16 +280,16 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `safety` | Set | [§9.5](#95-safety-urgency-clause), [§7.2](#72-the-18-rules-at-a-glance) |
 | `schoolDoc` | string | [§5.3](#53-the-iep-hard-gates) |
 | `schoolPlacement` | string | [§1.2](#12-the-s-object--property-reference) |
-| `schoolSvc` | Set | [§10.10](#1010-service-rationale-blocks) |
-| `schoolSvcAuto` / `schoolSvcManualOff` | Set | [§10.13](#1013-the-schoolsvcauto--schoolsvcmanualoff-tracking) |
+| `schoolSvc` | Set | [§10.11](#1011-service-rationale-blocks) |
+| `schoolSvcAuto` / `schoolSvcManualOff` | Set | [§10.14](#1014-the-schoolsvcauto--schoolsvcmanualoff-tracking) |
 | `seizureConcern` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
 | `sleepStudy` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
-| `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.12](#1012-specifier-edge-cases) |
+| `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.13](#1013-specifier-edge-cases) |
 | `strengths` | string | [§1.2](#12-the-s-object--property-reference) |
 | `teacherMaterials` | Set | [§1.2](#12-the-s-object--property-reference), [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `teacherMaterialsReturned` | Set | [§4.5.2](#452-workup-completion-statuses-evalpathsteps) |
 | `therapyStatus` | object | [§1.2](#12-the-s-object--property-reference) |
-| `traumaIncludeInIEP` | boolean | [§6.4](#64-the-trauma-iep-gate), [§10.8](#108-trauma-opt-in-gate) |
+| `traumaIncludeInIEP` | boolean | [§6.4](#64-the-trauma-iep-gate), [§10.9](#109-trauma-opt-in-gate) |
 | `unevenCog` / `unevenCogDesc` | boolean / string | [§1.2](#12-the-s-object--property-reference) |
 | `visitType` | string | [§1.2](#12-the-s-object--property-reference) |
 
@@ -315,7 +315,7 @@ The branches below all read `S.ageGroup` directly or via a helper like `isYoung(
 |---|---|---|---|
 | IEP tab visibility | 3938 | `ageGroup !== 'toddler'` (plus `schoolDoc !== ''`) | Hide IEP tab for toddlers |
 | School-section Part B band in the note | ~3120–3200 | `ageGroup !== 'toddler'` | Toddlers (IDEA Part C) get only the Early Steps bullet ("age under 36 months" + promptness caveat) and a Part C→Part B transition line; the placement / IEP-doc / school-services band, the IEP/504 accommodations, the SLP/OT "school-based vs clinic-based" clauses, and the concurrent-billing note are all suppressed |
-| `syncSchoolSvcFromNeeds()` toddler gate | ~6150 | `ageGroup === 'toddler'` → early return | No Part B school services are auto-populated for toddlers (see [§10.14](#1014-psychoeducational-evaluation-auto-recommendation)) |
+| `syncSchoolSvcFromNeeds()` toddler gate | ~6150 | `ageGroup === 'toddler'` → early return | No Part B school services are auto-populated for toddlers (see [§10.15](#1015-psychoeducational-evaluation-auto-recommendation)) |
 | §"School & Educational Supports" form section hidden + dynamic folios | end of `updateAgeBasedVisibility()` | `ageGroup === 'toddler'` | The whole form section (`sh-school`'s `.section` wrapper) is hidden, stale Part B state is torn down (placement, doc, services + DOM controls), and the **visible section folios are resequenced** over the canonical 9-id list so toddlers see a contiguous 1–8. Nothing reads `.sec-folio` (dot/summary logic keys on `sh-*` ids), so the renumber is display-only — keep it that way |
 | NDBI vs FBA prose in ABA letter | 2067–2068 | `isYoung()` → NDBI; `'schoolAge'` → FBA | Letter language shifts |
 | Cognitive-profile tier age gates | 4494, 4505, 4517 | `young` hides ID tier + BIF radios; `older` hides GDD tier | DSM-5/AACAP: ID/BIF require IQ testing (unreliable <5); GDD doesn't apply ≥5. Teardown clears `cogProfile` and calls `bridgeCogProfileToSpecifier('')` to drop the matching specifier |
@@ -1047,7 +1047,7 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `functional_comm` | `needsComm.has('expressive') \|\| needsComm.has('receptive') \|\| needsComm.has('functional_aac')` |
 | `safety_skills` | `needsAdaptive.has('commSafety') \|\| needsAdaptive.has('commIndependence')` |
 | `menstrual_care` | `needsAdaptive.has('menstrualCare')` |
-| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA). For school-age and up, the academic *concern* instead routes to the `psychoed` school eval — see [§10.14](#1014-psychoeducational-evaluation-auto-recommendation) |
+| `academics` | `S.academic === true && isYoung()` — **toddler/preschool only** (school-age academics belong to IDEA/FAPE, not ABA). For school-age and up, the academic *concern* instead routes to the `psychoed` school eval — see [§10.15](#1015-psychoeducational-evaluation-auto-recommendation) |
 | `joint_attention` + `imitation` | `isYoung() && (needsSocial.size > 0 \|\| needsComm.size > 0)` |
 | `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` — gated to the repetitive-movement/speech criterion or disruptive vocalizations only. The former `needsBehavior.size > 0` catch-all was removed (council 2026-06-02, §4 review Unit 1 D2): it made *any* interfering behavior (aggression, elopement, SIB, noncompliance) add a stereotypy-reduction target. `vocalDisruption`'s function (stereotypy vs. communicative/attention-maintained) is an FBA determination. |
 | `reduce_pica` | `needsBehavior.has('pica')` |
@@ -1300,7 +1300,35 @@ reach out to the office and the physician decides case by case from there. The c
 director had reached the same place from the other direction: an offer of presence the clinic
 cannot honour costs more credibility across repeated letters than it gains on any one.
 
-### 10.5 Assessment Results (free-text instrument summaries)
+### 10.5 Repetition control: which surface owns an ask
+
+A ruled-out letter was once asking for the same thing many times over: the FBA eight times, the
+psychoeducational evaluation seven, visual supports five, and both the evaluation request and the
+60-day timeline twice each. Repetition does not read as thoroughness to a district team; it trains
+them to skim, which costs the asks that appear only once.
+
+Two rules now decide who owns an ask, and the distinction between them is the important part:
+
+**Accommodation versus accommodation — the fuller one wins.** `needsBehavior.has('rigidity')`
+suppresses the short `schedItem` core accommodation, because the detailed "Transition supports"
+bullet in `accomBeh` says everything it says and more. Safe because both land on the *same*
+accommodations page of the IEP, so nothing is lost in transcription. This applies to every letter,
+not only ruled-out ones.
+
+**Service versus accommodation — both render, deliberately.** A suppression keyed on
+`schoolSvc.has('visual')` / `has('sensory')` was built and then **reverted on 2026-08-21 at the
+maintainer's direction.** Services and accommodations land on *different pages* of an IEP and are
+decided in different parts of the meeting; the general-education teacher who implements day to day
+may only ever read the accommodations page. An ask that exists solely inside a services paragraph
+can be lost in transcription, and that failure is more expensive than the repetition. Do not
+re-introduce that suppression.
+
+Genuine duplicates were removed instead: the request section no longer restates the ask or the
+timeline (the opening paragraph carries both), and its FBA and psychoeducational paragraphs are
+gone because they fired on conditions identical to their Recommended Services blocks. The
+suspected-SLD educational-impact bullet states impact only; its recommendation lives in Services.
+
+### 10.6 Assessment Results (free-text instrument summaries)
 
 `S.iepInstruments` is a single free-text field in the School section, rendered verbatim as an
 "Assessment Results" section **between the diagnosis paragraph and Educational Impact** — evidence,
@@ -1328,7 +1356,7 @@ report. Both may appear on the same letter without conflict.
 The IEP signature block no longer emits `{Phone Number}` — the clinician pastes a signature line
 that already carries it (maintainer, 2026-08-21). The ABA letter never had one.
 
-### 10.6 Citation register: pediatrician, not lawyer
+### 10.7 Citation register: pediatrician, not lawyer
 
 A ruled-out letter carried 17 legal citations; a confirmed-autism letter carried 2. The maintainer's
 direction was to cite "as a pediatrician would and not a lawyer, in a way that increases likelihood
@@ -1345,7 +1373,7 @@ The survivors were also reframed. "The district must" became "it may help to not
 remain verified in [references.md §9](references.md#9-education-law--idea-and-florida-ese-rules)
 even where the letter no longer surfaces them: dropping a citation from the prose is not retiring it.
 
-### 10.7 Citation audit (2026-08-21)
+### 10.8 Citation audit (2026-08-21)
 
 Every regulatory citation in the IEP letter was read against the official source on 2026-08-21 —
 federal sections on eCFR, Florida rules on flrules.org cross-checked against Cornell LII. Full
@@ -1400,7 +1428,7 @@ Do not rewrite it to "is under evaluation for" in a cleanup pass; it reads as a 
 recommendation letter argues from the regulations; citing litigation in it would misrepresent
 what the document is and invite the district to read it as a threat.
 
-### 10.8 Trauma opt-in gate
+### 10.9 Trauma opt-in gate
 
 `autism-ap-builder.html:3384, 3636`:
 
@@ -1412,7 +1440,7 @@ if (S.comorbid.has('trauma') && S.traumaIncludeInIEP) {
 
 Default behavior: trauma is **omitted** from the IEP letter even when present in `S.comorbid`. The clinician must check `traumaIncludeInIEP` to include it. When included, the IEP letter preview displays a banner at the top warning that trauma content is present in the educational record (`autism-ap-builder.html:3636–3638`). See [§6.4](#64-the-trauma-iep-gate) for the rationale.
 
-### 10.9 Educational impact bullets
+### 10.10 Educational impact bullets
 
 `autism-ap-builder.html:3388–3416` builds an array of impact bullets, each gated on a different domain. The bullets become the "Educational Impact" section of the letter.
 
@@ -1427,7 +1455,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | SLD (confirmed) | `comorbid.has('ld_reading' \| 'ld_math' \| 'ld_written')` | Domain-specific SLD impact |
 | SLD (suspected) | `comorbid.has('ld_suspected')` + no confirmed domains | Recommend psychoed eval to characterize domain |
 
-### 10.10 Service rationale blocks
+### 10.11 Service rationale blocks
 
 `autism-ap-builder.html:3437–3544` builds the `svContent` object, with one block per service the IEP letter recommends. Each block fires when its membership condition holds in `schoolSvc`.
 
@@ -1449,7 +1477,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 
 The recommendations are coordinated — checking `aide` for a child with `safety.has('elopement_counsel')` produces a paragraph that explicitly cites the elopement risk as the rationale.
 
-### 10.11 Accommodations
+### 10.12 Accommodations
 
 Four accommodation groups, each populated conditionally:
 
@@ -1511,7 +1539,7 @@ The double gate is important: suspected ID alone (`withSuspectedID`) does not pr
 | `comorbid.has('ld_math')` | Calculator, manipulatives, graph paper |
 | `comorbid.has('ld_suspected')` | Interim extended time + chunking pending eval results |
 
-### 10.12 Specifier edge cases
+### 10.13 Specifier edge cases
 
 **`suspectedIDNote`** (`autism-ap-builder.html:3587–3592`): If `specifiers.has('withSuspectedID')` or `withSuspectedGDD` AND `cogDataSource !== 'priorExternal'`, the letter appends:
 
@@ -1521,7 +1549,7 @@ This protects against schools assigning ID eligibility based on a "suspected" cl
 
 **`idDocPrompt`**: If `specifiers.has('withID')` is true but `hasID() === false` (no severity selected in `cogProfile`), the letter shows an in-letter prompt to the clinician to select severity before sending. This catches the failure mode where the clinician checked the specifier checkbox but didn't complete the severity dropdown.
 
-### 10.13 The `schoolSvcAuto` / `schoolSvcManualOff` tracking
+### 10.14 The `schoolSvcAuto` / `schoolSvcManualOff` tracking
 
 These two Sets track *provenance* of each service:
 - `schoolSvcAuto` — services the app auto-recommended
@@ -1529,7 +1557,7 @@ These two Sets track *provenance* of each service:
 
 When state changes re-trigger auto-recommendations, services in `schoolSvcManualOff` are *not* re-added even if their auto-recommendation condition still holds. This mirrors the §9 `syncABATargetsFromNeeds()` add-only philosophy: respect clinician curation over recomputed defaults.
 
-### 10.14 Psychoeducational-evaluation auto-recommendation
+### 10.15 Psychoeducational-evaluation auto-recommendation
 
 `syncSchoolSvcFromNeeds()` (`autism-ap-builder.html:6178`) holds the full needs→school-service auto-population mapping (it is the source of truth for which need adds which service). **The whole function early-returns for toddlers** (IDEA Part C — no Part B school services to auto-populate; Unit 7); the per-trigger `ageGroup !== 'toddler'` clause on the academic trigger below is retained as documentation-in-code and defense-in-depth. The `psychoed` service is auto-recommended from **three** triggers, which the `schoolSvc` Set dedupes to a **single** recommendation regardless of how many fire:
 
