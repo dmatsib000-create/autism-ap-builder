@@ -1234,7 +1234,8 @@ federal "speech or language impairment" category (§300.8(c)(11)) into two eligi
 different criteria and different evaluators; a student can qualify for one and not the other.
 
 The Developmental Delay candidate states Florida's ceiling — ages three through nine **or through
-completion of grade 2, whichever occurs first** (Rule 6A-6.03027). The `ageGroup` buckets cannot
+completion of grade 2, whichever occurs first** — quoted from the adopted 9/20/2022 text of Rule
+6A-6.03027 (the amendment that widened the rule from three-through-five and renamed it). The `ageGroup` buckets cannot
 see grade level, so the limit is stated in the letter for the team to apply rather than gated in
 code. Note also that under §300.111(b) it is the *State* that adopts the term and its age range;
 an LEA may not adopt it independently. Florida has adopted it.
@@ -1285,6 +1286,23 @@ suspected letters as well:
 | OHI candidate: "limited alertness to educational stimuli" | Tracks §300.8(c)(9) | The original inverted the definition, which is limited strength/vitality/alertness *with respect to the educational environment*. |
 
 The Autism-category ask now also carries Florida Rule 6A-6.03023 alongside §300.8(c)(1).
+
+**Adopted text only.** Every Florida rule cited was read from the document linked under its
+flrules.org "Latest version of the final adopted rule presented in Florida Administrative Code"
+header, never from a Notice of Proposed Rule, and each carries a recorded effective date
+(references.md §9). Federal sections were read on eCFR, whose Recent Changes view shows no
+amendment to 34 C.F.R. Part 300 since 8/10/2017.
+
+A multi-rule **Notice of Rule Development** published 3/16/2026 touches 6A-6.030121,
+6A-6.03018, and 6A-6.0331. It is development-stage — not proposed, not adopted, not effective —
+and nothing from it is cited here. Florida rulemaking runs Development, then Proposed, then
+Final; only a Final notice changes what this tool should say.
+
+One wording consequence of reading the text closely: §300.111(a)(1) is framed as a **State**
+obligation, not a district one. `ruleOutEvalRequest` therefore states child find in the passive
+voice and attributes the district-level duty to the introductory text of Rule 6A-6.0331, which
+is where Florida actually puts it. Note that duty sits in the rule's unnumbered preamble, so it
+is cited without a subsection number.
 
 **Case law is deliberately absent.** CourtListener was searched during the audit. A physician
 recommendation letter argues from the regulations; citing litigation in it would misrepresent

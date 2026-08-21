@@ -223,7 +223,9 @@ Hoyme HE, Kalberg WO, Elliott AJ, et al. **Updated Clinical Guidelines for Diagn
 
 These are the regulatory citations the IEP letter puts in front of a school district. They are not clinical literature, but they carry the same do-not-invent rule and a sharper consequence for being wrong: a district that checks a citation and finds it does not say what the letter implies discounts the whole letter. Every citation is surfaced by section number and subject only — the tool never paraphrases regulatory text as if quoting it.
 
-**Verification method.** Each federal section below was read in full on eCFR (the official, continuously updated C.F.R.) on 2026-08-21, against Title 34 as amended through 7/24/2026. The Florida rules were read from the official rule text published by the Florida Department of State at flrules.org and cross-checked against Cornell LII. Case law was searched on CourtListener and deliberately **not** cited: a physician recommendation letter argues from the regulations, and citing litigation in it would misrepresent what the document is.
+**Verification method.** Each federal section below was read in full on eCFR (the official, continuously updated C.F.R.) on 2026-08-21, against Title 34 as amended through 7/24/2026. eCFR's Recent Changes view for Title 34 Part 300 shows **no amendment to Part 300 since 8/10/2017**, so the federal sections cited here are stable adopted text and the 7/24/2026 Title 34 amendment did not reach them. The Florida rules were read from the adopted FAC text published by the Florida Department of State at flrules.org, specifically the document linked under each rule's "Latest version of the final adopted rule" header, and cross-checked against Cornell LII. Case law was searched on CourtListener and deliberately **not** cited: a physician recommendation letter argues from the regulations, and citing litigation in it would misrepresent what the document is.
+
+**Adopted text only.** No citation in this tool rests on a proposed, draft, or under-development rule. Where rulemaking is in progress it is recorded as a watch item below and nothing from it is used.
 
 ### `[idea-34cfr300]` — IDEA Part B implementing regulations
 
@@ -234,7 +236,7 @@ U.S. Department of Education. **Assistance to States for the Education of Childr
   - **§300.8(b)** — developmental delay, ages three through nine or a subset, subject to §300.111(b). Consumed by the Developmental Delay eligibility candidate.
   - **§300.8(c)(1)** Autism, **(c)(6)** Intellectual disability, **(c)(9)** Other health impairment, **(c)(10)** Specific learning disability, **(c)(11)** Speech or language impairment. Consumed by the eligibility candidates and the Autism-category ask.
   - **§300.34(a)** — related services expressly include "speech-language pathology and audiology services... physical and occupational therapy." Consumed by `ruleOutRelatedSvcNote`.
-  - **§300.111(a)(1)(i) and (c)(1)** — child find; (c)(1) expressly reaches children suspected of having a disability "even though they are advancing from grade to grade." Consumed by `ruleOutEvalRequest`.
+  - **§300.111(a)(1)(i) and (c)(1)** — child find; (c)(1) expressly reaches children suspected of having a disability "even though they are advancing from grade to grade." Consumed by `ruleOutEvalRequest`. Note that §300.111(a)(1) is framed as a **State** obligation ("The State must have in effect policies and procedures to ensure that..."), so the letter states the requirement in the passive voice and attributes the district-level duty to the introductory text of Florida Rule 6A-6.0331, which is where it actually sits.
   - **§300.301(b)** — either a parent or the public agency may request an initial evaluation. **§300.301(c)(1)** — the 60-day evaluation timeline, or the State's timeframe where the State sets one. Consumed by `ruleOutEvalRequest` and the evaluation-timeline paragraph.
   - **§300.304(c)(6)** — the evaluation must be "sufficiently comprehensive to identify all of the child's special education and related services needs, whether or not commonly linked to the disability category in which the child has been classified." Consumed by `ruleOutDxRest`.
   - **§300.306(c)(1)(i)** — in interpreting evaluation data the agency must draw on information from a variety of sources, expressly including "information about the child's physical condition, social or cultural background, and adaptive behavior." Consumed by `ruleOutDxRest`.
@@ -254,17 +256,21 @@ U.S. Department of Education. **Assistance to States for the Education of Childr
 
 Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-1.0943. Read at <https://www.flrules.org>.
 
-| Rule | Title | Used for |
-|---|---|---|
-| 6A-6.0331(3)(g) | General Education Intervention Procedures, Evaluation, Determination of Eligibility, Reevaluation and the Provision of Exceptional Student Education Services | Initial-evaluation timeline. Current version effective 9/23/2025. |
-| 6A-6.03011 | ESE Eligibility for Students with Intellectual Disabilities | Intellectual Disability candidate |
-| 6A-6.03012 | ESE Eligibility for Students with Speech Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Speech Services | Speech Impaired candidate |
-| 6A-6.030121 | ESE Eligibility for Students with Language Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Language Services | Language Impaired candidate |
-| 6A-6.030152 | ESE Eligibility for Students with Other Health Impairment | Other Health Impaired candidate |
-| 6A-6.03018 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
-| 6A-6.03023 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
-| 6A-6.03027 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate |
-| 6A-1.0943 | Statewide Assessment for Students with Disabilities (effective 7/14/2021) | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
+**Every rule below is an adopted rule in the Florida Administrative Code, not a proposed or draft one.** The Effective column is the date of the currently operative adopted version, read from the "Latest version of the final adopted rule presented in Florida Administrative Code (FAC)" header on each rule's flrules.org page. Where rule text was quoted, the document read was the one linked under that header, which is the adopted FAC text, never a Notice of Proposed Rule.
+
+| Rule | Effective | Title | Used for |
+|---|---|---|---|
+| 6A-6.0331(3)(g) | 9/23/2025 | General Education Intervention Procedures, Evaluation, Determination of Eligibility, Reevaluation and the Provision of Exceptional Student Education Services | Initial-evaluation timeline; introductory text also cited for district child-find responsibility |
+| 6A-6.03011 | 1/4/2009 | ESE Eligibility for Students with Intellectual Disabilities | Intellectual Disability candidate |
+| 6A-6.03012 | 7/1/2010 | ESE Eligibility for Students with Speech Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Speech Services | Speech Impaired candidate |
+| 6A-6.030121 | 1/7/2016 | ESE Eligibility for Students with Language Impairments and Qualifications and Responsibilities for the Speech-Language Pathologists Providing Language Services | Language Impaired candidate |
+| 6A-6.030152 | 12/15/2009 | ESE Eligibility for Students with Other Health Impairment | Other Health Impaired candidate |
+| 6A-6.03018 | 1/7/2016 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
+| 6A-6.03023 | 4/1/2015 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
+| 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate |
+| 6A-1.0943 | 7/14/2021 | Statewide Assessment for Students with Disabilities | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
+
+Independent cross-check: the introductory text of 6A-6.0331 itself enumerates the ESE eligibility rules by number, and every rule number this tool cites appears in that list.
 
 - **Supports the claim:** the Florida-specific eligibility and procedural hooks a district in this region actually applies. Florida splits the single federal "speech or language impairment" category into two separate eligibilities (6A-6.03012 and 6A-6.030121) with different criteria and different evaluators, which is why the letter can list both.
 - **Verified:** Claude 2026-08-21 against the official rule text at flrules.org, cross-checked on Cornell LII.
@@ -277,7 +283,9 @@ Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-
 
 Sixty school days is roughly three calendar months; sixty calendar days is about two. Every evaluation-request letter the tool produced before this fix handed the district a month it does not have.
 
-**Watch item:** a rule development notice for **6A-6.030121** (Language Impairments) published 3/16/2026 (Vol. 52/51) proposes amendments. Not effective as of 2026-08-21. Re-check that rule number before relying on it long-term.
+**Watch item, and it is development-stage only.** A multi-rule Notice of Rule Development published 3/16/2026 (Vol. 52/51, notice 30620298) covers **6A-6.030121**, **6A-6.03018**, and **6A-6.0331** among others, "to ensure students with disabilities are properly identified and served under the requirements of the Individuals with Disabilities Education Act and state laws." As of 2026-08-21 it remains at the development stage: not proposed, not adopted, not effective, and **nothing from it is cited in this tool.** Florida rulemaking runs Development, then Proposed, then Final; watch for a Final notice before assuming any of these rule numbers or their content has changed.
+
+The Developmental Delay age language is quoted from the adopted 9/20/2022 text of 6A-6.03027: "A child who is developmentally delayed is three (3) through nine (9) years of age, or through the student's completion of grade 2, whichever occurs first," with eligibility criterion (2)(a) reading "The child is three (3) through nine (9) years of age, unless the child has completed grade 2." That 2022 amendment is what widened this rule from three-through-five to three-through-nine, and it also renamed the rule. The letter reflects the current adopted version, not the superseded one.
 
 ### `[section-504]` — Section 504 of the Rehabilitation Act
 
