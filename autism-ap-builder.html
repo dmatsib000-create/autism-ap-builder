@@ -5097,7 +5097,7 @@ function _iepLetterContent(){
   const reqTail=[];
   if(ruledOut&&(eligibilityCandidates.length||eligibilityFallback)) reqTail.push('the eligibility categories I would ask the team to consider');
   if(S.schoolSvc.size) reqTail.push('the services and accommodations I recommend');
-  const reqTailStr=reqTail.length?' , together with '.replace(' ,',',')+reqTail.join(' and ')+'.':'.';
+  const reqTailStr=reqTail.length?', together with '+reqTail.join(' and ')+'.':'.';
   let requestPara;
   if(S.schoolDoc==='iep')
     requestPara='Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below'+reqTailStr;
