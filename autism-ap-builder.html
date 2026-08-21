@@ -1059,7 +1059,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 2. Diagnostic Workup -->
   <div id="dxWorkupSection" class="section">
-    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup, Testing &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <div id="evalProfileDoneHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Cognitive/developmental testing is complete — update <strong>Cognitive Profile</strong> and its data source in Patient Profile.</div>
@@ -1114,7 +1114,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         </div>
       </div>
       <div class="field-group" style="margin-top:8px">
-        <button id="priorTestToggleBtn" class="expander-btn" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
+        <label class="field-label" for="iepInstrumentsField">Evaluation &amp; Testing Summaries <span style="font-weight:400;opacity:.7;font-size:var(--text-9)">(optional, free text)</span></label>
+        <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries and results as you want them to appear, e.g.&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
+        <span class="phi-hint">Renders verbatim in the IEP Letter only, after the diagnosis paragraph — not in the A&amp;P note or ABA letter. PHI-free zone: no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)").</span>
+      </div>
+      <div class="field-group" style="margin-top:8px">
+        <span class="field-label">Prior Testing Reviewed</span>
+        <button id="priorTestToggleBtn" class="expander-btn" aria-expanded="false" aria-controls="priorTestList" onclick="togglePriorExpander()"><span id="priorTestArrow">&#9658;</span> Prior autism-specific testing reviewed<span id="priorTestCount" class="expander-count" style="display:none"></span></button>
         <div id="priorTestList" style="display:none">
         <div class="field-hint" style="margin:3px 0 5px">Results documented separately — select outcome per instrument</div>
         <div style="display:flex;flex-direction:column;gap:var(--space-1)">
@@ -1523,11 +1529,6 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="504">504 Plan</label>
           <label class="r-opt"><input type="radio" name="schoolDoc" data-bind="schoolDoc" value="neither">Neither / N/A</label>
         </div>
-      </div>
-      <div class="field-group">
-        <span class="field-label">Assessment Results for the IEP Letter <span style="font-weight:400;opacity:.7;font-size:var(--text-9)">(optional, free text)</span></span>
-        <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries and results as you want them to appear, e.g.&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
-        <span class="phi-hint">PHI-free zone — no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)"). Renders verbatim in the IEP Letter, after the diagnosis paragraph. Not used in the A&amp;P note or ABA letter.</span>
       </div>
       <div class="field-group">
         <span class="field-label">School-Based Services to Request</span>
@@ -5885,6 +5886,10 @@ function _applyPriorExpander(){
   const countEl=document.getElementById('priorTestCount');
   if(list) list.style.display=priorTestingExpanded?'':'none';
   if(arrow) arrow.textContent=priorTestingExpanded?'▾':'▸';
+  // Keep aria-expanded truthful. A static attribute in the markup would lie to a
+  // screen reader the moment the arrow moved, which is worse than omitting it.
+  const btn=document.getElementById('priorTestToggleBtn');
+  if(btn) btn.setAttribute('aria-expanded',priorTestingExpanded?'true':'false');
   if(countEl){const n=S.priorTesting.size;countEl.textContent=n+' selected';countEl.style.display=n>0?'':'none';}
 }
 function cycleOverride(k){
