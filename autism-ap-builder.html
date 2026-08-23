@@ -1115,7 +1115,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       </div>
       <div class="field-group" style="margin-top:8px">
         <label class="field-label" for="iepInstrumentsField">Evaluation &amp; Testing Summaries <span style="font-weight:400;opacity:.7;font-size:var(--text-9)">(optional, free text)</span></label>
-        <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries and results as you want them to appear, e.g.&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
+        <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries as you want them to appear. Leave a blank line between instruments and each becomes its own paragraph in the letter.&#10;&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
         <span class="phi-hint">Renders verbatim in the IEP Letter only, after the diagnosis paragraph — not in the A&amp;P note or ABA letter. PHI-free zone: no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)"). Avoid curly braces { } — the Epic copy turns anything inside them into ***.</span>
       </div>
       <div class="field-group" style="margin-top:8px">
@@ -5116,6 +5116,13 @@ function _iepLetterContent(){
   // screeners the clinician marked "consistent" and is suppressed on ruled-out
   // letters, whereas this is whatever the clinician chose to report, verbatim.
   const instruments=(S.iepInstruments||'').trim();
+  // Blank line (optionally with stray spaces) separates blocks; single newlines are
+  // line breaks inside a block. Empty blocks are dropped so a triple newline or a
+  // trailing blank line cannot emit an empty paragraph.
+  const instrumentBlocks=instruments?instruments.split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).map(b=>{
+    const nl=b.indexOf('\n');
+    return nl<0?{head:'',body:b}:{head:b.slice(0,nl),body:b.slice(nl+1)};
+  }):[];
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
@@ -5125,7 +5132,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instruments,impactLead,
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instruments,instrumentBlocks,impactLead,
     ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
@@ -5174,7 +5181,9 @@ function generateIEPLetterHTML(){
 
   if(c.instruments){
     h+=`<div class="aba-sec">Assessment Results</div>`;
-    h+=`<p>${e(c.instruments).replace(/\n/g,'<br>')}</p>`;
+    c.instrumentBlocks.forEach(b=>{
+      h+=`<p>${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
+    });
   }
 
   if(c.impacts.length){
@@ -5279,7 +5288,7 @@ function generateIEPLetterPlain(){
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.instruments){
     t+=sep+'\nASSESSMENT RESULTS\n'+sep+'\n';
-    t+=c.instruments+'\n\n';
+    t+=c.instrumentBlocks.map(b=>(b.head?b.head+'\n':'')+b.body).join('\n\n')+'\n\n';
   }
   if(c.impacts.length){
     t+=sep+'\nEDUCATIONAL IMPACT\n'+sep+'\n';
@@ -5383,7 +5392,9 @@ async function copyIEPLetter(format){
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.instruments){
         h+=`<p style="${secSt}">Assessment Results</p>`;
-        h+=`<p style="margin-bottom:10px">${e(c.instruments).replace(/\n/g,'<br>')}</p>`;
+        c.instrumentBlocks.forEach(b=>{
+          h+=`<p style="margin-bottom:10px">${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
+        });
       }
       if(c.impacts.length){
         h+=`<p style="${secSt}">Educational Impact</p>`;

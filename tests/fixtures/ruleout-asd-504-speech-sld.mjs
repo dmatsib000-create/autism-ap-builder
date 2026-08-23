@@ -36,15 +36,22 @@ export default {
     S.needsMotor.add('fine');
 
     // Free-text instrument summaries, rendered verbatim in the IEP letter after the
-    // diagnosis paragraph. Multi-line on purpose: the clinician's own line breaks
-    // are the whole point of a free-text field, so this golden pins that they
-    // survive into the plain text that gets pasted into Epic. Years only, no exact
-    // administration dates -- the field's PHI hint asks for exactly that.
+    // diagnosis paragraph. Two blocks separated by a blank line, each several lines
+    // long -- the shape the clinician actually writes: instrument name, what it
+    // measures, then the results. This pins BOTH mechanisms at once: a blank line
+    // starts a new paragraph in the HTML and Word surfaces, and single newlines stay
+    // line breaks inside one block. Rendered as a single <p> full of <br>, which is
+    // what this did before 2026-08-23, several instruments became one undifferentiated
+    // wall. Years only, no exact administration dates -- the field's PHI hint asks
+    // for exactly that.
     S.iepInstruments = [
-      'WISC-V (2026): FSIQ 68; VCI 72, VSI 70, FRI 69, WMI 65, PSI 71.',
-      'WIAT-4 (2026): Word Reading 65, Reading Comprehension 70, Pseudoword Decoding 62.',
-      'Vineland-3 (2026), caregiver form: ABC 71; Communication 68, Daily Living 74, Socialization 70.',
-      'GFTA-3 (2026): standard score 74; intelligibility to unfamiliar listeners reduced in connected speech.',
+      'WISC-V (Wechsler Intelligence Scale for Children, Fifth Edition), 2026',
+      'A comprehensive measure of cognitive ability for children ages 6 through 16.',
+      'Results: FSIQ 68; VCI 72, VSI 70, FRI 69, WMI 65, PSI 71.',
+      '',
+      'Vineland-3 (Vineland Adaptive Behavior Scales, Third Edition), 2026',
+      'Adaptive functioning across communication, daily living, and socialization, by caregiver report.',
+      'Results: ABC 71; Communication 68, Daily Living 74, Socialization 70.',
     ].join('\n');
 
     S.schoolPlacement = 'genEd';

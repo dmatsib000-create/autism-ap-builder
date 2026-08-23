@@ -24,10 +24,13 @@ Speech-language pathology, occupational therapy, and physical therapy are relate
 ────────────────────────────────────────────────────────────
 ASSESSMENT RESULTS
 ────────────────────────────────────────────────────────────
-WISC-V (2026): FSIQ 68; VCI 72, VSI 70, FRI 69, WMI 65, PSI 71.
-WIAT-4 (2026): Word Reading 65, Reading Comprehension 70, Pseudoword Decoding 62.
-Vineland-3 (2026), caregiver form: ABC 71; Communication 68, Daily Living 74, Socialization 70.
-GFTA-3 (2026): standard score 74; intelligibility to unfamiliar listeners reduced in connected speech.
+WISC-V (Wechsler Intelligence Scale for Children, Fifth Edition), 2026
+A comprehensive measure of cognitive ability for children ages 6 through 16.
+Results: FSIQ 68; VCI 72, VSI 70, FRI 69, WMI 65, PSI 71.
+
+Vineland-3 (Vineland Adaptive Behavior Scales, Third Edition), 2026
+Adaptive functioning across communication, daily living, and socialization, by caregiver report.
+Results: ABC 71; Communication 68, Daily Living 74, Socialization 70.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
