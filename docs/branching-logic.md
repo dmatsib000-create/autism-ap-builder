@@ -1358,6 +1358,18 @@ and worse to fill in at the end of a clinic day, and the resulting data-entry bu
 maintainer's stated concern. One box, clinician-structured. Do not "improve" this into a structured
 capture without asking.
 
+**Blank line starts a new paragraph.** `instrumentBlocks` splits the field on blank lines,
+trims each block and drops empty ones. The HTML and Word surfaces emit one `<p>` per block, with
+single newlines rendered as `<br>` inside it; the plain surface rejoins blocks with a blank
+line. All three therefore agree on what a block is, and messy input -- leading blank lines, four
+consecutive newlines, trailing whitespace-only lines -- normalises to the same clean output.
+
+This replaced a single `<p>` full of `<br>` on 2026-08-23. That was the right primitive for the
+terse one-line entries the field was designed around, and the wrong one for what the maintainer
+actually writes: instrument name, an explanation of what it measures, then the results, several
+instruments deep. Rendered as one paragraph that was an undifferentiated wall -- and the Word
+letter a district receives came out worse than the plain text pasted into Epic, which is backwards.
+
 Interior line breaks are preserved — the clinician's own layout is the point of a free-text field —
 so the HTML and Word surfaces convert `
 ` to `<br>` after escaping, and the plain surface inserts
