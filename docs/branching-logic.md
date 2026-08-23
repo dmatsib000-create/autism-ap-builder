@@ -1364,6 +1364,13 @@ single newlines rendered as `<br>` inside it; the plain surface rejoins blocks w
 line. All three therefore agree on what a block is, and messy input -- leading blank lines, four
 consecutive newlines, trailing whitespace-only lines -- normalises to the same clean output.
 
+**The first line of a multi-line block is bolded** in the HTML and Word surfaces: it is the
+instrument name, and it gives a district reader an anchor to scan by when several instruments run
+in sequence. A block containing only ONE line gets no bold -- there is no name line separate from
+its content, so emphasising it would set the whole entry, scores and all, in bold. That is why
+`head` may be empty. Plain text has no bold and simply rejoins head and body, reconstructing what
+the clinician typed exactly; formatting is free to differ across the three surfaces, presence is not.
+
 This replaced a single `<p>` full of `<br>` on 2026-08-23. That was the right primitive for the
 terse one-line entries the field was designed around, and the wrong one for what the maintainer
 actually writes: instrument name, an explanation of what it measures, then the results, several

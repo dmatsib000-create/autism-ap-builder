@@ -5119,7 +5119,10 @@ function _iepLetterContent(){
   // Blank line (optionally with stray spaces) separates blocks; single newlines are
   // line breaks inside a block. Empty blocks are dropped so a triple newline or a
   // trailing blank line cannot emit an empty paragraph.
-  const instrumentBlocks=instruments?instruments.split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean):[];
+  const instrumentBlocks=instruments?instruments.split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).map(b=>{
+    const nl=b.indexOf('\n');
+    return nl<0?{head:'',body:b}:{head:b.slice(0,nl),body:b.slice(nl+1)};
+  }):[];
 
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
@@ -5178,7 +5181,9 @@ function generateIEPLetterHTML(){
 
   if(c.instruments){
     h+=`<div class="aba-sec">Assessment Results</div>`;
-    c.instrumentBlocks.forEach(b=>h+=`<p>${e(b).replace(/\n/g,'<br>')}</p>`);
+    c.instrumentBlocks.forEach(b=>{
+      h+=`<p>${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
+    });
   }
 
   if(c.impacts.length){
@@ -5283,7 +5288,7 @@ function generateIEPLetterPlain(){
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.instruments){
     t+=sep+'\nASSESSMENT RESULTS\n'+sep+'\n';
-    t+=c.instrumentBlocks.join('\n\n')+'\n\n';
+    t+=c.instrumentBlocks.map(b=>(b.head?b.head+'\n':'')+b.body).join('\n\n')+'\n\n';
   }
   if(c.impacts.length){
     t+=sep+'\nEDUCATIONAL IMPACT\n'+sep+'\n';
@@ -5387,7 +5392,9 @@ async function copyIEPLetter(format){
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.instruments){
         h+=`<p style="${secSt}">Assessment Results</p>`;
-        c.instrumentBlocks.forEach(b=>h+=`<p style="margin-bottom:10px">${e(b).replace(/\n/g,'<br>')}</p>`);
+        c.instrumentBlocks.forEach(b=>{
+          h+=`<p style="margin-bottom:10px">${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
+        });
       }
       if(c.impacts.length){
         h+=`<p style="${secSt}">Educational Impact</p>`;
