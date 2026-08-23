@@ -1197,6 +1197,24 @@ and the chart. Council review 2026-08-21 (clinical psychology / ESE / SLP / OT /
 district team reading "diagnosis pending" defers and waits for a diagnosis that will never
 arrive. State the negative plainly and once, then pivot to the functional findings.
 
+**Lead with what was found, not with what was excluded.** The letter once carried six
+separate mentions of autism's absence, three of them in the `Re:` line and the first two
+paragraphs, and three of those six were the same reassurance reworded: "ruling out autism does not
+settle eligibility", "the absence of an autism diagnosis does not bear on them", "autism has been
+ruled out; the need for evaluation has not". Said once that is a pivot; said three times it argues
+with a reader who was not arguing.
+
+The maintainer's account of the actual reader settled it on 2026-08-22: **the school usually has no
+idea an autism evaluation happened**, so the negative was answering a question nobody asked. There
+is now exactly one mention, placed after the diagnoses that are present — "Autism spectrum disorder
+was considered and criteria were not met." The `Re:` line reads "Developmental and behavioral
+evaluation completed (ICD-10: Z03.89)" and no longer leads on a negative; Z03.89 already encodes
+observation with the condition ruled out, for a reader who reads codes.
+
+The `schoolDoc === 'iep'` branch keeps a second mention in `ruleOutIEPCategoryReview`, and that one
+is load-bearing: if the student holds eligibility under the Autism category and the letter is silent,
+the team has no way to know the category needs revisiting. Do not collapse it into the single mention.
+
 **Diagnosis paragraph.** Built from two pieces so all three letter surfaces render the same
 prose: `ruleOutReferralTail` (the subject-dependent opening — the plain-text surface prefixes
 a pronoun through `v3()`, HTML and Word prefix the `{Student Name}` placeholder) and

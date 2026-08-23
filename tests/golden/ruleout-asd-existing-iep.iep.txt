@@ -7,7 +7,7 @@ Date: {Date}
 {School Name}
 {School Address}
 
-Re: {Student Name} | Neurodevelopmental evaluation completed; autism spectrum disorder not diagnosed (ICD-10: Z03.89)
+Re: {Student Name} | Developmental and behavioral evaluation completed (ICD-10: Z03.89)
 
 Dear {Principal / Special Education Coordinator Name}:
 
@@ -15,11 +15,11 @@ I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Stud
 
 Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the eligibility categories I would ask the team to consider and the services and accommodations I recommend.
 
-They were referred to this clinic for evaluation of concerns in behavioral regulation and sensory processing. A comprehensive diagnostic evaluation was completed at the visit referenced above. Autism Spectrum Disorder was formally considered, and full DSM-5 diagnostic criteria are not met at this evaluation; an autism diagnosis is not being assigned. The evaluation did, however, document an anxiety disorder, which independently affects educational performance.
+They were referred to this clinic for evaluation of concerns in behavioral regulation and sensory processing. That evaluation documented an anxiety disorder, which affects educational performance. Autism spectrum disorder was considered and criteria were not met.
 
-Ruling out autism does not settle the question of eligibility. The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
+The functional impairments described below were directly observed at this evaluation and stand on their own. Under IDEA, eligibility rests on whether the district's evaluation identifies a disability that adversely affects educational performance and creates a need for specially designed instruction; a medical diagnosis is neither required for that determination nor sufficient to establish it (34 C.F.R. §300.8). I hope the findings below are useful to the team, whose evaluation will draw on sources I do not have, including the school's own observations of this student across the day.
 
-Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The sensory findings described here support those services whichever category the team determines, and the absence of an autism diagnosis does not bear on them.
+Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The sensory findings described here support those services whichever category the team determines.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
