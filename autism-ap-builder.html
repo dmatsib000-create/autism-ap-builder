@@ -5121,6 +5121,8 @@ function _iepLetterContent(){
   // trailing blank line cannot emit an empty paragraph.
   const instrumentBlocks=instruments?instruments.split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).map(b=>{
     const nl=b.indexOf('\n');
+    // head==='' means "no name line to emphasise" -- a one-line block is all content,
+    // and bolding it would set the scores in bold too. The surfaces skip <strong> then.
     return nl<0?{head:'',body:b}:{head:b.slice(0,nl),body:b.slice(nl+1)};
   }):[];
 
@@ -5132,7 +5134,7 @@ function _iepLetterContent(){
   const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
-  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instruments,instrumentBlocks,impactLead,
+  return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instrumentBlocks,impactLead,
     ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
@@ -5179,7 +5181,7 @@ function generateIEPLetterHTML(){
   if(c.idDocPrompt) h+=`<p style="margin-top:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
   if(c.suspectedIDNote) h+=`<p style="margin-top:10px"><em>${e(c.suspectedIDNote)}</em></p>`;
 
-  if(c.instruments){
+  if(c.instrumentBlocks.length){
     h+=`<div class="aba-sec">Assessment Results</div>`;
     c.instrumentBlocks.forEach(b=>{
       h+=`<p>${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
@@ -5286,7 +5288,7 @@ function generateIEPLetterPlain(){
   if(c.ruleOutRelatedSvcNote) t+=c.ruleOutRelatedSvcNote+'\n\n';
   if(c.idDocPrompt) t+='['+c.idDocPrompt+']\n\n';
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
-  if(c.instruments){
+  if(c.instrumentBlocks.length){
     t+=sep+'\nASSESSMENT RESULTS\n'+sep+'\n';
     t+=c.instrumentBlocks.map(b=>(b.head?b.head+'\n':'')+b.body).join('\n\n')+'\n\n';
   }
@@ -5390,7 +5392,7 @@ async function copyIEPLetter(format){
       if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-bottom:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
       if(c.idDocPrompt) h+=`<p style="margin-bottom:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
-      if(c.instruments){
+      if(c.instrumentBlocks.length){
         h+=`<p style="${secSt}">Assessment Results</p>`;
         c.instrumentBlocks.forEach(b=>{
           h+=`<p style="margin-bottom:10px">${b.head?`<strong>${e(b.head)}</strong><br>`:''}${e(b.body).replace(/\n/g,'<br>')}</p>`;
