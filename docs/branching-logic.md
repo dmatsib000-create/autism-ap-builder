@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `df6e658`
+> **Last verified against commit:** `fe17c90`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -1357,6 +1357,25 @@ indices, Vineland domains, BASC scales, CTOPP, WIAT), a form covering them would
 and worse to fill in at the end of a clinic day, and the resulting data-entry burden was the
 maintainer's stated concern. One box, clinician-structured. Do not "improve" this into a structured
 capture without asking.
+
+**Blank line starts a new paragraph.** `instrumentBlocks` splits the field on blank lines,
+trims each block and drops empty ones. The HTML and Word surfaces emit one `<p>` per block, with
+single newlines rendered as `<br>` inside it; the plain surface rejoins blocks with a blank
+line. All three therefore agree on what a block is, and messy input -- leading blank lines, four
+consecutive newlines, trailing whitespace-only lines -- normalises to the same clean output.
+
+**The first line of a multi-line block is bolded** in the HTML and Word surfaces: it is the
+instrument name, and it gives a district reader an anchor to scan by when several instruments run
+in sequence. A block containing only ONE line gets no bold -- there is no name line separate from
+its content, so emphasising it would set the whole entry, scores and all, in bold. That is why
+`head` may be empty. Plain text has no bold and simply rejoins head and body, reconstructing what
+the clinician typed exactly; formatting is free to differ across the three surfaces, presence is not.
+
+This replaced a single `<p>` full of `<br>` on 2026-08-23. That was the right primitive for the
+terse one-line entries the field was designed around, and the wrong one for what the maintainer
+actually writes: instrument name, an explanation of what it measures, then the results, several
+instruments deep. Rendered as one paragraph that was an undifferentiated wall -- and the Word
+letter a district receives came out worse than the plain text pasted into Epic, which is backwards.
 
 Interior line breaks are preserved — the clinician's own layout is the point of a free-text field —
 so the HTML and Word surfaces convert `
