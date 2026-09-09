@@ -41,7 +41,7 @@ Supporting References:
     - Proximity maintenance: "Stay with me" and recall-to-caregiver behaviors reinforced in public settings using graduated distance and distraction hierarchies.
     - Environmental boundary training: Identifying and honoring physical/geographic boundaries (parking lots, store exits, water bodies) using visual supports, rule rehearsal, and reinforcement of safe behavior. Note: this target addresses navigation and environmental safety; interpersonal boundary training is addressed separately below if indicated.
     - Elopement prevention protocol: BCBA should conduct a functional behavior assessment of any elopement behavior before intervention; the function of the behavior (escape, sensory seeking, access to tangibles) determines treatment. Safety skills training is not a substitute for function-based elopement intervention.
-    [Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.]
+    {Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.}
   • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
 
 2. PARENT-CHILD INTERACTION THERAPY (PCIT)
