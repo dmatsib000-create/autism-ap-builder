@@ -17,7 +17,7 @@ Specifically, I am requesting that the IEP Team convene to review and update the
 
 She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 3 (requiring very substantial support) (with accompanying intellectual disability), confirmed at the evaluation referenced above.
 
-[Note to clinician: The "with intellectual disability" specifier is checked but no ID severity (Mild, Moderate, Severe) is selected in the Cognitive Profile section of the tool. Please select a severity so accommodation recommendations specific to the level of intellectual disability render correctly in this letter.]
+{Note to clinician: The "with intellectual disability" specifier is checked but no ID severity (Mild, Moderate, Severe) is selected in the Cognitive Profile section of the tool. Please select a severity so accommodation recommendations specific to the level of intellectual disability render correctly in this letter.}
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT

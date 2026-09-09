@@ -4384,11 +4384,12 @@ function _abaContent(){
   const p=getPron();
   // PHI-tightening: letter date was previously auto-inserted as today's date, which is a
   // date directly related to the patient encounter (HIPAA §164.514(b)(2)(C) — PHI more
-  // specific than year). Replaced with a bracketed placeholder; the clinician fills in
+  // specific than year). Replaced with a brace placeholder; the clinician fills in
   // the actual date in Epic post-paste. Aligns with the "complete absence of PHI by
   // design" principle in CLAUDE.md. To revert to auto-today, replace with:
   //   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const today='[DATE]';
+  // Braces, not brackets: the Epic copy path rewrites {...} to *** so F2 stops here.
+  const today='{Date}';
   const youngChild=S.ageGroup==='toddler'||S.ageGroup==='preschool';
   const isMilitary=S.insuranceType==='tricare'||S.insuranceType==='champva';
 
@@ -4795,7 +4796,7 @@ function _iepLetterContent(){
     : '';
   // Fallback when nothing derives — the letter must not go out silent on category.
   const eligibilityFallback=(ruledOut&&!eligibilityCandidates.length)
-    ? '[Clinician: name the eligibility category or categories the district should evaluate under, based on the presenting profile. Autism eligibility should not be requested on this letter.]'
+    ? '{Clinician: name the eligibility category or categories the district should evaluate under, based on the presenting profile. Autism eligibility should not be requested on this letter.}'
     : '';
 
   // On a ruled-out letter the whole argument is that no single condition accounts for
@@ -5286,7 +5287,7 @@ function generateIEPLetterPlain(){
   }
   t+=dxPara+'\n\n';
   if(c.ruleOutRelatedSvcNote) t+=c.ruleOutRelatedSvcNote+'\n\n';
-  if(c.idDocPrompt) t+='['+c.idDocPrompt+']\n\n';
+  if(c.idDocPrompt) t+='{'+c.idDocPrompt+'}\n\n';
   if(c.suspectedIDNote) t+=c.suspectedIDNote+'\n\n';
   if(c.instrumentBlocks.length){
     t+=sep+'\nASSESSMENT RESULTS\n'+sep+'\n';
