@@ -34,6 +34,8 @@ claude_code/
 
 Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, and `package.json` are tracked in git and pushed to GitHub. Everything else is local.
 
+**`backups/autism-ap-builder_2026-05-16_pre-git.zip` must not be deleted.** Git history for this repo starts at the initial commit on 2026-05-18, where the app is already 343,953 bytes. That zip holds a 90,537-byte version from 2026-05-16 — two days earlier and roughly a quarter the size — so it is the only surviving copy of the tool from before it was placed under version control. `git` cannot reproduce it and no other backup comes close. Every other file in `backups/` is a routine dated snapshot of a state git already has; this one is not, which is why it carries `pre-git` in its name.
+
 ### Tests (golden + unit + wiring + invariants regression net)
 
 `npm test` runs four lanes against the **real**, unmodified `autism-ap-builder.html` (the golden/unit lanes evaluate its `<script>` in Node with DOM stubs; the wiring/invariants lanes read the file as text — no browser, no file changes):
