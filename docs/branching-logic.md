@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `f0fec2e`
+> **Last verified against commit:** `35fc8d2`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -455,6 +455,8 @@ If the clinician sets `diagStatus = 'confirmed'` but `validateCriteria()` return
 > ⚠ DSM-5 criteria incomplete — A: 2/3 · B: 1/4 · C/D/E: missing C
 
 The warning is non-blocking — the clinician can still proceed (the tool serves cases where the clinician *intends* to document an exception). But the banner is intentionally prominent so an omission isn't accidental.
+
+A second banner of the same kind, **⚠ Coding Warning**, fires when the `withID` specifier is checked but no ID severity tier is selected in Cognitive Profile. The note itself still codes `F79` (unspecified severity) and reads correctly as signed; the prompt to pick a severity lives only on screen. It used to be a bracketed "documentation note" inside the note text, which the placeholder rule forbids (brackets paste verbatim into Epic and can be signed into the chart). The IEP letter keeps its own brace-placeholder prompt for the same gap (`idDocPrompt`, §10), because that letter is the one the school reads.
 
 ### 4.4 Side effects of specific criteria
 
@@ -1129,7 +1131,7 @@ const hoursText = S.abaHours === '30plus'
   ? '30 or more hours per week'
   : S.abaHours
     ? S.abaHours + ' hours per week'
-    : '[hours/week — not yet specified]';
+    : '{hours per week}';   // brace placeholder: the Epic copy path rewrites it to ***
 ```
 
 ### 9.7 Specifier display — intentional omissions

@@ -6,7 +6,6 @@ ICD-10-CM: F84.0
 
 Co-occurring conditions:
   • Intellectual disability, unspecified severity (F79)
-  • [DOCUMENTATION NOTE: "With intellectual disability" specifier is checked but no ID severity is selected in Cognitive Profile. ICD-10 code defaults to F79 (unspecified severity). Select a severity in Cognitive Profile for precise coding.]
   • ADHD, Combined presentation (F90.2)
   • Anxiety disorder (F41.9)
 
