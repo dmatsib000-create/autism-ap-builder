@@ -786,8 +786,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" aria-label="Switch color theme" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
     <div class="header-sep"></div>
     <button class="btn btn-outline" onclick="window.print()">Print</button>
-    <button class="btn btn-outline" onclick="copyNote('plain','all')">Copy Plain</button>
-    <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
+    <button class="btn btn-outline" onclick="copyNote('plain','all',this)">Copy Plain</button>
+    <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
     <div class="header-sep"></div>
     <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
   </div>
@@ -1733,10 +1733,10 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <small>No PHI collected or stored. All output requires clinician review.</small></div>
   </div>
   <div class="note-sticky-bar" id="noteStickyBar">
-    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','assessment')">Assessment (plain)</button>
-    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','plan')">Plan (plain)</button>
-    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','all')">All (plain)</button>
-    <button class="btn btn-green btn-sm" id="copyRichBtn" onclick="copyNote('rich','all')">&#9733; Copy Rich Text</button>
+    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','assessment',this)">Assessment (plain)</button>
+    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','plan',this)">Plan (plain)</button>
+    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','all',this)">All (plain)</button>
+    <button class="btn btn-green btn-sm" id="copyRichBtnSticky" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
     <span id="abaLevelWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
@@ -2235,6 +2235,13 @@ function resolveOv(key,rule) {
   const v=S.overrides[key];
   return v==='yes'?true:v==='no'?false:rule.include;
 }
+// Letter eligibility — ONE gate per letter, shared by the tab in render(), both generators
+// (preview + plain) and the copy handler, so they can never disagree. They once did: an ABA
+// referral overridden to 'no' hid the tab but the generators still produced a full letter.
+// keep docs/branching-logic.md §5 in sync
+function abaLetterEligible(){ return S.diagStatus==='confirmed'&&resolveOv('aba',ruleABA()); }
+// IEP: needs a school context and an IDEA Part B age (toddlers are Part C / Early Steps).
+function iepLetterEligible(){ return S.schoolDoc!==''&&S.ageGroup!=='toddler'; }
 
 // ─── DSM-5 VALIDATION ────────────────────────────────────────────────────────
 // keep docs/branching-logic.md §4 in sync (criteria gate; A=3, B>=2, C&&D&&E)
@@ -4535,7 +4542,7 @@ function _abaContent(){
 }
 
 function generateABALetter(isPreview=false){
-  if(S.diagStatus!=='confirmed') return isPreview?'<div class="note-empty">ABA Letter requires a <strong>confirmed ASD</strong> diagnosis.</div>':'';
+  if(!abaLetterEligible()) return isPreview?'<div class="note-empty">ABA Letter requires a <strong>confirmed ASD</strong> diagnosis with the ABA referral included.</div>':'';
   const c=_abaContent();
   const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const linkify=t=>e(t).replace(/https?:\/\/[^\s<>"]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
@@ -4593,7 +4600,7 @@ function generateABALetter(isPreview=false){
 }
 
 function generateABALetterPlain(){
-  if(S.diagStatus!=='confirmed') return '';
+  if(!abaLetterEligible()) return '';
   const c=_abaContent();
   const sep='─'.repeat(60);
   let t='LETTER OF MEDICAL NECESSITY\n';
@@ -4625,8 +4632,8 @@ function generateABALetterPlain(){
 }
 
 async function copyABALetter(format){
+  if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(!plain){toast('ABA Letter requires a confirmed ASD diagnosis.','warn');return;}
   if(format==='epic'){
     const epicBtn=document.getElementById('copyABAEpicBtn');
     const epic=plain.replace(/\{[^}]+\}/g,'***');
@@ -5140,7 +5147,7 @@ function _iepLetterContent(){
 }
 
 function generateIEPLetterHTML(){
-  if(!S.schoolDoc||S.ageGroup==='toddler') return '<div class="note-empty">Select a school documentation status (above, in School section) and an age group other than toddler to generate the IEP Letter.</div>';
+  if(!iepLetterEligible()) return '<div class="note-empty">Select a school documentation status (above, in School section) and an age group other than toddler to generate the IEP Letter.</div>';
   const c=_iepLetterContent();
   const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ph=s=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span class="iep-ph">{${e(t)}}</span>`);
@@ -5257,7 +5264,7 @@ function generateIEPLetterHTML(){
 }
 
 function generateIEPLetterPlain(){
-  if(!S.schoolDoc||S.ageGroup==='toddler') return '';
+  if(!iepLetterEligible()) return '';
   const c=_iepLetterContent();
   const p=getPron();
   // pronoun helpers for prose substitution after first {Student Name} introduction
@@ -5348,8 +5355,8 @@ function generateIEPLetterPlain(){
 }
 
 async function copyIEPLetter(format){
+  if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(!plain){toast('IEP Letter requires a school documentation status to be selected.','warn');return;}
   if(format==='epic'){
     const epicBtn=document.getElementById('copyIEPEpicBtn');
     const epic=plain.replace(/\{[^}]+\}/g,'***');
@@ -5616,13 +5623,12 @@ function render(){
   const abaParamsSec=document.getElementById('abaParamsSection');
   if(abaParamsSec) abaParamsSec.style.display=abaIncluded?'':'none';
   const tabABA=document.getElementById('tabABA');
-  if(tabABA) tabABA.style.display=abaIncluded&&S.diagStatus==='confirmed'?'':'none';
-  if(!abaIncluded||S.diagStatus!=='confirmed') {
-    if(S.previewMode==='aba'){S.previewMode='note';setPreviewMode('note');return;}
-  }
+  const abaLetter=abaLetterEligible();
+  if(tabABA) tabABA.style.display=abaLetter?'':'none';
+  if(!abaLetter&&S.previewMode==='aba'){S.previewMode='note';setPreviewMode('note');return;}
 
   // IEP letter tab — show when schoolDoc is set and age is not toddler
-  const showIEP=S.schoolDoc!==''&&S.ageGroup!=='toddler';
+  const showIEP=iepLetterEligible();
   const tabIEP=document.getElementById('tabIEP');
   if(tabIEP) tabIEP.style.display=showIEP?'':'none';
   if(!showIEP&&S.previewMode==='iep'){S.previewMode='note';setPreviewMode('note');return;}
@@ -6058,7 +6064,9 @@ function addStrength(text){
 }
 
 // ─── COPY ────────────────────────────────────────────────────────────────────
-async function copyNote(format,part){
+// btn: the clicked button (passed as `this` from the onclick) so the feedback lands on the
+// control the clinician actually pressed — the header and sticky-bar buttons are separate.
+async function copyNote(format,part,btn){
   const note=generateNote();
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
@@ -6066,15 +6074,15 @@ async function copyNote(format,part){
     try{
       const richHTML=generateRichHTML();
       await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([richHTML],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
-      flashBtn('✓ Rich text copied!');return;
+      flashBtn('✓ Rich text copied!',btn);return;
     }catch(e){}
   }
   try{await navigator.clipboard.writeText(plain);}
   catch(e){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-  flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!');
+  flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
-function flashBtn(msg){
-  const b=document.getElementById('copyRichBtn');if(!b)return;
+function flashBtn(msg,btn){
+  const b=btn||document.getElementById('copyRichBtn');if(!b)return;
   const o=b.textContent,ob=b.style.background;
   b.textContent=msg;b.style.background='#16a34a';
   setTimeout(()=>{b.textContent=o;b.style.background=ob;},1800);
