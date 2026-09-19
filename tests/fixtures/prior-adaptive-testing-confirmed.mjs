@@ -1,11 +1,13 @@
-// Prior-testing citation gate: a confirmed ASD case where the family brings BOTH an
-// autism-specific instrument (ADOS-2, consistent) and an adaptive/behavior instrument
-// (Vineland-3, consistent). The note's "Objective autism-specific assessment (...) is
-// consistent with and supports this diagnosis" sentence must cite the ADOS-2 only.
-// Before this gate the Vineland-3 leaked into that sentence as a raw key ('vineland3'),
-// and once instrument labels were shared across surfaces it would have printed as a
-// clean "Vineland-3", a clinically false claim that reads as intended. The Vineland-3
-// still appears in the Prior Testing block, where it belongs.
+// Prior-testing citation gate, all three surfaces: a confirmed ASD case where the family
+// brings BOTH an autism-specific instrument (ADOS-2, consistent) and an adaptive/behavior
+// instrument (Vineland-3, consistent). Only the ADOS-2 may be cited as evidence for the
+// diagnosis: the note's "Objective autism-specific assessment (...) supports this
+// diagnosis" sentence and the ABA/IEP letters' "Supporting prior diagnostic assessments"
+// clause all filter with ASD_DX_TEST_KEYS. The Vineland-3 appears only in the note's
+// Prior Testing block under "Behavioral/adaptive assessments reviewed". Before this gate
+// the Vineland-3 leaked into the note sentence as a raw key ('vineland3'); once labels
+// were shared it would have printed as a clean "Vineland-3", a false claim that reads
+// as intended. Setup is the minimum that makes all three outputs render.
 export default {
   name: 'prior-adaptive-testing-confirmed',
   describe: 'Confirmed ASD, school-age — ADOS-2 and Vineland-3 both consistent; only the ADOS-2 may support the diagnosis',
@@ -15,9 +17,6 @@ export default {
     S.pronouns = 'she';
     S.langLevel = 'simpleSentence';
     S.cogProfile = 'average';
-    S.cogDataSource = 'comprehensive';
-    S.adaptProfile = 'mildlyImpaired';
-    S.adaptiveStandardized = true;
 
     S.diagStatus = 'confirmed';
     S.asdLevelSC = '2';
@@ -34,16 +33,10 @@ export default {
     S.priorTesting.add('vineland3');
     S.priorTestingOutcome.vineland3 = 'consistent';
 
+    // One communication and one social need so ruleABA includes ABA (ABA letter renders);
+    // schoolDoc so the IEP letter renders.
     S.needsComm.add('expressive');
     S.needsSocial.add('reciprocity');
-    S.needsAdaptive.add('toileting');
-    S.abaTargets.add('functional_comm');
-    S.abaSetting.add('home');
-    S.abaHours = '15';
-
     S.schoolDoc = 'iep';
-    S.schoolSvc.add('sped');
-    S.insuranceType = 'medicaid';
-    S.rtcInterval = '6 months';
   },
 };

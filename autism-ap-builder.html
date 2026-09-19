@@ -1943,9 +1943,18 @@ const isPartBAge = () => S.ageGroup!=='toddler';
 // Prior-testing instrument abbreviations, shared by every surface: an instrument's name does
 // not change with the audience, only the sentence each surface wraps around it does.
 const PRIOR_TEST_LABELS={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
-// The autism-specific subset the letters may cite as supporting an ASD diagnosis
-// (excludes the adaptive/behavior instruments: Vineland-3, BASC-3, Conners 4).
-const ASD_DX_TEST_KEYS=new Set(['cars2st','cars2hf','ados2','adir','asdpeds','midgas','srs2','gars3']);
+// Adaptive/behavior instruments: reported in the note's own "Behavioral/adaptive assessments"
+// line and never cited for or against ASD. Every other instrument is autism-specific; the
+// invariants lane checks PRIOR_TEST_LABELS against the priorTesting checkboxes 1:1.
+const ADAPTIVE_TEST_KEYS=new Set(['vineland3','basc3','conners4']);
+const ASD_DX_TEST_KEYS=new Set(Object.keys(PRIOR_TEST_LABELS).filter(k=>!ADAPTIVE_TEST_KEYS.has(k)));
+// Label for one prior instrument with the ADOS-2 module appended in the surface's own
+// format: the note writes "ADOS-2, Module 3", the letters "ADOS-2 (Module 3)".
+const MOD_COMMA=m=>', '+m, MOD_PAREN=m=>' ('+m+')';
+const priorTestLabel=(k,modFmt)=>{let l=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)l+=modFmt(S.ados2Module);return l;};
+// Labels of the prior instruments whose recorded outcome is `outcome`, optionally limited
+// to a key set (ASD_DX_TEST_KEYS for anything that cites evidence for the diagnosis).
+const priorTestsByOutcome=(outcome,modFmt,keys)=>[...S.priorTesting].filter(k=>(!keys||keys.has(k))&&(S.priorTestingOutcome[k]||'')===outcome).map(k=>priorTestLabel(k,modFmt));
 const isSchoolAgePlus = () => ['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
 const isTeenPlus = () => S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
 // Single words = minimally verbal for clinical gating (ABA, social skills)
@@ -1956,8 +1965,6 @@ const isVerbalEnough = () => ['simpleSentence','conversational','ageAppropriate'
 // withID requires formal evidence on BOTH cognitive (comprehensive battery, not screener) AND adaptive
 // (formally-impaired severity + standardized assessment basis) domains per DSM-5/AAIDD criteria.
 const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaired','mildlyImpaired','belowPotential'].includes(S.adaptProfile);
-// Same gate under the older name the note/ABA reason lists use; one definition, two readers.
-const hasSigAdaptive = hasFormallyImpairedAdaptive;
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
@@ -2126,7 +2133,7 @@ function ruleABA() {
   if(isMinVerbal()) r.push('nonverbal/minimally verbal');
   // Confirmed-ID-only — see comment on parallel specR push in ABA medical-necessity block.
   if(hasID()&&S.specifiers.has('withID')) r.push('intellectual disability');
-  if(hasSigAdaptive()) r.push('significant adaptive impairment');
+  if(hasFormallyImpairedAdaptive()) r.push('significant adaptive impairment');
   if(S.needsBehavior.size>0) r.push('interfering behaviors');
   if(S.safety.size>0) r.push('safety needs');
   if(S.needsComm.has('functional_aac')) r.push('functional communication/AAC needs');
@@ -2579,8 +2586,7 @@ function generateClinicalSummary(){
       // Autism instruments only: a Vineland-3 / BASC-3 / Conners 4 marked consistent must not be
       // cited as an "objective autism-specific assessment" (same gate the letters apply).
       const supportive=[...S.priorTesting].filter(k=>ASD_DX_TEST_KEYS.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
-        let lbl=PRIOR_TEST_LABELS[k]||k;
-        if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
+        let lbl=priorTestLabel(k,MOD_COMMA);
         const dt=S.priorTestingDate[k]; if(dt) lbl+=' ('+dt+')';
         return lbl;
       });
@@ -2597,9 +2603,9 @@ function generateClinicalSummary(){
     if(cD.length) body+=` in ${cD.join(' and ')}`;
     body+=` that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation.`;
     if(S.priorTesting.size>0){
-      const eqv=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='equivocal').map(k=>{let lbl=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
+      const eqv=priorTestsByOutcome('equivocal',MOD_COMMA);
       if(eqv.length) body+=` Prior testing (${eqv.join('; ')}) yielded equivocal results and has been incorporated into the diagnostic formulation.`;
-      const nc=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='notConsistent').map(k=>{let lbl=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
+      const nc=priorTestsByOutcome('notConsistent',MOD_COMMA);
       if(nc.length) body+=` Prior testing (${nc.join('; ')}) was not individually consistent with ASD; these results have been incorporated into the diagnostic formulation alongside clinical history and direct observation.`;
     }
 
@@ -3010,10 +3016,9 @@ function generateNote() {
     }
     if(S.priorTesting.size){
       if(evalPathShows||S.teacherMaterials.size) L.push('');
-      const behavAdaptKeys=new Set(['vineland3','basc3','conners4']);
       const buildLbl=k=>{
-        let lbl=PRIOR_TEST_LABELS[k]; if(!lbl) return null;
-        if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
+        if(!PRIOR_TEST_LABELS[k]) return null;
+        let lbl=priorTestLabel(k,MOD_COMMA);
         const dt=S.priorTestingDate[k]; if(dt) lbl+=' (administered '+dt+')';
         return lbl;
       };
@@ -3023,7 +3028,7 @@ function generateNote() {
         const lbl=buildLbl(k); if(!lbl) return;
         const out=S.priorTestingOutcome[k]||'';
         if(!out) return;
-        if(behavAdaptKeys.has(k)){
+        if(ADAPTIVE_TEST_KEYS.has(k)){
           if(out==='consistent') adaptConsist.push(lbl);
           else if(out==='equivocal') adaptEquiv.push(lbl);
           else adaptNormal.push(lbl);
@@ -3223,7 +3228,7 @@ function generateNote() {
     // language for the suspected case (e.g., severity-based justification without
     // claiming the ID diagnosis).
     if(hasID()&&S.specifiers.has('withID')) specR.push('intellectual disability requiring intensive skills-based programming');
-    if(hasSigAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
+    if(hasFormallyImpairedAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
     if(asdLevel23()&&!specR.length) specR.push('ASD Level 2 or 3 support needs');
     const specRStr=specR.length?specR.join('; '):abaR.reasons.join(', ');
     // ABA target rationale map — one rationale sentence per target key
@@ -4463,7 +4468,7 @@ function _abaContent(){
   // Opening paragraph
   const levelClause=asdLevelKey?`, ${levelLabel},`:'';
   const insClause=S.insuranceType&&S.insuranceType!=='selfpay'?` enrolled under ${({commercial:'commercial/private insurance',medicaid:'Medicaid/CHIP',tricare:'TRICARE',champva:'ChampVA'}[S.insuranceType]||'')}`:'' ;
-  const abaConsistentPrior=[...S.priorTesting].filter(k=>ASD_DX_TEST_KEYS.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const abaConsistentPrior=priorTestsByOutcome('consistent',MOD_PAREN,ASD_DX_TEST_KEYS);
   const abaPtCite=abaConsistentPrior.length?` Supporting prior diagnostic assessments consistent with ASD include: ${abaConsistentPrior.join('; ')}.`:'';
   const openPara=`I write to request authorization for Applied Behavior Analysis (ABA) therapy for ${p.subj==='he'||p.subj==='she'||p.subj==='they'?'the patient':p.subj}, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD)${levelClause} as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013)${insClause}. ABA therapy is medically necessary, as documented below.${abaPtCite}`;
 
@@ -4522,13 +4527,12 @@ function generateABALetter(isPreview=false){
   const c=_abaContent();
   const e=escapeHtml;
   const linkify=t=>e(t).replace(/https?:\/\/[^\s<>"]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
-  const ph=s=>phSpan(s,'aba-ph');
 
   if(isPreview){
     let h=`<div class="aba-doc">`;
     h+=`<h3>LETTER OF MEDICAL NECESSITY</h3>`;
     h+=`<div class="aba-subtitle">Applied Behavior Analysis (ABA) Therapy — Autism Spectrum Disorder</div>`;
-    h+=`<p class="aba-meta"><strong>Date:</strong> ${ph(c.today)}</p>`;
+    h+=`<p class="aba-meta"><strong>Date:</strong> ${c.today}</p>`;
     h+=`<p class="aba-meta"><strong>Diagnosis:</strong> Autism Spectrum Disorder${c.asdLevelKey?', '+e(c.levelLabel):''}${c.abaSpecStr?', '+e(c.abaSpecStr):''} (DSM-5) &nbsp;|&nbsp; <strong>ICD-10-CM:</strong> F84.0</p>`;
     h+=`<p style="margin:16px 0 6px">To Whom It May Concern / Dear Medical Director:</p>`;
     h+=`<p>${e(c.openPara)}</p>`;
@@ -4539,16 +4543,19 @@ function generateABALetter(isPreview=false){
     h+=`<div class="aba-sec">III. Treatment Necessity &amp; Evidence Base</div>`;
     h+=`<p>${linkify(c.evidPara)}</p>`;
     h+=`<div class="aba-sec">IV. Requested Treatment Parameters</div>`;
-    h+=`<p><strong>Requested intensity:</strong> ${ph(e(c.hoursText))}</p>`;
+    h+=`<p><strong>Requested intensity:</strong> ${e(c.hoursText)}</p>`;
     if(c.settings.length) h+=`<p><strong>Recommended setting(s):</strong> ${e(c.settings.join(', '))}</p>`;
     if(c.targets.length){h+=`<p><strong>Priority treatment targets:</strong></p><ul>`;c.targets.forEach(t=>{h+=`<li>${e(t)}</li>`;});h+=`</ul>`;}
     h+=`<p style="margin-top:8px">Treatment will be implemented by a Board Certified Behavior Analyst (BCBA) who will oversee program development, conduct ongoing assessment, and adjust treatment based on objective data. Direct therapy will be provided by trained Registered Behavior Technicians (RBTs) under BCBA supervision, consistent with Behavior Analyst Certification Board (BACB) professional and ethical standards.</p>`;
     h+=`<div class="aba-sec">V. Supporting References</div>`;
     c.refs.forEach(r=>{h+=`<p class="aba-ref">${r.num}. ${linkify(r.text)}</p>`;});
-    h+=`<div class="aba-sig">Submitted by: ___________________________________<br>Credentials / Title: ___________________________________<br>Practice / Institution: ___________________________________<br>Date: ${ph(c.today)}&nbsp;&nbsp;&nbsp; Phone: ___________________________________</div>`;
+    h+=`<div class="aba-sig">Submitted by: ___________________________________<br>Credentials / Title: ___________________________________<br>Practice / Institution: ___________________________________<br>Date: ${e(c.today)}&nbsp;&nbsp;&nbsp; Phone: ___________________________________</div>`;
     h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review, attestation, and signature prior to submission. This tool does not constitute legal or billing advice.</p>`;
     h+=`</div>`;
-    return h;
+    // One pass over the finished markup: every {placeholder} any field carries is highlighted,
+    // so a new fill-in slot in _abaContent() cannot ship unhighlighted (the markup itself
+    // contains no braces).
+    return phSpan(h,'aba-ph');
   }
 
   // Clipboard / rich HTML — inline styles
@@ -4611,10 +4618,10 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){await writeClipboardText(toEpic(plain));flashText('copyABAEpicBtn','✓ Copied!');return;}
-  if(format==='rich'&&await writeClipboardRich(tryBuild(()=>generateABALetter(false)),plain)){flashText('copyABABtn','✓ Letter copied!');return;}
+  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
   await writeClipboardText(plain);
-  flashText('copyABABtn','✓ Copied!');
+  flashBtn('✓ Copied!',document.getElementById('copyABABtn'));
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
@@ -5098,7 +5105,7 @@ function _iepLetterContent(){
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
   // Prior testing citation for diagnosis paragraph
-  const iepConsistentPrior=[...S.priorTesting].filter(k=>ASD_DX_TEST_KEYS.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const iepConsistentPrior=priorTestsByOutcome('consistent',MOD_PAREN,ASD_DX_TEST_KEYS);
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
   return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instrumentBlocks,impactLead,
@@ -5316,10 +5323,9 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){await writeClipboardText(toEpic(plain));flashText('copyIEPEpicBtn','✓ Copied!');return;}
-  if(format==='rich'){
+  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='rich'&&await writeClipboardRich(()=>{
     // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
-    try{
       const c=_iepLetterContent();
       const e=escapeHtml;
       const phSt='background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic';
@@ -5411,11 +5417,10 @@ async function copyIEPLetter(format){
       h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic</div>`;
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;
-      if(await writeClipboardRich(h,plain)){flashText('copyIEPBtn','✓ Letter copied!');return;}
-    }catch(err){}
-  }
+      return h;
+  },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
   await writeClipboardText(plain);
-  flashText('copyIEPBtn','✓ Copied!');
+  flashBtn('✓ Copied!',document.getElementById('copyIEPBtn'));
 }
 
 function setPreviewMode(mode){
@@ -5605,8 +5610,12 @@ function render(){
 
   // Standard note preview
   const hasInput=S.diagStatus||S.ageGroup||S.criteriaA.size||S.criteriaB.size;
-  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();renderOverrides();return;}
+  // Only the preview body depends on hasInput. The tail (dx-active toggle, criteria badge,
+  // override pills, prior-testing expander, section headers) runs unconditionally so an
+  // emptied form (Clear All) never leaves stale UI behind; each tail step handles empty state.
   let html='';
+  if(!hasInput) html='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';
+  else{
   if(S.diagStatus==='confirmed'){
     if(!v.complete){const iss=[];if(v.aCount<3)iss.push('A: '+v.aCount+'/3');if(v.bCount<2)iss.push('B: '+v.bCount+'/4');if(!v.cde)iss.push('C/D/E incomplete');html+=`<div class="note-err"><strong>⚠ Criteria Warning:</strong> DSM-5 criteria incomplete for confirmed ASD: ${iss.join('; ')}.</div>`;}
     else html+='<div class="note-ok"><strong>✓ DSM-5 criteria complete</strong></div>';
@@ -5617,6 +5626,7 @@ function render(){
   // idDocPrompt, because that letter is the one the school reads.
   if(S.specifiers.has('withID')&&!hasID()) html+=`<div class="note-err"><strong>⚠ Coding Warning:</strong> "With intellectual disability" is checked but no ID severity is selected in Cognitive Profile. The note codes F79 (unspecified severity); select a severity for precise coding.</div>`;
   html+=generateRichHTML(true);
+  }
   pre.innerHTML=html;
   const dxSec=document.getElementById('dxWorkupSection');
   if(dxSec) dxSec.classList.toggle('dx-active',S.diagStatus==='suspected');
@@ -6030,20 +6040,12 @@ async function writeClipboardText(text){
   try{await navigator.clipboard.writeText(text);}
   catch(e){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
 }
-// Build the rich HTML for a copy; '' on a throw so writeClipboardRich falls back to plain
-// text instead of aborting the copy with an unhandled rejection.
-function tryBuild(fn){ try{return fn()||'';}catch(e){return '';} }
-// Rich copy (HTML + plain alternates). Returns false when the browser refuses ClipboardItem
-// (or there is no HTML to send) so the caller can fall back to plain text.
-async function writeClipboardRich(html,plain){
-  if(!html) return false;
-  try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);return true;}
+// Rich copy (HTML + plain alternates). `build` returns the HTML; if it throws or returns
+// nothing, or the browser refuses ClipboardItem, the result is false and the caller falls
+// back to plain text. One guard for all three copy paths.
+async function writeClipboardRich(build,plain){
+  try{const html=build(); if(!html) return false; await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);return true;}
   catch(e){return false;}
-}
-// Momentary button feedback; restores the original label after 1.8 s.
-function flashText(btnId,msg){
-  const b=document.getElementById(btnId);if(!b)return;
-  const o=b.textContent;b.textContent=msg;setTimeout(()=>{b.textContent=o;},1800);
 }
 // btn: the clicked button (passed as `this` from the onclick) so the feedback lands on the
 // control the clinician actually pressed — the header and sticky-bar buttons are separate.
@@ -6051,12 +6053,13 @@ async function copyNote(format,part,btn){
   const note=generateNote();
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
-  if(format==='rich'&&await writeClipboardRich(tryBuild(generateRichHTML),plain)){flashBtn('✓ Rich text copied!',btn);return;}
+  if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Rich text copied!',btn);return;}
   await writeClipboardText(plain);
   flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
-function flashBtn(msg,btn){
-  const b=btn||document.getElementById('copyRichBtn');if(!b)return;
+// Momentary button feedback (label + green tint); restores both after 1.8 s.
+function flashBtn(msg,b){
+  if(!b)return;
   const o=b.textContent,ob=b.style.background;
   b.textContent=msg;b.style.background='#16a34a';
   setTimeout(()=>{b.textContent=o;b.style.background=ob;},1800);
@@ -6138,14 +6141,10 @@ function clearAll(opts){
   syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('is-on'));
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
-  // Reset every field from the one initializer. Sets and nested objects (overrides, ev,
-  // therapyStatus, behavFreq, priorTesting*) are emptied and refilled IN PLACE, so a
-  // reference captured anywhere stays valid; only scalars are reassigned.
-  for(const [k,v] of Object.entries(initialState())){
-    if(v instanceof Set) S[k].clear();
-    else if(v&&typeof v==='object'){ for(const kk of Object.keys(S[k])) delete S[k][kk]; Object.assign(S[k],v); }
-    else S[k]=v;
-  }
+  // Reset every field from the one initializer. Fresh Sets/objects are fine: every consumer
+  // reads S.x at call time and nothing holds a reference into S. If that ever changes,
+  // clear the containers in place here instead of replacing them.
+  Object.assign(S,initialState());
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
@@ -6167,7 +6166,6 @@ function clearAll(opts){
   document.getElementById('levelJustificationSCField').value='';
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
-  document.getElementById('criteriaStatus').innerHTML='';
   // Hide the behavior-frequency input rows
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
@@ -6501,9 +6499,8 @@ function updateAgeBasedVisibility(){
   // Community independence — school-age+ only
   const commIndepRow=document.getElementById('commIndepRow');
   if(commIndepRow){
-    const showIndep=isSchoolAgePlus();
-    commIndepRow.style.display=(S.ageGroup===''||showIndep)?'':'none';
-    if(S.ageGroup!==''&&!showIndep&&S.needsAdaptive.has('commIndependence')){
+    commIndepRow.style.display=(S.ageGroup===''||older)?'':'none';
+    if(S.ageGroup!==''&&!older&&S.needsAdaptive.has('commIndependence')){
       S.needsAdaptive.delete('commIndependence');
       const cb=commIndepRow.querySelector('input[type=checkbox]');
       if(cb) cb.checked=false;

@@ -7,7 +7,7 @@ ICD-10-CM: F84.0
 
 To Whom It May Concern / Dear Medical Director:
 
-I write to request authorization for Applied Behavior Analysis (ABA) therapy for the patient, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD), Level 2 — Requiring Substantial Support, as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013) enrolled under Medicaid/CHIP. ABA therapy is medically necessary, as documented below. Supporting prior diagnostic assessments consistent with ASD include: ADOS-2 (Module 3).
+I write to request authorization for Applied Behavior Analysis (ABA) therapy for the patient, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD), Level 2 — Requiring Substantial Support, as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013). ABA therapy is medically necessary, as documented below. Supporting prior diagnostic assessments consistent with ASD include: ADOS-2 (Module 3).
 
 ────────────────────────────────────────────────────────────
 I. DIAGNOSIS & LEVEL OF SUPPORT
@@ -17,7 +17,7 @@ Marked deficits in verbal and nonverbal social communication skills are present;
 ────────────────────────────────────────────────────────────
 II. FUNCTIONAL IMPAIRMENT
 ────────────────────────────────────────────────────────────
-She demonstrates clinically significant functional impairments across the following domains: expressive and/or receptive communication; adaptive and daily living skills; social interaction and peer relationships. With respect to communication, she uses simple sentences.
+She demonstrates clinically significant functional impairments across the following domains: expressive and/or receptive communication; social interaction and peer relationships. With respect to communication, she uses simple sentences.
 
 ────────────────────────────────────────────────────────────
 III. TREATMENT NECESSITY & EVIDENCE BASE
@@ -27,10 +27,7 @@ ABA therapy, the most extensively studied behavioral intervention for ASD, is ex
 ────────────────────────────────────────────────────────────
 IV. REQUESTED TREATMENT PARAMETERS
 ────────────────────────────────────────────────────────────
-Requested intensity: 15 hours per week
-Recommended setting(s): home
-Priority treatment targets:
-  • Functional communication and requesting (manding)
+Requested intensity: {hours per week}
 
 Treatment will be implemented by a Board Certified Behavior Analyst (BCBA) who will oversee program development, conduct ongoing assessment, and adjust treatment based on objective data. Direct therapy will be provided by trained Registered Behavior Technicians (RBTs) under BCBA supervision, consistent with BACB professional and ethical standards.
 

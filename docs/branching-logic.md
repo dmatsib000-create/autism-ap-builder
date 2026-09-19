@@ -83,7 +83,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 
 ### 1.2 The `S` object — property reference
 
-`S` is created once as `const S = initialState()` and never reassigned. `initialState()` is the only place the state shape is declared: `clearAll()` resets every field from a fresh `initialState()` (Sets are cleared in place), so the Clear All reset list can never drift from the properties below. Properties fall into a few categories:
+`S` is created once as `const S = initialState()` and never reassigned. `initialState()` is the only place the state shape is declared: `clearAll()` resets every field from a fresh `initialState()`, so the Clear All reset list can never drift from the properties below. Properties fall into a few categories:
 
 **Demographics & visit:**
 
