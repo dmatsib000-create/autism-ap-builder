@@ -1,0 +1,65 @@
+PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
+IEP Review Request
+
+Date: {Date}
+
+{Principal / Special Education Coordinator Name}
+{School Name}
+{School Address}
+
+Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (requiring substantial support)
+
+Dear {Principal / Special Education Coordinator Name}:
+
+I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
+
+Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the services and accommodations I recommend.
+
+She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support), confirmed at the evaluation referenced above. Supporting prior diagnostic assessments consistent with ASD include: ADOS-2 (Module 3).
+
+────────────────────────────────────────────────────────────
+EDUCATIONAL IMPACT
+────────────────────────────────────────────────────────────
+These conditions result in the following challenges that require specialized support in the educational setting:
+  • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
+  • Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.
+  • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
+
+────────────────────────────────────────────────────────────
+REQUEST FOR IEP TEAM MEETING
+────────────────────────────────────────────────────────────
+I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
+
+Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED SERVICES
+────────────────────────────────────────────────────────────
+I recommend the following updates to the current IEP:
+
+Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
+
+────────────────────────────────────────────────────────────
+RECOMMENDED ACCOMMODATIONS
+────────────────────────────────────────────────────────────
+I recommend that the IEP team consider the following accommodations, calibrated to evaluation findings and individual educational need. These are clinical recommendations, not legal entitlements; the team's selection should reflect what the evaluation supports.
+
+Core ASD-Related Accommodations:
+The following accommodations have broad evidence support across the autism spectrum. Implementation should be calibrated to this student's developmental level and individual presentation.
+  • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
+  • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
+
+Behavioral and Emotional Accommodations:
+  • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+
+────────────────────────────────────────────────────────────
+Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
+
+Sincerely,
+
+
+___________________________________
+{Physician Name}, MD
+UF Behavior and Development Clinic
+
+Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}

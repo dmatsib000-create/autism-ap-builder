@@ -1900,6 +1900,7 @@ function applyPreset(key,opts){
   if(!p) return;
   if(reset && formHasInput()
      && !confirm('Replace the current form with the "'+p.label+'" template? This clears existing selections.')) return;
+  const wasSuspended=renderSuspended;
   renderSuspended=true;
   try{
   if(reset) clearAll({confirmed:true});
@@ -1925,7 +1926,7 @@ function applyPreset(key,opts){
     const c=document.querySelector(`input[data-key="${k}"][value="${val}"]`);
     if(c && !c.checked) c.click();
   });
-  }finally{renderSuspended=false;}
+  }finally{renderSuspended=wasSuspended;}
   render();
 }
 
@@ -1936,6 +1937,9 @@ const hasLDConfirmed = () => S.comorbid.has('ld_reading')||S.comorbid.has('ld_ma
 const hasLD = () => hasLDConfirmed()||S.comorbid.has('ld_suspected');
 const hasID = () => ['id_severe','id_moderate','id_mild'].includes(S.cogProfile);
 const isYoung = () => S.ageGroup==='toddler'||S.ageGroup==='preschool';
+// IDEA Part B (school-district) age: everyone but toddlers, who are Part C / Early Steps.
+// An unset age counts as Part B so the school section stays visible until an age is chosen.
+const isPartBAge = () => S.ageGroup!=='toddler';
 // Prior-testing instrument abbreviations, shared by every surface: an instrument's name does
 // not change with the audience, only the sentence each surface wraps around it does.
 const PRIOR_TEST_LABELS={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
@@ -2227,7 +2231,7 @@ function resolveOv(key,rule) {
 // keep docs/branching-logic.md §5 in sync
 function abaLetterEligible(){ return S.diagStatus==='confirmed'&&referralIncluded('aba'); }
 // IEP: needs a school context and an IDEA Part B age (toddlers are Part C / Early Steps).
-function iepLetterEligible(){ return S.schoolDoc!==''&&S.ageGroup!=='toddler'; }
+function iepLetterEligible(){ return S.schoolDoc!==''&&isPartBAge(); }
 
 // ─── DSM-5 VALIDATION ────────────────────────────────────────────────────────
 // keep docs/branching-logic.md §4 in sync (criteria gate; A=3, B>=2, C&&D&&E)
@@ -2572,7 +2576,9 @@ function generateClinicalSummary(){
     }
     // Prior testing citation
     if(S.priorTesting.size>0){
-      const supportive=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
+      // Autism instruments only: a Vineland-3 / BASC-3 / Conners 4 marked consistent must not be
+      // cited as an "objective autism-specific assessment" (same gate the letters apply).
+      const supportive=[...S.priorTesting].filter(k=>ASD_DX_TEST_KEYS.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
         let lbl=PRIOR_TEST_LABELS[k]||k;
         if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
         const dt=S.priorTestingDate[k]; if(dt) lbl+=' ('+dt+')';
@@ -3447,7 +3453,7 @@ function generateNote() {
   // For toddlers, only Early Steps / FDLRS can open this section — stale Part B state
   // (placement/doc/services set before an age switch, or set directly by a fixture)
   // must not produce a header whose entire content band is toddler-suppressed below.
-  if(hES||hFD||(S.ageGroup!=='toddler'&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size))){
+  if(hES||hFD||(isPartBAge()&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size))){
     L.push(n+++'. SCHOOL / EDUCATIONAL SUPPORTS');
     // "Under 36 months" is the Part C eligibility boundary (Florida Early Steps serves
     // birth to 36 months); the toddler age bucket is 12-35mo, so the clause is always
@@ -3464,7 +3470,7 @@ function generateNote() {
     // with the syncSchoolSvcFromNeeds toddler gate and the §7 form-section hide:
     // this output gate is what protects fixtures/state-restoration paths that set
     // school state directly without the DOM teardown running.
-    if(S.ageGroup!=='toddler'){
+    if(isPartBAge()){
     if(S.schoolPlacement==='privateNoIEP'){
       L.push('  • Private school enrollment (no current IEP or district services): Under IDEA, children with disabilities enrolled in private school by their parents retain the right to equitable participation in special education services. The local school district is responsible for conducting a timely evaluation and, if the child is found eligible, providing services through an equitable participation plan. Equitable participation services may differ in scope from what a public school student would receive, but the family has the right to request an evaluation. Family counseled to contact the local district to submit a written evaluation request.');
     } else if(S.schoolPlacement==='privateWithIEP'){
@@ -3493,7 +3499,7 @@ function generateNote() {
     }
     } // end Part B band (ageGroup !== 'toddler')
     // Auto-generated IEP/504 accommodations — grouped into three categories
-    if(S.ageGroup!=='toddler'){
+    if(isPartBAge()){
       // Group 1: Core ASD accommodations (always shown for school-age+)
       const accomASD=[];
       accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
@@ -3537,7 +3543,7 @@ function generateNote() {
       }
     }
     // Concurrent-billing framing is IEP (Part B) language — suppressed for toddlers.
-    if(S.ageGroup!=='toddler') L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
+    if(isPartBAge()) L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
     L.push('');
   }
 
@@ -4533,13 +4539,13 @@ function generateABALetter(isPreview=false){
     h+=`<div class="aba-sec">III. Treatment Necessity &amp; Evidence Base</div>`;
     h+=`<p>${linkify(c.evidPara)}</p>`;
     h+=`<div class="aba-sec">IV. Requested Treatment Parameters</div>`;
-    h+=`<p><strong>Requested intensity:</strong> ${e(c.hoursText)}</p>`;
+    h+=`<p><strong>Requested intensity:</strong> ${ph(e(c.hoursText))}</p>`;
     if(c.settings.length) h+=`<p><strong>Recommended setting(s):</strong> ${e(c.settings.join(', '))}</p>`;
     if(c.targets.length){h+=`<p><strong>Priority treatment targets:</strong></p><ul>`;c.targets.forEach(t=>{h+=`<li>${e(t)}</li>`;});h+=`</ul>`;}
     h+=`<p style="margin-top:8px">Treatment will be implemented by a Board Certified Behavior Analyst (BCBA) who will oversee program development, conduct ongoing assessment, and adjust treatment based on objective data. Direct therapy will be provided by trained Registered Behavior Technicians (RBTs) under BCBA supervision, consistent with Behavior Analyst Certification Board (BACB) professional and ethical standards.</p>`;
     h+=`<div class="aba-sec">V. Supporting References</div>`;
     c.refs.forEach(r=>{h+=`<p class="aba-ref">${r.num}. ${linkify(r.text)}</p>`;});
-    h+=`<div class="aba-sig">Submitted by: ___________________________________<br>Credentials / Title: ___________________________________<br>Practice / Institution: ___________________________________<br>Date: ${e(c.today)}&nbsp;&nbsp;&nbsp; Phone: ___________________________________</div>`;
+    h+=`<div class="aba-sig">Submitted by: ___________________________________<br>Credentials / Title: ___________________________________<br>Practice / Institution: ___________________________________<br>Date: ${ph(c.today)}&nbsp;&nbsp;&nbsp; Phone: ___________________________________</div>`;
     h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review, attestation, and signature prior to submission. This tool does not constitute legal or billing advice.</p>`;
     h+=`</div>`;
     return h;
@@ -4606,7 +4612,7 @@ async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
   if(format==='epic'){await writeClipboardText(toEpic(plain));flashText('copyABAEpicBtn','✓ Copied!');return;}
-  if(format==='rich'&&await writeClipboardRich(generateABALetter(false),plain)){flashText('copyABABtn','✓ Letter copied!');return;}
+  if(format==='rich'&&await writeClipboardRich(tryBuild(()=>generateABALetter(false)),plain)){flashText('copyABABtn','✓ Letter copied!');return;}
   await writeClipboardText(plain);
   flashText('copyABABtn','✓ Copied!');
 }
@@ -5599,7 +5605,7 @@ function render(){
 
   // Standard note preview
   const hasInput=S.diagStatus||S.ageGroup||S.criteriaA.size||S.criteriaB.size;
-  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();return;}
+  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();renderOverrides();return;}
   let html='';
   if(S.diagStatus==='confirmed'){
     if(!v.complete){const iss=[];if(v.aCount<3)iss.push('A: '+v.aCount+'/3');if(v.bCount<2)iss.push('B: '+v.bCount+'/4');if(!v.cde)iss.push('C/D/E incomplete');html+=`<div class="note-err"><strong>⚠ Criteria Warning:</strong> DSM-5 criteria incomplete for confirmed ASD: ${iss.join('; ')}.</div>`;}
@@ -6024,9 +6030,13 @@ async function writeClipboardText(text){
   try{await navigator.clipboard.writeText(text);}
   catch(e){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
 }
+// Build the rich HTML for a copy; '' on a throw so writeClipboardRich falls back to plain
+// text instead of aborting the copy with an unhandled rejection.
+function tryBuild(fn){ try{return fn()||'';}catch(e){return '';} }
 // Rich copy (HTML + plain alternates). Returns false when the browser refuses ClipboardItem
-// so the caller can fall back to plain text.
+// (or there is no HTML to send) so the caller can fall back to plain text.
 async function writeClipboardRich(html,plain){
+  if(!html) return false;
   try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);return true;}
   catch(e){return false;}
 }
@@ -6041,7 +6051,7 @@ async function copyNote(format,part,btn){
   const note=generateNote();
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
-  if(format==='rich'&&await writeClipboardRich(generateRichHTML(),plain)){flashBtn('✓ Rich text copied!',btn);return;}
+  if(format==='rich'&&await writeClipboardRich(tryBuild(generateRichHTML),plain)){flashBtn('✓ Rich text copied!',btn);return;}
   await writeClipboardText(plain);
   flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
@@ -6128,9 +6138,14 @@ function clearAll(opts){
   syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('is-on'));
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
-  // Reset every field from the one initializer (Sets are cleared in place so nothing that
-  // captured a Set reference goes stale).
-  for(const [k,v] of Object.entries(initialState())){ if(v instanceof Set) S[k].clear(); else S[k]=v; }
+  // Reset every field from the one initializer. Sets and nested objects (overrides, ev,
+  // therapyStatus, behavFreq, priorTesting*) are emptied and refilled IN PLACE, so a
+  // reference captured anywhere stays valid; only scalars are reassigned.
+  for(const [k,v] of Object.entries(initialState())){
+    if(v instanceof Set) S[k].clear();
+    else if(v&&typeof v==='object'){ for(const kk of Object.keys(S[k])) delete S[k][kk]; Object.assign(S[k],v); }
+    else S[k]=v;
+  }
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
@@ -6617,7 +6632,7 @@ function updateAgeBasedVisibility(){
   const schoolHead=document.getElementById('sh-school');
   if(schoolHead){
     const schoolWrap=schoolHead.closest('.section');
-    const hideSchool=S.ageGroup==='toddler';
+    const hideSchool=!isPartBAge();
     if(schoolWrap) schoolWrap.style.display=hideSchool?'none':'';
     if(hideSchool&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size)){
       S.schoolPlacement='';S.schoolDoc='';
@@ -6808,7 +6823,7 @@ function syncSchoolSvcFromNeeds(){
   // Toddlers are served under IDEA Part C (Early Steps), not Part B school services.
   // Without this gate, any need checkbox auto-populates S.schoolSvc and the suppressed
   // school-based-services output re-opens downstream despite §7 being hidden.
-  if(S.ageGroup==='toddler') return;
+  if(!isPartBAge()) return;
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
     S.schoolSvc.add(t);
@@ -6835,7 +6850,7 @@ function syncSchoolSvcFromNeeds(){
   // they are served under Part C (Early Steps), not a Part B psychoed eval. This is
   // independent of the academic-ABA FAPE gate (academic ABA targets stay toddler/preschool-
   // only because academic instruction is the district's obligation, not medical ABA).
-  if((S.academic&&S.ageGroup!=='toddler')||S.comorbid.has('ld_suspected')||(isSchoolAgePlus()&&hasHyperlexia())) add('psychoed');
+  if((S.academic&&isPartBAge())||S.comorbid.has('ld_suspected')||(isSchoolAgePlus()&&hasHyperlexia())) add('psychoed');
   if(hasID()) add('sped');
 }
 

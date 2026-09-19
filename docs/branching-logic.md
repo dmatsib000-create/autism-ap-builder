@@ -309,7 +309,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 
 ### 2.1 Content branches by age group
 
-The branches below all read `S.ageGroup` directly or via one of three module-scope helpers: `isYoung()` (toddler or preschool), `isSchoolAgePlus()` (school-age, adolescent or young adult) and `isTeenPlus()` (adolescent or young adult; the ABA letter aliases it as `isOlderForABA`).
+The branches below all read `S.ageGroup` directly or via one of four module-scope helpers: `isYoung()` (toddler or preschool), `isSchoolAgePlus()` (school-age, adolescent or young adult), `isTeenPlus()` (adolescent or young adult; the ABA letter aliases it as `isOlderForABA`) and `isPartBAge()` (everyone but toddlers: the IDEA Part B boundary used by the school section, the school-service sync and `iepLetterEligible()`; an unset age counts as Part B).
 
 | Branch | Line | Condition | Effect |
 |---|---|---|---|
@@ -578,7 +578,7 @@ Three output tabs sit at the top of the right-hand panel. Their visibility is re
 |---|---|---|---|
 | A&P Note | `tabNote` | always visible | — |
 | ABA Letter | `tabABA` | `abaLetterEligible()` = `S.diagStatus === 'confirmed' && referralIncluded('aba')` | next to `resolveOv()` |
-| IEP Letter | `tabIEP` | `iepLetterEligible()` = `S.schoolDoc !== '' && S.ageGroup !== 'toddler'` | next to `resolveOv()` |
+| IEP Letter | `tabIEP` | `iepLetterEligible()` = `S.schoolDoc !== '' && isPartBAge()` | next to `resolveOv()` |
 
 Each predicate is the **single** gate for its letter: `render()` (tab visibility and the fallback below), both generators (`generateABALetter` / `generateABALetterPlain`, `generateIEPLetterHTML` / `generateIEPLetterPlain`) and the copy handler all call it. They used to spell the condition out separately, and the copies drifted — the ABA generators checked only `diagStatus`, so an ABA referral overridden to `'no'` hid the tab but still produced a full letter. The `referralIncluded('aba')` inside `abaLetterEligible()` is the same resolution layer described in [§7](#7-therapy-recommendations--override-system); the ABA parameters section in the form still keys off that inclusion alone (it is form input, not letter output).
 
@@ -710,7 +710,7 @@ flowchart LR
 
 Every recommendation follows this exact shape — there is no second mechanism. If you understand `ruleX()` and `resolveOv()`, you understand the whole therapy layer.
 
-Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the rule up in `OV_DEFS` and passes it to `resolveOv()`, and `generateNote()`, `render()` and the therapy-status rows all go through it, so a key can never be bound to the wrong rule function. `resolveOv(key, rule)` is called directly only inside `referralIncluded` and in the two places that also need the rule object itself (the ABA reasons list and the FDLRS bullet).
+Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the rule up in `OV_DEFS` and passes it to `resolveOv()`, and `generateNote()`, `render()` and the therapy-status rows all go through it, so a key can never be bound to the wrong rule function. `resolveOv(key, rule)` is called directly only inside `referralIncluded`, in the two note sites that also need the rule object itself (the ABA reasons list and the FDLRS bullet), and in `renderOverrides()`, which needs the rule result separately from the override to colour each pill.
 
 ### 7.2 The 18 rules at a glance
 
