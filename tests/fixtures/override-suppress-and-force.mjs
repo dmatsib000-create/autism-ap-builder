@@ -12,7 +12,9 @@
 export default {
   name: 'override-suppress-and-force',
   describe: 'Confirmed ASD, school-age — ABA force-excluded and psychotherapy force-included via overrides',
-  outputs: ['note'],
+  // 'aba' is expected to be EMPTY: abaLetterEligible() requires the ABA referral to be
+  // included, so an override to 'no' must suppress the letter, not just the tab.
+  outputs: ['note', 'aba'],
   apply(S) {
     S.ageGroup = 'schoolAge';
     S.pronouns = 'he';

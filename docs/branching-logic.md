@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `fe17c90`
+> **Last verified against commit:** `f0fec2e`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -575,14 +575,14 @@ Three output tabs sit at the top of the right-hand panel. Their visibility is re
 | Tab | DOM id | Gate | Line |
 |---|---|---|---|
 | A&P Note | `tabNote` | always visible | — |
-| ABA Letter | `tabABA` | `abaIncluded && S.diagStatus === 'confirmed'` | 3928, 3932 |
-| IEP Letter | `tabIEP` | `S.schoolDoc !== '' && S.ageGroup !== 'toddler'` | 3938–3940 |
+| ABA Letter | `tabABA` | `abaLetterEligible()` = `S.diagStatus === 'confirmed' && resolveOv('aba', ruleABA())` | next to `resolveOv()` |
+| IEP Letter | `tabIEP` | `iepLetterEligible()` = `S.schoolDoc !== '' && S.ageGroup !== 'toddler'` | next to `resolveOv()` |
 
-Where `abaIncluded = resolveOv('aba', ruleABA())` — i.e., the same resolution layer described in [§7](#7-therapy-recommendations--override-system).
+Each predicate is the **single** gate for its letter: `render()` (tab visibility and the fallback below), both generators (`generateABALetter` / `generateABALetterPlain`, `generateIEPLetterHTML` / `generateIEPLetterPlain`) and the copy handler all call it. They used to spell the condition out separately, and the copies drifted — the ABA generators checked only `diagStatus`, so an ABA referral overridden to `'no'` hid the tab but still produced a full letter. The `resolveOv('aba', ruleABA())` inside `abaLetterEligible()` is the same resolution layer described in [§7](#7-therapy-recommendations--override-system); the ABA parameters section in the form still keys off that inclusion alone (it is form input, not letter output).
 
 ### 5.2 The ABA hard gate
 
-The ABA letter requires `diagStatus === 'confirmed'`. There is no way to render the letter for a suspected diagnosis — the clinician would have to first confirm. This is intentional: the letter is a medical-necessity attestation, and writing one without a confirmed diagnosis would be clinically inappropriate. The override system can force `abaIncluded` to true, but it cannot bypass the diagnosis check.
+The ABA letter requires `diagStatus === 'confirmed'` **and** the ABA referral resolved as included (auto rule or a `'yes'` override; a `'no'` override suppresses the letter as well as the tab, pinned by the `override-suppress-and-force` fixture's empty `aba` golden). There is no way to render the letter for a suspected diagnosis — the clinician would have to first confirm. This is intentional: the letter is a medical-necessity attestation, and writing one without a confirmed diagnosis would be clinically inappropriate. The override system can force `abaIncluded` to true, but it cannot bypass the diagnosis check.
 
 ### 5.3 The IEP hard gates
 
@@ -595,12 +595,10 @@ The IEP letter is hidden when:
 If a previously-active tab hides, `render()` switches to the A&P note tab automatically (`autism-ap-builder.html:3933–3935`, `:3941`):
 
 ```javascript
-if (!abaIncluded || S.diagStatus !== 'confirmed') {
-  if (S.previewMode === 'aba') {
-    S.previewMode = 'note';
-    setPreviewMode('note');
-    return;
-  }
+if (!abaLetterEligible() && S.previewMode === 'aba') {
+  S.previewMode = 'note';
+  setPreviewMode('note');
+  return;
 }
 ```
 
@@ -1016,7 +1014,7 @@ function generateABALetter(isPreview = false) {
 }
 ```
 
-The letter does not render for suspected or rule-out evaluations, regardless of override state. See [§5.2](#52-the-aba-hard-gate) for the tab-visibility implications.
+The letter does not render for suspected or rule-out evaluations, regardless of override state, and it does not render when the ABA referral is overridden to `'no'` (`abaLetterEligible()`). See [§5.2](#52-the-aba-hard-gate).
 
 ### 9.2 ABA target population — `syncABATargetsFromNeeds()`
 
@@ -1790,7 +1788,7 @@ Any change to the following files or constructs requires updating this doc **in 
 
 - `render()`, `generateNote()`, `generateClinicalSummary()`
 - `_abaContent()`, `_iepLetterContent()` (or their `Plain()` siblings)
-- Any `rule*()` function or its conditions
+- Any `rule*()` function or its conditions, or the letter-eligibility predicates `abaLetterEligible()` / `iepLetterEligible()` (§5)
 - The `OV_DEFS` array, `resolveOv()`, `cycleOverride()`, `setOverride()`
 - `syncABATargetsFromNeeds()`, `bridgeCogProfileToSpecifier()`, `validateCriteria()`
 - Adding/removing/renaming any property on `S`

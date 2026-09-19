@@ -1,7 +1,7 @@
 LETTER OF MEDICAL NECESSITY
 Applied Behavior Analysis (ABA) Therapy — Autism Spectrum Disorder
 
-Date: [DATE]
+Date: {Date}
 Diagnosis: Autism Spectrum Disorder, Level 2 — Requiring Substantial Support (DSM-5)
 ICD-10-CM: F84.0
 
@@ -44,4 +44,4 @@ V. SUPPORTING REFERENCES
 Submitted by: ___________________________________
 Credentials / Title: ___________________________________
 Practice / Institution: ___________________________________
-Date: [DATE]     Phone: ___________________________________
+Date: {Date}     Phone: ___________________________________
