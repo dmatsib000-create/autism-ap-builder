@@ -83,7 +83,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 
 ### 1.2 The `S` object — property reference
 
-`S` is initialized once (`autism-ap-builder.html:1200`) and never reassigned. Properties fall into a few categories:
+`S` is created once as `const S = initialState()` and never reassigned. `initialState()` is the only place the state shape is declared: `clearAll()` resets every field from a fresh `initialState()` (Sets are cleared in place), so the Clear All reset list can never drift from the properties below. Properties fall into a few categories:
 
 **Demographics & visit:**
 
@@ -168,7 +168,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `schoolPlacement` | string — IEP letter framing |
 | `schoolDoc` | string — §5 (IEP tab gate) |
 | `schoolSvc` (Set) | §10 — service block selection |
-| `schoolSvcAuto` / `schoolSvcManualOff` | Sets — tracks which services were auto-recommended vs manually toggled off |
+| `schoolSvcManualOff` | Set — services the clinician manually turned off; the auto-sync never re-adds them |
 | `priorTesting` (Set) | Instrument names with `priorTestingOutcome[k]` and `priorTestingDate[k]` — cited in letters |
 | `teacherMaterials` (Set) | School-supplied artifacts that informed assessment |
 | `teacherMaterialsReturned` (Set) | Subset of `teacherMaterials` marked returned and reviewed — §4.5.2 (returned/awaited note split) |
@@ -281,7 +281,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `schoolDoc` | string | [§5.3](#53-the-iep-hard-gates) |
 | `schoolPlacement` | string | [§1.2](#12-the-s-object--property-reference) |
 | `schoolSvc` | Set | [§10.11](#1011-service-rationale-blocks) |
-| `schoolSvcAuto` / `schoolSvcManualOff` | Set | [§10.14](#1014-the-schoolsvcauto--schoolsvcmanualoff-tracking) |
+| `schoolSvcManualOff` | Set | [§10.14](#1014-the-schoolsvcmanualoff-tracking) |
 | `seizureConcern` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
 | `sleepStudy` | boolean | [§7.2](#72-the-18-rules-at-a-glance) |
 | `specifiers` | Set | [§9.7](#97-specifier-display--intentional-omissions), [§10.13](#1013-specifier-edge-cases) |
@@ -309,7 +309,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 
 ### 2.1 Content branches by age group
 
-The branches below all read `S.ageGroup` directly or via a helper like `isYoung()` (toddler or preschool) or `isOlderForABA()` (adolescent or young adult).
+The branches below all read `S.ageGroup` directly or via one of three module-scope helpers: `isYoung()` (toddler or preschool), `isSchoolAgePlus()` (school-age, adolescent or young adult) and `isTeenPlus()` (adolescent or young adult; the ABA letter aliases it as `isOlderForABA`).
 
 | Branch | Line | Condition | Effect |
 |---|---|---|---|
@@ -577,10 +577,10 @@ Three output tabs sit at the top of the right-hand panel. Their visibility is re
 | Tab | DOM id | Gate | Line |
 |---|---|---|---|
 | A&P Note | `tabNote` | always visible | — |
-| ABA Letter | `tabABA` | `abaLetterEligible()` = `S.diagStatus === 'confirmed' && resolveOv('aba', ruleABA())` | next to `resolveOv()` |
+| ABA Letter | `tabABA` | `abaLetterEligible()` = `S.diagStatus === 'confirmed' && referralIncluded('aba')` | next to `resolveOv()` |
 | IEP Letter | `tabIEP` | `iepLetterEligible()` = `S.schoolDoc !== '' && S.ageGroup !== 'toddler'` | next to `resolveOv()` |
 
-Each predicate is the **single** gate for its letter: `render()` (tab visibility and the fallback below), both generators (`generateABALetter` / `generateABALetterPlain`, `generateIEPLetterHTML` / `generateIEPLetterPlain`) and the copy handler all call it. They used to spell the condition out separately, and the copies drifted — the ABA generators checked only `diagStatus`, so an ABA referral overridden to `'no'` hid the tab but still produced a full letter. The `resolveOv('aba', ruleABA())` inside `abaLetterEligible()` is the same resolution layer described in [§7](#7-therapy-recommendations--override-system); the ABA parameters section in the form still keys off that inclusion alone (it is form input, not letter output).
+Each predicate is the **single** gate for its letter: `render()` (tab visibility and the fallback below), both generators (`generateABALetter` / `generateABALetterPlain`, `generateIEPLetterHTML` / `generateIEPLetterPlain`) and the copy handler all call it. They used to spell the condition out separately, and the copies drifted — the ABA generators checked only `diagStatus`, so an ABA referral overridden to `'no'` hid the tab but still produced a full letter. The `referralIncluded('aba')` inside `abaLetterEligible()` is the same resolution layer described in [§7](#7-therapy-recommendations--override-system); the ABA parameters section in the form still keys off that inclusion alone (it is form input, not letter output).
 
 ### 5.2 The ABA hard gate
 
@@ -710,6 +710,8 @@ flowchart LR
 
 Every recommendation follows this exact shape — there is no second mechanism. If you understand `ruleX()` and `resolveOv()`, you understand the whole therapy layer.
 
+Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the rule up in `OV_DEFS` and passes it to `resolveOv()`, and `generateNote()`, `render()` and the therapy-status rows all go through it, so a key can never be bound to the wrong rule function. `resolveOv(key, rule)` is called directly only inside `referralIncluded` and in the two places that also need the rule object itself (the ABA reasons list and the FDLRS bullet).
+
 ### 7.2 The 18 rules at a glance
 
 | # | Rule | Line | Trigger (simplified) | Override key |
@@ -800,7 +802,7 @@ Display states (CSS classes):
 
 The saturation difference between `auto-yes` (default fires) and `ov-yes` (clinician forced) is intentional: at a glance, the clinician can tell *which* recommendations came from the rules and which they overrode.
 
-`setOverride(key, value)` is the imperative setter (used internally and exposed for tests); `cycleOverride(key)` is what the click handler calls.
+`cycleOverride(key)` (auto → yes → no → auto) is what the pill click handler calls; there is no separate imperative setter.
 
 ### 7.6 Worked example — ABA end-to-end
 
@@ -1596,13 +1598,9 @@ This protects against schools assigning ID eligibility based on a "suspected" cl
 
 **`idDocPrompt`**: If `specifiers.has('withID')` is true but `hasID() === false` (no severity selected in `cogProfile`), the letter shows an in-letter prompt to the clinician to select severity before sending. This catches the failure mode where the clinician checked the specifier checkbox but didn't complete the severity dropdown.
 
-### 10.14 The `schoolSvcAuto` / `schoolSvcManualOff` tracking
+### 10.14 The `schoolSvcManualOff` tracking
 
-These two Sets track *provenance* of each service:
-- `schoolSvcAuto` — services the app auto-recommended
-- `schoolSvcManualOff` — services the clinician manually turned off
-
-When state changes re-trigger auto-recommendations, services in `schoolSvcManualOff` are *not* re-added even if their auto-recommendation condition still holds. This mirrors the §9 `syncABATargetsFromNeeds()` add-only philosophy: respect clinician curation over recomputed defaults.
+`schoolSvcManualOff` records the services the clinician manually turned off. When state changes re-trigger auto-recommendations, services in this Set are *not* re-added even if their auto-recommendation condition still holds. (Which services were *auto*-recommended is shown only by the on-screen `.svc-auto-badge` next to the checkbox; no state field tracks it, because nothing reads it.) This mirrors the §9 `syncABATargetsFromNeeds()` add-only philosophy: respect clinician curation over recomputed defaults.
 
 ### 10.15 Psychoeducational-evaluation auto-recommendation
 
@@ -1770,7 +1768,7 @@ This mirrors the `priorExtAttribution` pattern used for the ID/GDD F70/F71/F72/F
 
 A "Quick start" bar at the top of `.left-panel` offers six one-click archetype presets plus a composable `+ADHD` modifier, to cut in-visit entry cost. The engine — `PRESETS`, `MODIFIERS`, `formHasInput()`, `applyPreset()` — is defined just after `setByPath()`.
 
-**Mechanism.** `applyPreset(key, opts)` does **not** assign `S` directly. It `.click()`s the real form controls (radios by `name`+`value`, set-membership checkboxes by `data-key`+`value`, langModifier chips by `mod_<key>` id), so every existing change-handler side effect fires — the cog→specifier bridge, `syncCommNeedsFromLangLevel`, `syncABATargetsFromNeeds`, `syncSchoolSvcFromNeeds`, the `.is-on` selection classes, and `render()`. A preset can never diverge from the hand-click code path because it *is* the hand-click code path. Each click is guarded (`!checked` for inputs, `!S.langModifiers.has()` for chips) so it can't toggle an auto-populated selection back off. `reset:true` (default; archetype buttons) calls `clearAll({confirmed:true})` first, gated by a `formHasInput()` confirm; `reset:false` (the modifier button) overlays without clearing.
+**Mechanism.** `applyPreset(key, opts)` does **not** assign `S` directly. While it runs, `render()` is suspended (the `renderSuspended` flag) and fires once at the end, so a preset costs one re-render rather than one per control. It `.click()`s the real form controls (radios by `name`+`value`, set-membership checkboxes by `data-key`+`value`, langModifier chips by `mod_<key>` id), so every existing change-handler side effect fires — the cog→specifier bridge, `syncCommNeedsFromLangLevel`, `syncABATargetsFromNeeds`, `syncSchoolSvcFromNeeds`, the `.is-on` selection classes, and `render()`. A preset can never diverge from the hand-click code path because it *is* the hand-click code path. Each click is guarded (`!checked` for inputs, `!S.langModifiers.has()` for chips) so it can't toggle an auto-populated selection back off. `reset:true` (default; archetype buttons) calls `clearAll({confirmed:true})` first, gated by a `formHasInput()` confirm; `reset:false` (the modifier button) overlays without clearing.
 
 **Cross-preset invariant (the load-bearing rule).** No preset sets the diagnostic determination: `diagStatus`, `asdLevelSC`, `asdLevelRRB`, `criteriaA`/`criteriaB`, `criteriaC`/`D`/`E`, and `ev.*` are never touched. The clinician affirms every diagnosis-determining call, every time. Only the two early-workup presets (`p1`/`p2`) set `cogProfile='unknown'` — an explicit *non*-assertion driving the "awaiting comprehensive battery" pathway (leaves `S.specifiers` and `S.specifiersManuallySet` empty — no auto-pin). No preset sets a specific cognitive tier; higher-support presets (`p4`/`p6`) leave `cogProfile` blank rather than presume ID.
 
@@ -1791,7 +1789,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - `render()`, `generateNote()`, `generateClinicalSummary()`
 - `_abaContent()`, `_iepLetterContent()` (or their `Plain()` siblings)
 - Any `rule*()` function or its conditions, or the letter-eligibility predicates `abaLetterEligible()` / `iepLetterEligible()` (§5)
-- The `OV_DEFS` array, `resolveOv()`, `cycleOverride()`, `setOverride()`
+- The `OV_DEFS` array, `resolveOv()`, `referralIncluded()`, `cycleOverride()`
 - `syncABATargetsFromNeeds()`, `bridgeCogProfileToSpecifier()`, `validateCriteria()`
 - Adding/removing/renaming any property on `S`
 - Adding/removing any HTML control that mutates a `Set` on `S`

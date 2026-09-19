@@ -83,7 +83,7 @@ Everything lives in one file: CSS in `<style>`, JavaScript in `<script>`. There 
 
 **Three output tabs:** A&P Note, ABA Letter, IEP Letter — each with a sticky copy bar. Tab visibility is driven by state (e.g., IEP tab only appears when `S.schoolDoc !== ''` and `S.ageGroup !== 'toddler'`).
 
-**Override system:** `resolveOv(key, defaultRule)` — allows per-section manual overrides of therapy recommendations.
+**Override system:** `resolveOv(key, defaultRule)` — allows per-section manual overrides of therapy recommendations. Callers use `referralIncluded(key)`, which looks the rule up in `OV_DEFS`; call `resolveOv` directly only when you also need the rule object.
 
 **Pronoun system:** `getPron()` returns `{subj, obj, poss, refl, cap}`. The `cap` field is the sentence-opening capitalized subject (He/She/They/The child).
 
