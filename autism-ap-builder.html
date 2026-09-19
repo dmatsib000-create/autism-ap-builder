@@ -2730,7 +2730,6 @@ function generateNote() {
     const idCode={id_mild:'F70',id_moderate:'F71',id_severe:'F72'}[S.cogProfile]||'F79';
     const idSev={id_mild:'mild',id_moderate:'moderate',id_severe:'severe'}[S.cogProfile]||'unspecified severity';
     comorbs.push(`Intellectual disability, ${idSev} (${idCode})`+priorExtAttribution);
-    if(!hasID()) comorbs.push('[DOCUMENTATION NOTE: "With intellectual disability" specifier is checked but no ID severity is selected in Cognitive Profile. ICD-10 code defaults to F79 (unspecified severity). Select a severity in Cognitive Profile for precise coding.]');
   }
   if(S.specifiers.has('withSuspectedID')){
     comorbs.push('Intellectual disability — suspected, formal evaluation pending (F79)'+priorExtAttribution);
@@ -3974,7 +3973,7 @@ function generateNote() {
     L.push('');L.push('Plan:');
     L.push('  • Trauma-informed approach required across all providers, educational settings, and ABA team.');
     L.push('  • Therapy: TF-CBT (Trauma-Focused Cognitive Behavioral Therapy) for verbal individuals; EMDR (adapted), play therapy, or sensorimotor approaches for minimally verbal individuals. Therapist must have both trauma and ASD training.');
-    L.push('  • Safety assessment: [active trauma source screened; mandatory reporting obligations reviewed and addressed]');
+    L.push('  • Safety assessment: {active trauma source screened; mandatory reporting obligations reviewed and addressed}');
     L.push('  • Body safety education provided in age- and communication-appropriate format.');
     L.push('  • PCIT may be appropriate if caregiver relationship is a key protective factor; see ASD plan if applicable.');
     L.push('');
@@ -4474,7 +4473,7 @@ function _abaContent(){
 
   const SL={home:'home',clinic:'clinic/center-based',school:'school/educational setting',community:'community settings',telehealth:'Telehealth (parent coaching and caregiver training)'};
   const settings=[...S.abaSetting].map(s=>SL[s]||s);
-  const hoursText=S.abaHours==='30plus'?'30 or more hours per week':S.abaHours?S.abaHours+' hours per week':'[hours/week — not yet specified]';
+  const hoursText=S.abaHours==='30plus'?'30 or more hours per week':S.abaHours?S.abaHours+' hours per week':'{hours per week}';
 
   const refs=[];
   refs.push({num:1,text:'Hyman SL, Levy SE, Myers SM, et al.; Council on Children with Disabilities, Section on Developmental and Behavioral Pediatrics. Identification, Evaluation, and Management of Children With Autism Spectrum Disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447'});
@@ -5659,6 +5658,11 @@ function render(){
     if(!v.complete){const iss=[];if(v.aCount<3)iss.push('A: '+v.aCount+'/3');if(v.bCount<2)iss.push('B: '+v.bCount+'/4');if(!v.cde)iss.push('C/D/E incomplete');html+=`<div class="note-err"><strong>⚠ Criteria Warning:</strong> DSM-5 criteria incomplete for confirmed ASD: ${iss.join('; ')}.</div>`;}
     else html+='<div class="note-ok"><strong>✓ DSM-5 criteria complete</strong></div>';
   }
+  // Coding gap stays on screen, never in the note: a withID specifier without a severity tier
+  // is a data-entry prompt for the clinician, not chart text (the note itself codes F79 and
+  // reads correctly as signed). The IEP letter carries its own brace-placeholder prompt,
+  // idDocPrompt, because that letter is the one the school reads.
+  if(S.specifiers.has('withID')&&!hasID()) html+=`<div class="note-err"><strong>⚠ Coding Warning:</strong> "With intellectual disability" is checked but no ID severity is selected in Cognitive Profile. The note codes F79 (unspecified severity); select a severity for precise coding.</div>`;
   html+=generateRichHTML(true);
   pre.innerHTML=html;
   const dxSec=document.getElementById('dxWorkupSection');

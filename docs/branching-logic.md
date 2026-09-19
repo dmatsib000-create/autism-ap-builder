@@ -456,6 +456,8 @@ If the clinician sets `diagStatus = 'confirmed'` but `validateCriteria()` return
 
 The warning is non-blocking — the clinician can still proceed (the tool serves cases where the clinician *intends* to document an exception). But the banner is intentionally prominent so an omission isn't accidental.
 
+A second banner of the same kind, **⚠ Coding Warning**, fires when the `withID` specifier is checked but no ID severity tier is selected in Cognitive Profile. The note itself still codes `F79` (unspecified severity) and reads correctly as signed; the prompt to pick a severity lives only on screen. It used to be a bracketed "documentation note" inside the note text, which the placeholder rule forbids (brackets paste verbatim into Epic and can be signed into the chart). The IEP letter keeps its own brace-placeholder prompt for the same gap (`idDocPrompt`, §10), because that letter is the one the school reads.
+
 ### 4.4 Side effects of specific criteria
 
 A few criteria toggle other state when set, beyond their own membership:
@@ -1129,7 +1131,7 @@ const hoursText = S.abaHours === '30plus'
   ? '30 or more hours per week'
   : S.abaHours
     ? S.abaHours + ' hours per week'
-    : '[hours/week — not yet specified]';
+    : '{hours per week}';   // brace placeholder: the Epic copy path rewrites it to ***
 ```
 
 ### 9.7 Specifier display — intentional omissions
