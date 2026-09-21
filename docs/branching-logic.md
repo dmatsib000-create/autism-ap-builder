@@ -1133,7 +1133,7 @@ const hoursText = S.abaHours === '30plus'
   ? '30 or more hours per week'
   : S.abaHours
     ? S.abaHours + ' hours per week'
-    : '{hours per week}';   // brace placeholder: the Epic copy path rewrites it to ***
+    : '{hours per week}';   // brace placeholder: an F2 cursor stop once pasted into Epic
 ```
 
 ### 9.7 Specifier display — intentional omissions

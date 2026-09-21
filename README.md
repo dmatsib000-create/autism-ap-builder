@@ -63,7 +63,7 @@ The eight above produce a clinically defensible note. These six additions are wh
 
 The A&P Note tab has three buttons in the top toolbar: **Print**, **Copy Plain**, and **★ Copy Rich Text**. For Maya's note, click **Copy Rich Text** → switch to Epic → paste into the note composer; formatting (bold, bullets, section structure) is preserved.
 
-The ABA Letter and IEP Letter tabs each have their own per-tab toolbar with a third option: **Copy for Epic (`***`)**. This copies the letter as plain text with every `{placeholder}` field replaced by `***` Epic cursor stops — once pasted into the Epic note composer, you can Tab through and fill or skip each placeholder. Use this for the letter tabs; use Rich Text for the A&P note.
+The ABA Letter and IEP Letter tabs each have their own per-tab toolbar with a second option: **Copy for Epic (plain)**. This copies the letter as plain text with every `{placeholder}` field left exactly as written. Epic treats the braces as cursor stops, so once pasted into the Epic note composer you can press F2 to hop to each placeholder, read its hint, and fill or delete it. Use this for the letter tabs; use Rich Text for the A&P note.
 
 ### If you see ⚠ Incomplete
 
@@ -99,7 +99,7 @@ A few boundaries to know before you rely on the output. Read this section before
 
 - **Doesn't save your inputs between sessions.** The form is stateless by design (no PHI is stored or transmitted). Closing the browser tab discards everything. Copy your outputs into Epic *before* closing the tab.
 
-- **Doesn't integrate with Epic or any other EMR.** Copy-paste is manual. The Copy for Epic (`***`) button produces Epic SmartText-compatible output with Tab-navigable cursor stops, but the paste itself is a manual step.
+- **Doesn't integrate with Epic or any other EMR.** Copy-paste is manual. The Copy for Epic (plain) button produces text whose `{placeholder}` fields act as F2 cursor stops in Epic, but the paste itself is a manual step.
 
 - **Doesn't cover every neurodevelopmental presentation.** Focused on autism evaluations with common comorbidities (ADHD, anxiety, depression, OCD, trauma, language disorder, SLDs, sleep, GI, PFD/ARFID, epilepsy, ID/GDD, catatonia). Less common comorbidities (Fragile X, Rett, Tourette's, etc.) are not yet in the checkbox lists — note them manually in the relevant free-text fields.
 
@@ -186,7 +186,7 @@ Quick decoder for the acronyms and short forms used in the rest of this document
 - **AMA-style citation** — formatting convention from the American Medical Association Manual of Style; uses superscript numerical markers in prose and a numbered reference list (distinct from "AMA" as in "against medical advice")
 - **SPED** — special education / specialized academic instruction (school-based service category)
 - **NAMI** — National Alliance on Mental Illness (caregiver mental-health support resource referenced in Family Resources output)
-- **SmartText / SmartForms** — Epic terminology for reusable text templates with cursor-stop navigation (the `***` Epic copy format produces SmartText-compatible output)
+- **SmartText / SmartForms** — Epic terminology for reusable text templates with cursor-stop navigation (the `{placeholder}` fields in the letter output behave as cursor stops after paste)
 
 **Educational / IDEA**
 - **IDEA** — Individuals with Disabilities Education Act (U.S. federal law governing special education)
@@ -224,7 +224,7 @@ Quick decoder for the acronyms and short forms used in the rest of this document
 - **Add-only** — auto-population helpers add checks but never remove them; the clinician's manual unchecks persist across re-renders
 - **The bridge** — the cognitive-profile → DSM-5 specifier auto-link (see the [technical reference](docs/branching-logic.md) §11.7 and the clinician guide)
 - **Override pill** — the three-state Auto/Include/Exclude toggle in the Adjust Referrals section that overrides a referral rule
-- **`{placeholder}` field** — bracketed text in letter output that the clinician fills in after copying (e.g., `{Student Name}`); the Copy for Epic format replaces these with `***` cursor stops
+- **`{placeholder}` field** — brace-wrapped text in letter output that the clinician fills in after copying (e.g., `{Student Name}`); Epic treats each one as an F2 cursor stop and will not let the note be signed while one remains
 
 ## How it works
 
