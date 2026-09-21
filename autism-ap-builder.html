@@ -1088,7 +1088,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group" style="margin-top:8px">
         <label class="field-label" for="iepInstrumentsField">Evaluation &amp; Testing Summaries <span style="font-weight:400;opacity:.7;font-size:var(--text-9)">(optional, free text)</span></label>
         <textarea class="strengths-area" id="iepInstrumentsField" placeholder="Paste or type instrument summaries as you want them to appear. Leave a blank line between instruments and each becomes its own paragraph in the letter.&#10;&#10;WISC-V (2026): FSIQ 78; VCI 84, VSI 81, FRI 76, WMI 73, PSI 70.&#10;Vineland-3 (2026): ABC 71; Communication 68, Daily Living 74, Socialization 70." rows="4"></textarea>
-        <span class="phi-hint">Renders verbatim in the IEP Letter only, after the diagnosis paragraph — not in the A&amp;P note or ABA letter. PHI-free zone: no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)"). Avoid curly braces { } — the Epic copy turns anything inside them into ***.</span>
+        <span class="phi-hint">Renders verbatim in the IEP Letter only, after the diagnosis paragraph — not in the A&amp;P note or ABA letter. PHI-free zone: no names, MRNs, or exact test dates; use the year only (e.g. "WISC-V (2026)"). Avoid curly braces { } — Epic treats anything inside them as a fill-in stop.</span>
       </div>
       <div class="field-group" style="margin-top:8px">
         <span class="field-label">Prior Testing Reviewed</span>
@@ -1714,14 +1714,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <span id="abaLevelWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
     <span id="abaThinWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--red-dark);background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
     <span id="abaCatatoniaWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
-    <button class="btn btn-gray btn-sm" onclick="copyABALetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
-    <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Copy with *** cursor stops for Epic SmartText paste">Copy for Epic (***)</button>
+    <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
   <div class="note-sticky-bar" id="iepStickyBar" style="display:none">
-    <button class="btn btn-gray btn-sm" onclick="copyIEPLetter('plain')">Copy Letter (plain)</button>
     <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')">&#9733; Copy Letter (rich)</button>
-    <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Copy with *** cursor stops — paste directly into Epic note composer and Tab through fields">Copy for Epic (***)</button>
+    <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
 </div>
 </div><!-- /main -->
@@ -4378,7 +4376,7 @@ function _abaContent(){
   // the actual date in Epic post-paste. Aligns with the "complete absence of PHI by
   // design" principle in CLAUDE.md. To revert to auto-today, replace with:
   //   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  // Braces, not brackets: the Epic copy path rewrites {...} to *** so F2 stops here.
+  // Braces, not brackets: Epic treats {...} as an F2 cursor stop and will not let the note be signed with one left in.
   const today='{Date}';
   const youngChild=isYoung();
   const isMilitary=S.insuranceType==='tricare'||S.insuranceType==='champva';
@@ -4618,7 +4616,7 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
   await writeClipboardText(plain);
   flashBtn('✓ Copied!',document.getElementById('copyABABtn'));
@@ -5323,39 +5321,40 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>{
     // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
       const c=_iepLetterContent();
       const e=escapeHtml;
-      const phSt='background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic';
-      const wph=s=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span style="${phSt}">{${e(t)}}</span>`);
+      // Placeholders are deliberately unstyled here. Word carries inline run formatting
+      // into whatever the clinician types over the placeholder, so a highlighted {Student Name}
+      // became highlighted "Jane Doe" and had to be un-highlighted by hand. The braces are the marker.
       const ss='font-family:Georgia,"Times New Roman",serif;font-size:11pt;line-height:1.85;color:#1a1a2e;max-width:700px';
       const secSt='font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:#1d4ed8;border-bottom:1.5px solid #dbeafe;padding-bottom:2px;margin:20px 0 8px';
       let h=`<div style="${ss}">`;
       h+=`<p style="font-size:14pt;font-weight:bold;text-align:center;margin-bottom:4px">PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES</p>`;
       h+=`<p style="text-align:center;font-size:10pt;color:#6b7280;margin-bottom:22px;font-style:italic">${e(c.letterTypeLabel)}</p>`;
-      h+=`<p style="margin-bottom:4px"><strong>Date:</strong> ${wph('{Date}')}</p>`;
-      h+=`<p style="margin-bottom:16px"><strong>Re:</strong> ${wph('{Student Name}')} &nbsp;|&nbsp; ${e(c.reLineLabel)}</p>`;
-      h+=`<p style="margin:0 0 4px">${wph('{Principal / Special Education Coordinator Name}')}<br>${wph('{School Name}')}<br>${wph('{School Address}')}</p>`;
-      h+=`<p style="margin:14px 0 8px">Dear ${wph('{Principal / Special Education Coordinator Name}')}:</p>`;
-      h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated ${wph('{Student Name}')} on ${wph('{Date of Evaluation}')} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
-      h+=`<p style="margin-bottom:10px">${wph(e(c.requestPara))}</p>`;
+      h+=`<p style="margin-bottom:4px"><strong>Date:</strong> {Date}</p>`;
+      h+=`<p style="margin-bottom:16px"><strong>Re:</strong> {Student Name} &nbsp;|&nbsp; ${e(c.reLineLabel)}</p>`;
+      h+=`<p style="margin:0 0 4px">{Principal / Special Education Coordinator Name}<br>{School Name}<br>{School Address}</p>`;
+      h+=`<p style="margin:14px 0 8px">Dear {Principal / Special Education Coordinator Name}:</p>`;
+      h+=`<p style="margin-bottom:10px">I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).</p>`;
+      h+=`<p style="margin-bottom:10px">${e(c.requestPara)}</p>`;
 
       let dxPara;
       if(c.ruledOut){
-        dxPara=`${wph('{Student Name}')} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}</p><p style="margin-bottom:10px">${e(c.ruleOutDxPivot)}`;
+        dxPara=`{Student Name} was${e(c.ruleOutReferralTail)} ${e(c.ruleOutDxRest)}</p><p style="margin-bottom:10px">${e(c.ruleOutDxPivot)}`;
       } else {
-        dxPara=`${wph('{Student Name}')} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
+        dxPara=`{Student Name} has received a diagnosis of ${e(c.dxStr)} (ICD-10-CM: ${e(c.dxCode)})`;
         if(c.levelLabel) dxPara+=`, classified as ${e(c.levelLabel)}`;
         if(c.specStr) dxPara+=` (${e(c.specStr)})`;
         dxPara+=S.diagStatus==='confirmed'?', confirmed at the evaluation referenced above.':', as documented at the evaluation referenced above.';
-        if(c.coDxs.length) dxPara+=` In addition, ${wph('{Student Name}')} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${e(c.coDxs.join('; '))}.`;
+        if(c.coDxs.length) dxPara+=` In addition, {Student Name} carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: ${e(c.coDxs.join('; '))}.`;
         if(c.priorTestingCite) dxPara+=e(c.priorTestingCite);
       }
       h+=`<p style="margin-bottom:10px">${dxPara}</p>`;
       if(c.ruleOutRelatedSvcNote) h+=`<p style="margin-bottom:10px">${e(c.ruleOutRelatedSvcNote)}</p>`;
-      if(c.idDocPrompt) h+=`<p style="margin-bottom:10px"><span class="iep-ph">${e(c.idDocPrompt)}</span></p>`;
+      if(c.idDocPrompt) h+=`<p style="margin-bottom:10px">${e(c.idDocPrompt)}</p>`;
       if(c.suspectedIDNote) h+=`<p style="margin-bottom:10px;font-style:italic">${e(c.suspectedIDNote)}</p>`;
       if(c.instrumentBlocks.length){
         h+=`<p style="${secSt}">Assessment Results</p>`;
@@ -5369,30 +5368,30 @@ async function copyIEPLetter(format){
         c.impacts.forEach(i=>h+=`<li style="margin-bottom:4px">${e(i)}</li>`);
         h+=`</ul>`;
       }
-      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note ${wph('{Student Name}')}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
+      if(S.strengths) h+=`<p style="margin-bottom:10px">It is also important to note {Student Name}'s identified strengths, which should inform the IEP team's instructional approach: ${e(S.strengths)}.</p>`;
       if(S.schoolDoc==='iep'){
         h+=`<p style="${secSt}">Request for IEP Team Meeting</p>`;
-        h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
+        h+=`<p style="margin-bottom:10px">I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.</p>`;
         h+=`<p style="margin-bottom:10px">Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.</p>`;
-        if(c.ruledOut) h+=`<p style="margin-bottom:10px">${wph(e(c.ruleOutIEPCategoryReview))}</p>`;
+        if(c.ruledOut) h+=`<p style="margin-bottom:10px">${e(c.ruleOutIEPCategoryReview)}</p>`;
       } else if(S.schoolDoc==='504'){
         h+=`<p style="${secSt}">Request for IEP Eligibility Evaluation and/or 504 Review</p>`;
-        h+=`<p style="margin-bottom:10px">I understand that ${wph('{Student Name}')} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether ${wph('{Student Name}')} meets eligibility for an IEP under IDEA, which provides more comprehensive and legally enforceable services than a 504 accommodation plan.</p>`;
+        h+=`<p style="margin-bottom:10px">I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an IEP under IDEA, which provides more comprehensive and legally enforceable services than a 504 accommodation plan.</p>`;
         h+=(c.ruledOut
           ?`<p style="margin-bottom:10px">${e(c.ruleOutAsk504)}</p>`
-          :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend the school evaluate ${wph('{Student Name}')}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
+          :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
       } else {
         h+=`<p style="${secSt}">Request for Special Education Evaluation</p>`;
         h+=(c.ruledOut
-          ?`<p style="margin-bottom:10px">${wph(e(c.ruleOutEvalRequest))}</p>`
-          :`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that ${wph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
+          ?`<p style="margin-bottom:10px">${e(c.ruleOutEvalRequest)}</p>`
+          :`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
         h+=`<p style="margin-bottom:10px">The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
       }
       if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
         h+=`<p style="${secSt}">Eligibility Categories for the Team to Consider</p>`;
         if(c.eligibilityLead) h+=`<p style="margin-bottom:8px">${e(c.eligibilityLead)}</p>`;
         if(c.eligibilityCandidates.length){h+=`<ul style="margin:4px 0 4px 20px">`;c.eligibilityCandidates.forEach(x=>h+=`<li style="margin-bottom:3px">${e(x)}</li>`);h+=`</ul>`;}
-        if(c.eligibilityFallback) h+=`<p style="margin-bottom:10px"><span style="${phSt}">${e(c.eligibilityFallback)}</span></p>`;
+        if(c.eligibilityFallback) h+=`<p style="margin-bottom:10px">${e(c.eligibilityFallback)}</p>`;
       }
       const hasSvc=IEP_SVC_ORDER.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
       if(hasSvc){
@@ -5413,9 +5412,9 @@ async function copyIEPLetter(format){
         if(c.accomBeh.length){h+=`<p><strong>Behavioral and Emotional Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomBeh.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
         if(c.accomAcad.length){h+=`<p><strong>Academic Accommodations:</strong></p><ul style="margin:4px 0 4px 20px">`;c.accomAcad.forEach(a=>h+=`<li style="margin-bottom:3px">${e(a)}</li>`);h+=`</ul>`;}
       }
-      h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to ${wph('{Student Name}')}'s educational needs and am glad to support this process.</p>`;
-      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic</div>`;
-      h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
+      h+=`<p style="margin-top:14px">Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting. I appreciate the school's attention to {Student Name}'s educational needs and am glad to support this process.</p>`;
+      h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>{Physician Name}, MD<br>UF Behavior and Development Clinic</div>`;
+      h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}</p>`;
       h+=`</div>`;
       return h;
   },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
@@ -6031,9 +6030,9 @@ function addStrength(text){
 }
 
 // ─── COPY ────────────────────────────────────────────────────────────────────
-// Shared by the note and both letters. Epic paste format: every {placeholder} becomes a
-// *** F2 stop (see CLAUDE.md); square brackets are deliberately NOT rewritten.
-const toEpic=t=>t.replace(/\{[^}]+\}/g,'***');
+// Shared by the note and both letters. The Epic copy is the plain text verbatim: Epic
+// already treats every {placeholder} as an F2 cursor stop and blocks signing while one
+// remains, so no *** rewrite is needed (see CLAUDE.md). Square brackets get no such stop.
 // Plain-text copy with the execCommand fallback for contexts where the async Clipboard
 // API is unavailable (non-secure origins, older WebViews).
 async function writeClipboardText(text){
