@@ -224,6 +224,19 @@ check('ABA targets (TARGET_RATIONALE keys are real targets)',
 check('ABA targets (sync add() targets a real checkbox)',
   subset('sync add()', abaSyncAddKeys, 'checkboxes', abaCheckboxKeys));
 
+// ── D2. Prior-testing instruments: label table = checkboxes; adaptive subset is real ──
+// PRIOR_TEST_LABELS is the one instrument-name table every surface reads, and
+// ASD_DX_TEST_KEYS (what may be cited as evidence for the diagnosis) is derived from
+// it minus ADAPTIVE_TEST_KEYS. A checkbox with no label renders its raw key; an
+// adaptive key missing from ADAPTIVE_TEST_KEYS would be cited as autism-specific.
+const priorTestCheckboxKeys = [...html.matchAll(/data-key="priorTesting"\s+value="([^"]+)"/g)].map(m => m[1]);
+const priorTestLabelKeys = flatObjectKeys(balancedAfter('const PRIOR_TEST_LABELS='));
+const adaptiveTestKeys = [...(html.match(/const ADAPTIVE_TEST_KEYS=new Set\(\[([^\]]*)\]\)/)?.[1] ?? '').matchAll(/'([^']+)'/g)].map(m => m[1]);
+check('Prior testing (checkboxes vs PRIOR_TEST_LABELS)',
+  diff('checkboxes', priorTestCheckboxKeys, 'PRIOR_TEST_LABELS', priorTestLabelKeys));
+check('Prior testing (ADAPTIVE_TEST_KEYS are real instruments)',
+  subset('ADAPTIVE_TEST_KEYS', adaptiveTestKeys, 'PRIOR_TEST_LABELS', priorTestLabelKeys));
+
 // ── E. IEP letter: three surfaces must consume the same content fields ───────
 // The IEP letter is rendered THREE times from one `_iepLetterContent()` object:
 // the on-screen preview (generateIEPLetterHTML), the plain text the clinician
@@ -288,6 +301,7 @@ console.log(
   `invariants: SW reasons ${swLabelKeys.length} keys; ` +
   `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
+  `prior tests ${priorTestCheckboxKeys.length} checkboxes = ${priorTestLabelKeys.length} labels (${adaptiveTestKeys.length} adaptive); ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`
 );

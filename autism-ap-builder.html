@@ -31,6 +31,7 @@
   /* Brand & accent */
   --blue:#1e50d2;--blue-light:#dbeafe;--blue-dark:#1438a8;
   --accent:var(--blue);--accent-soft:var(--blue-light);--accent-hover:var(--blue-dark);
+  --dx-head-bg:var(--amber-light); /* active-section header tint; themes re-point it */
   /* Neutral scale — warmed slightly toward clinical-paper neutral */
   --gray-50:#fafafb;--gray-100:#f4f4f6;--gray-200:#e6e6ea;
   --gray-300:#d2d2d8;--gray-400:#6c6c76;--gray-500:#6b6b75; /* gray-400 darkened from #9b9ba3 for WCAG AA (>=4.5:1) on muted text/labels, incl. the panel surface (lands near gray-500 in this theme) */
@@ -149,6 +150,8 @@
 :root[data-theme="slate"]{
   /* brand accent -> editorial vermilion */
   --blue:#c8362a; --blue-light:#f6ded9; --blue-dark:#9c241a;
+  /* active-section highlight stays on-palette (a vermilion tint, not the amber semantic) */
+  --dx-head-bg:var(--accent-soft);
   /* cool slate paper + graphite ink scale */
   --gray-50:#f4f4f2; --gray-100:#ececea; --gray-200:#dcdcd8; --gray-300:#bcbcb6;
   --gray-400:#6b707b; --gray-500:#5a5f68; --gray-600:#454a52; --gray-700:#2c2f35; /* gray-400 darkened (was #878d97) for WCAG AA, incl. the slate panel surface */
@@ -189,14 +192,12 @@
 [data-theme="slate"] .r-opt.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
 [data-theme="slate"] .tab-btn.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent)}
 /* Slate: selected-chip glyph becomes an em-dash, ONLY where a mark already exists */
-[data-theme="slate"] .chip--check.is-on::before{content:'\2014 ';color:var(--accent);font-weight:700}
 /* Slate: square the toggle (track + knob) */
 [data-theme="slate"] .tog-sl{border-radius:2px}
 [data-theme="slate"] .tog-sl::after{border-radius:1px}
 
 /* Warm document sheet: warm paper. Frame only (background); the note/letter
  * interior text, fonts, dividers and letter ink are unchanged. */
-[data-theme="warm"] .note-content,
 [data-theme="warm"] .note-doc,
 [data-theme="warm"] .aba-doc{background:var(--bg-elevated)}
 
@@ -222,11 +223,6 @@
 [data-theme="slate"] .section{border:none;border-top:1px solid var(--border-strong);border-radius:0;box-shadow:none;background:transparent}
 [data-theme="slate"] .sec-head{background:none;border-bottom-color:var(--border-subtle);align-items:center}
 @media (hover:hover){[data-theme="slate"] .sec-head:hover{background:var(--gray-100)}}
-/* Slate: keep the active-section highlight on-palette — a vermilion tint instead
-   of the shared --amber-light semantic, which would clash with the masthead.
-   !important to beat the existing `.dx-active .sec-head{...!important}` rule. */
-[data-theme="slate"] .dx-active .sec-head{background:var(--accent-soft)!important}
-
 /* Slate: the masthead header — hanging-style folio + vermilion kicker + Newsreader title. */
 [data-theme="slate"] .sec-label{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center}
 [data-theme="slate"] .sec-folio{grid-column:1;grid-row:1/-1;align-self:center;font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1;color:var(--gray-600)}
@@ -307,7 +303,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
 .rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:var(--space-2);box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .rp-header h2{font-size:var(--text-13);font-weight:600;color:var(--gray-700)}
-.rp-actions{display:flex;gap:5px;flex-wrap:wrap}
 .note-preview{flex:1;overflow-y:auto;padding:16px 20px}
 .note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:var(--text-13);line-height:1.8}
 .section{margin-bottom:10px;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-sm);transition:box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
@@ -444,8 +439,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .chip.is-on{border-color:var(--chip-tint);background:var(--chip-tint-soft);color:var(--chip-tint-strong);font-weight:500}
 .chip--sm{font-size:var(--text-11)}
 .chip--success{--chip-tint:var(--green);--chip-tint-soft:var(--green-light);--chip-tint-strong:var(--green-dark)}
-.chip--check.is-on::before{content:'✓ '}
-.chip--ring.is-on{box-shadow:inset 0 0 0 1px var(--chip-tint)}
 .modifier-strip{display:flex;flex-wrap:wrap;gap:var(--space-1);padding:9px 11px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-default);box-shadow:var(--shadow-sm)}
 /* .mod-chip composes .chip and keeps only its deltas: stronger border, larger
    font at always-500 weight, inherited (darker) text, and the ✓-on-selected
@@ -479,12 +472,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .badge.err{background:var(--red-light);color:var(--red-dark)}
 .note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--red-dark);line-height:1.5}
 .note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--green-dark)}
-.note-content{font-family:'Courier New',Courier,monospace;font-size:var(--text-12);line-height:1.75;white-space:pre-wrap;color:var(--gray-800);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px 22px;min-height:300px;box-shadow:var(--shadow-sm);max-width:900px;margin:0 auto}
-.dsm-tbl{width:100%;border-collapse:collapse;font-size:var(--text-11-5);margin-top:10px}
-.dsm-tbl th{background:var(--blue);color:white;padding:5px 9px;text-align:left;font-size:var(--text-11)}
-.dsm-tbl td{padding:5px 9px;border-bottom:1px solid var(--gray-200);vertical-align:top;line-height:1.45}
-.dsm-tbl tr:nth-child(even) td{background:var(--gray-50)}
-.met{color:var(--green);font-weight:700}.notmet{color:var(--red);font-weight:700}
 .tog{position:relative;width:32px;height:18px;flex-shrink:0}
 .tog input{display:none}
 .tog-sl{position:absolute;inset:0;background:var(--gray-300);border-radius:9px;transition:background .2s;cursor:pointer}
@@ -492,11 +479,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 input:checked+.tog-sl{background:var(--blue)}
 input:checked+.tog-sl::after{transform:translateX(14px)}
 .toggle-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-12);cursor:pointer;padding:3px 0}
-.ov-sel{font-size:var(--text-11);padding:2px 5px;border:1px solid var(--gray-300);border-radius:3px;color:var(--gray-600);margin-left:auto;background:white;cursor:pointer}
-.ov-row{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-12);padding:3px 6px;border-radius:3px}
-.ov-row:hover{background:var(--gray-50)}
-.ov-label{flex:1;line-height:1.4}
-.ov-auto{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--blue-light);color:var(--blue-dark);font-weight:500}
 .ov-yes{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--green-light);color:var(--green-dark);font-weight:500}
 .ov-no{font-size:var(--text-10);padding:1px 5px;border-radius:3px;background:var(--gray-200);color:var(--gray-600);font-weight:500}
 .divider{border:none;border-top:1px solid var(--gray-200);margin:8px 0}
@@ -622,7 +604,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .note-sticky-bar{padding:7px 14px;border-top:1px solid var(--gray-200);display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;background:white;flex-shrink:0}
 /* ── Contextual dx-active highlight ─── */
 .dx-active{border-color:var(--amber)!important;box-shadow:0 0 0 2px var(--amber-light)!important}
-.dx-active .sec-head{background:var(--amber-light)!important}
+.dx-active .sec-head{background:var(--dx-head-bg)!important}
 /* ── Diagnosis status banner ─────────── */
 .dx-banner{background:white;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;box-shadow:var(--shadow-card)}
 .dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
@@ -647,15 +629,12 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .aba-doc .aba-sig{margin-top:24px;border-top:1px solid var(--gray-300);padding-top:12px;font-size:10pt;color:var(--gray-600);line-height:2.2}
 .aba-doc .aba-ref{font-size:9.5pt;color:var(--gray-700);margin-bottom:6px;padding-left:18px;text-indent:-18px}
 .aba-doc .aba-caveat{font-size:9pt;color:var(--gray-400);font-style:italic;margin-top:10px;border-top:1px dashed var(--gray-200);padding-top:8px}
-.iep-ph{background:#fef9c3;color:var(--amber-dark);border-radius:3px;padding:0 2px;font-style:italic}
+.iep-ph,.aba-ph{background:#fef9c3;color:var(--amber-dark);border-radius:3px;padding:0 2px;font-style:italic}
 .iep-notice{font-size:9pt;color:var(--gray-500);font-style:italic;border:1px solid var(--gray-200);background:#f9fafb;border-radius:4px;padding:8px 12px;margin-bottom:18px;line-height:1.5}
 /* ── Mobile nav bar (hidden on desktop) ─── */
 #mobile-nav{display:none;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:0;z-index:50}
 .mnav-btn{flex:1;padding:10px 8px;font-size:var(--text-13);font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--gray-500);border-bottom:3px solid transparent;font-family:var(--font);transition:color .15s,border-color .15s;letter-spacing:.01em}
 .mnav-btn.is-on{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
-/* ── Paper-card wrapper for output preview (desktop only) ───────────── */
-.note-paper{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:4px;margin:0 auto;max-width:900px}
-.note-paper > .note-doc,.note-paper > .note-content,.note-paper > .aba-doc{border:none;box-shadow:none;border-radius:var(--radius-md);margin:0}
 
 /* ── Reviewer's-eye toggle (strips placeholder highlighting) ─────────── */
 .rev-eye-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--radius);border:1px solid var(--border-default);background:var(--bg-card);color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:500;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
@@ -690,7 +669,6 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   body:not(.mob-output) .right-panel{display:none}
   body.mob-output .left-panel{display:none}
   .note-preview{overflow:visible;height:auto;padding:10px}
-  .note-content{min-height:50vh}
   #mobile-nav{display:flex}
   .app-header{flex-wrap:wrap;padding:8px 12px}
   .app-header h1{font-size:var(--text-13)}
@@ -726,8 +704,6 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border-radius:var(--radius);padding:0;background:transparent;border:none;gap:var(--space-1)}
   .tab-btn{padding:9px 8px;font-size:var(--text-12);border-radius:var(--radius);border:1px solid var(--border-default);min-height:40px;background:var(--bg-card)}
   .tab-btn.is-on{background:var(--accent-soft);color:var(--accent-hover);border-color:var(--accent);box-shadow:none}
-  /* Strip the paper card on mobile — no nesting */
-  .note-paper{border:none;box-shadow:none;border-radius:0;padding:0;max-width:100%}
   /* Reviewer's-eye becomes icon-only */
   .rev-eye-btn .rev-eye-label{display:none}
   .rev-eye-btn{padding:7px 9px;min-height:36px}
@@ -744,17 +720,13 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .app-header,.left-panel,.rp-header,#mobile-nav,.note-sticky-bar,.toast-container{display:none!important}
   .main{display:block}.right-panel{overflow:visible;background:white}
   .note-preview{padding:0;overflow:visible}
-  .note-content,.note-doc,.aba-doc{border:none;box-shadow:none;padding:0;min-height:auto;color:black;max-width:100%;font-family:var(--font-serif)}
-  .note-paper{border:none;box-shadow:none;padding:0;background:transparent}
+  .note-doc,.aba-doc{border:none;box-shadow:none;padding:0;min-height:auto;color:black;max-width:100%;font-family:var(--font-serif)}
   .note-err,.note-ok{display:none}
   .iep-ph,.aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
   a{color:black;text-decoration:underline}
   .preview-tabs{display:none}
-  /* Page header on print */
-  .print-only{display:block!important}
   @page{margin:.75in}
 }
-.print-only{display:none}
 /* Quick-start preset bar — in-visit archetype scaffolding (prototype).
    Sits above the diagnosis banner as the "start here" affordance. */
 .preset-bar{margin:0 0 12px;padding:10px 12px;border:1px solid var(--gray-300,#d1d5db);border-radius:var(--radius);background:var(--gray-50,#f9fafb)}
@@ -1759,7 +1731,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 // DSM-5 uses two separate severity domains; there is no single asdLevel field.
 // Derive a combined display level as Math.max(asdLevelSC, asdLevelRRB) where needed.
 // keep docs/branching-logic.md §1.2 in sync (state model — every property here)
-const S = {
+// Single source of truth for the state shape. clearAll() resets from a fresh initialState()
+// so its reset list can never drift from the fields declared here.
+function initialState(){ return {
   ageGroup:'', pronouns:'', langLevel:'', langModifiers:new Set(),
   cogProfile:'', unevenCog:false, unevenCogDesc:'', cogDataSource:'', adaptProfile:'', adaptiveStandardized:false, strengths:'',
   diagStatus:'', asdLevelSC:'', asdLevelRRB:'', asdLevelJustificationSC:'', asdLevelJustificationRRB:'',
@@ -1810,7 +1784,7 @@ const S = {
   pfdDomains:new Set(),
   arfidMechanism:new Set(), arfidImpact:new Set(),
   socialWorkReasons:new Set(),
-  schoolPlacement:'', schoolDoc:'', iepInstruments:'', schoolSvc:new Set(), schoolSvcAuto:new Set(), schoolSvcManualOff:new Set(),
+  schoolPlacement:'', schoolDoc:'', iepInstruments:'', schoolSvc:new Set(), schoolSvcManualOff:new Set(),
   strangerDanger:false,
   safety:new Set(), ag:new Set(), showDSMTable:true, showDSMLines:false,
   insuranceType:'', abaHours:'', abaSetting:new Set(), abaTargets:new Set(),
@@ -1819,7 +1793,8 @@ const S = {
     slp:'auto',ot:'auto',pt:'auto',genetics:'auto',neurology:'auto',
     psychiatry:'auto',gi:'auto',sleep_ref:'auto',audiology:'auto',qbtest:'auto',
     earlySteps:'auto',fdlrs:'auto',eeg:'auto',card:'auto'}
-};
+};}
+const S = initialState();
 
 // ─── PATH HELPERS (data-bind support) ────────────────────────────────────────
 // Walk a dotted path like "therapyStatus.slp" against S — used by the data-bind
@@ -1925,6 +1900,9 @@ function applyPreset(key,opts){
   if(!p) return;
   if(reset && formHasInput()
      && !confirm('Replace the current form with the "'+p.label+'" template? This clears existing selections.')) return;
+  const wasSuspended=renderSuspended;
+  renderSuspended=true;
+  try{
   if(reset) clearAll({confirmed:true});
   // Radios first — ageGroup/langLevel side-effect handlers may auto-populate needs.
   // The !checked guard below then SKIPS anything those syncs already turned on, so we
@@ -1948,6 +1926,7 @@ function applyPreset(key,opts){
     const c=document.querySelector(`input[data-key="${k}"][value="${val}"]`);
     if(c && !c.checked) c.click();
   });
+  }finally{renderSuspended=wasSuspended;}
   render();
 }
 
@@ -1958,11 +1937,30 @@ const hasLDConfirmed = () => S.comorbid.has('ld_reading')||S.comorbid.has('ld_ma
 const hasLD = () => hasLDConfirmed()||S.comorbid.has('ld_suspected');
 const hasID = () => ['id_severe','id_moderate','id_mild'].includes(S.cogProfile);
 const isYoung = () => S.ageGroup==='toddler'||S.ageGroup==='preschool';
+// IDEA Part B (school-district) age: everyone but toddlers, who are Part C / Early Steps.
+// An unset age counts as Part B so the school section stays visible until an age is chosen.
+const isPartBAge = () => S.ageGroup!=='toddler';
+// Prior-testing instrument abbreviations, shared by every surface: an instrument's name does
+// not change with the audience, only the sentence each surface wraps around it does.
+const PRIOR_TEST_LABELS={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
+// Adaptive/behavior instruments: reported in the note's own "Behavioral/adaptive assessments"
+// line and never cited for or against ASD. Every other instrument is autism-specific; the
+// invariants lane checks PRIOR_TEST_LABELS against the priorTesting checkboxes 1:1.
+const ADAPTIVE_TEST_KEYS=new Set(['vineland3','basc3','conners4']);
+const ASD_DX_TEST_KEYS=new Set(Object.keys(PRIOR_TEST_LABELS).filter(k=>!ADAPTIVE_TEST_KEYS.has(k)));
+// Label for one prior instrument with the ADOS-2 module appended in the surface's own
+// format: the note writes "ADOS-2, Module 3", the letters "ADOS-2 (Module 3)".
+const MOD_COMMA=m=>', '+m, MOD_PAREN=m=>' ('+m+')';
+const priorTestLabel=(k,modFmt)=>{let l=PRIOR_TEST_LABELS[k]||k;if(k==='ados2'&&S.ados2Module)l+=modFmt(S.ados2Module);return l;};
+// Labels of the prior instruments whose recorded outcome is `outcome`, optionally limited
+// to a key set (ASD_DX_TEST_KEYS for anything that cites evidence for the diagnosis).
+const priorTestsByOutcome=(outcome,modFmt,keys)=>[...S.priorTesting].filter(k=>(!keys||keys.has(k))&&(S.priorTestingOutcome[k]||'')===outcome).map(k=>priorTestLabel(k,modFmt));
+const isSchoolAgePlus = () => ['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
+const isTeenPlus = () => S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
 // Single words = minimally verbal for clinical gating (ABA, social skills)
 const isMinVerbal = () => S.langLevel==='nonverbal'||S.langLevel==='singleWord';
 // phrase/simpleSentence excluded — psychotherapy requires meta-language (self-reflection, abstract reasoning)
 const isVerbalEnough = () => ['simpleSentence','conversational','ageAppropriate'].includes(S.langLevel);
-const hasSigAdaptive = () => S.adaptProfile==='severelyImpaired'||S.adaptProfile==='moderatelyImpaired'||S.adaptProfile==='mildlyImpaired'||S.adaptProfile==='belowPotential';
 // ID-confirmation gating helpers — drive bridgeCogProfileToSpecifier upgrade from suspected→confirmed.
 // withID requires formal evidence on BOTH cognitive (comprehensive battery, not screener) AND adaptive
 // (formally-impaired severity + standardized assessment basis) domains per DSM-5/AAIDD criteria.
@@ -1985,7 +1983,7 @@ const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' ||
 function currentClinicalPathway(){
   const cog = S.cogProfile;
   if(!cog) return null;
-  const young = S.ageGroup==='toddler'||S.ageGroup==='preschool';
+  const young = isYoung();
   if(['id_mild','id_moderate','id_severe'].includes(cog)){
     const sev = cog==='id_mild'?'Mild':cog==='id_moderate'?'Moderate':'Severe';
     const confirmed = cogSourceSupportsConfirmation() && hasFormallyImpairedAdaptive() && adaptiveEvidenceConfirmed();
@@ -2050,7 +2048,7 @@ function getPron() {
     they:{subj:'they',obj:'them',poss:'their',refl:'themselves',cap:'They'}
   };
   if (m[S.pronouns]) return m[S.pronouns];
-  const n = ['adolescent','youngAdult'].includes(S.ageGroup) ? 'the individual' : 'the child';
+  const n = isTeenPlus() ? 'the individual' : 'the child';
   // refl: singular-they reflexive ('themselves') reads naturally with the noun-phrase fallback
   // ('the child themselves'), unlike the broken concat 'the childself' / 'the individualself' it replaces.
   return {subj:n, obj:n, poss:n+"'s", refl:'themselves', cap:n.charAt(0).toUpperCase()+n.slice(1)};
@@ -2135,7 +2133,7 @@ function ruleABA() {
   if(isMinVerbal()) r.push('nonverbal/minimally verbal');
   // Confirmed-ID-only — see comment on parallel specR push in ABA medical-necessity block.
   if(hasID()&&S.specifiers.has('withID')) r.push('intellectual disability');
-  if(hasSigAdaptive()) r.push('significant adaptive impairment');
+  if(hasFormallyImpairedAdaptive()) r.push('significant adaptive impairment');
   if(S.needsBehavior.size>0) r.push('interfering behaviors');
   if(S.safety.size>0) r.push('safety needs');
   if(S.needsComm.has('functional_aac')) r.push('functional communication/AAC needs');
@@ -2145,16 +2143,15 @@ function ruleABA() {
 function rulePCIT() {
   // PCIT evidence base is toddler through school-age; not indicated for adolescents/adults
   const ageOk=['toddler','preschool','schoolAge'].includes(S.ageGroup);
-  const notOlder=S.ageGroup!=='adolescent'&&S.ageGroup!=='youngAdult';
   const beh=S.needsBehavior.has('aggression')||S.needsBehavior.has('tantrums')||
     S.needsBehavior.has('noncompliance')||S.needsBehavior.has('property')||
     hasADHD()||S.comorbid.has('anxiety')||S.comorbid.has('trauma');
-  return {include:ageOk&&notOlder&&beh};
+  return {include:ageOk&&beh};
 }
 function rulePsychotherapy() {
-  const ageOk=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
+  const ageOk=isSchoolAgePlus();
   const langOk=isVerbalEnough();
-  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.emotionalReg||(['adolescent','youngAdult'].includes(S.ageGroup)&&S.needsBehavior.has('boundaryViol'));
+  const ind=S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd')||S.comorbid.has('trauma')||S.emotionalReg||(isTeenPlus()&&S.needsBehavior.has('boundaryViol'));
   return {include:ageOk&&langOk&&ind};
 }
 function ruleSocialSkills() {
@@ -2197,7 +2194,7 @@ function ruleGenetics() {
 function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure||S.developmentalRegression}; }
 function rulePsychiatry() {
   const med=hasConfirmedADHD()||S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd');
-  const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup);
+  const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus();
   return {include:med||sev};
 }
 // Fecal smearing contributes a GI trigger only when a medical cause is NOT ruled out
@@ -2212,13 +2209,13 @@ function ruleAudiology() {
   // FASD flags also trigger (audiologic evaluation is part of the FASD workup). base/fasd are
   // exposed separately so the output bullet can adapt its rationale to what actually fired —
   // one bullet always, so a child with both triggers never gets two hearing referrals.
-  const youngAge=['toddler','preschool'].includes(S.ageGroup);
+  const youngAge=isYoung();
   const speechConcern=hasSpeechSoundErrors()||hasReducedIntell()||hasMorphoErrors();
   const base=S.hearingScreenFail||(youngAge&&speechConcern);
   const fasd=S.prenatalAlcohol||S.fasdFeatures;
   return {include:base||fasd,base,fasd};
 }
-function ruleQBTest() { return {include:S.comorbid.has('adhd_suspected')&&['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)}; }
+function ruleQBTest() { return {include:S.comorbid.has('adhd_suspected')&&isSchoolAgePlus()}; }
 function ruleEarlySteps() {
   return {include:S.ageGroup==='toddler'&&(S.diagStatus==='confirmed'||S.diagStatus==='suspected')};
 }
@@ -2239,9 +2236,9 @@ function resolveOv(key,rule) {
 // (preview + plain) and the copy handler, so they can never disagree. They once did: an ABA
 // referral overridden to 'no' hid the tab but the generators still produced a full letter.
 // keep docs/branching-logic.md §5 in sync
-function abaLetterEligible(){ return S.diagStatus==='confirmed'&&resolveOv('aba',ruleABA()); }
+function abaLetterEligible(){ return S.diagStatus==='confirmed'&&referralIncluded('aba'); }
 // IEP: needs a school context and an IDEA Part B age (toddlers are Part C / Early Steps).
-function iepLetterEligible(){ return S.schoolDoc!==''&&S.ageGroup!=='toddler'; }
+function iepLetterEligible(){ return S.schoolDoc!==''&&isPartBAge(); }
 
 // ─── DSM-5 VALIDATION ────────────────────────────────────────────────────────
 // keep docs/branching-logic.md §4 in sync (criteria gate; A=3, B>=2, C&&D&&E)
@@ -2267,14 +2264,6 @@ const LEVEL_DESC={
     '3':'Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected'
   }
 };
-function updateOverallLevelBadge(){
-  const el=document.getElementById('overallLevelBadge');if(!el)return;
-  const lv=(S.asdLevelSC&&S.asdLevelRRB)?String(Math.max(parseInt(S.asdLevelSC),parseInt(S.asdLevelRRB))):S.asdLevelSC||S.asdLevelRRB;
-  if(!lv){el.innerHTML='';return;}
-  const bg={'1':'var(--amber)','2':'var(--red)','3':'#7c3aed'};
-  const names={'1':'Requires Support','2':'Requires Substantial Support','3':'Requires Very Substantial Support'};
-  el.innerHTML=`<div style="margin-top:7px;padding:4px 10px;background:${bg[lv]};color:white;border-radius:4px;display:inline-flex;align-items:center;gap:5px;font-size:var(--text-11);font-weight:600">&#9654; Overall: Level ${lv} — ${names[lv]}</div>`;
-}
 // GDD severity rendering: F88 has no severity sub-coding in ICD-10, so the prose
 // adjective ("mild" / "moderate" / "severe") is the only place where the severity
 // tier the clinician selected on cogProfile actually surfaces in output. Mehler
@@ -2501,7 +2490,6 @@ function generateClinicalSummary(){
   const pr=getPron();
   const ageLabelMap={toddler:'toddler',preschool:'preschool-aged child',schoolAge:'school-aged child',adolescent:'adolescent',youngAdult:'young adult'};
   const ageLabel=ageLabelMap[S.ageGroup]||'patient';
-  const verb=S.pronouns==='they'?'are':'is';
   // v3() and aOr() are now module-scope helpers (defined just after getPron).
 
   // Profile clauses
@@ -2595,10 +2583,10 @@ function generateClinicalSummary(){
     }
     // Prior testing citation
     if(S.priorTesting.size>0){
-      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
-      const supportive=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
-        let lbl=allLbls[k]||k;
-        if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
+      // Autism instruments only: a Vineland-3 / BASC-3 / Conners 4 marked consistent must not be
+      // cited as an "objective autism-specific assessment" (same gate the letters apply).
+      const supportive=[...S.priorTesting].filter(k=>ASD_DX_TEST_KEYS.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{
+        let lbl=priorTestLabel(k,MOD_COMMA);
         const dt=S.priorTestingDate[k]; if(dt) lbl+=' ('+dt+')';
         return lbl;
       });
@@ -2615,10 +2603,9 @@ function generateClinicalSummary(){
     if(cD.length) body+=` in ${cD.join(' and ')}`;
     body+=` that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation.`;
     if(S.priorTesting.size>0){
-      const allLbls={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
-      const eqv=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='equivocal').map(k=>{let lbl=allLbls[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
+      const eqv=priorTestsByOutcome('equivocal',MOD_COMMA);
       if(eqv.length) body+=` Prior testing (${eqv.join('; ')}) yielded equivocal results and has been incorporated into the diagnostic formulation.`;
-      const nc=[...S.priorTesting].filter(k=>(S.priorTestingOutcome[k]||'')==='notConsistent').map(k=>{let lbl=allLbls[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=', '+S.ados2Module;return lbl;});
+      const nc=priorTestsByOutcome('notConsistent',MOD_COMMA);
       if(nc.length) body+=` Prior testing (${nc.join('; ')}) was not individually consistent with ASD; these results have been incorporated into the diagnostic formulation alongside clinical history and direct observation.`;
     }
 
@@ -2932,7 +2919,7 @@ function generateNote() {
     }
     if(evalPathShows){
       if(S.teacherMaterials.size) L.push('');
-      const cars2HF=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&
+      const cars2HF=isSchoolAgePlus()&&
         ['conversational','ageAppropriate'].includes(S.langLevel)&&
         ['average','aboveAverage'].includes(S.cogProfile);
       // Completed steps render past-tense with the outcome register below; scheduled steps
@@ -3029,11 +3016,9 @@ function generateNote() {
     }
     if(S.priorTesting.size){
       if(evalPathShows||S.teacherMaterials.size) L.push('');
-      const baseLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3',vineland3:'Vineland-3',basc3:'BASC-3',conners4:'Conners 4'};
-      const behavAdaptKeys=new Set(['vineland3','basc3','conners4']);
       const buildLbl=k=>{
-        let lbl=baseLabels[k]; if(!lbl) return null;
-        if(k==='ados2'&&S.ados2Module) lbl+=', '+S.ados2Module;
+        if(!PRIOR_TEST_LABELS[k]) return null;
+        let lbl=priorTestLabel(k,MOD_COMMA);
         const dt=S.priorTestingDate[k]; if(dt) lbl+=' (administered '+dt+')';
         return lbl;
       };
@@ -3043,7 +3028,7 @@ function generateNote() {
         const lbl=buildLbl(k); if(!lbl) return;
         const out=S.priorTestingOutcome[k]||'';
         if(!out) return;
-        if(behavAdaptKeys.has(k)){
+        if(ADAPTIVE_TEST_KEYS.has(k)){
           if(out==='consistent') adaptConsist.push(lbl);
           else if(out==='equivocal') adaptEquiv.push(lbl);
           else adaptNormal.push(lbl);
@@ -3070,7 +3055,7 @@ function generateNote() {
     // labels, data-source popovers, the IQ<->dev tier-transition guard); this paragraph was
     // the one place it had not been applied, so a GDD referral asked the receiving
     // psychologist for the wrong battery.
-    if((S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'){
+    if(hasSuspectedIDorGDD){
       // Tier follows the specifier, not ageGroup: the UI already age-gates the cogProfile
       // tiers (ID/BIF school-age and up, GDD toddler/preschool), and the specifier is the
       // thing the prose is actually about. Both specifiers set at once is not reachable
@@ -3243,7 +3228,7 @@ function generateNote() {
     // language for the suspected case (e.g., severity-based justification without
     // claiming the ID diagnosis).
     if(hasID()&&S.specifiers.has('withID')) specR.push('intellectual disability requiring intensive skills-based programming');
-    if(hasSigAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
+    if(hasFormallyImpairedAdaptive()&&!S.needsAdaptive.size) specR.push('significant adaptive impairment');
     if(asdLevel23()&&!specR.length) specR.push('ASD Level 2 or 3 support needs');
     const specRStr=specR.length?specR.join('; '):abaR.reasons.join(', ');
     // ABA target rationale map — one rationale sentence per target key
@@ -3320,18 +3305,18 @@ function generateNote() {
       L.push('    - Personal space concept: Explicit teaching of "personal space bubble" using visual supports (hula hoop, floor markers, social narratives), discrimination between appropriate proximity for strangers, acquaintances, and family members.');
       L.push('    - Appropriate touch by relationship type: Discrete trial and video modeling to discriminate handshake (peer/acquaintance), side-hug or fist-bump (close friend/family), no-touch (stranger or non-consenting person). Discrimination must be probed across novel people and settings.');
       L.push('    - Permission-seeking: Teaching "Can I hug you?" or equivalent social script before any physical contact; reinforcing the wait-for-response interval before acting.');
-      if(['adolescent','youngAdult'].includes(S.ageGroup)){
+      if(isTeenPlus()){
         L.push('    - Consent education: ASD-adapted, age-appropriate instruction on consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, and self-advocacy when others violate one\'s own boundaries. Coordinate with school counseling and outpatient therapist.');
         L.push('    - Legal and social consequence awareness: Psychoeducation (adapted to cognitive level) on the legal and disciplinary consequences of uninvited physical contact. Coordinate with outpatient therapist and family.');
       }
       L.push('    - Generalization: All boundary skills require systematic generalization probing across school, home, community, and (where applicable) vocational settings; do not assume transfer from clinic training alone.');
     }
-    if(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)) L.push('  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.');
+    if(isSchoolAgePlus()) L.push('  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.');
     L.push('');
   }
 
   // PCIT
-  if(resolveOv('pcit',rulePCIT())){
+  if(referralIncluded('pcit')){
     therapyIntro();
     L.push(n+++'. PARENT-CHILD INTERACTION THERAPY (PCIT)');
     const i=[];if(S.needsBehavior.has('aggression'))i.push('aggression');if(S.needsBehavior.has('property'))i.push('property destruction');if(S.needsBehavior.has('tantrums'))i.push('tantrums');if(S.needsBehavior.has('noncompliance'))i.push('noncompliance');if(hasADHD())i.push('ADHD');if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('trauma'))i.push('trauma/stress');
@@ -3342,41 +3327,42 @@ function generateNote() {
   }
 
   // Psychotherapy
-  if(resolveOv('psychotherapy',rulePsychotherapy())){
+  if(referralIncluded('psychotherapy')){
     therapyIntro();
     L.push(n+++'. AUTISM-INFORMED PSYCHOTHERAPY');
     const i=[];if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression/mood');if(S.comorbid.has('ocd'))i.push('OCD');if(S.emotionalReg)i.push('emotional regulation');if(S.needsBehavior.has('boundaryViol'))i.push('boundary safety and social skill development');
     L.push('CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: '+(i.join(', ')||'emotional/coping needs')+'.');
     L.push(`Therapist with ASD-specific training required. Approaches must account for ${pr.poss} communication profile, cognitive style, and sensory differences.`);
-    if(['adolescent','youngAdult'].includes(S.ageGroup)) L.push('Self-advocacy and self-determination should be integrated into treatment.');
-    if(['adolescent','youngAdult'].includes(S.ageGroup)&&S.needsBehavior.has('boundaryViol')) L.push('Boundary safety priority: Given documented boundary violations at this developmental stage, psychotherapy should explicitly address consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, legal and social consequences of uninvited physical contact, and self-advocacy when one\'s own boundaries are violated. ASD-adapted sexuality and relationship education (e.g., FLASH curriculum, Safety Net program) should be coordinated with the school team and family.');
+    if(isTeenPlus()) L.push('Self-advocacy and self-determination should be integrated into treatment.');
+    if(isTeenPlus()&&S.needsBehavior.has('boundaryViol')) L.push('Boundary safety priority: Given documented boundary violations at this developmental stage, psychotherapy should explicitly address consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, legal and social consequences of uninvited physical contact, and self-advocacy when one\'s own boundaries are violated. ASD-adapted sexuality and relationship education (e.g., FLASH curriculum, Safety Net program) should be coordinated with the school team and family.');
     L.push('');
   }
 
   // Social skills
-  if(resolveOv('socialSkills',ruleSocialSkills())){
+  if(referralIncluded('socialSkills')){
     therapyIntro();
     L.push(n+++'. SOCIAL SKILLS INTERVENTION');
-    if(['adolescent','youngAdult'].includes(S.ageGroup)){
+    const pushSocialTargets=()=>{if(!S.needsSocial.size)return;L.push('Targets:');if(S.needsSocial.has('peer'))L.push('  • Peer interaction and friendship skills');if(S.needsSocial.has('play'))L.push('  • Play skill development');if(S.needsSocial.has('reciprocity'))L.push('  • Social reciprocity and balanced social exchange');if(S.needsSocial.has('emotion'))L.push('  • Emotion recognition and labeling: identifying emotions in self and others, connecting emotions to situations and facial expressions');if(S.needsSocial.has('perspective'))L.push('  • Perspective-taking and Theory of Mind: understanding others\' thoughts, feelings, and intentions; foundational for empathy and flexible social interaction');if(S.needsSocial.has('conversation'))L.push('  • Conversation skills: topic initiation, maintenance, and graceful exit; balanced turn-taking; recognizing when a partner has lost interest');};
+    if(isTeenPlus()){
       L.push('PEERS (Program for the Education and Enrichment of Relational Skills) or comparable evidence-based program for adolescents/young adults. Generalization to natural settings should be explicitly planned and monitored.');
     } else if(S.ageGroup==='preschool'){
       L.push('Structured social skills intervention appropriate to developmental level. Options in the Gainesville area:');
       L.push('  - Social Thinking (ages 4+): Available through Speech4Kids. Addresses social cognition, perspective-taking, and social communication in a structured group format.');
       L.push('  - Play-based social skill groups: OT- or SLP-facilitated peer play groups targeting reciprocity, turn-taking, and joint attention.');
       L.push('  Note: UF CARD social skills programming begins at age 6; refer at a future visit if social skills remain a treatment priority.');
-      if(S.needsSocial.size){L.push('Targets:');if(S.needsSocial.has('peer'))L.push('  • Peer interaction and friendship skills');if(S.needsSocial.has('play'))L.push('  • Play skill development');if(S.needsSocial.has('reciprocity'))L.push('  • Social reciprocity and balanced social exchange');if(S.needsSocial.has('emotion'))L.push('  • Emotion recognition and labeling: identifying emotions in self and others, connecting emotions to situations and facial expressions');if(S.needsSocial.has('perspective'))L.push('  • Perspective-taking and Theory of Mind: understanding others\' thoughts, feelings, and intentions; foundational for empathy and flexible social interaction');if(S.needsSocial.has('conversation'))L.push('  • Conversation skills: topic initiation, maintenance, and graceful exit; balanced turn-taking; recognizing when a partner has lost interest');}
+      pushSocialTargets();
     } else {
       L.push('Structured autism-specific social skills group. Options in the Gainesville area:');
       L.push('  - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 273-0517) for current group availability and enrollment.');
       L.push('  - Social Thinking (Speech4Kids): Structured social cognition curriculum appropriate for school-age children with ASD. Contact Speech4Kids: (352) 240-3155 | speech4kidsgainesville.com');
       L.push('  - PEERS for Kids: Manualized, evidence-based social skills training program for school-age children.');
-      if(S.needsSocial.size){L.push('Targets:');if(S.needsSocial.has('peer'))L.push('  • Peer interaction and friendship skills');if(S.needsSocial.has('play'))L.push('  • Play skill development');if(S.needsSocial.has('reciprocity'))L.push('  • Social reciprocity and balanced social exchange');if(S.needsSocial.has('emotion'))L.push('  • Emotion recognition and labeling: identifying emotions in self and others, connecting emotions to situations and facial expressions');if(S.needsSocial.has('perspective'))L.push('  • Perspective-taking and Theory of Mind: understanding others\' thoughts, feelings, and intentions; foundational for empathy and flexible social interaction');if(S.needsSocial.has('conversation'))L.push('  • Conversation skills: topic initiation, maintenance, and graceful exit; balanced turn-taking; recognizing when a partner has lost interest');}
+      pushSocialTargets();
     }
     L.push('');
   }
 
   // SLP
-  if(resolveOv('slp',ruleSLP())){
+  if(referralIncluded('slp')){
     therapyIntro();
     L.push(n+++'. SPEECH-LANGUAGE PATHOLOGY (SLP)');
     {const sl=therapyStatusLine('slp','SLP');if(sl){L.push(sl);L.push('');}}
@@ -3410,7 +3396,7 @@ function generateNote() {
   }
 
   // OT
-  if(resolveOv('ot',ruleOT())){
+  if(referralIncluded('ot')){
     therapyIntro();
     L.push(n+++'. OCCUPATIONAL THERAPY (OT)');
     {const sl=therapyStatusLine('ot','OT');if(sl){L.push(sl);L.push('');}}
@@ -3433,7 +3419,7 @@ function generateNote() {
       L.push('    -Functional living skills assessment: Use a standardized tool (e.g., Assessment of Functional Living Skills [AFLS], community domain; TEACCH Transition Assessment Profile) to identify skill targets and measure progress over time. Goals should reflect family priorities and the individual\'s community participation needs.');
       L.push('    -Graduated independence protocol: Systematically fade adult support from full prompting → partial prompting → supervised independence → independent. Establish mastery criteria before fading; do not require errorless performance prior to increasing independence opportunities.');
       L.push('    -Technology as compensatory strategy: Explicitly teach smartphone navigation apps, contactless payment, accessibility features, and communication apps as tools that extend functional independence (not as shortcuts, but as legitimate accommodations).');
-      if(S.ageGroup==='adolescent'||S.ageGroup==='youngAdult'){
+      if(isTeenPlus()){
         L.push('    -Transition planning: IEP transition goals should include community access and independent living skills (IDEA mandates transition planning from age 16; best practice per NTACT-C guidelines is age 14). Florida Vocational Rehabilitation (VR) and Agency for Persons with Disabilities (APD) Medicaid waiver programs may fund community-based support services for eligible individuals; discuss eligibility and application timeline with family.');
       }
     }
@@ -3448,7 +3434,7 @@ function generateNote() {
   }
 
   // PT
-  if(resolveOv('pt',rulePT())){
+  if(referralIncluded('pt')){
     therapyIntro();
     L.push(n+++'. PHYSICAL THERAPY (PT)');
     {const sl=therapyStatusLine('pt','PT');if(sl){L.push(sl);L.push('');}}
@@ -3457,7 +3443,7 @@ function generateNote() {
     // C2: when motor coordination/DCD drives BOTH therapies, name the co-management
     // split so the dual OT+PT referral does not read as redundant. Only fires when OT
     // is also active (respecting an OT override-off).
-    if((S.needsMotor.has('coordination')||S.comorbid.has('dcd'))&&resolveOv('ot',ruleOT())){
+    if((S.needsMotor.has('coordination')||S.comorbid.has('dcd'))&&referralIncluded('ot')){
       // Only name "(DCD)" when the comorbidity is actually set — a bare coordination
       // need is not a diagnosis.
       const dcdTag=S.comorbid.has('dcd')?' (DCD)':'';
@@ -3472,7 +3458,7 @@ function generateNote() {
   // For toddlers, only Early Steps / FDLRS can open this section — stale Part B state
   // (placement/doc/services set before an age switch, or set directly by a fixture)
   // must not produce a header whose entire content band is toddler-suppressed below.
-  if(hES||hFD||(S.ageGroup!=='toddler'&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size))){
+  if(hES||hFD||(isPartBAge()&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size))){
     L.push(n+++'. SCHOOL / EDUCATIONAL SUPPORTS');
     // "Under 36 months" is the Part C eligibility boundary (Florida Early Steps serves
     // birth to 36 months); the toddler age bucket is 12-35mo, so the clause is always
@@ -3489,7 +3475,7 @@ function generateNote() {
     // with the syncSchoolSvcFromNeeds toddler gate and the §7 form-section hide:
     // this output gate is what protects fixtures/state-restoration paths that set
     // school state directly without the DOM teardown running.
-    if(S.ageGroup!=='toddler'){
+    if(isPartBAge()){
     if(S.schoolPlacement==='privateNoIEP'){
       L.push('  • Private school enrollment (no current IEP or district services): Under IDEA, children with disabilities enrolled in private school by their parents retain the right to equitable participation in special education services. The local school district is responsible for conducting a timely evaluation and, if the child is found eligible, providing services through an equitable participation plan. Equitable participation services may differ in scope from what a public school student would receive, but the family has the right to request an evaluation. Family counseled to contact the local district to submit a written evaluation request.');
     } else if(S.schoolPlacement==='privateWithIEP'){
@@ -3498,7 +3484,7 @@ function generateNote() {
     if(S.schoolDoc==='iep') L.push('IEP in place; recommend review/update to reflect current evaluation findings.');
     else if(S.schoolDoc==='iep_needed'){L.push('IEP evaluation recommended. Under IDEA, district must evaluate within 60 days of written parental consent. Autism eligibility category should be pursued.');}
     else if(S.schoolDoc==='504'){L.push('504 Plan in place. Review accommodations for adequacy; consider whether IEP eligibility is more appropriate given identified functional needs.');}
-    else if(S.schoolDoc==='neither'&&S.ageGroup!=='toddler'&&!['privateNoIEP','privateWithIEP'].includes(S.schoolPlacement)){L.push('No IEP or 504 Plan in place. Given identified needs, IDEA evaluation recommended. Family counseled on right to submit written evaluation request to district.');}
+    else if(S.schoolDoc==='neither'&&!['privateNoIEP','privateWithIEP'].includes(S.schoolPlacement)){L.push('No IEP or 504 Plan in place. Given identified needs, IDEA evaluation recommended. Family counseled on right to submit written evaluation request to district.');}
     if(S.schoolSvc.size){
       const sv={sped:'Special education services',slp_school:'Speech-language therapy',ot_school:'Occupational therapy',pt_school:'Physical therapy',counseling:'Counseling / social-emotional support',esy:'Extended school year (ESY): assess for regression risk',aide:'1:1 paraprofessional aide',lowRatio:'Low student:teacher ratio',sensory:'Sensory accommodations',visual:'Visual supports / schedules',social_skills_school:'Social skills instruction',
         fba:'Functional Behavior Assessment (FBA) recommended: clinician recommends the school conduct a formal FBA to identify antecedents, behaviors, and consequences driving interfering behaviors. FBA findings should directly inform development of a Behavior Intervention Plan (BIP). Parent may submit written request under IDEA.',
@@ -3518,7 +3504,7 @@ function generateNote() {
     }
     } // end Part B band (ageGroup !== 'toddler')
     // Auto-generated IEP/504 accommodations — grouped into three categories
-    if(S.ageGroup!=='toddler'){
+    if(isPartBAge()){
       // Group 1: Core ASD accommodations (always shown for school-age+)
       const accomASD=[];
       accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
@@ -3542,7 +3528,7 @@ function generateNote() {
       if(S.comorbid.has('ld_reading')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
       if(S.comorbid.has('ld_written')) accomAcad.push('Written expression: speech-to-text, keyboarding alternative to handwriting, extended time, reduced written output requirements');
       if(S.comorbid.has('ld_math')) accomAcad.push('Math: calculator access for fact-dependent tasks, extended time, manipulatives, graph paper for number alignment');
-      if(S.comorbid.has('ld_suspected')&&!S.comorbid.has('ld_reading')&&!S.comorbid.has('ld_math')&&!S.comorbid.has('ld_written'))
+      if(S.comorbid.has('ld_suspected')&&!hasLDConfirmed())
         accomAcad.push('Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time and chunked assignments may be appropriate.');
 
       const anyAccom=accomASD.length||accomBeh.length||accomAcad.length;
@@ -3562,7 +3548,7 @@ function generateNote() {
       }
     }
     // Concurrent-billing framing is IEP (Part B) language — suppressed for toddlers.
-    if(S.ageGroup!=='toddler') L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
+    if(isPartBAge()) L.push('  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.');
     L.push('');
   }
 
@@ -3581,17 +3567,15 @@ function generateNote() {
     L.push('  • Sleep hygiene: dark, cool, quiet environment; screen-free hour before bed');
     L.push('  • Stimulus control: bedroom associated with sleep only');
     L.push('  • Visual bedtime routine schedule recommended');
-    if(S.comorbid.has('sleep_disorder')||S.sleep){
       L.push('Low-dose melatonin (0.5–1 mg, 30–60 minutes before target bedtime) discussed as an adjunct to behavioral intervention. Dose and timing to be titrated to response. Behavioral strategies should be implemented concurrently and not replaced by melatonin.');
-    }
     L.push('');
   }
 
   // Medical referrals
-  const hA=resolveOv('audiology',ruleAudiology()),hG=resolveOv('genetics',ruleGenetics()),
-    hN=resolveOv('neurology',ruleNeurology()),hQ=resolveOv('qbtest',ruleQBTest()),
-    hP=resolveOv('psychiatry',rulePsychiatry()),hGI=resolveOv('gi',ruleGI()),hS=resolveOv('sleep_ref',ruleSleepRef()),
-    hEEG=resolveOv('eeg',ruleEEG());
+  const hA=referralIncluded('audiology'),hG=referralIncluded('genetics'),
+    hN=referralIncluded('neurology'),hQ=referralIncluded('qbtest'),
+    hP=referralIncluded('psychiatry'),hGI=referralIncluded('gi'),hS=referralIncluded('sleep_ref'),
+    hEEG=referralIncluded('eeg');
   // Ophthalmology fires only when BOTH FASD flags are set (documented exposure AND
   // concerning features) — a dilated eye exam is part of the formal FASD workup, not a
   // screen for exposure alone. Plain plan line, no override key in v1.
@@ -3740,11 +3724,11 @@ function generateNote() {
   }
 
   // CARD + Family Resources
-  const hCARD=resolveOv('card',ruleCARD());
-  const anyTherapyInPlan=resolveOv('aba',ruleABA())||resolveOv('pcit',rulePCIT())||resolveOv('slp',ruleSLP())||resolveOv('ot',ruleOT())||resolveOv('pt',rulePT());
+  const hCARD=referralIncluded('card');
+  const anyTherapyInPlan=referralIncluded('aba')||referralIncluded('pcit')||referralIncluded('slp')||referralIncluded('ot')||referralIncluded('pt');
   const under6=isYoung();
   const behaviorconcern=S.needsBehavior.has('noncompliance')||S.needsBehavior.has('tantrums')||S.needsBehavior.has('aggression')||hasADHD();
-  const over5ABA=['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&ruleABA().include;
+  const over5ABA=isSchoolAgePlus()&&ruleABA().include;
   const showResources=hCARD||anyTherapyInPlan||under6||behaviorconcern||over5ABA||S.prenatalAlcohol||S.fasdFeatures;
   if(showResources){
     L.push(n+++'. FAMILY RESOURCES & NEXT STEPS');
@@ -3756,7 +3740,7 @@ function generateNote() {
       L.push('');L.push('  Finding Therapies / Navigating the System:');
       L.push('    1. Call your insurance company and ask to be assigned a case manager.');
       L.push('    2. Request a list of all recommended providers.');
-      if(resolveOv('aba',ruleABA())){const pendingTesting=evalPathSteps().pendingTesting;
+      if(referralIncluded('aba')){const pendingTesting=evalPathSteps().pendingTesting;
         if(pendingTesting){L.push('    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously');L.push('       - no matter how long the lists appear.');}
         else{L.push('    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.');}}
       L.push('    4. Use Google Maps to search for nearby providers and call to confirm insurance.');
@@ -3765,7 +3749,7 @@ function generateNote() {
       L.push('       consider appearing in person if phone calls go unanswered.');
       L.push('    7. When a spot is obtained, notify other waitlists so another child may benefit.');
     }
-    const hasAtHome=under6||S.highlyMotivated||over5ABA||behaviorconcern||resolveOv('aba',ruleABA());
+    const hasAtHome=under6||S.highlyMotivated||over5ABA||behaviorconcern||referralIncluded('aba');
     if(hasAtHome){
       L.push('');L.push('  At-Home Strategies While Waiting for Formal Therapy:');
       if(under6){
@@ -3791,7 +3775,7 @@ function generateNote() {
         L.push('  https://afirm.fpg.unc.edu/afirm-modules/');
       }
       if(behaviorconcern){
-        if(['toddler','preschool'].includes(S.ageGroup)){
+        if(isYoung()){
           L.push('');
           L.push('  Pocket PCIT');
           L.push('  Free online resource based on Parent-Child Interaction Therapy (PCIT) for children ages 2–7 with behavior challenges. Video demonstrations and guidance on building the parent-child relationship (Child-Directed Interaction) and consistent limit-setting (Parent-Directed Interaction).');
@@ -3805,7 +3789,7 @@ function generateNote() {
           L.push('  Workbook: https://www.seattlechildrens.org/globalassets/documents/healthcare-professionals/pal/fast/fast-b-caregiver-workbook.pdf');
         }
       }
-      if(resolveOv('aba',ruleABA())){
+      if(referralIncluded('aba')){
         L.push('');L.push('  Recommended Reading: Understanding ABA');
         L.push('    • What Is Applied Behavior Analysis?');
         L.push('    • The Controversy Around ABA');
@@ -4133,7 +4117,7 @@ function generateNote() {
     L.push('  • Seizure action plan to be developed in collaboration with neurology; all caregivers and school staff trained.');
     L.push('  • Safety precautions: no unsupervised bathing or swimming; fall precautions if atonic or absence seizures; Medical ID bracelet recommended.');
     L.push('  • AED adherence counseling; medication interactions reviewed.');
-    if(['adolescent','youngAdult'].includes(S.ageGroup))
+    if(isTeenPlus())
       L.push('  • Driving: discuss seizure-free interval requirements per state law before licensure.');
     L.push('');
   }
@@ -4305,7 +4289,7 @@ function buildDSMTable(esc){
   const aC=S.criteriaA.size,bC=S.criteriaB.size;
   subhdr(`Criterion A — Social Communication &amp; Social Interaction (all 3 required) <span style="color:${aC===3?mc:nc};margin-left:6px">${aC===3?'All 3 met':aC+'/3 met'}</span>`);
   ['a1','a2','a3'].forEach(k=>row(k.toUpperCase(),CRIT_A[k],S.criteriaA.has(k),true));
-  subhdr(`Criterion B — Restricted &amp; Repetitive Behaviors (≥2 of 4 required) <span style="color:${bC>=2?mc:nc};margin-left:6px">${bC>=2?bC+'/4 met':bC+'/4 met'}</span>`);
+  subhdr(`Criterion B — Restricted &amp; Repetitive Behaviors (≥2 of 4 required) <span style="color:${bC>=2?mc:nc};margin-left:6px">${bC}/4 met</span>`);
   ['b1','b2','b3','b4'].forEach(k=>row(k.toUpperCase(),CRIT_B[k],S.criteriaB.has(k),false));
   t+=`<tr><td colspan="4" style="${cell};background:#f3f4f6;color:#374151;font-weight:600;font-size:9.5pt;padding:4px 8px">Criteria C, D, E — Specifying Criteria</td></tr>`;
   [[S.criteriaC,'C','c','Symptoms present in early developmental period'],[S.criteriaD,'D','d','Clinically significant impairment in functioning'],[S.criteriaE,'E','e','Not better explained by intellectual disability or GDD alone']].forEach(([met,k,evk,desc])=>{
@@ -4325,7 +4309,7 @@ function generateRichHTML(isPreview=false) {
   let html=wrap;
   let inUL=false;
   const closeUL=()=>{if(inUL){html+='</ul>';inUL=false;}};
-  const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const e=escapeHtml;
   // Linkify URLs (for preview only, clipboard gets plain links)
   const linkify=s=>{
     if(!isPreview) return e(s);
@@ -4337,7 +4321,7 @@ function generateRichHTML(isPreview=false) {
   lines.forEach(line=>{
     if(line==='ASSESSMENT'||line==='PLAN'){
       closeUL();
-      const border=isPreview?'border-bottom:2px solid #374151':'border-bottom:2px solid #374151';
+      const border='border-bottom:2px solid #374151';
       html+=`<p style="font-size:${isPreview?'13pt':'14pt'};font-weight:bold;${border};padding-bottom:3px;margin:18px 0 8px">${e(line)}</p>`;
       if(line==='PLAN') planSectionIdx=-1;
     }
@@ -4396,7 +4380,7 @@ function _abaContent(){
   //   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   // Braces, not brackets: the Epic copy path rewrites {...} to *** so F2 stops here.
   const today='{Date}';
-  const youngChild=S.ageGroup==='toddler'||S.ageGroup==='preschool';
+  const youngChild=isYoung();
   const isMilitary=S.insuranceType==='tricare'||S.insuranceType==='champva';
 
   const levelData={
@@ -4468,7 +4452,7 @@ function _abaContent(){
     instructional_control:'Cooperation and self-management in instructional and work settings',
     reduce_smearing:'Hygiene independence and self-management',
   };
-  const isOlderForABA=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
+  const isOlderForABA=isTeenPlus();
   const targets=[...S.abaTargets].map(t=>(isOlderForABA&&TL_OLDER[t])||TL[t]||t);
 
   const SL={home:'home',clinic:'clinic/center-based',school:'school/educational setting',community:'community settings',telehealth:'Telehealth (parent coaching and caregiver training)'};
@@ -4484,9 +4468,7 @@ function _abaContent(){
   // Opening paragraph
   const levelClause=asdLevelKey?`, ${levelLabel},`:'';
   const insClause=S.insuranceType&&S.insuranceType!=='selfpay'?` enrolled under ${({commercial:'commercial/private insurance',medicaid:'Medicaid/CHIP',tricare:'TRICARE',champva:'ChampVA'}[S.insuranceType]||'')}`:'' ;
-  const abaAsdDxKeys=new Set(['cars2st','cars2hf','ados2','adir','asdpeds','midgas','srs2','gars3']);
-  const abaAsdDxLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
-  const abaConsistentPrior=[...S.priorTesting].filter(k=>abaAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=abaAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const abaConsistentPrior=priorTestsByOutcome('consistent',MOD_PAREN,ASD_DX_TEST_KEYS);
   const abaPtCite=abaConsistentPrior.length?` Supporting prior diagnostic assessments consistent with ASD include: ${abaConsistentPrior.join('; ')}.`:'';
   const openPara=`I write to request authorization for Applied Behavior Analysis (ABA) therapy for ${p.subj==='he'||p.subj==='she'||p.subj==='they'?'the patient':p.subj}, who has received a confirmed diagnosis of Autism Spectrum Disorder (ASD)${levelClause} as defined by the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5; American Psychiatric Association, 2013)${insClause}. ABA therapy is medically necessary, as documented below.${abaPtCite}`;
 
@@ -4495,7 +4477,7 @@ function _abaContent(){
   if(domains.length>0){
     impPara=`${p.cap} ${v3('demonstrates')} clinically significant functional impairments across the following domains: ${domains.join('; ')}.`;
     if(S.langLevel&&!['ageAppropriate','unclearSLP'].includes(S.langLevel)){
-      const langShort={nonverbal:'is nonverbal/minimally verbal',singleWord:'communicates primarily via single words',phrase:'uses two- to three-word phrases',simpleSentence:'uses simple sentences',verbal:'has multi-word verbal output below sentence level',conversational:'communicates conversationally with noted deficits'};
+      const langShort={nonverbal:'is nonverbal/minimally verbal',singleWord:'communicates primarily via single words',phrase:'uses two- to three-word phrases',simpleSentence:'uses simple sentences',conversational:'communicates conversationally with noted deficits'};
       // Verb-in-data case: split off the lead verb so v3() can conjugate it for "they".
       const langStr=langShort[S.langLevel]||'';
       if(langStr){
@@ -4543,7 +4525,7 @@ function _abaContent(){
 function generateABALetter(isPreview=false){
   if(!abaLetterEligible()) return isPreview?'<div class="note-empty">ABA Letter requires a <strong>confirmed ASD</strong> diagnosis with the ABA referral included.</div>':'';
   const c=_abaContent();
-  const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const e=escapeHtml;
   const linkify=t=>e(t).replace(/https?:\/\/[^\s<>"]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
 
   if(isPreview){
@@ -4570,7 +4552,10 @@ function generateABALetter(isPreview=false){
     h+=`<div class="aba-sig">Submitted by: ___________________________________<br>Credentials / Title: ___________________________________<br>Practice / Institution: ___________________________________<br>Date: ${e(c.today)}&nbsp;&nbsp;&nbsp; Phone: ___________________________________</div>`;
     h+=`<p class="aba-caveat">This letter was generated as a clinical documentation aid. All content requires clinician review, attestation, and signature prior to submission. This tool does not constitute legal or billing advice.</p>`;
     h+=`</div>`;
-    return h;
+    // One pass over the finished markup: every {placeholder} any field carries is highlighted,
+    // so a new fill-in slot in _abaContent() cannot ship unhighlighted (the markup itself
+    // contains no braces).
+    return phSpan(h,'aba-ph');
   }
 
   // Clipboard / rich HTML — inline styles
@@ -4633,26 +4618,10 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){
-    const epicBtn=document.getElementById('copyABAEpicBtn');
-    const epic=plain.replace(/\{[^}]+\}/g,'***');
-    try{await navigator.clipboard.writeText(epic);}
-    catch(e){const ta=document.createElement('textarea');ta.value=epic;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-    if(epicBtn){const o=epicBtn.textContent;epicBtn.textContent='✓ Copied!';setTimeout(()=>epicBtn.textContent=o,1800);}
-    return;
-  }
-  const btn=document.getElementById('copyABABtn');
-  const flash=(msg)=>{if(!btn)return;const o=btn.textContent;btn.textContent=msg;setTimeout(()=>{btn.textContent=o;},1800);};
-  if(format==='rich'){
-    try{
-      const richHTML=generateABALetter(false);
-      await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([richHTML],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
-      flash('✓ Letter copied!');return;
-    }catch(e){}
-  }
-  try{await navigator.clipboard.writeText(plain);}
-  catch(e){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-  flash('✓ Copied!');
+  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
+  await writeClipboardText(plain);
+  flashBtn('✓ Copied!',document.getElementById('copyABABtn'));
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
@@ -4727,7 +4696,7 @@ function _iepLetterContent(){
   if(S.criteriaA.size||S.needsSocial.size||S.needsComm.size) roConcernParts.push('social communication and interaction');
   if(S.criteriaB.size||S.needsBehavior.size||S.needsSensory.size) roConcernParts.push('behavioral regulation and sensory processing');
   if(S.needsAdaptive.size) roConcernParts.push('adaptive functioning');
-  if(S.needsMotor&&S.needsMotor.size) roConcernParts.push('motor development');
+  if(S.needsMotor.size) roConcernParts.push('motor development');
   // Semicolons rather than commas for the multi-item case: each domain phrase already
   // contains its own "and", so a comma list reads as one run-on clause.
   const ruleOutReferralTail=!roConcernParts.length
@@ -4757,7 +4726,7 @@ function _iepLetterContent(){
   const roRelatedDomains=[];
   if(S.needsComm.size) roRelatedDomains.push('communication');
   if(S.needsSensory.size) roRelatedDomains.push('sensory');
-  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) roRelatedDomains.push('motor');
+  if(S.needsMotor.size||S.comorbid.has('dcd')) roRelatedDomains.push('motor');
   const roRelatedDomainStr=roRelatedDomains.length>1
     ? roRelatedDomains.slice(0,-1).join(', ')+' and '+roRelatedDomains[roRelatedDomains.length-1]
     : roRelatedDomains[0];
@@ -4784,7 +4753,7 @@ function _iepLetterContent(){
       eligibilityCandidates.push('Speech Impaired (Florida Rule 6A-6.03012): documented speech-sound production and/or intelligibility needs, evaluated separately from language eligibility.');
     if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')||S.comorbid.has('epilepsy')||S.comorbid.has('sleep_disorder'))
       eligibilityCandidates.push('Other Health Impaired (Florida Rule 6A-6.030152): limited strength, vitality, or alertness with respect to the educational environment, due to a chronic or acute health condition documented at this evaluation, that adversely affects educational performance. Attention-deficit/hyperactivity disorder and epilepsy are named among qualifying conditions in this category.');
-    if(S.comorbid.has('ld_reading')||S.comorbid.has('ld_math')||S.comorbid.has('ld_written'))
+    if(hasLDConfirmed())
       eligibilityCandidates.push('Specific Learning Disability (Florida Rule 6A-6.03018): documented learning disability affecting one or more academic domains.');
     else if(S.comorbid.has('ld_suspected'))
       eligibilityCandidates.push('Specific Learning Disability, suspected (Florida Rule 6A-6.03018): the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility.');
@@ -4812,7 +4781,7 @@ function _iepLetterContent(){
     : 'These conditions result in the following challenges that require specialized support in the educational setting:';
   const impacts=[];
   if(S.needsComm.size) impacts.push('Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.');
-  if(S.needsSocial&&S.needsSocial.size) impacts.push('Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.');
+  if(S.needsSocial.size) impacts.push('Social understanding: Difficulty with social comprehension, perspective-taking, and peer interaction that limits meaningful participation in group academic and social activities.');
   if(S.needsBehavior.size){
     const bp=[];
     if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) bp.push('behavioral safety concerns requiring active supervision and impacting the safety of the student and others in the environment');
@@ -4830,7 +4799,7 @@ function _iepLetterContent(){
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
   if(S.needsSensory.size) impacts.push('Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.');
-  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) impacts.push('Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.');
+  if(S.needsMotor.size||S.comorbid.has('dcd')) impacts.push('Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.');
   if(S.needsAdaptive.size) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
   if(S.comorbid.has('ld_reading')) impacts.push('Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.');
   if(S.comorbid.has('ld_math')) impacts.push('Mathematics: A specific learning disability in mathematics affecting computation, problem-solving, and access to grade-level math curriculum.');
@@ -4838,7 +4807,7 @@ function _iepLetterContent(){
   // Domain-uncharacterized SLD suspicion: do NOT default to reading. Council
   // review 2026-05-20 — defaulting "suspected" to reading puts a wrong-domain
   // claim in a letter that schools will scope their evaluation against.
-  if(S.comorbid.has('ld_suspected')&&!S.comorbid.has('ld_reading')&&!S.comorbid.has('ld_math')&&!S.comorbid.has('ld_written'))
+  if(S.comorbid.has('ld_suspected')&&!hasLDConfirmed())
     impacts.push('Academic learning: Concerns for a suspected specific learning disability affecting academic functioning, with the affected domain (reading, mathematics, written expression, or a combination) not yet characterized.');
 
   // Specifiers — withCatatonia deferred: add checkbox + SPEC_LABELS + comorbidity block before re-adding here
@@ -4865,16 +4834,16 @@ function _iepLetterContent(){
   if(S.schoolSvc.has('slp_school')){
     let s='Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access.';
     const goals=[];
-    if(S.needsComm.has('functional_aac')||S.langLevel==='nonverbal'||S.langLevel==='singleWord')
+    if(S.needsComm.has('functional_aac')||isMinVerbal())
       goals.push('AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners');
     // 'phrase' and 'simpleSentence' are the actual S.langLevel values (not 'phrases'/'sentences')
     if(S.needsComm.has('expressive')||S.langLevel==='phrase'||S.langLevel==='simpleSentence')
       goals.push('expressive language development: sentence formulation, topic maintenance, and narrative organization');
     if(S.needsComm.has('receptive'))
       goals.push('receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary');
-    if(S.langModifiers&&(S.langModifiers.has('pragmatic')||(S.needsSocial&&S.needsSocial.size)))
+    if(hasPragmaticDeficit()||S.needsSocial.size)
       goals.push('social-pragmatic language: conversational turn-taking, perspective-taking in academic discussion, and understanding classroom social discourse');
-    if(S.langModifiers&&(S.langModifiers.has('speechSound')||S.langModifiers.has('reducedIntell')))
+    if(hasAnyArticulation())
       goals.push('speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness');
     if(S.comorbid.has('language_disorder'))
       // The "distinct from ASD" contrast only means something on a letter that asserts
@@ -4889,8 +4858,8 @@ function _iepLetterContent(){
     let s='Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output.';
     const goals=[];
     if(S.needsSensory.size) goals.push('sensory support plan (Sensory Profile 2 and/or SPM-2 evaluation): individualized sensory regulation strategies implemented in the classroom in coordination with the teacher');
-    if(S.needsMotor&&(S.needsMotor.has('fine')||S.needsMotor.has('handwriting'))) goals.push('fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
-    if(S.needsMotor&&S.needsMotor.has('coordination')) goals.push('motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
+    if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) goals.push('fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
+    if(S.needsMotor.has('coordination')) goals.push('motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
     if(S.needsAdaptive.size) goals.push('adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence');
     if(goals.length) s+=' Goals: '+goals.join('; ')+'.';
     svContent.ot_school=s;
@@ -4899,8 +4868,8 @@ function _iepLetterContent(){
   if(S.schoolSvc.has('pt_school')){
     let s='Physical Therapy (PT): School-based PT services are recommended to address motor needs that affect safe navigation of the school environment and access to physical education.';
     const goals=[];
-    if(S.needsMotor&&S.needsMotor.has('gross')) goals.push('gross motor skill development: balance, coordination, and age-appropriate locomotor skills');
-    if(S.needsMotor&&S.needsMotor.has('hypotonia')) goals.push('postural control and core strengthening to address low muscle tone affecting endurance, positioning, and sustained classroom participation');
+    if(S.needsMotor.has('gross')) goals.push('gross motor skill development: balance, coordination, and age-appropriate locomotor skills');
+    if(S.needsMotor.has('hypotonia')) goals.push('postural control and core strengthening to address low muscle tone affecting endurance, positioning, and sustained classroom participation');
     goals.push('safe navigation of the school campus (stairs, hallways, playground equipment)');
     if(S.comorbid.has('dcd')) goals.push('motor planning and body awareness targeting the Developmental Coordination Disorder profile');
     s+=' Goals: '+goals.join('; ')+'.';
@@ -4922,7 +4891,7 @@ function _iepLetterContent(){
   if(S.schoolSvc.has('social_skills_school')){
     // Rule-out letters drop "autism-specific" — the ask survives, the claim does not.
     let s='Social Skills Instruction: Structured'+(ruledOut?'':', autism-specific')+' social skills instruction within the school setting is recommended. Goals: peer interaction initiation, conversational reciprocity, cooperative work skills, and understanding and navigating social expectations in group academic and recess settings.';
-    if(S.ageGroup==='adolescent'||S.ageGroup==='youngAdult') s+=' At this developmental stage, goals should also address social communication in vocational and community contexts.';
+    if(isTeenPlus()) s+=' At this developmental stage, goals should also address social communication in vocational and community contexts.';
     svContent.social_skills_school=s;
   }
 
@@ -4931,7 +4900,7 @@ function _iepLetterContent(){
     const reasons=[];
     if(S.needsBehavior.has('elopement')) reasons.push('active elopement risk requiring continuous proximity supervision');
     if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) reasons.push('behavioral safety needs requiring capacity for immediate adult intervention');
-    if(S.langLevel==='nonverbal'||S.langLevel==='singleWord') reasons.push('communication access requiring adult facilitation for AAC use and participation in instruction');
+    if(isMinVerbal()) reasons.push('communication access requiring adult facilitation for AAC use and participation in instruction');
     if(S.needsAdaptive.size>1) reasons.push('significant adaptive skill deficits requiring adult support throughout the school day');
     if(reasons.length) s+=' Specific rationale: '+reasons.join('; ')+'.';
     s+=' The aide\'s role and prompting hierarchy should be explicitly specified in the IEP to promote independence and prevent prompt dependency.';
@@ -5027,7 +4996,7 @@ function _iepLetterContent(){
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-  if((S.needsMotor&&S.needsMotor.size)||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  if(S.needsMotor.size||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
   // Curriculum and assessment modifications — only when intellectual disability is confirmed
   // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
   // academic instruction; those are placement-defining recommendations that require formal
@@ -5081,7 +5050,7 @@ function _iepLetterContent(){
   if(S.comorbid.has('ld_reading')) accomAcad.push('Reading: text-to-speech technology, audiobooks for reading-dependent assignments, extended time on reading tasks, oral response option');
   if(S.comorbid.has('ld_written')) accomAcad.push('Written expression: speech-to-text, keyboarding alternative to handwriting, extended time, reduced written output requirements');
   if(S.comorbid.has('ld_math')) accomAcad.push('Math: calculator access for fact-dependent tasks, extended time, manipulatives, graph paper for number alignment');
-  if(S.comorbid.has('ld_suspected')&&!S.comorbid.has('ld_reading')&&!S.comorbid.has('ld_math')&&!S.comorbid.has('ld_written'))
+  if(S.comorbid.has('ld_suspected')&&!hasLDConfirmed())
     accomAcad.push('Academic supports pending psychoeducational evaluation: domain-specific accommodations (e.g., text-to-speech, calculator access, keyboarding alternative) should be implemented as supported by evaluation findings; in the interim, extended time on assessments and chunked assignments may be appropriate.');
 
   // Do NOT re-add a legal citation to the strengths sentence. On 2026-08-21 that
@@ -5136,20 +5105,21 @@ function _iepLetterContent(){
   const letterTypeLabel=S.schoolDoc==='iep'?'IEP Review Request':S.schoolDoc==='504'?'504 Review / IEP Eligibility Request':'Initial Special Education Evaluation Request';
 
   // Prior testing citation for diagnosis paragraph
-  const iepAsdDxKeys=new Set(['cars2st','cars2hf','ados2','adir','asdpeds','midgas','srs2','gars3']);
-  const iepAsdDxLabels={cars2st:'CARS-2 ST',cars2hf:'CARS-2 HF',ados2:'ADOS-2',adir:'ADI-R',asdpeds:'ASD-PEDS',midgas:'MIGDAS-2',srs2:'SRS-2',gars3:'GARS-3'};
-  const iepConsistentPrior=[...S.priorTesting].filter(k=>iepAsdDxKeys.has(k)&&(S.priorTestingOutcome[k]||'')==='consistent').map(k=>{let lbl=iepAsdDxLabels[k]||k;if(k==='ados2'&&S.ados2Module)lbl+=' ('+S.ados2Module+')';return lbl;});
+  const iepConsistentPrior=priorTestsByOutcome('consistent',MOD_PAREN,ASD_DX_TEST_KEYS);
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
   return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instrumentBlocks,impactLead,
     ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
 }
 
+// Print order of the school-service paragraphs. Keys must match the schoolSvc checkboxes;
+// all three IEP renderers (preview, plain, Word paste) walk this one list.
+const IEP_SVC_ORDER=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
 function generateIEPLetterHTML(){
   if(!iepLetterEligible()) return '<div class="note-empty">Select a school documentation status (above, in School section) and an age group other than toddler to generate the IEP Letter.</div>';
   const c=_iepLetterContent();
-  const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const ph=s=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span class="iep-ph">{${e(t)}}</span>`);
+  const e=escapeHtml;
+  const ph=s=>phSpan(s,'iep-ph');
 
   let h='';
   if(S.comorbid.has('trauma')&&S.traumaIncludeInIEP){
@@ -5232,12 +5202,11 @@ function generateIEPLetterHTML(){
     if(c.eligibilityFallback) h+=`<p><span class="iep-ph">${e(c.eligibilityFallback)}</span></p>`;
   }
 
-  const svcOrder=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
-  const hasSvc=svcOrder.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
+  const hasSvc=IEP_SVC_ORDER.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
   if(hasSvc){
     h+=`<div class="aba-sec">Recommended Services</div>`;
     h+=(S.schoolDoc==='iep'?`<p>I recommend the following updates to the current IEP:</p>`:`<p>If eligible for special education services, I recommend the IEP include the following:</p>`);
-    svcOrder.forEach(k=>{
+    IEP_SVC_ORDER.forEach(k=>{
       if(!S.schoolSvc.has(k)||!c.svContent[k]) return;
       h+=`<p style="margin:6px 0">${e(c.svContent[k])}</p>`;
     });
@@ -5270,7 +5239,6 @@ function generateIEPLetterPlain(){
   const pCap=p.cap;       // He / She / They / The child
   const pSub=p.subj;      // he / she / they / the child
   const pPoss=p.poss;     // his / her / their / the child's
-  const pPossCap=pPoss.charAt(0).toUpperCase()+pPoss.slice(1);
   // v3() is module-scope (defined just after getPron); see V3_MAP for the verb list.
   const sep='─'.repeat(60);
   let t=`PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES\n${c.letterTypeLabel}\n\n`;
@@ -5328,12 +5296,11 @@ function generateIEPLetterPlain(){
     if(c.eligibilityCandidates.length) t+='\n';
     if(c.eligibilityFallback) t+=c.eligibilityFallback+'\n\n';
   }
-  const svcOrder=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
-  const hasSvc=svcOrder.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
+  const hasSvc=IEP_SVC_ORDER.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
   if(hasSvc){
     t+=sep+'\nRECOMMENDED SERVICES\n'+sep+'\n';
     t+=(S.schoolDoc==='iep'?'I recommend the following updates to the current IEP:\n\n':'If eligible for special education services, I recommend the IEP include the following:\n\n');
-    svcOrder.forEach(k=>{
+    IEP_SVC_ORDER.forEach(k=>{
       if(!S.schoolSvc.has(k)||!c.svContent[k]) return;
       t+=c.svContent[k]+'\n\n';
     });
@@ -5356,20 +5323,11 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){
-    const epicBtn=document.getElementById('copyIEPEpicBtn');
-    const epic=plain.replace(/\{[^}]+\}/g,'***');
-    try{await navigator.clipboard.writeText(epic);}
-    catch(e){const ta=document.createElement('textarea');ta.value=epic;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-    if(epicBtn){const o=epicBtn.textContent;epicBtn.textContent='✓ Copied!';setTimeout(()=>epicBtn.textContent=o,1800);}
-    return;
-  }
-  const btn=document.getElementById('copyIEPBtn');
-  const flash=(msg)=>{if(!btn)return;const o=btn.textContent;btn.textContent=msg;setTimeout(()=>{btn.textContent=o;},1800);};
-  if(format==='rich'){
-    try{
+  if(format==='epic'){await writeClipboardText(toEpic(plain));flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='rich'&&await writeClipboardRich(()=>{
+    // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
       const c=_iepLetterContent();
-      const e=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const e=escapeHtml;
       const phSt='background:#fef9c3;color:#92400e;border-radius:3px;padding:0 2px;font-style:italic';
       const wph=s=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span style="${phSt}">{${e(t)}}</span>`);
       const ss='font-family:Georgia,"Times New Roman",serif;font-size:11pt;line-height:1.85;color:#1a1a2e;max-width:700px';
@@ -5436,12 +5394,11 @@ async function copyIEPLetter(format){
         if(c.eligibilityCandidates.length){h+=`<ul style="margin:4px 0 4px 20px">`;c.eligibilityCandidates.forEach(x=>h+=`<li style="margin-bottom:3px">${e(x)}</li>`);h+=`</ul>`;}
         if(c.eligibilityFallback) h+=`<p style="margin-bottom:10px"><span style="${phSt}">${e(c.eligibilityFallback)}</span></p>`;
       }
-      const svcOrder2=['sped','slp_school','ot_school','pt_school','counseling','social_skills_school','aide','esy','lowRatio','sensory','visual','fba','psychoed'];
-      const hasSvc2=svcOrder2.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
-      if(hasSvc2){
+      const hasSvc=IEP_SVC_ORDER.some(k=>S.schoolSvc.has(k)&&c.svContent[k]);
+      if(hasSvc){
         h+=`<p style="${secSt}">Recommended Services</p>`;
         h+=(S.schoolDoc==='iep'?`<p>I recommend the following updates to the current IEP:</p>`:`<p>If eligible for special education services, I recommend the IEP include the following:</p>`);
-        svcOrder2.forEach(k=>{
+        IEP_SVC_ORDER.forEach(k=>{
           if(!S.schoolSvc.has(k)||!c.svContent[k]) return;
           h+=`<p style="margin:6px 0">${e(c.svContent[k])}</p>`;
         });
@@ -5460,13 +5417,10 @@ async function copyIEPLetter(format){
       h+=`<div style="margin-top:26px;border-top:1px solid #d1d5db;padding-top:12px;font-size:10pt;color:#374151;line-height:2.4">Sincerely,<br><br><br>___________________________________<br>${wph('{Physician Name}')}, MD<br>UF Behavior and Development Clinic</div>`;
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated ${wph('{Date of Evaluation}')}</p>`;
       h+=`</div>`;
-      await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
-      flash('✓ Letter copied!');return;
-    }catch(err){}
-  }
-  try{await navigator.clipboard.writeText(plain);}
-  catch(err){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
-  flash('✓ Copied!');
+      return h;
+  },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
+  await writeClipboardText(plain);
+  flashBtn('✓ Copied!',document.getElementById('copyIEPBtn'));
 }
 
 function setPreviewMode(mode){
@@ -5602,7 +5556,11 @@ function updateEvChips(){
   });
 }
 
+// Set while applyPreset() drives many controls in a row: each .click() fires a change
+// handler that calls render(), so a preset would otherwise re-render 10-25 times.
+let renderSuspended=false;
 function render(){
+  if(renderSuspended) return;
   // Adjust-Referrals coupling — both run unconditionally at the top so the various
   // early-return paths below (no-input, ABA-preview, IEP-preview) still get the
   // therapy-status state and visual enablement updated. syncTherapyStatusFromActivity
@@ -5618,7 +5576,7 @@ function render(){
   renderManualSpecCaptions();
 
   // ABA inclusion logic — show/hide params section and tab
-  const abaIncluded=resolveOv('aba',ruleABA());
+  const abaIncluded=referralIncluded('aba');
   const abaParamsSec=document.getElementById('abaParamsSection');
   if(abaParamsSec) abaParamsSec.style.display=abaIncluded?'':'none';
   const tabABA=document.getElementById('tabABA');
@@ -5652,8 +5610,12 @@ function render(){
 
   // Standard note preview
   const hasInput=S.diagStatus||S.ageGroup||S.criteriaA.size||S.criteriaB.size;
-  if(!hasInput){pre.innerHTML='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';updateSectionHeaders();return;}
+  // Only the preview body depends on hasInput. The tail (dx-active toggle, criteria badge,
+  // override pills, prior-testing expander, section headers) runs unconditionally so an
+  // emptied form (Clear All) never leaves stale UI behind; each tail step handles empty state.
   let html='';
+  if(!hasInput) html='<div class="note-empty">Select options in the input form to generate the A&P note.<br><br><small>No PHI collected or stored. All output requires clinician review.</small></div>';
+  else{
   if(S.diagStatus==='confirmed'){
     if(!v.complete){const iss=[];if(v.aCount<3)iss.push('A: '+v.aCount+'/3');if(v.bCount<2)iss.push('B: '+v.bCount+'/4');if(!v.cde)iss.push('C/D/E incomplete');html+=`<div class="note-err"><strong>⚠ Criteria Warning:</strong> DSM-5 criteria incomplete for confirmed ASD: ${iss.join('; ')}.</div>`;}
     else html+='<div class="note-ok"><strong>✓ DSM-5 criteria complete</strong></div>';
@@ -5664,6 +5626,7 @@ function render(){
   // idDocPrompt, because that letter is the one the school reads.
   if(S.specifiers.has('withID')&&!hasID()) html+=`<div class="note-err"><strong>⚠ Coding Warning:</strong> "With intellectual disability" is checked but no ID severity is selected in Cognitive Profile. The note codes F79 (unspecified severity); select a severity for precise coding.</div>`;
   html+=generateRichHTML(true);
+  }
   pre.innerHTML=html;
   const dxSec=document.getElementById('dxWorkupSection');
   if(dxSec) dxSec.classList.toggle('dx-active',S.diagStatus==='suspected');
@@ -5720,9 +5683,10 @@ const OV_GROUPS=[
   {title:'Clinician-judgment referrals', keys:['socialWork']},
 ];
 // True when a referral is currently included in the output — either the auto rule says
-// include OR the clinician has manually overridden to 'yes'. Used to enable/disable the
-// therapy-status rows below (you can only modify a therapy's status if it's being referred).
-function isTherapyActive(key){
+// include OR the clinician has manually overridden to 'yes'. The note generator, render()
+// and the therapy-status rows all resolve through here so a key can never be paired with
+// the wrong rule function (a mismatched pair would silently read S.overrides[undefined]).
+function referralIncluded(key){
   const def = OV_DEFS.find(d => d.key === key);
   if(!def) return false;
   return resolveOv(key, def.rule());
@@ -5733,7 +5697,7 @@ function isTherapyActive(key){
 // which therapyStatusLine would still emit as orphaned prose in the rendered note.
 function syncTherapyStatusFromActivity(){
   ['slp','ot','aba','pt'].forEach(key => {
-    if(S.therapyStatus[key] && !isTherapyActive(key)){
+    if(S.therapyStatus[key] && !referralIncluded(key)){
       S.therapyStatus[key] = '';
       document.querySelectorAll(`input[name="therapyStatus_${key}"]`).forEach(r=>{
         r.checked = false;
@@ -5748,7 +5712,7 @@ function syncTherapyStatusFromActivity(){
 function updateTherapyStatusEnablement(){
   document.querySelectorAll('.therapy-status-row[data-therapy-key]').forEach(row=>{
     const key = row.getAttribute('data-therapy-key');
-    row.classList.toggle('inactive', !isTherapyActive(key));
+    row.classList.toggle('inactive', !referralIncluded(key));
   });
 }
 // Labels for socialWorkReasons sub-options. Single source of truth — also consumed by
@@ -5926,7 +5890,6 @@ function cycleOverride(k){
   S.overrides[k]=cur==='auto'?'yes':cur==='yes'?'no':'auto';
   render();
 }
-function setOverride(k,v){S.overrides[k]=v;render();}
 
 // ─── UNEVEN COG TOGGLE ───────────────────────────────────────────────────────
 function toggleUnevenCog(){
@@ -5968,7 +5931,7 @@ const GDD_COGDATASOURCE_LABELS = {
 function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
   if(!g) return;
-  const isId  = ['id_mild','id_moderate','id_severe'].includes(S.cogProfile);
+  const isId  = hasID();
   const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
   // Borderline is exposed to cogDataSource so the clinician can record which
   // instrument grounded the BIF call. BIF is an IQ-defined construct, so it
@@ -6068,25 +6031,35 @@ function addStrength(text){
 }
 
 // ─── COPY ────────────────────────────────────────────────────────────────────
+// Shared by the note and both letters. Epic paste format: every {placeholder} becomes a
+// *** F2 stop (see CLAUDE.md); square brackets are deliberately NOT rewritten.
+const toEpic=t=>t.replace(/\{[^}]+\}/g,'***');
+// Plain-text copy with the execCommand fallback for contexts where the async Clipboard
+// API is unavailable (non-secure origins, older WebViews).
+async function writeClipboardText(text){
+  try{await navigator.clipboard.writeText(text);}
+  catch(e){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+}
+// Rich copy (HTML + plain alternates). `build` returns the HTML; if it throws or returns
+// nothing, or the browser refuses ClipboardItem, the result is false and the caller falls
+// back to plain text. One guard for all three copy paths.
+async function writeClipboardRich(build,plain){
+  try{const html=build(); if(!html) return false; await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);return true;}
+  catch(e){return false;}
+}
 // btn: the clicked button (passed as `this` from the onclick) so the feedback lands on the
 // control the clinician actually pressed — the header and sticky-bar buttons are separate.
 async function copyNote(format,part,btn){
   const note=generateNote();
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
-  if(format==='rich'){
-    try{
-      const richHTML=generateRichHTML();
-      await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([richHTML],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
-      flashBtn('✓ Rich text copied!',btn);return;
-    }catch(e){}
-  }
-  try{await navigator.clipboard.writeText(plain);}
-  catch(e){const ta=document.createElement('textarea');ta.value=plain;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Rich text copied!',btn);return;}
+  await writeClipboardText(plain);
   flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
-function flashBtn(msg,btn){
-  const b=btn||document.getElementById('copyRichBtn');if(!b)return;
+// Momentary button feedback (label + green tint); restores both after 1.8 s.
+function flashBtn(msg,b){
+  if(!b)return;
   const o=b.textContent,ob=b.style.background;
   b.textContent=msg;b.style.background='#16a34a';
   setTimeout(()=>{b.textContent=o;b.style.background=ob;},1800);
@@ -6168,19 +6141,10 @@ function clearAll(opts){
   syncStrengthChips();
   document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('is-on'));
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
-  Object.assign(S,{ageGroup:'',pronouns:'',langLevel:'',cogProfile:'',unevenCog:false,unevenCogDesc:'',cogDataSource:'',adaptProfile:'',adaptiveStandardized:false,strengths:'',
-    diagStatus:'',asdLevelSC:'',asdLevelRRB:'',asdLevelJustificationSC:'',asdLevelJustificationRRB:'',rtcInterval:'',emotionalReg:false,academic:false,sleep:false,feeding:false,hearingScreenFail:false,
-    visitType:'',seizureConcern:false,neurologyNowForSeizure:false,focalNeuroFindings:false,highlyMotivated:false,sleepStudy:false,socialWork:false,therapyStatus:{slp:'',ot:'',aba:'',pt:''},
-    dysmorphism:'',congenitalAnomalies:false,developmentalRegression:false,regressionTiming:'',
-    prenatalAlcohol:false,fasdFeatures:false,paeQuantity:'',paeFrequency:'',paeTiming:'',paeDetail:'',
-    teacherMaterialOther:'',dxEvalPath:'',evalProfileStatus:'',evalDxStatus:'',evalDxOutcome:'',priorTestingOutcome:{},priorTestingDate:{},ados2Module:'',depressionSafety:'',smearWorkup:'',
-    schoolPlacement:'',schoolDoc:'',iepInstruments:'',showDSMTable:true,showDSMLines:false,criteriaC:false,criteriaD:false,criteriaE:false,
-    ev:{a1:'',a2:'',a3:'',b1:'',b2:'',b3:'',b4:'',c:'',d:'',e:''},
-    insuranceType:'',abaHours:'',previewMode:'note'});
-  [S.langModifiers,S.specifiers,S.criteriaA,S.criteriaB,S.needsComm,S.needsAdaptive,
-   S.needsBehavior,S.needsSocial,S.needsSensory,S.needsMotor,
-   S.comorbid,S.comorbidInPlan,S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff,S.safety,S.ag,S.teacherMaterials,S.teacherMaterialsReturned,S.abaSetting,S.abaTargets,S.priorTesting,
-   S.sleepFactors,S.pfdDomains,S.arfidMechanism,S.arfidImpact,S.socialWorkReasons,S.paeEvidence,S.fasdDomains].forEach(s=>s.clear());
+  // Reset every field from the one initializer. Fresh Sets/objects are fine: every consumer
+  // reads S.x at call time and nothing holds a reference into S. If that ever changes,
+  // clear the containers in place here instead of replacing them.
+  Object.assign(S,initialState());
   document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
   document.querySelectorAll('input[name^="therapyStatus_"][value=""]').forEach(r=>r.checked=true);
   document.querySelectorAll('select[data-outcome-key]').forEach(s=>s.value='');
@@ -6192,7 +6156,6 @@ function clearAll(opts){
   const tmo=document.getElementById('teacherMaterialOtherField');if(tmo)tmo.value='';
   document.querySelectorAll('label[data-tm-returned]').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
-  Object.keys(S.overrides).forEach(k=>{S.overrides[k]='auto';});
   document.getElementById('levelGroup').style.display='none';
   // Hide the conditional regression-timing sub-row that the developmentalRegression
   // checkbox toggles. clearAll bypasses the change handler that normally controls
@@ -6203,13 +6166,10 @@ function clearAll(opts){
   document.getElementById('levelJustificationSCField').value='';
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
-  document.getElementById('criteriaStatus').innerHTML='';
-  // Reset behavFreq and hide its input rows
-  Object.assign(S.behavFreq,{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''});
+  // Hide the behavior-frequency input rows
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
-  S.strangerDanger=false;
   ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
@@ -6247,7 +6207,7 @@ function updateSectionHeaders(){
     sum.textContent=summary?' — '+summary:'';
   };
   const agShort={toddler:'Toddler',preschool:'Preschool',schoolAge:'School-age',adolescent:'Adolescent',youngAdult:'Young adult'};
-  const llShort={nonverbal:'Nonverbal',singleWord:'Single words',phrase:'2–3 words',simpleSentence:'Simple sentences',verbal:'Verbal',conversational:'Conversational',ageAppropriate:'Age-appropriate',unclearSLP:'Needs SLP eval'};
+  const llShort={nonverbal:'Nonverbal',singleWord:'Single words',phrase:'2–3 words',simpleSentence:'Simple sentences',conversational:'Conversational',ageAppropriate:'Age-appropriate',unclearSLP:'Needs SLP eval'};
   // 1 Patient Profile
   const pp=[];if(S.ageGroup)pp.push(agShort[S.ageGroup]||'');if(S.langLevel)pp.push(llShort[S.langLevel]||'');
   setSH('sh-profile',!!(S.ageGroup||S.langLevel||S.strengths),pp.join(' · '));
@@ -6534,14 +6494,13 @@ function toggleBifAdaptiveCrossCheck(){
 
 // ─── AGE-BASED VISIBILITY ────────────────────────────────────────────────────
 function updateAgeBasedVisibility(){
-  const young=S.ageGroup==='toddler'||S.ageGroup==='preschool';
-  const older=S.ageGroup==='schoolAge'||S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
+  const young=isYoung();
+  const older=isSchoolAgePlus();
   // Community independence — school-age+ only
   const commIndepRow=document.getElementById('commIndepRow');
   if(commIndepRow){
-    const showIndep=S.ageGroup==='schoolAge'||S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
-    commIndepRow.style.display=(S.ageGroup===''||showIndep)?'':'none';
-    if(S.ageGroup!==''&&!showIndep&&S.needsAdaptive.has('commIndependence')){
+    commIndepRow.style.display=(S.ageGroup===''||older)?'':'none';
+    if(S.ageGroup!==''&&!older&&S.needsAdaptive.has('commIndependence')){
       S.needsAdaptive.delete('commIndependence');
       const cb=commIndepRow.querySelector('input[type=checkbox]');
       if(cb) cb.checked=false;
@@ -6550,7 +6509,7 @@ function updateAgeBasedVisibility(){
   // Menstrual care — adolescent/young adult + hygiene checked
   const menstrualCareRow=document.getElementById('menstrualCareRow');
   if(menstrualCareRow){
-    const ageOk=S.ageGroup==='adolescent'||S.ageGroup==='youngAdult';
+    const ageOk=isTeenPlus();
     const show=ageOk&&S.needsAdaptive.has('hygiene');
     menstrualCareRow.style.display=show?'':'none';
     if(!show&&S.needsAdaptive.has('menstrualCare')){
@@ -6670,11 +6629,11 @@ function updateAgeBasedVisibility(){
   const schoolHead=document.getElementById('sh-school');
   if(schoolHead){
     const schoolWrap=schoolHead.closest('.section');
-    const hideSchool=S.ageGroup==='toddler';
+    const hideSchool=!isPartBAge();
     if(schoolWrap) schoolWrap.style.display=hideSchool?'none':'';
     if(hideSchool&&(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size)){
       S.schoolPlacement='';S.schoolDoc='';
-      [S.schoolSvc,S.schoolSvcAuto,S.schoolSvcManualOff].forEach(s=>s.clear());
+      [S.schoolSvc,S.schoolSvcManualOff].forEach(s=>s.clear());
       document.querySelectorAll('input[name="schoolPlacement"], input[name="schoolDoc"]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       document.querySelectorAll('input[data-key="schoolSvc"]').forEach(c=>{c.checked=false;});
       document.querySelectorAll('.svc-auto-badge').forEach(b=>b.remove());
@@ -6709,7 +6668,9 @@ function clearIdGddEvidenceFlags(){
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
-function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// Wrap each {placeholder} in a highlight span (token escaped; the rest of the string is the caller's).
+const phSpan=(s,cls)=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span class="${cls}">{${escapeHtml(t)}}</span>`);
 
 // ─── SYNC HELPERS ────────────────────────────────────────────────────────────
 // All sync functions are add-only — they never uncheck boxes the clinician manually set.
@@ -6742,7 +6703,7 @@ function syncABATargetsFromNeeds(){
   // claims-examiner denial reason. Council review 2026-05-19 (Case 19).
   if(S.academic&&isYoung())                                                 add('academics');
   // Early intervention core targets — fire for toddler/preschool with social or communication needs
-  if((S.ageGroup==='toddler'||S.ageGroup==='preschool')&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
+  if(isYoung()&&(S.needsSocial.size>0||S.needsComm.size>0)){add('joint_attention');add('imitation');}
   // Stereotypy — fire ONLY when b1 (repetitive movements/speech) is checked or disruptive vocalizations
   // are present. The former `needsBehavior.size>0` catch-all was dropped (council 2026-06-02): it made ANY
   // interfering behavior (aggression, elopement, SIB, noncompliance…) wrongly add a stereotypy-reduction
@@ -6859,11 +6820,10 @@ function syncSchoolSvcFromNeeds(){
   // Toddlers are served under IDEA Part C (Early Steps), not Part B school services.
   // Without this gate, any need checkbox auto-populates S.schoolSvc and the suppressed
   // school-based-services output re-opens downstream despite §7 being hidden.
-  if(S.ageGroup==='toddler') return;
+  if(!isPartBAge()) return;
   const add=(t)=>{
     if(S.schoolSvc.has(t)||S.schoolSvcManualOff.has(t)) return;
     S.schoolSvc.add(t);
-    S.schoolSvcAuto.add(t);
     const cb=document.querySelector(`input[data-key="schoolSvc"][value="${t}"]`);
     if(cb) cb.checked=true;
     const lbl=document.getElementById('svcLbl_'+t);
@@ -6887,7 +6847,7 @@ function syncSchoolSvcFromNeeds(){
   // they are served under Part C (Early Steps), not a Part B psychoed eval. This is
   // independent of the academic-ABA FAPE gate (academic ABA targets stay toddler/preschool-
   // only because academic instruction is the district's obligation, not medical ABA).
-  if((S.academic&&S.ageGroup!=='toddler')||S.comorbid.has('ld_suspected')||(['schoolAge','adolescent','youngAdult'].includes(S.ageGroup)&&hasHyperlexia())) add('psychoed');
+  if((S.academic&&isPartBAge())||S.comorbid.has('ld_suspected')||(isSchoolAgePlus()&&hasHyperlexia())) add('psychoed');
   if(hasID()) add('sped');
 }
 
@@ -7273,7 +7233,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(k==='schoolSvc'){
           if(!inp.checked){
             S.schoolSvcManualOff.add(v);
-            S.schoolSvcAuto.delete(v);
             const lbl=document.getElementById('svcLbl_'+v);
             if(lbl){const b=lbl.querySelector('.svc-auto-badge');if(b)b.remove();}
           } else {
