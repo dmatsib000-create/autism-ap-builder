@@ -4878,6 +4878,10 @@ function _iepLetterContent(){
       else if(isMinVerbal()) goals.push('expressive communication: increasing spontaneous, functional communication (spoken words, signs, gestures, or pictures) to request, protest, gain attention, and share interest across classroom routines and play');
       else if(S.langLevel==='phrase') goals.push('expressive language development: combining words into phrases and longer utterances, and using language to request, comment, protest, and answer simple questions during play and classroom routines');
       else if(S.langLevel==='simpleSentence') goals.push('expressive language development: expanding sentence length and grammar, asking and answering wh- questions, and talking about familiar and recent events with adult support');
+      // Conversational/fluent never get 'expressive' auto-added (syncCommNeedsFromLangLevel), so
+      // reaching here means the clinician checked it for a fluent child with a language need;
+      // the catch-all below (signs, pictures, AAC) would undersell that child. Council 2026-09-22.
+      else if(S.langLevel==='conversational'||S.langLevel==='ageAppropriate') goals.push('expressive language development: using more complete and varied sentences, expanding vocabulary, and organizing ideas when describing events, stories, and play, with adult support as needed');
       else goals.push('expressive language development: expanding the length and variety of communication, using words, signs, pictures, or AAC to request, comment, protest, and answer simple questions during classroom routines and play');
     }
     if(S.needsComm.has('receptive'))
