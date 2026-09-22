@@ -233,7 +233,7 @@ U.S. Department of Education. **Assistance to States for the Education of Childr
 
 - **Used for**, by section:
   - **§300.8(a)(1)** — "child with a disability" means a child evaluated as having one of the listed impairments "and who, by reason thereof, needs special education and related services." Both prongs. Consumed by the rule-out diagnosis paragraph (`ruleOutDxRest`).
-  - **§300.8(b)** — developmental delay, ages three through nine or a subset, subject to §300.111(b). Consumed by the Developmental Delay eligibility candidate.
+  - **§300.8(b)** — developmental delay, ages three through nine or a subset, subject to §300.111(b); (b)(1) names the five developmental areas (physical, cognitive, communication, social or emotional, adaptive). Consumed by the Developmental Delay eligibility candidate, the `ddConsider` paragraph, and the GDD-marked `evalDomains` sentence.
   - **§300.8(c)(1)** Autism, **(c)(6)** Intellectual disability, **(c)(9)** Other health impairment, **(c)(10)** Specific learning disability, **(c)(11)** Speech or language impairment. Consumed by the eligibility candidates and the Autism-category ask.
   - **§300.34(a)** — related services expressly include "speech-language pathology and audiology services... physical and occupational therapy." Consumed by `ruleOutRelatedSvcNote`.
   - **§300.111(a)(1)(i) and (c)(1)** — child find; (c)(1) expressly reaches children suspected of having a disability "even though they are advancing from grade to grade." Consumed by `ruleOutEvalRequest`. Note that §300.111(a)(1) is framed as a **State** obligation ("The State must have in effect policies and procedures to ensure that..."), so the letter states the requirement in the passive voice and attributes the district-level duty to the introductory text of Florida Rule 6A-6.0331, which is where it actually sits.
@@ -268,7 +268,7 @@ Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-
 | 6A-6.03016 | 12/15/2009 | ESE Eligibility for Students with Emotional/Behavioral Disabilities | Emotional/Behavioral Disability candidate |
 | 6A-6.03018 | 1/7/2016 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
 | 6A-6.03023 | 4/1/2015 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
-| 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate |
+| 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate; `ddConsider` paragraph and GDD-marked `psychoed` block on confirmed/suspected letters |
 | 6A-6.03028 | 8/27/2024 | Provision of Free Appropriate Public Education (FAPE) and Development of Individual Educational Plans for Students with Disabilities | FAPE reference in the 504 branch (subsection (1)); the IEP Team's duty to revise the IEP to address information provided by the parents, on the IEP-in-place branch ((3)(j)2.c.); (3)(g)1., the Team's duty to consider student strengths, is deliberately NOT cited — see note below |
 | 6A-1.0943 | 7/14/2021 | Statewide Assessment for Students with Disabilities | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
 

@@ -4636,6 +4636,12 @@ function _iepLetterContent(){
   // An ambiguous "diagnosis pending" letter gets set aside by district teams waiting on
   // a diagnosis that will never arrive.
   const ruledOut=S.diagStatus==='ruleOut';
+  // GDD specifiers are age-gated to toddler/preschool in the UI and this letter is hidden
+  // for toddlers, so here a GDD specifier means a preschooler. At that age an IQ battery,
+  // achievement testing, and an SLD determination are the wrong request; the district's
+  // developmental-delay evaluation is. Gated on the specifier rather than on ageGroup
+  // alone: maintainer decision 2026-09-22.
+  const gddMarked=S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD');
   const levelNumMap={1:'Level 1 (requiring support)',2:'Level 2 (requiring substantial support)',3:'Level 3 (requiring very substantial support)'};
   const scLvl=parseInt(S.asdLevelSC)||0;
   const rrbLvl=parseInt(S.asdLevelRRB)||0;
@@ -4946,7 +4952,9 @@ function _iepLetterContent(){
   }
 
   if(S.schoolSvc.has('psychoed')){
-    svContent.psychoed='Psychoeducational Evaluation: A comprehensive psychoeducational evaluation is recommended to fully characterize the academic achievement and cognitive processing profile. The evaluation should include: cognitive assessment (IQ and index scores), academic achievement testing across reading, mathematics, and written expression (WIAT-4 or equivalent), phonological processing assessment (CTOPP-2 if reading concerns are present), working memory and processing speed indices, and a Specific Learning Disability (SLD) eligibility determination per Florida Rule 6A-6.03018. Results will directly inform IEP goal development and eligibility determination.';
+    svContent.psychoed=gddMarked
+      ? 'Developmental Evaluation: A comprehensive developmental evaluation is recommended in place of a standard psychoeducational battery. At this age, a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning) covering cognitive, communication, motor, social-emotional, and adaptive development is more informative than IQ or academic achievement testing. Results will directly inform IEP goal development and the Developmental Delay eligibility determination (Florida Rule 6A-6.03027).'
+      : 'Psychoeducational Evaluation: A comprehensive psychoeducational evaluation is recommended to fully characterize the academic achievement and cognitive processing profile. The evaluation should include: cognitive assessment (IQ and index scores), academic achievement testing across reading, mathematics, and written expression (WIAT-4 or equivalent), phonological processing assessment (CTOPP-2 if reading concerns are present), working memory and processing speed indices, and a Specific Learning Disability (SLD) eligibility determination per Florida Rule 6A-6.03018. Results will directly inform IEP goal development and eligibility determination.';
   }
 
   if(S.schoolSvc.has('sped')){
@@ -5013,8 +5021,22 @@ function _iepLetterContent(){
   // Current behavior keeps the caveat on rule-out letters because the suspected-ID
   // workup recommendation is still clinically true even when ASD is being ruled out.
   // Revisit if clinicians report this language feels off-topic on rule-out letters.
+  // Suspected GDD alone gets its own wording: the ID wording names the ID category and an
+  // IQ battery plus achievement testing, which misdirects a preschool evaluation. The
+  // both-set state (unreachable through the UI mutex) keeps the ID wording.
+  const suspectedGDDOnly=S.specifiers.has('withSuspectedGDD')&&!S.specifiers.has('withSuspectedID');
   const suspectedIDNote = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'
-    ? 'Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA evaluation procedures and should include a comprehensive standardized cognitive battery, a standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive composite), and academic achievement testing.'
+    ? (suspectedGDDOnly
+      ? 'Educational eligibility should not be assigned on the basis of this physician letter alone. Global developmental delay is suspected but not yet confirmed, and the district\'s evaluation should include a comprehensive standardized developmental assessment; brief developmental screeners are not sufficient to establish the degree of delay. At this age, a developmental evaluation is more informative than an IQ-based cognitive battery or academic achievement testing.'
+      : 'Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA evaluation procedures and should include a comprehensive standardized cognitive battery, a standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive composite), and academic achievement testing.')
+    : '';
+  // The five areas are the ones IDEA names for developmental delay (34 C.F.R. §300.8(b)(1)).
+  const evalDomains=gddMarked
+    ? 'The evaluation should be a comprehensive developmental evaluation across cognitive, communication, physical, social or emotional, and adaptive development, using a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning), together with assessment of behavioral functioning and sensory processing.'
+    : 'The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.';
+  // Rule-out letters already list Developmental Delay among their eligibility candidates.
+  const ddConsider=gddMarked&&!ruledOut
+    ? 'Because global developmental delay '+(S.specifiers.has('withGDD')?'was identified':'is suspected')+' at this evaluation, I also ask the team to consider eligibility under the Developmental Delay category (34 C.F.R. §300.8(b); Florida Rule 6A-6.03027), which Florida makes available for children ages three through nine, or through completion of grade 2, whichever occurs first. Evaluating for both categories in a single evaluation spares the family a second referral if the team does not find {Student Name} eligible under the Autism category.'
     : '';
   // Documentation prompt paired with the existing A&P note prompt at line ~1664.
   // Fires when the withID specifier is checked but no ID severity is selected in
@@ -5107,7 +5129,7 @@ function _iepLetterContent(){
   const priorTestingCite=iepConsistentPrior.length&&S.diagStatus!=='ruleOut'?` Supporting prior diagnostic assessments consistent with ASD include: ${iepConsistentPrior.join('; ')}.`:'';
 
   return {ruledOut,levelLabel,dxStr,dxCode,reLineLabel,specStr,coDxs,impacts,svContent,accomCore,accomCoreHeading,accomCoreLead,accomIndividual,accomIDMod,accomBeh,accomAcad,letterTypeLabel,priorTestingCite,suspectedIDNote,idDocPrompt,requestPara,instrumentBlocks,impactLead,
-    ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview};
+    ruleOutReferralTail,ruleOutDxRest,ruleOutDxPivot,ruleOutRelatedSvcNote,eligibilityCandidates,eligibilityLead,eligibilityFallback,ruleOutEvalRequest,ruleOutAsk504,ruleOutIEPCategoryReview,evalDomains,ddConsider};
 }
 
 // Print order of the school-service paragraphs. Keys must match the schoolSvc checkboxes;
@@ -5182,6 +5204,7 @@ function generateIEPLetterHTML(){
     h+=(c.ruledOut
       ?`<p>${e(c.ruleOutAsk504)}</p>`
       :`<p>Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend that the school evaluate ${ph('{Student Name}')}'s eligibility for special education services under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
+    if(c.ddConsider) h+=`<p>${ph(e(c.ddConsider))}</p>`;
   } else {
     h+=`<div class="aba-sec">Request for Special Education Evaluation</div>`;
     // The 60-school-day timeline, FBA, and psychoeducational paragraphs below apply to
@@ -5190,7 +5213,8 @@ function generateIEPLetterHTML(){
     h+=(c.ruledOut
       ?`<p>${ph(e(c.ruleOutEvalRequest))}</p>`
       :`<p>Based on the above diagnosis and identified educational impact, I strongly recommend that ${ph('{Student Name}')} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
-    h+=`<p>The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+    if(c.ddConsider) h+=`<p>${ph(e(c.ddConsider))}</p>`;
+    h+=`<p>${e(c.evalDomains)}</p>`;
   }
 
   if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
@@ -5280,12 +5304,14 @@ function generateIEPLetterPlain(){
     t+=sep+'\nREQUEST FOR IEP ELIGIBILITY EVALUATION AND/OR 504 REVIEW\n'+sep+'\n';
     t+=`I understand that {Student Name} currently has a 504 Plan in place. Based on the current evaluation, I am requesting that the team consider: (1) updating the 504 Plan to reflect current functional needs, and (2) evaluating whether {Student Name} meets eligibility for an Individualized Education Program (IEP) under IDEA, which provides more comprehensive and legally enforceable services and supports than a 504 accommodation plan.\n\n`;
     t+=(c.ruledOut?c.ruleOutAsk504:`Given the identified level of support needed, a 504 accommodation plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend that the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).`)+'\n\n';
+    if(c.ddConsider) t+=c.ddConsider+'\n\n';
   } else {
     t+=sep+'\nREQUEST FOR SPECIAL EDUCATION EVALUATION\n'+sep+'\n';
     // The 60-school-day timeline, FBA, and psychoeducational paragraphs apply to
     // rule-out letters too — procedural asks, not diagnosis-dependent claims.
     t+=(c.ruledOut?c.ruleOutEvalRequest:`Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.`)+'\n\n';
-    t+=`The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.\n\n`;
+    if(c.ddConsider) t+=c.ddConsider+'\n\n';
+    t+=c.evalDomains+'\n\n';
   }
   if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
     t+=sep+'\nELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER\n'+sep+'\n';
@@ -5380,12 +5406,14 @@ async function copyIEPLetter(format){
         h+=(c.ruledOut
           ?`<p style="margin-bottom:10px">${e(c.ruleOutAsk504)}</p>`
           :`<p style="margin-bottom:10px">Given the identified level of support needed, a 504 plan alone may be insufficient to provide Free and Appropriate Public Education (FAPE) as defined under IDEA and Florida Rule 6A-6.03028(1). I recommend the school evaluate {Student Name}'s eligibility under the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023).</p>`);
+        if(c.ddConsider) h+=`<p style="margin-bottom:10px">${e(c.ddConsider)}</p>`;
       } else {
         h+=`<p style="${secSt}">Request for Special Education Evaluation</p>`;
         h+=(c.ruledOut
           ?`<p style="margin-bottom:10px">${e(c.ruleOutEvalRequest)}</p>`
           :`<p style="margin-bottom:10px">Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.</p>`);
-        h+=`<p style="margin-bottom:10px">The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.</p>`;
+        if(c.ddConsider) h+=`<p style="margin-bottom:10px">${e(c.ddConsider)}</p>`;
+        h+=`<p style="margin-bottom:10px">${e(c.evalDomains)}</p>`;
       }
       if(c.ruledOut&&(c.eligibilityCandidates.length||c.eligibilityFallback)){
         h+=`<p style="${secSt}">Eligibility Categories for the Team to Consider</p>`;
