@@ -4771,7 +4771,11 @@ function _iepLetterContent(){
     if(hasLDConfirmed())
       eligibilityCandidates.push('Specific Learning Disability (Florida Rule 6A-6.03018): documented learning disability affecting one or more academic domains.');
     else if(S.comorbid.has('ld_suspected'))
-      eligibilityCandidates.push('Specific Learning Disability, suspected (Florida Rule 6A-6.03018): the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility.');
+      // GDD-marked letters request a developmental evaluation instead of a psychoed battery,
+      // so this candidate must not point back to one.
+      eligibilityCandidates.push('Specific Learning Disability, suspected (Florida Rule 6A-6.03018): '+(gddMarked
+        ? 'at this age the developmental evaluation requested in this letter comes first; the affected academic domain and eligibility can be characterized once academic skills can be reliably assessed.'
+        : 'the psychoeducational evaluation requested in this letter should characterize the affected domain and determine eligibility.'));
     if(hasID()||S.specifiers.has('withID'))
       eligibilityCandidates.push('Intellectual Disability (Florida Rule 6A-6.03011): cognitive and adaptive findings documented at this evaluation warrant the district\'s own eligibility determination.');
     // Florida caps developmental delay at completion of grade 2 (Rule 6A-6.03027), which the
