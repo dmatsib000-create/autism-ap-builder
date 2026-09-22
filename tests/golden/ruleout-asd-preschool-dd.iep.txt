@@ -21,7 +21,7 @@ The functional impairments described below were directly observed at this evalua
 
 Speech-language pathology, occupational therapy, and physical therapy are related services available under any eligibility category (34 C.F.R. §300.34). The communication and motor findings described here support those services whichever category the team determines.
 
-Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA evaluation procedures and should include a comprehensive standardized cognitive battery, a standardized adaptive behavior measure (e.g., Vineland-3, ABAS-3, SIB-R, DABS, or BASC-3 adaptive composite), and academic achievement testing.
+Educational eligibility should not be assigned on the basis of this physician letter alone. Global developmental delay is suspected but not yet confirmed, and the district's evaluation should include a comprehensive standardized developmental assessment; brief developmental screeners are not sufficient to establish the degree of delay. At this age, a developmental evaluation is more informative than an IQ-based cognitive battery or academic achievement testing.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
@@ -36,7 +36,7 @@ REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
 {Student Name} presents with documented functional impairments that affect educational performance, described in the Educational Impact section above. IDEA's child find requirement reaches a student suspected of having a disability even when that student is advancing from grade to grade (34 C.F.R. §300.111(c)(1)), so passing grades need not delay the evaluation.
 
-The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
+The evaluation should be a comprehensive developmental evaluation across cognitive, communication, physical, social or emotional, and adaptive development, using a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning), together with assessment of behavioral functioning and sensory processing.
 
 ────────────────────────────────────────────────────────────
 ELIGIBILITY CATEGORIES FOR THE TEAM TO CONSIDER
@@ -55,7 +55,7 @@ Speech-Language Pathology (SLP): School-based SLP services are recommended to ad
 
 Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence.
 
-Psychoeducational Evaluation: A comprehensive psychoeducational evaluation is recommended to fully characterize the academic achievement and cognitive processing profile. The evaluation should include: cognitive assessment (IQ and index scores), academic achievement testing across reading, mathematics, and written expression (WIAT-4 or equivalent), phonological processing assessment (CTOPP-2 if reading concerns are present), working memory and processing speed indices, and a Specific Learning Disability (SLD) eligibility determination per Florida Rule 6A-6.03018. Results will directly inform IEP goal development and eligibility determination.
+Developmental Evaluation: A comprehensive developmental evaluation is recommended in place of a standard psychoeducational battery. At this age, a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning) covering cognitive, communication, motor, social-emotional, and adaptive development is more informative than IQ or academic achievement testing. Results will directly inform IEP goal development and the Developmental Delay eligibility determination (Florida Rule 6A-6.03027).
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS

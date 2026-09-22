@@ -1521,7 +1521,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Sensory accommodations | `sensory` | Developed with OT; noise-canceling, sensory breaks, calm space |
 | Visual supports | `visual` | Schedules, task sequences, transition warnings. When `ruledOut`, described as research-supported for students with communication, attention, and self-regulation needs rather than as ASD-specific |
 | Functional Behavior Assessment | `fba` | Conducted by BCBA; lists behavioral concerns by type |
-| Psychoeducational evaluation | `psychoed` | IQ + academic achievement + SLD eligibility determination |
+| Psychoeducational evaluation | `psychoed` | IQ + academic achievement + SLD eligibility determination. **When `withGDD` or `withSuspectedGDD` is set**, renders instead as "Developmental Evaluation": a standardized developmental instrument across the five developmental areas, feeding the Developmental Delay determination (see §10.13) |
 | Specialized academic instruction | `sped` | Calibrated to present level; **if `hasID() && specifiers.has('withID')`**: append "consider modified curriculum, FAA (Florida Alternate Assessment), transition planning" |
 
 The recommendations are coordinated — checking `aide` for a child with `safety.has('elopement_counsel')` produces a paragraph that explicitly cites the elopement risk as the rationale.
@@ -1590,11 +1590,19 @@ The double gate is important: suspected ID alone (`withSuspectedID`) does not pr
 
 ### 10.13 Specifier edge cases
 
-**`suspectedIDNote`** (`autism-ap-builder.html:3587–3592`): If `specifiers.has('withSuspectedID')` or `withSuspectedGDD` AND `cogDataSource !== 'priorExternal'`, the letter appends:
+**`suspectedIDNote`** (in `_iepLetterContent()`): If `specifiers.has('withSuspectedID')` or `withSuspectedGDD` AND `cogDataSource !== 'priorExternal'`, the letter appends:
 
-> *"Educational eligibility under the Intellectual Disability category should NOT be assigned on this letter alone. Comprehensive psychoeducational evaluation is required per IDEA..."*
+> *"Educational eligibility under the Intellectual Disability category should not be assigned on the basis of this physician letter alone. A comprehensive psychoeducational evaluation is required per IDEA..."*
 
-This protects against schools assigning ID eligibility based on a "suspected" clinical impression — an inappropriate use of the letter that the language explicitly redirects.
+This protects against schools assigning ID eligibility based on a "suspected" clinical impression — an inappropriate use of the letter that the language explicitly redirects. When **only** `withSuspectedGDD` is set, the note uses separate wording: no ID category, and it asks for a comprehensive standardized developmental assessment (not a screener) instead of an IQ battery and achievement testing. The both-set state (unreachable through the UI mutex) keeps the ID wording.
+
+**GDD-marked letters (`gddMarked`).** GDD specifiers are age-gated to toddler/preschool and the IEP letter is hidden for toddlers, so on this letter `withGDD || withSuspectedGDD` means a preschooler with global delay. The gate is the specifier, not `ageGroup` alone (maintainer decision 2026-09-22: a preschooler without marked GDD keeps the default wording). When set:
+
+- **`evalDomains`** — the "The evaluation should include assessment of…" sentence on the no-plan branch becomes a request for a comprehensive developmental evaluation across the five areas §300.8(b)(1) names (cognitive, communication, physical, social or emotional, adaptive) with a standardized developmental instrument, plus behavioral and sensory assessment. "Academic achievement" is dropped.
+- **`ddConsider`** — on **non-rule-out** letters, on the no-plan and 504 branches, a paragraph asks the team to also consider the Developmental Delay category (§300.8(b); Fla. Rule 6A-6.03027) so one evaluation covers both Autism and Developmental Delay. "was identified" for `withGDD`, "is suspected" for `withSuspectedGDD`. Rule-out letters don't get it because their eligibility-candidate list already carries Developmental Delay. The IEP-in-place branch doesn't get it either: a preschooler with an IEP usually already holds one under a category.
+- **`psychoed`** service block — developmental version (§10.11 table).
+
+Both `evalDomains` and `ddConsider` are in the invariants lane's `IEP_SHARED_FIELDS`.
 
 **`idDocPrompt`**: If `specifiers.has('withID')` is true but `hasID() === false` (no severity selected in `cogProfile`), the letter shows an in-letter prompt to the clinician to select severity before sending. This catches the failure mode where the clinician checked the specifier checkbox but didn't complete the severity dropdown.
 
@@ -1611,6 +1619,8 @@ This protects against schools assigning ID eligibility based on a "suspected" cl
 3. School-age-and-up with hyperlexia (`hasHyperlexia()`).
 
 The single `schoolSvc.psychoed` entry then drives the recommendation in both the note (School / Educational Supports block) and the IEP letter (eval-request paragraph + the §10.7 `psychoed` service block) with no per-surface duplication.
+
+**GDD-marked (`withGDD` or `withSuspectedGDD`, preschool by age gate):** the note's `psychoed` bullet becomes "Developmental evaluation recommended" (standardized developmental evaluation across cognitive, communication, motor, social-emotional, and adaptive domains, in place of IQ and achievement testing; feeds Developmental Delay eligibility), and the FDLRS bullet asks for a "developmental" rather than "psychoeducational" evaluation. Same gate as the IEP letter's `gddMarked` (§10.13).
 
 The `S.academic` trigger is **distinct from** the `'academics'` ABA-target FAPE gate (§9.2), which stays toddler/preschool-only: the academic *concern* drives a school evaluation, never a school-age medical-ABA target (academic instruction is the district's FAPE obligation, not billable medical ABA).
 
