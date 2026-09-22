@@ -6995,7 +6995,9 @@ function syncSchoolSvcFromNeeds(){
     }
   };
   if(S.needsComm.size>0||(S.langLevel&&S.langLevel!=='ageAppropriate'&&!isLangAgeAppropriate())||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()||S.langModifiers.has('echolalic')) add('slp_school');
-  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
+  // Only the school self-care boxes (the keys of SELF_CARE_ITEMS in _iepLetterContent) feed the
+  // OT goal; community safety/independence and menstrual care alone would recommend OT with no goals.
+  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||['toileting','hygiene','dressing','feeding_adl'].some(k=>S.needsAdaptive.has(k))||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');

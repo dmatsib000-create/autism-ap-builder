@@ -1517,7 +1517,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Service | `schoolSvc` key | Content |
 |---|---|---|
 | Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder. Preschool wording differs (§2.1) |
-| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care. Preschool wording differs (§2.1) |
+| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care. Preschool wording differs (§2.1). `syncSchoolSvcFromNeeds()` auto-adds it from the adaptive domain only for the four school self-care boxes (toileting, hygiene, dressing, feeding), the same set the self-care goal names; community safety, community independence, or menstrual care alone do not auto-add it, since the paragraph would then carry no goal |
 | Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
