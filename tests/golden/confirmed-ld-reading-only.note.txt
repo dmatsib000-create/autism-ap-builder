@@ -4,14 +4,14 @@ ASSESSMENT
 Autism Spectrum Disorder (ASD), Level 1 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors)
 ICD-10-CM: F84.0
 
+Co-occurring conditions:
+  • Specific learning disorder, with impairment in reading (F81.0)
+
 ── Clinical Summary ──
 
-The patient is a school-aged boy who is conversational, with cognitive functioning in the average range. He demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including motor development. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+The patient is a school-aged girl who is conversational. She demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
 
 ── DSM-5 Diagnostic Criteria ──
-
-── Functional Needs Identified ──
-  • Motor: hypotonia
 
 PLAN
 ════════════════════════════════════════════════════════
@@ -23,22 +23,7 @@ The recommendations below identify clinically established needs and the indicate
 1. SPEECH-LANGUAGE PATHOLOGY (SLP)
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
-2. PHYSICAL THERAPY (PT)
-Evaluation and treatment targeting: core strengthening and postural control (low muscle tone). Goal: improve participation in PE, playground activities, and daily physical function.
-
-3. SCHOOL / EDUCATIONAL SUPPORTS
-IEP in place; recommend review/update to reflect current evaluation findings.
-Recommended IEP updates based on current evaluation findings:
-  • Review current IEP to ensure physical therapy goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
-
-Recommended IEP/504 accommodations based on current evaluation findings:
-  Core ASD-Related Accommodations:
-    - Predictable daily schedule with advance written or visual notice before transitions
-    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
-    - Motor accommodations: support for PE participation and moving around campus, adapted PE evaluation if indicated; supportive seating for sustained desk work
-  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
-
-4. MEDICAL REFERRALS
+2. MEDICAL REFERRALS
   • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
       Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
       Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
@@ -48,7 +33,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
     2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
 
-5. FAMILY RESOURCES & NEXT STEPS
+3. FAMILY RESOURCES & NEXT STEPS
   • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
 
   Finding Therapies / Navigating the System:
@@ -60,6 +45,31 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     6. Follow up with providers every 3 weeks until a spot is secured;
        consider appearing in person if phone calls go unanswered.
     7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+── Problem 2: Specific Learning Disorder, with impairment in reading (F81.0) ──
+
+Assessment:
+  Specific learning disorder with impairment in reading confirmed based on review of available psychoeducational testing data, including IEP evaluation records. Formal psychoeducational diagnosis of learning disability is outside the scope of this DBP visit; the above is based on review of external evaluation data. {Specify: source and date of testing reviewed, instruments administered, and primary domains of impairment documented.}
+
+Plan:
+  Specific learning disorder confirmed. DBP cannot bill for or perform psychoeducational assessment. Management goals are appropriate evidence-based intervention and IEP implementation.
+  • Ensure IEP reflects SLD (Specific Learning Disability) eligibility category and includes specialized academic instruction targeting the confirmed deficit area. If not currently in place, parent should request an IEP meeting to update eligibility and services in writing to the school district.
+  • If IEP services appear inadequate: parent may request an Independent Educational Evaluation (IEE) at district expense. UF Multidisciplinary Diagnostic and Training Program (UF MDTP) can perform this evaluation and provide intervention recommendations; contact UF MDTP for scheduling.
+  Reading/literacy intervention:
+  • UF Reading Program: evaluation and intervention for reading disability.
+  • Peak Literacy (free tutoring): (352) 234-3172 | info@peakliteracy.org | peakliteracy.org
+  • ReadingRockets.org: free reading strategies and resources for parents
+  • Orton Academy parent resources: ortonacademy.org/for-parents/resources-for-parents/
+  Private literacy intervention (Gainesville area):
+  • Speech4Kids: 13577 NW 2nd Ln., Suite 30, Newberry FL 32669 | (352) 240-3155 | speech4kidsgainesville.com
+  • Dr. Wendy Cheyney: (352) 474-9095
+  • Phoenix Comprehensive Care Group (Lindamood Phoneme Sequencing Program, LiPS): 2114 NW 40th Terrace, Suite C3, Gainesville FL 32605 | (352) 812-3080 | phoenixcomprehensivecare.com
+  • SLP phonological awareness evaluation and intervention: Phonological awareness (phoneme segmentation, blending, manipulation) is the language-based foundation of reading acquisition and falls within SLP scope of practice. SLP evaluation of phonological processing (e.g., CTOPP-2) is recommended to characterize the profile; phonological awareness intervention should be coordinated with reading instruction and Orton-Gillingham or structured literacy approaches. Refer to SLP with literacy specialization if not already involved.
+  Classroom accommodations (regardless of services):
+  • Extended time on assignments and assessments
+  • Text-to-speech tools and audiobooks for reading-dependent tasks; oral response option
+  • If spelling is also affected on testing: spell-check, word prediction, or speech-to-text for written work, with spelling errors not penalized on assignments that do not assess spelling
+  • Multisensory reading instruction (e.g., Orton-Gillingham approach)
 
 RETURN TO CLINIC
 Return to clinic in 6 months.

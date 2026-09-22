@@ -54,7 +54,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
   Core ASD-Related Accommodations:
     - Predictable daily schedule with advance written or visual notice before transitions
     - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
-    - Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted PE referral if indicated
+    - Motor accommodations: keyboarding or speech-to-text for longer written work, reduced copying demands, extended time on written tasks
   Behavioral and Emotional Accommodations:
     - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
   Academic Accommodations:

@@ -37,7 +37,7 @@ EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
 The findings below affect educational performance and require specialized support in the school setting:
   • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
-  • Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.
+  • Motor skills: Motor difficulties affecting handwriting and written output, within the school setting.
   • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
   • Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.
 
@@ -65,9 +65,9 @@ If eligible for special education services, I recommend the IEP include the foll
 
 Special Education (Specialized Academic Instruction): Specially designed instruction, delivered by a qualified ESE teacher, is recommended to address academic goals aligned with the identified areas of need. Specialized academic instruction should be individually tailored to the student's present levels of performance and updated at each annual IEP review.
 
-Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: sentence formulation, topic maintenance, and narrative organization; speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness.
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: expanding sentence length and grammatical complexity, asking and answering questions about classroom content, and retelling events, short stories, and classroom activities in sequence, with visual supports as needed; speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness.
 
-Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output; adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence.
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output; adaptive self-care skills relevant to the school day: clothing management such as jackets and fasteners, and related self-care routines.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -80,7 +80,7 @@ The following accommodations are supported by the specific findings documented i
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation for students with communication, attention, and self-regulation needs
 
 Individually Indicated Accommodations:
-  • Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated
+  • Motor accommodations: keyboarding or speech-to-text for longer written work, reduced copying and handwriting demands, and extended time on written tasks
 
 Behavioral and Emotional Accommodations:
   • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations

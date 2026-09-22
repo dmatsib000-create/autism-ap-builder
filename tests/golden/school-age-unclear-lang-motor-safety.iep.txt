@@ -1,5 +1,5 @@
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
-IEP Review Request
+Initial Special Education Evaluation Request
 
 Date: {Date}
 
@@ -13,33 +13,35 @@ Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the services and accommodations I recommend.
+Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the services and accommodations I recommend.
 
-She has received a diagnosis of Autism Spectrum Disorder (ASD), suspected (ICD-10-CM: Z03.89), as documented at the evaluation referenced above. In addition, she carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: a language disorder.
+They have received a diagnosis of Autism Spectrum Disorder (ASD), suspected (ICD-10-CM: Z03.89), as documented at the evaluation referenced above. In addition, they carry the following co-occurring diagnoses, each of which contributes to the educational challenges described below: a specific learning disability in written expression (dysgraphia).
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
 These conditions result in the following challenges that require specialized support in the educational setting:
   • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
-  • Motor skills: Motor difficulties affecting pre-writing and handling of classroom materials, and learning new multi-step motor routines, within the classroom.
+  • Motor skills: Motor difficulties affecting handwriting and written output, within the school setting.
   • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
+  • Safety awareness: family reports limited awareness of hazards in community settings, which may affect safety during arrival and dismissal, field trips, and other less-structured school settings.
+  • Written expression: A specific learning disability in written expression affecting the ability to produce written work at grade level.
 
 ────────────────────────────────────────────────────────────
-REQUEST FOR IEP TEAM MEETING
+REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
-I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
+Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
 ────────────────────────────────────────────────────────────
-I recommend the following updates to the current IEP:
+If eligible for special education services, I recommend the IEP include the following:
 
-Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that affect participation in classroom routines, play, and early learning activities. Recommended goals include: expressive language development: expanding sentence length and grammar, asking and answering wh- questions, and talking about familiar and recent events with adult support; receptive language: following one- and two-step directions within classroom routines, understanding early concepts such as position, size, and quantity (in, on, big, little, more), and responding to simple questions about familiar activities and shared books; social-pragmatic language: sharing attention and interests with adults and peers (joint attention), starting and responding to interactions, turn-taking in play and conversation, and participation in group activities; speech intelligibility and articulation targeting sound patterns, relative to developmental expectations, that make speech harder for teachers and peers to understand; language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting comprehension, participation in classroom routines and early learning activities, and peer interaction, addressed as a diagnosis distinct from ASD-related social communication impairment.
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access. Recommended goals include: expressive language development: expanding expressive language for classroom participation, with specific targets and communication modality to be determined by the school SLP evaluation.
 
-Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect participation in classroom routines, play, and early learning activities. Goals: fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes; motor planning and praxis: imitation of new motor actions, sequencing of multi-step play and classroom routines, and use of simple tools; adaptive self-care skills relevant to the school day: dressing tasks such as jackets and shoes, and related self-care routines.
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output; adaptive self-care skills relevant to the school day: clothing management such as jackets and fasteners, and related self-care routines.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -52,11 +54,14 @@ The following accommodations have broad evidence support across the autism spect
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
 Individually Indicated Accommodations:
-  • Motor accommodations: adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks; hands-on modeling and extra time for multi-step motor routines
+  • Motor accommodations: reduced copying and handwriting demands, and extended time on written tasks
+  • Safety supervision: planned adult supervision during arrival and dismissal, transitions between areas, and off-campus activities such as field trips, with the level of supervision determined by the school team
 
 Behavioral and Emotional Accommodations:
   • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
-  • Language: simplified verbal instructions, extended response time
+
+Academic Accommodations:
+  • Written expression: speech-to-text, keyboarding alternative to handwriting, extended time, reduced written output requirements
 
 ────────────────────────────────────────────────────────────
 Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
