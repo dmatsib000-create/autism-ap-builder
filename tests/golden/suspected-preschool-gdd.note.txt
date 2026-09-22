@@ -65,7 +65,7 @@ Targets:
   • Service frequency: OT services at a frequency to be determined following formal evaluation, typically 1-2 sessions per week for direct intervention. School-based and clinic-based OT address different goals; concurrent services are appropriate when goals are documented as distinct.
 
 7. SCHOOL / EDUCATIONAL SUPPORTS
-  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
+  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive developmental evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
 
 Recommended IEP/504 accommodations based on current evaluation findings:
   Core ASD-Related Accommodations:

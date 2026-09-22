@@ -268,7 +268,7 @@ Florida Administrative Code, Rule Chapter 6A-6 (Special Programs I) and Rule 6A-
 | 6A-6.03016 | 12/15/2009 | ESE Eligibility for Students with Emotional/Behavioral Disabilities | Emotional/Behavioral Disability candidate |
 | 6A-6.03018 | 1/7/2016 | Exceptional Education Eligibility for Students with Specific Learning Disabilities | SLD candidate, suspected-SLD impact bullet, `psychoed` service block |
 | 6A-6.03023 | 4/1/2015 | ESE Eligibility for Students With Autism Spectrum Disorder | Autism-category ask on confirmed and suspected letters |
-| 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate; `ddConsider` paragraph and GDD-marked `psychoed` block on confirmed/suspected letters |
+| 6A-6.03027 | 9/20/2022 | Special Programs for Children Three Through Nine Years Old who are Developmentally Delayed | Developmental Delay candidate; `ddConsider` paragraph and GDD-marked `psychoed` block on confirmed/suspected letters; GDD-marked `psychoed` bullet in the A&P note |
 | 6A-6.03028 | 8/27/2024 | Provision of Free Appropriate Public Education (FAPE) and Development of Individual Educational Plans for Students with Disabilities | FAPE reference in the 504 branch (subsection (1)); the IEP Team's duty to revise the IEP to address information provided by the parents, on the IEP-in-place branch ((3)(j)2.c.); (3)(g)1., the Team's duty to consider student strengths, is deliberately NOT cited — see note below |
 | 6A-1.0943 | 7/14/2021 | Statewide Assessment for Students with Disabilities | Florida Alternate Assessment, in the `sped` block and `accomIDMod` |
 

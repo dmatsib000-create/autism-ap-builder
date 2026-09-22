@@ -3453,6 +3453,10 @@ function generateNote() {
   // School
   const esR=ruleEarlySteps(),fdR=ruleFDLRS();
   const hES=resolveOv('earlySteps',esR),hFD=resolveOv('fdlrs',fdR);
+  // GDD specifiers are age-gated to toddler/preschool, so this means a young child: an IQ
+  // battery and achievement testing are the wrong school evaluation to name. Same gate as
+  // the IEP letter's gddMarked.
+  const schoolEvalGdd=S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD');
   // For toddlers, only Early Steps / FDLRS can open this section — stale Part B state
   // (placement/doc/services set before an age switch, or set directly by a fixture)
   // must not produce a header whose entire content band is toddler-suppressed below.
@@ -3466,7 +3470,7 @@ function generateNote() {
       L.push('  • Early Steps (Florida Part C Early Intervention): Given developmental concerns and age under 36 months, referral to Florida Early Steps is recommended. Provides in-home and clinic-based services including ITDS (Infant/Toddler Developmental Specialist), speech-language therapy, OT, PT, and intensive family coaching in the natural environment under IDEA Part C. Family counseled on rights. Referral to be submitted through Early Steps. Referral should be made promptly, as Part C eligibility must be established before the third birthday.');
       L.push('  • Part C to Part B transition: Around the third birthday, Early Steps coordinates transition to the local school district for evaluation of Part B (IEP) eligibility; transition planning begins several months before age 3.');
     }
-    if(hFD){L.push('  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.');}
+    if(hFD){L.push('  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive '+(schoolEvalGdd?'developmental':'psychoeducational')+' evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.');}
     // Everything below the Early Steps / FDLRS bullets is IDEA Part B content
     // (placement, IEP/504 documents, school-based services) — toddlers are served
     // under Part C, so the whole band is suppressed for them. Belt-and-suspenders
@@ -3486,7 +3490,10 @@ function generateNote() {
     if(S.schoolSvc.size){
       const sv={sped:'Special education services',slp_school:'Speech-language therapy',ot_school:'Occupational therapy',pt_school:'Physical therapy',counseling:'Counseling / social-emotional support',esy:'Extended school year (ESY): assess for regression risk',aide:'1:1 paraprofessional aide',lowRatio:'Low student:teacher ratio',sensory:'Sensory accommodations',visual:'Visual supports / schedules',social_skills_school:'Social skills instruction',
         fba:'Functional Behavior Assessment (FBA) recommended: clinician recommends the school conduct a formal FBA to identify antecedents, behaviors, and consequences driving interfering behaviors. FBA findings should directly inform development of a Behavior Intervention Plan (BIP). Parent may submit written request under IDEA.',
-        psychoed:'Psychoeducational evaluation recommended: comprehensive evaluation including cognitive, academic achievement, and processing domains. Family may submit written request to the school district; under IDEA, the district must evaluate within 60 days of written parental consent.'};
+        psychoed:(schoolEvalGdd
+          ? 'Developmental evaluation recommended: comprehensive standardized developmental evaluation across cognitive, communication, motor, social-emotional, and adaptive domains, in place of IQ and academic achievement testing given age; results inform Developmental Delay eligibility (Florida Rule 6A-6.03027).'
+          : 'Psychoeducational evaluation recommended: comprehensive evaluation including cognitive, academic achievement, and processing domains.')
+          +' Family may submit written request to the school district; under IDEA, the district must evaluate within 60 days of written parental consent.'};
       if(S.schoolDoc==='iep'){
         L.push('Recommended IEP updates based on current evaluation findings:');
         S.schoolSvc.forEach(s=>{

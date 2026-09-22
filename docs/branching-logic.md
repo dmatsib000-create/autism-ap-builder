@@ -1620,6 +1620,8 @@ Both `evalDomains` and `ddConsider` are in the invariants lane's `IEP_SHARED_FIE
 
 The single `schoolSvc.psychoed` entry then drives the recommendation in both the note (School / Educational Supports block) and the IEP letter (eval-request paragraph + the §10.7 `psychoed` service block) with no per-surface duplication.
 
+**GDD-marked (`withGDD` or `withSuspectedGDD`, preschool by age gate):** the note's `psychoed` bullet becomes "Developmental evaluation recommended" (standardized developmental evaluation across cognitive, communication, motor, social-emotional, and adaptive domains, in place of IQ and achievement testing; feeds Developmental Delay eligibility), and the FDLRS bullet asks for a "developmental" rather than "psychoeducational" evaluation. Same gate as the IEP letter's `gddMarked` (§10.13).
+
 The `S.academic` trigger is **distinct from** the `'academics'` ABA-target FAPE gate (§9.2), which stays toddler/preschool-only: the academic *concern* drives a school evaluation, never a school-age medical-ABA target (academic instruction is the district's FAPE obligation, not billable medical ABA).
 
 ---
