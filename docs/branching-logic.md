@@ -328,6 +328,8 @@ The branches below all read `S.ageGroup` directly or via one of four module-scop
 | Social skills group rule | 1377 | `['preschool','schoolAge','adolescent'].includes(ageGroup)` | Toddlers excluded (developmental fit); young adults excluded (use psychotherapy instead) |
 | FDLRS rule (Florida pre-K) | 1430 | `'preschool'` AND not in public school | FDLRS referral |
 | Early Steps rule | 1426 | `'toddler'` | Part C referral |
+| Preschool SLP/OT goals and motor lines (IEP letter) | `_iepLetterContent()` `preschool` | `ageGroup === 'preschool'` | Swaps the school-age wording (narrative organization, figurative language, academic vocabulary, pencil grip, letter formation, keyboarding, cafeteria routines, written tasks) for routine- and play-anchored goals, a pre-writing motor impact line, and an adapted-materials motor accommodation with PT or adapted PE *consultation*. The preschool expressive goal is tiered by language level: `isMinVerbal()` (no AAC mention, because the AAC goal always fires alongside it), `'phrase'`, `'simpleSentence'`, anything else. No letter line says "preschool" (kindergartners are sometimes entered as preschool). Council 2026-09-22 |
+| Preschool motor accommodation (A&P note) | IEP/504 accommodations block | `ageGroup === 'preschool'` | Note-voice counterpart of the letter's preschool motor accommodation; families read the note in the portal, so the two must agree |
 | Audiology — speech-driven | 1419–1420 | `isYoung() && speechConcern` | Audiology fires; older children assumed already screened |
 | QbTest age gate | 1424 | `['schoolAge','adolescent','youngAdult'].includes(ageGroup)` | Excludes toddler/preschool (instrument norms start at 6) |
 | ABA target labels | 3149–3155 | `isOlderForABA()` | "play skills" → "social-pragmatic skills for workplace"; "self-help" → "independent living" |
@@ -1510,8 +1512,8 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 
 | Service | `schoolSvc` key | Content |
 |---|---|---|
-| Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder |
-| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care |
+| Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder. Preschool wording differs (§2.1) |
+| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care. Preschool wording differs (§2.1) |
 | Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
