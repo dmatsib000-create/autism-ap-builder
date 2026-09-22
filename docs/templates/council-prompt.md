@@ -25,6 +25,7 @@ Reusable structure for multi-voice deliberation prompts. Drop in the placeholder
 5. Set `{{THRESHOLD}}` to 95% for substantive design decisions, 90% for smaller cleanup. Don't go lower — that pushes honesty out.
 6. Set `{{MAX_ROUNDS}}` to 3–5. Past 5, you're either anchored or the question is genuinely hard and needs real-world evidence, not more deliberation.
 7. Use conditional sub-councils to skip implementation discussion when clinical-validity resolves "no change needed."
+8. Choose a deliberation mode: **one sitting** (one Claude plays every voice) or **independent voices** (each voice scores blind in its own run). See "Independent voices" below the template for when each is worth it and what it costs.
 
 ---
 
@@ -35,6 +36,8 @@ You are running a structured multi-voice clinical-design council on
 {{PROJECT_NAME}} ({{FILE_PATH}} on the {{BRANCH}} branch). {{N}}
 clinical/UX concerns are on the table, each gets its own council;
 {{ADDITIONAL_DELIVERABLES_IF_ANY}}. Produce all outputs in one pass.
+Deliberation mode: {{MODE}} (one sitting, or independent voices —
+see "Independent voices" below the template).
 
 # Concerns under review
 
@@ -121,9 +124,13 @@ AND every other voice's proposal):
      to 0 if I observed [specific observable]"
    A vague line here indicates the voice didn't engage; restate with
    a concrete observable.
-4. Confidence anchoring: no two of a voice's FOR ratings (across
-   rounds and across options) may be within 2 percentage points of
-   each other.
+4. Confidence anchoring: within a round, no two of a voice's FOR
+   ratings for different options may be within 2 percentage points
+   of each other. The rule forces a real ranking of the options; it
+   does not apply across rounds. A voice that still believes the
+   same thing in the next round keeps the same score, and the
+   position-shift tracking below depends on that: a score nudged
+   only to satisfy this rule would pollute the shift audit.
 5. UNRESOLVED ≥10% triggers question discipline below — without a
    concrete question, UNRESOLVED must be restated as FOR or AGAINST.
    "I don't know" without a path to find out is not a rating, it's
@@ -142,8 +149,10 @@ extend the existing section"), never letters or codenames alone.
 *Inter-member questions.* Any voice may direct a specific question
 at another voice whose answer would move their UNRESOLVED. Format:
 "[AskerVoice → TargetVoice]: [specific resolvable question]." The
-target voice must respond before the round closes. Silent UNRESOLVED
-is not permitted — name the question or collapse to FOR/AGAINST.
+target voice must respond before the round closes (in independent-
+voices mode, at the start of the next round; see below the
+template). Silent UNRESOLVED is not permitted — name the question or
+collapse to FOR/AGAINST.
 
 *Member-to-user questions.* If resolution requires an external fact
 the council cannot supply (clinical reference, real-world data,
@@ -303,6 +312,79 @@ validity sub-council finds the predicate is over-strict"), run a
 
 ---
 
+## Independent voices (added 2026-09-21)
+
+Every council before this date ran in one sitting: one Claude played every voice in a single pass. That is cheap and fast, but the scores are not independent. When the attending's rating is written by the same mind that just wrote the claims examiner's, the three-way scores lean on each other, and the score honesty check ends up checking one mind against itself. A more capable model makes that performance more convincing, not more independent.
+
+Independent voices fixes this the way a case conference does: each reader reads the case alone and writes down an opinion before the conference starts, and the conference then argues from those written opinions.
+
+### How it runs
+
+- **The main session is the coordinator.** It builds the council plan, packages the concern for each voice, tallies the tables, runs the shift audit and the score honesty check, and writes the report. It never scores, and it never adjusts a voice's number. Every score in the report is a voice's own, quoted verbatim.
+- **Round one is a blind read.** Each voice is a separate Claude run that receives only: the concern framing and council question, the file:line grounding (it reads those lines itself), its own role and the dimension it owns, the project constraints and invariants, and the scoring discipline. It does not receive another voice's scores, and it does not receive a preferred answer. Each voice proposes its own options, names them descriptively, and scores every one with both change-my-mind lines.
+- **The coordinator merges the options** into one named list, combining duplicates and keeping a voice's own wording where it differs in substance. Nothing is discarded at this step.
+- **Round two and later are the deliberation.** Each voice continues in its own run with its round-one memory intact. It receives the merged option list, every voice's prior scores and reasoning, the questions directed at it, and the answers it received. It answers its questions first, restates its prior scores, then re-scores every surviving option, naming the cause of any shift of 15 points or more.
+- **Questions cross rounds.** A question asked in one round is answered at the start of the next. A question asked in the final round stays open and goes in the unresolved list. This is the one timing change from one-sitting mode, where the target answers before the round closes.
+- **Form violations go back to the voice.** A missing or vague change-my-mind line, two options scored within 2 points of each other, or an UNRESOLVED of 10% or more without a question is returned to that voice for restatement. The coordinator may ask a voice to fix its form; it may not change its score.
+
+### What does not change
+
+The three-way scores, the change-my-mind lines, the within-round 2-point spread, the 15-point shift naming, the question discipline, the threshold and stop rule, the score honesty check, the deliverables, and the authority rule (clinical leads decide content, implementation leads decide how) are all identical. The report gains one header line, "Deliberation mode: independent voices — N voices, M rounds, K runs," and the shift audit becomes worth reading, because the round-one scores were produced blind.
+
+### Choosing a mode
+
+| Choose independent voices when | Choose one sitting when |
+|---|---|
+| The topic is substantive clinical content or note prose | The council is a cleanup council |
+| Two voices are expected to legitimately diverge (the disagreement is the signal) | One clinical voice can answer the question |
+| The recommendation reopens a prior council's merged decision | The user asks for a quick council |
+
+Cost: one run per voice per round, and each run reads the cited source itself. Four voices over three rounds is twelve runs. At roughly one council a month that is affordable, but it is not free, so the council plan states the run count and the user picks.
+
+### Voice packet
+
+Each voice receives this with the placeholders filled. The discipline text is the protocol above, under the plain names.
+
+```
+You are the {{VOICE_NAME}} on a clinical-design council for
+{{PROJECT_NAME}} ({{FILE_PATH}} on the {{BRANCH}} branch). You own
+{{DIMENSION}}; your authority is {{AUTHORITY_AREA}}. Other voices
+are scoring other dimensions. You will see their scores from round
+two onward, never before.
+
+# The concern
+{{CONCERN_FRAMING}}
+
+Grounding — read these lines yourself before scoring:
+- {{FILE}}:{{LINE}} — {{WHAT_IT_DOES}}
+
+The council question: {{EXPLICIT_QUESTION}}.
+
+# Constraints
+- Cite {{FILE_PATH}}:line for every claim about current behavior.
+- Do not propose changes that violate {{LIST_KEY_INVARIANTS}}.
+- Plain clinical English throughout; descriptive option names.
+- {{ADDITIONAL_PROJECT_CONSTRAINTS}}
+
+# Round 1 — your blind read
+Propose the options you would put on the table (usually two to
+four), name each descriptively, and score every one:
+- FOR / AGAINST / UNRESOLVED, summing to 100
+- {{RATIONALE_WORD_COUNT}} words of reasoning in both directions
+- "FOR — what would change my mind: I would drop my FOR % to 0 if I
+  observed [specific observable]"
+- "AGAINST — what would change my mind: I would drop my AGAINST % to
+  0 if I observed [specific observable]"
+- No two of your FOR scores for different options within 2 points
+- UNRESOLVED of 10% or more requires a question: "[You → Voice]: ..."
+  for another voice, or "User question: ..." for a fact only the
+  maintainer can supply
+
+Output exactly: options; per-option scores and lines; questions.
+```
+
+Round two and later send the same voice a packet with the merged option list, every voice's prior scores and reasoning, the questions addressed to it, the answers it received, and the position-shift instructions from the protocol.
+
 ## Worked example
 
 For a concrete example of this template in use — including the per-asymmetry table, the option branching, the score honesty check, and a conditional implementation sub-council — see the **PR-G commit message** (`git log`, search for the ID vs GDD predicate split). The `docs/branching-logic.md` §11.14 / §11.15 entries record only the resulting current-state invariants, not the deliberation that produced them — by design, since §11 is a fragile-areas inventory, not a changelog.
@@ -312,7 +394,8 @@ For a concrete example of this template in use — including the per-asymmetry t
 - **Concrete enumeration over vague qualifiers.** "BIF branching is underpowered" produces guesswork; "BIF has no severity tiers, no auto-bridge, no priorExternal attribution, etc." produces verdicts.
 - **FOR/AGAINST/UNRESOLVED symmetry.** Scoring only the winning direction hides the magnitude of dissent. Requiring all three forces each voice to quantify what it's actually worried about, making low-confidence unanimity distinguishable from high-confidence consensus.
 - **A "what would change my mind" line per direction.** Requiring one for FOR and one for AGAINST forces the voice to engage with specific observables in both directions — not just the side it believes. (The clinical shape of the question: what finding would make you abandon this diagnosis?)
-- **2-point spread across a voice's FOR ratings.** Forces real ordering; no two FOR ratings can be within 2% of each other across rounds and options.
+- **2-point spread across a voice's FOR ratings, within a round.** Forces real ordering; no two FOR ratings for different options can be within 2% of each other in the same round. Across rounds the rule is silent, on purpose: holding a score steady is honest, and forced movement would read as drift in the shift audit.
+- **Blind round-one reads.** In independent-voices mode each voice scores before seeing any other voice's numbers, so the round-one tables are the closest the council gets to independent measurements, and the shift audit afterward measures real persuasion rather than one mind reconciling itself.
 - **Inter-member questions.** "I don't know" as UNRESOLVED without a named question is an abstention. Requiring a specific addressable question either resolves the uncertainty (UNRESOLVED moves) or surfaces a genuine gap the real world needs to close.
 - **Position-shift naming.** A ≥15-point shift between rounds that is un-named is a red flag for social pressure or anchoring. Named causes create an audit trail for why the council moved.
 - **Declare the expected score spread upfront.** Knowing roughly what % of ratings should land in each bucket catches anchoring (too pessimistic / too optimistic) before it ships.
@@ -329,6 +412,7 @@ For a concrete example of this template in use — including the per-asymmetry t
 - **Method jargon in user-facing output.** "Tree-of-thought," "falsifier," "calibration," Greek-letter option names — these are process words for the machinery, not for the reader. The Plain-language rule in the protocol maps each to its plain name; if a new mechanism gets added, name it in plain English from day one.
 - **Anonymous large shifts.** If a voice moves ≥15 points between rounds without explaining why, assume social pressure rather than epistemic movement until proven otherwise. The shift-naming rule makes this visible.
 - **Stalling on unanswered user questions.** A voice may ask the user for real-world data. If the user does not answer within the round, the council proceeds with its unresolved questions stated honestly — it may not collapse UNRESOLVED to 0 by assumption or defer indefinitely.
+- **A coordinator that scores.** In independent-voices mode the main session tallies and writes up; the moment it adds a number or "adjusts" one, the independence the mode exists for is gone and it has quietly become an extra voice with no declared dimension.
 
 ## Terminology note (2026-07-16)
 
@@ -343,3 +427,7 @@ Council records before this date use the original method jargon; the mechanisms 
 | residual(s) | unresolved questions |
 | scaffold | council plan |
 | synthesis (σ) | combined recommendation |
+
+## Rule clarification (2026-09-21)
+
+Council records before this date were run under a 2-point spread rule worded "across rounds and options." Read literally, that forbade a voice from keeping the same score for the same option from one round to the next, so some earlier rounds show small forced movements that carry no signal. The rule now applies within a round only. When reading older records, treat round-over-round changes under 15 points as noise from that wording, not as a change of mind.
