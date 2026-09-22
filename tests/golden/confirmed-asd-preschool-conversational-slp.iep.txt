@@ -7,7 +7,7 @@ Date: {Date}
 {School Name}
 {School Address}
 
-Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (requiring substantial support)
+Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 1 (requiring support)
 
 Dear {Principal / Special Education Coordinator Name}:
 
@@ -15,37 +15,27 @@ I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Stud
 
 Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the services and accommodations I recommend.
 
-He has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support) (with Global Developmental Delay, formal evaluation underway), confirmed at the evaluation referenced above.
-
-Educational eligibility should not be assigned on the basis of this physician letter alone. Global developmental delay is suspected but not yet confirmed, and the district's evaluation should include a comprehensive standardized developmental assessment; brief developmental screeners are not sufficient to establish the degree of delay. At this age, a developmental evaluation is more informative than an IQ-based cognitive battery or academic achievement testing.
+They have received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 1 (requiring support), confirmed at the evaluation referenced above. In addition, they carry the following co-occurring diagnoses, each of which contributes to the educational challenges described below: a language disorder.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
 These conditions result in the following challenges that require specialized support in the educational setting:
   • Communication: Significant difficulty with verbal and nonverbal communication, including understanding classroom instructions, expressing needs, and participating in peer conversation and group activities.
-  • Motor skills: Motor difficulties affecting pre-writing and handling of classroom materials, participation in playground and movement activities, and completion of classroom routines requiring fine or gross motor coordination.
-  • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
 
 ────────────────────────────────────────────────────────────
 REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
 Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Because global developmental delay is suspected at this evaluation, I also ask the team to consider eligibility under the Developmental Delay category (34 C.F.R. §300.8(b); Florida Rule 6A-6.03027). Florida makes this category available for children ages three through nine, or through completion of grade 2, whichever occurs first. Evaluating for both categories in a single evaluation spares the family a second referral if the team does not find {Student Name} eligible under the Autism category.
-
-The evaluation should be a comprehensive developmental evaluation across cognitive, communication, physical, social or emotional, and adaptive development, using a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning), together with assessment of behavioral functioning and sensory processing.
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
 ────────────────────────────────────────────────────────────
 If eligible for special education services, I recommend the IEP include the following:
 
-Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that affect participation in classroom routines, play, and early learning activities. Recommended goals include: AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners; expressive communication: increasing spontaneous, functional communication (spoken words, signs, gestures, or pictures) to request, protest, gain attention, and share interest across classroom routines and play; receptive language: following one- and two-step directions within classroom routines, understanding early concepts such as position, size, and quantity (in, on, big, little, more), and responding to simple questions about familiar activities and shared books.
-
-Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect participation in classroom routines, play, and early learning activities. Goals: fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes; adaptive self-care skills relevant to the school day: toileting, handwashing, dressing tasks such as jackets and shoes, and snack and mealtime routines.
-
-Developmental Evaluation: A comprehensive developmental evaluation is recommended in place of a standard psychoeducational battery. At this age, a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning) covering cognitive, communication, motor, social-emotional, and adaptive development is more informative than IQ or academic achievement testing. Results will directly inform IEP goal development and the Developmental Delay eligibility determination (Florida Rule 6A-6.03027).
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that affect participation in classroom routines, play, and early learning activities. Recommended goals include: expressive language development: using more complete and varied sentences, expanding vocabulary, and organizing ideas when describing events, stories, and play, with adult support as needed; language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting comprehension, participation in classroom routines and early learning activities, and peer interaction, addressed as a diagnosis distinct from ASD-related social communication impairment.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -57,11 +47,9 @@ The following accommodations have broad evidence support across the autism spect
   • Predictable daily schedule with advance written or visual notice before transitions (schedule format and complexity calibrated to developmental level)
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
-Individually Indicated Accommodations:
-  • Motor accommodations: adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks, and support for gross motor and playground participation, with physical therapy or adapted physical education consultation if the team finds it indicated
-
 Behavioral and Emotional Accommodations:
   • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  • Language: simplified verbal instructions, extended response time
 
 ────────────────────────────────────────────────────────────
 Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.

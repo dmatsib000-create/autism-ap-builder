@@ -3515,7 +3515,11 @@ function generateNote() {
       accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
       accomASD.push('Visual supports: written or pictorial schedule, visual cues for task steps and transitions');
       if(S.needsSensory.size) accomASD.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-      if(S.needsMotor.size||S.comorbid.has('dcd')) accomASD.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted PE referral if indicated');
+      // Preschool wording mirrors the IEP letter's preschool switch in the note's own voice;
+      // families read this note in the portal, so the two must not disagree on the motor plan.
+      if(S.needsMotor.size||S.comorbid.has('dcd')) accomASD.push(S.ageGroup==='preschool'
+        ? 'Motor accommodations: adapted fine motor materials, extra time and hands-on support for fine motor tasks, gross motor participation supports if indicated'
+        : 'Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted PE referral if indicated');
       // Group 2: Behavioral and Emotional
       const accomBeh=[];
       if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
@@ -4649,6 +4653,11 @@ function _iepLetterContent(){
   // developmental-delay evaluation is. Gated on the specifier rather than on ageGroup
   // alone: maintainer decision 2026-09-22.
   const gddMarked=S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD');
+  // Preschool swaps the school-age SLP/OT goals and motor lines (handwriting, keyboarding,
+  // figurative language, academic vocabulary) for age-appropriate ones. Council 2026-09-22
+  // (SLP / OT / ESE director / parent reviewer, independent voices). The word "preschool"
+  // is kept out of the letter text on purpose: some kindergartners are entered as preschool.
+  const preschool=S.ageGroup==='preschool';
   // One copy each: the instrument examples can print twice in one letter (psychoed block
   // and evalDomains), and the age limit is stated on both rule-out and autism letters.
   const devInstrumentEx='e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning';
@@ -4820,7 +4829,9 @@ function _iepLetterContent(){
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
   if(S.needsSensory.size) impacts.push('Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.');
-  if(S.needsMotor.size||S.comorbid.has('dcd')) impacts.push('Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.');
+  if(S.needsMotor.size||S.comorbid.has('dcd')) impacts.push(preschool
+    ? 'Motor skills: Motor difficulties affecting pre-writing and handling of classroom materials, participation in playground and movement activities, and completion of classroom routines requiring fine or gross motor coordination.'
+    : 'Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.');
   if(S.needsAdaptive.size) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
   if(S.comorbid.has('ld_reading')) impacts.push('Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.');
   if(S.comorbid.has('ld_math')) impacts.push('Mathematics: A specific learning disability in mathematics affecting computation, problem-solving, and access to grade-level math curriculum.');
@@ -4853,35 +4864,64 @@ function _iepLetterContent(){
   const svContent={};
 
   if(S.schoolSvc.has('slp_school')){
-    let s='Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that directly affect classroom access.';
+    let s='Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that '
+      +(preschool?'affect participation in classroom routines, play, and early learning activities.':'directly affect classroom access.');
     const goals=[];
     if(S.needsComm.has('functional_aac')||isMinVerbal())
       goals.push('AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners');
     // 'phrase' and 'simpleSentence' are the actual S.langLevel values (not 'phrases'/'sentences')
-    if(S.needsComm.has('expressive')||S.langLevel==='phrase'||S.langLevel==='simpleSentence')
-      goals.push('expressive language development: sentence formulation, topic maintenance, and narrative organization');
+    if(S.needsComm.has('expressive')||S.langLevel==='phrase'||S.langLevel==='simpleSentence'){
+      // Preschool tiers by language level: a nonverbal child gets 'expressive' auto-added from
+      // langLevel, so a single line would put word-combining next to the AAC goal above. The
+      // nonverbal tier omits AAC because isMinVerbal() always fires the AAC goal alongside it.
+      if(!preschool) goals.push('expressive language development: sentence formulation, topic maintenance, and narrative organization');
+      else if(isMinVerbal()) goals.push('expressive communication: increasing spontaneous, functional communication (spoken words, signs, gestures, or pictures) to request, protest, gain attention, and share interest across classroom routines and play');
+      else if(S.langLevel==='phrase') goals.push('expressive language development: combining words into phrases and longer utterances, and using language to request, comment, protest, and answer simple questions during play and classroom routines');
+      else if(S.langLevel==='simpleSentence') goals.push('expressive language development: expanding sentence length and grammar, asking and answering wh- questions, and talking about familiar and recent events with adult support');
+      // Conversational/fluent never get 'expressive' auto-added (syncCommNeedsFromLangLevel), so
+      // reaching here means the clinician checked it for a fluent child with a language need;
+      // the catch-all below (signs, pictures, AAC) would undersell that child. Council 2026-09-22.
+      else if(S.langLevel==='conversational'||S.langLevel==='ageAppropriate') goals.push('expressive language development: using more complete and varied sentences, expanding vocabulary, and organizing ideas when describing events, stories, and play, with adult support as needed');
+      else goals.push('expressive language development: expanding the length and variety of communication, using words, signs, pictures, or AAC to request, comment, protest, and answer simple questions during classroom routines and play');
+    }
     if(S.needsComm.has('receptive'))
-      goals.push('receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary');
+      goals.push(preschool
+        ? 'receptive language: following one- and two-step directions within classroom routines, understanding early concepts such as position, size, and quantity (in, on, big, little, more), and responding to simple questions about familiar activities and shared books'
+        : 'receptive language: following multi-step classroom directions, understanding figurative language, and processing academic vocabulary');
     if(hasPragmaticDeficit()||S.needsSocial.size)
-      goals.push('social-pragmatic language: conversational turn-taking, perspective-taking in academic discussion, and understanding classroom social discourse');
+      goals.push(preschool
+        ? 'social-pragmatic language: sharing attention and interests with adults and peers (joint attention), starting and responding to interactions, turn-taking in play and conversation, and participation in group activities'
+        : 'social-pragmatic language: conversational turn-taking, perspective-taking in academic discussion, and understanding classroom social discourse');
     if(hasAnyArticulation())
-      goals.push('speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness');
+      goals.push(preschool
+        ? 'speech intelligibility and articulation targeting sound patterns, relative to developmental expectations, that make speech harder for teachers and peers to understand'
+        : 'speech intelligibility and articulation targeting sounds that reduce classroom communication effectiveness');
     if(S.comorbid.has('language_disorder'))
       // The "distinct from ASD" contrast only means something on a letter that asserts
       // ASD. On a rule-out letter the language disorder is the standing diagnosis.
-      goals.push('language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting academic comprehension and classroom participation'
+      goals.push('language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting '
+        +(preschool?'comprehension, participation in classroom routines and early learning activities, and peer interaction':'academic comprehension and classroom participation')
         +(ruledOut?', addressed as a diagnosis in its own right':', addressed as a diagnosis distinct from ASD-related social communication impairment'));
     if(goals.length) s+=' Recommended goals include: '+goals.join('; ')+'.';
     svContent.slp_school=s;
   }
 
   if(S.schoolSvc.has('ot_school')){
-    let s='Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output.';
+    let s='Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect '
+      +(preschool?'participation in classroom routines, play, and early learning activities.':'classroom participation and academic output.');
     const goals=[];
     if(S.needsSensory.size) goals.push('sensory support plan (Sensory Profile 2 and/or SPM-2 evaluation): individualized sensory regulation strategies implemented in the classroom in coordination with the teacher');
-    if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) goals.push('fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
-    if(S.needsMotor.has('coordination')) goals.push('motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
-    if(S.needsAdaptive.size) goals.push('adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence');
+    if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) goals.push(preschool
+      ? 'fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes'
+      : 'fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
+    if(S.needsMotor.has('coordination')) goals.push(preschool
+      ? 'motor planning and praxis: imitation of new motor actions, sequencing of multi-step play and classroom routines, and use of simple tools'
+      : 'motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
+    // Fixed list (not only the checked areas) matches the school-age line; it names parts of
+    // the day without asserting a deficit in each.
+    if(S.needsAdaptive.size) goals.push(preschool
+      ? 'adaptive self-care skills relevant to the school day: toileting, handwashing, dressing tasks such as jackets and shoes, and snack and mealtime routines'
+      : 'adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence');
     if(goals.length) s+=' Goals: '+goals.join('; ')+'.';
     svContent.ot_school=s;
   }
@@ -5019,7 +5059,9 @@ function _iepLetterContent(){
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-  if(S.needsMotor.size||S.comorbid.has('dcd')) accomIndividual.push('Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  if(S.needsMotor.size||S.comorbid.has('dcd')) accomIndividual.push(preschool
+    ? 'Motor accommodations: adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks, and support for gross motor and playground participation, with physical therapy or adapted physical education consultation if the team finds it indicated'
+    : 'Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
   // Curriculum and assessment modifications — only when intellectual disability is confirmed
   // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
   // academic instruction; those are placement-defining recommendations that require formal

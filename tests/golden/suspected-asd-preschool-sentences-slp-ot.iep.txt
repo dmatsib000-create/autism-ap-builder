@@ -1,5 +1,5 @@
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
-Initial Special Education Evaluation Request
+IEP Review Request
 
 Date: {Date}
 
@@ -7,17 +7,15 @@ Date: {Date}
 {School Name}
 {School Address}
 
-Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (requiring substantial support)
+Re: {Student Name} | Autism Spectrum Disorder — under evaluation (ICD-10: Z03.89)
 
 Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the services and accommodations I recommend.
+Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the services and accommodations I recommend.
 
-He has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support) (with Global Developmental Delay, formal evaluation underway), confirmed at the evaluation referenced above.
-
-Educational eligibility should not be assigned on the basis of this physician letter alone. Global developmental delay is suspected but not yet confirmed, and the district's evaluation should include a comprehensive standardized developmental assessment; brief developmental screeners are not sufficient to establish the degree of delay. At this age, a developmental evaluation is more informative than an IQ-based cognitive battery or academic achievement testing.
+She has received a diagnosis of Autism Spectrum Disorder (ASD), suspected (ICD-10-CM: Z03.89), as documented at the evaluation referenced above. In addition, she carries the following co-occurring diagnoses, each of which contributes to the educational challenges described below: a language disorder.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
@@ -28,24 +26,20 @@ These conditions result in the following challenges that require specialized sup
   • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
 
 ────────────────────────────────────────────────────────────
-REQUEST FOR SPECIAL EDUCATION EVALUATION
+REQUEST FOR IEP TEAM MEETING
 ────────────────────────────────────────────────────────────
-Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
+I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
 
-Because global developmental delay is suspected at this evaluation, I also ask the team to consider eligibility under the Developmental Delay category (34 C.F.R. §300.8(b); Florida Rule 6A-6.03027). Florida makes this category available for children ages three through nine, or through completion of grade 2, whichever occurs first. Evaluating for both categories in a single evaluation spares the family a second referral if the team does not find {Student Name} eligible under the Autism category.
-
-The evaluation should be a comprehensive developmental evaluation across cognitive, communication, physical, social or emotional, and adaptive development, using a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning), together with assessment of behavioral functioning and sensory processing.
+Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
 ────────────────────────────────────────────────────────────
-If eligible for special education services, I recommend the IEP include the following:
+I recommend the following updates to the current IEP:
 
-Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that affect participation in classroom routines, play, and early learning activities. Recommended goals include: AAC system evaluation and implementation (low-tech: core vocabulary boards, PODD; and/or high-tech: speech-generating device) with training for all school communication partners; expressive communication: increasing spontaneous, functional communication (spoken words, signs, gestures, or pictures) to request, protest, gain attention, and share interest across classroom routines and play; receptive language: following one- and two-step directions within classroom routines, understanding early concepts such as position, size, and quantity (in, on, big, little, more), and responding to simple questions about familiar activities and shared books.
+Speech-Language Pathology (SLP): School-based SLP services are recommended to address the documented communication needs that affect participation in classroom routines, play, and early learning activities. Recommended goals include: expressive language development: expanding sentence length and grammar, asking and answering wh- questions, and talking about familiar and recent events with adult support; receptive language: following one- and two-step directions within classroom routines, understanding early concepts such as position, size, and quantity (in, on, big, little, more), and responding to simple questions about familiar activities and shared books; social-pragmatic language: sharing attention and interests with adults and peers (joint attention), starting and responding to interactions, turn-taking in play and conversation, and participation in group activities; speech intelligibility and articulation targeting sound patterns, relative to developmental expectations, that make speech harder for teachers and peers to understand; language disorder: evaluation and treatment of receptive and/or expressive language deficits affecting comprehension, participation in classroom routines and early learning activities, and peer interaction, addressed as a diagnosis distinct from ASD-related social communication impairment.
 
-Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect participation in classroom routines, play, and early learning activities. Goals: fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes; adaptive self-care skills relevant to the school day: toileting, handwashing, dressing tasks such as jackets and shoes, and snack and mealtime routines.
-
-Developmental Evaluation: A comprehensive developmental evaluation is recommended in place of a standard psychoeducational battery. At this age, a standardized developmental instrument (e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning) covering cognitive, communication, motor, social-emotional, and adaptive development is more informative than IQ or academic achievement testing. Results will directly inform IEP goal development and the Developmental Delay eligibility determination (Florida Rule 6A-6.03027).
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect participation in classroom routines, play, and early learning activities. Goals: fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes; motor planning and praxis: imitation of new motor actions, sequencing of multi-step play and classroom routines, and use of simple tools; adaptive self-care skills relevant to the school day: toileting, handwashing, dressing tasks such as jackets and shoes, and snack and mealtime routines.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -62,6 +56,7 @@ Individually Indicated Accommodations:
 
 Behavioral and Emotional Accommodations:
   • Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
+  • Language: simplified verbal instructions, extended response time
 
 ────────────────────────────────────────────────────────────
 Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
