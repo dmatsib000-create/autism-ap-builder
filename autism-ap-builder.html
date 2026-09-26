@@ -3744,8 +3744,11 @@ function generateNote() {
       L.push('  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. '
         +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
           :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.'));
-      // The elopement line above already names GPS tracking and the registry.
-      if(!S.safety.has('elopement_counsel')){
+      // The elopement line above already names GPS tracking and the registry, but not the
+      // medical ID or "If I am found" card, so those still print when it is checked.
+      if(S.safety.has('elopement_counsel')){
+        L.push('    - Identification supports: medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
+      } else {
         L.push('    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
         L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
       }
