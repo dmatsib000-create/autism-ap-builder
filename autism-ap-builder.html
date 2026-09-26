@@ -2170,7 +2170,11 @@ function ruleSLP() {
   const langTrigger = belowAge||S.langModifiers.has('echolalic')||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
-function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
+// Community safety alone does not refer to OT: its supports are family safety counseling
+// (printed in Safety Counseling), not OT work (council 2026-09-26). Only commSafety is
+// excluded; community independence and menstrual care still refer, so this is not the
+// school OT list (SCHOOL_SELF_CARE).
+function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||[...S.needsAdaptive].some(k=>k!=='commSafety')||S.comorbid.has('dcd')}; }
 function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() {
   // Fires when ASD is confirmed, OR when the clinician has staked out any
@@ -3302,7 +3306,7 @@ function generateNote() {
       L.push('    - Environmental boundary training: Identifying and honoring physical/geographic boundaries (parking lots, store exits, water bodies) using visual supports, rule rehearsal, and reinforcement of safe behavior. Note: this target addresses navigation and environmental safety; interpersonal boundary training is addressed separately below if indicated.');
       L.push('    - Elopement prevention protocol: BCBA should conduct a functional behavior assessment of any elopement behavior before intervention; the function of the behavior (escape, sensory seeking, access to tangibles) determines treatment. Safety skills training is not a substitute for function-based elopement intervention.');
       if(S.strangerDanger) L.push('    - Stranger discrimination and protective response: Identification of familiar vs. unfamiliar adults using visual category supports; appropriate responses to unsolicited touch or approach from unfamiliar individuals ("Stop, Go, Tell"); adult mediation strategies to reduce unsupervised exposure to unfamiliar individuals in community and school settings. Exploitation prevention framing adapted to the patient\'s cognitive and communication level.');
-      L.push('    {Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.}');
+      L.push('    {Clinician: document the primary safety concern. Equipment and identification supports are listed in the Safety Counseling section.}');
     }
     if(S.needsBehavior.has('boundaryViol')){
       L.push('  • Interpersonal Boundary and Personal Space Training: Structured ABA programming is indicated given documented boundary violations. This is a high-priority target given the risk of peer harm, disciplinary consequences, and exploitation. Recommended targets:');
@@ -3406,21 +3410,6 @@ function generateNote() {
     {const sl=therapyStatusLine('ot','OT');if(sl){L.push(sl);L.push('');}}
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
     if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
-    if(S.needsAdaptive.has('commSafety')){
-      // The cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
-      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. '
-        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
-          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.')
-        +' Additional OT-scope supports:');
-      if(S.safety.has('elopement_counsel')){
-        L.push('    - Equipment and identification supports: See Safety Counseling section for GPS tracking, ID bracelet, and registry resources discussed with family at this visit.');
-      } else {
-        L.push('    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
-        L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
-      }
-      const _sc=[];if(S.safety.has('elopement_counsel'))_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
-      L.push('    Primary community safety concern(s) driving this recommendation: '+(_sc.length?_sc.join('; '):'{specify — elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'. Cross-reference Safety Counseling section for specific items addressed with family at this visit.');
-    }
     if(S.needsAdaptive.has('commIndependence')){
       L.push('  • Community Independence / Life Skills: Building age-appropriate community independence is a treatment priority. Evidence-based approaches:');
       L.push('    -Community-Based Instruction (CBI): Direct skill practice in real community settings (grocery store, pharmacy, public transit, bank, restaurant). CBI is the evidence-based standard for generalizing community skills in ASD; skills are targeted using task analysis and reinforcement in the natural environment, not simulated practice alone.');
@@ -3739,7 +3728,10 @@ function generateNote() {
   }
 
   // Safety — before Resources
-  if(S.safety.size){
+  // Community safety opens this section on its own: its supports are family counseling,
+  // and it is the only way the stranger-safety line (gated behind commSafety) can print.
+  const commSafety=S.needsAdaptive.has('commSafety');
+  if(S.safety.size||commSafety){
     L.push(n+++'. SAFETY COUNSELING');
     if(S.safety.has('elopement_counsel')){L.push('  • Elopement/Wandering: Door alarms, keyed locks, fenced yard, GPS tracking (AngelSense, Apple Watch + Find My, Tile), law enforcement ASD registry, and Project Lifesaver enrollment discussed with family.');}
     if(S.safety.has('water_counsel')){L.push('  • Water Safety: Elevated drowning risk counseled. Pool fencing/barrier, alarm, adapted swim lessons, and life vest near open water recommended.');}
@@ -3750,6 +3742,27 @@ function generateNote() {
     if(S.safety.has('internet')) L.push('  • Internet/Social Media Safety: Privacy, appropriate online relationships, digital stranger safety discussed.');
     if(S.safety.has('fire_counsel')) L.push('  • Fire/Environmental Hazards: Home fire safety plan and smoke detector placement reviewed.');
     if(S.strangerDanger) L.push('  • Stranger Safety / Reduced Protective Response: Absence of age-appropriate stranger wariness discussed with family. Patient approaches unfamiliar adults without appropriate caution, creating significant safety risk and vulnerability to exploitation. Counseling provided regarding: continued direct supervision in community and school settings; stranger discrimination training (addressed via ABA programming); and caregiver strategies to minimize unsupervised access to unfamiliar adults. Family instructed to notify school staff and ensure supervision requirements are documented in the IEP/504 plan.');
+    if(commSafety){
+      // The ABA cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
+      L.push('  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. '
+        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
+          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.'));
+      // The elopement line above already names GPS tracking and the registry, and the Medical ID
+      // line names the ID, so each is dropped here when its counseling box is checked; the
+      // "If I am found" card is named nowhere else and always prints.
+      const elo=S.safety.has('elopement_counsel');
+      const _id=[];
+      if(!elo) _id.push('GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker)');
+      if(!S.safety.has('medID')) _id.push('medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure');
+      _id.push('\'If I am found\' information card in backpack or worn on person');
+      L.push('    - '+(elo?'Identification supports: ':'Equipment and identification supports: ')+_id.join(', ')+'.');
+      if(!elo)
+        L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
+      // A checked elopement/road/water/fire counseling item already names the concern in its
+      // own bullet above, so the concern line only prints as a prompt when none is checked.
+      if(!['elopement_counsel','road_counsel','water_counsel','fire_counsel'].some(k=>S.safety.has(k)))
+        L.push('    - Primary community safety concern(s): {specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}.');
+    }
     L.push('');
   }
 
@@ -3768,16 +3781,18 @@ function generateNote() {
     if(S.prenatalAlcohol||S.fasdFeatures){L.push('  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center\'s FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org');}
     if(anyTherapyInPlan){
       L.push('');L.push('  Finding Therapies / Navigating the System:');
-      L.push('    1. Call your insurance company and ask to be assigned a case manager.');
-      L.push('    2. Request a list of all recommended providers.');
+      // Steps 3 (ABA) and 5 (confirmed diagnosis) are conditional, so number as we go.
+      let stepN=1;const step=t=>'    '+(stepN++)+'. '+t;
+      L.push(step('Call your insurance company and ask to be assigned a case manager.'));
+      L.push(step('Request a list of all recommended providers.'));
       if(referralIncluded('aba')){const pendingTesting=evalPathSteps().pendingTesting;
-        if(pendingTesting){L.push('    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously');L.push('       - no matter how long the lists appear.');}
-        else{L.push('    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.');}}
-      L.push('    4. Use Google Maps to search for nearby providers and call to confirm insurance.');
-      if(S.diagStatus==='confirmed'){L.push('    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.');L.push('       Please reach out for assistance.');}
-      L.push('    6. Follow up with providers every 3 weeks until a spot is secured;');
+        if(pendingTesting){L.push(step('[ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously'));L.push('       - no matter how long the lists appear.');}
+        else{L.push(step('[ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.'));}}
+      L.push(step('Use Google Maps to search for nearby providers and call to confirm insurance.'));
+      if(S.diagStatus==='confirmed'){L.push(step('[Autism diagnosis] Your local CARD center is also a resource for locating therapy services.'));L.push('       Please reach out for assistance.');}
+      L.push(step('Follow up with providers every 3 weeks until a spot is secured;'));
       L.push('       consider appearing in person if phone calls go unanswered.');
-      L.push('    7. When a spot is obtained, notify other waitlists so another child may benefit.');
+      L.push(step('When a spot is obtained, notify other waitlists so another child may benefit.'));
     }
     const hasAtHome=under6||S.highlyMotivated||over5ABA||behaviorconcern||referralIncluded('aba');
     if(hasAtHome){
@@ -4383,8 +4398,8 @@ function generateRichHTML(isPreview=false) {
     // doesn't fragment into separate <ul> blocks when copied as rich text.
     // 6 spaces (not 4) so this branch only matches lines we intentionally emit
     // as bullet-continuation — 4-space-indented sub-items used elsewhere in
-    // the note (ADHD med tables, AAC, safety targets, accommodations) keep
-    // falling through to the default <p> branch as they did pre-genetics.
+    // the note (ADHD med tables, AAC, safety targets, accommodations) close
+    // the list and render as their own indented <p> (final branch below).
     else if(inUL && /^      \S/.test(line)){
       html+=`<li style="list-style:none;margin:1px 0 3px 18px;font-size:10.5pt;color:#374151">${linkify(line.trim())}</li>`;
     }
@@ -4400,7 +4415,14 @@ function generateRichHTML(isPreview=false) {
     // 9.5pt matches the ABA letter's .aba-ref convention so references
     // render at the same scale across all three output documents.
     else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
-    else{closeUL();html+=`<p style="margin:3px 0">${linkify(line)}</p>`;}
+    // Any other line indented 4+ spaces (dash sub-items, numbered steps, their wrapped
+    // continuations). HTML collapses leading spaces, so without a margin these sit flush
+    // left and read as detached from the bullet above; 7+ spaces is a continuation of an
+    // indented line and sits one step deeper. Kept as <p> (not nested <li>) so the rich
+    // paste keeps the same block structure. 2-space lines (sub-headers, reference lists)
+    // stay flush by design.
+    else{closeUL();const ind=/^ */.exec(line)[0].length;
+      html+=ind>=4?`<p style="margin:1px 0 2px ${ind>=7?56:36}px">${linkify(line.trim())}</p>`:`<p style="margin:3px 0">${linkify(line)}</p>`;}
   });
   closeUL();
   html+='</div>';
