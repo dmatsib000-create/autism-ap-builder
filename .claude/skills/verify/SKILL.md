@@ -15,9 +15,8 @@ preview_start with {"name": "autism-ap-builder"}     # .claude/launch.json, port
 navigate to http://localhost:3737/autism-ap-builder.html
 ```
 
-**Cloud sessions:** there is no browser pane and `launch.json` is not in the repo. Run
-`npm test` and inspect the golden diffs instead, and say plainly in the report that the
-live app was not driven.
+**Cloud sessions** (`$CLAUDE_CODE_REMOTE` is `true`): skip this Launch section and follow
+[cloud.md](cloud.md) instead. Everything from "Drive it" down still applies.
 
 `preview_start` with a **url** only opens a tab — it does not start the server. Use the
 **name** form. Confirm the server is actually serving the working tree before trusting
