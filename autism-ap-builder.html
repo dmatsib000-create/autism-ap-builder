@@ -2170,7 +2170,9 @@ function ruleSLP() {
   const langTrigger = belowAge||S.langModifiers.has('echolalic')||hasMorphoErrors()||hasPragmaticDeficit()||hasSemanticDeficit()||hasAnyArticulation()||hasPedanticSpeech()||hasHyperlexia();
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
-function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')}; }
+// Community safety alone does not refer to OT: its supports are family safety counseling
+// (printed in Safety Counseling), not OT work. Same call as school OT (council 2026-09-26).
+function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||[...S.needsAdaptive].some(k=>k!=='commSafety')||S.comorbid.has('dcd')}; }
 function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() {
   // Fires when ASD is confirmed, OR when the clinician has staked out any
@@ -3302,7 +3304,7 @@ function generateNote() {
       L.push('    - Environmental boundary training: Identifying and honoring physical/geographic boundaries (parking lots, store exits, water bodies) using visual supports, rule rehearsal, and reinforcement of safe behavior. Note: this target addresses navigation and environmental safety; interpersonal boundary training is addressed separately below if indicated.');
       L.push('    - Elopement prevention protocol: BCBA should conduct a functional behavior assessment of any elopement behavior before intervention; the function of the behavior (escape, sensory seeking, access to tangibles) determines treatment. Safety skills training is not a substitute for function-based elopement intervention.');
       if(S.strangerDanger) L.push('    - Stranger discrimination and protective response: Identification of familiar vs. unfamiliar adults using visual category supports; appropriate responses to unsolicited touch or approach from unfamiliar individuals ("Stop, Go, Tell"); adult mediation strategies to reduce unsupervised exposure to unfamiliar individuals in community and school settings. Exploitation prevention framing adapted to the patient\'s cognitive and communication level.');
-      L.push('    {Clinician: document the primary safety concern and cross-reference the OT community safety section for equipment supports.}');
+      L.push('    {Clinician: document the primary safety concern. Equipment and identification supports are listed in the Safety Counseling section.}');
     }
     if(S.needsBehavior.has('boundaryViol')){
       L.push('  • Interpersonal Boundary and Personal Space Training: Structured ABA programming is indicated given documented boundary violations. This is a high-priority target given the risk of peer harm, disciplinary consequences, and exploitation. Recommended targets:');
@@ -3406,21 +3408,6 @@ function generateNote() {
     {const sl=therapyStatusLine('ot','OT');if(sl){L.push(sl);L.push('');}}
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
     if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
-    if(S.needsAdaptive.has('commSafety')){
-      // The cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
-      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. '
-        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
-          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.')
-        +' Additional OT-scope supports:');
-      if(S.safety.has('elopement_counsel')){
-        L.push('    - Equipment and identification supports: See Safety Counseling section for GPS tracking, ID bracelet, and registry resources discussed with family at this visit.');
-      } else {
-        L.push('    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
-        L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
-      }
-      const _sc=[];if(S.safety.has('elopement_counsel'))_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
-      L.push('    Primary community safety concern(s) driving this recommendation: '+(_sc.length?_sc.join('; '):'{specify — elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'. Cross-reference Safety Counseling section for specific items addressed with family at this visit.');
-    }
     if(S.needsAdaptive.has('commIndependence')){
       L.push('  • Community Independence / Life Skills: Building age-appropriate community independence is a treatment priority. Evidence-based approaches:');
       L.push('    -Community-Based Instruction (CBI): Direct skill practice in real community settings (grocery store, pharmacy, public transit, bank, restaurant). CBI is the evidence-based standard for generalizing community skills in ASD; skills are targeted using task analysis and reinforcement in the natural environment, not simulated practice alone.');
@@ -3739,7 +3726,9 @@ function generateNote() {
   }
 
   // Safety — before Resources
-  if(S.safety.size){
+  // Community safety opens this section on its own: its supports are family counseling,
+  // and it is the only way the stranger-safety line (gated behind commSafety) can print.
+  if(S.safety.size||S.needsAdaptive.has('commSafety')){
     L.push(n+++'. SAFETY COUNSELING');
     if(S.safety.has('elopement_counsel')){L.push('  • Elopement/Wandering: Door alarms, keyed locks, fenced yard, GPS tracking (AngelSense, Apple Watch + Find My, Tile), law enforcement ASD registry, and Project Lifesaver enrollment discussed with family.');}
     if(S.safety.has('water_counsel')){L.push('  • Water Safety: Elevated drowning risk counseled. Pool fencing/barrier, alarm, adapted swim lessons, and life vest near open water recommended.');}
@@ -3750,6 +3739,19 @@ function generateNote() {
     if(S.safety.has('internet')) L.push('  • Internet/Social Media Safety: Privacy, appropriate online relationships, digital stranger safety discussed.');
     if(S.safety.has('fire_counsel')) L.push('  • Fire/Environmental Hazards: Home fire safety plan and smoke detector placement reviewed.');
     if(S.strangerDanger) L.push('  • Stranger Safety / Reduced Protective Response: Absence of age-appropriate stranger wariness discussed with family. Patient approaches unfamiliar adults without appropriate caution, creating significant safety risk and vulnerability to exploitation. Counseling provided regarding: continued direct supervision in community and school settings; stranger discrimination training (addressed via ABA programming); and caregiver strategies to minimize unsupervised access to unfamiliar adults. Family instructed to notify school staff and ensure supervision requirements are documented in the IEP/504 plan.');
+    if(S.needsAdaptive.has('commSafety')){
+      // The ABA cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
+      L.push('  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. '
+        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
+          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.'));
+      // The elopement line above already names GPS tracking and the registry.
+      if(!S.safety.has('elopement_counsel')){
+        L.push('    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
+        L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
+      }
+      const _sc=[];if(S.safety.has('elopement_counsel'))_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
+      L.push('    - Primary community safety concern(s): '+(_sc.length?_sc.join('; '):'{specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'.');
+    }
     L.push('');
   }
 

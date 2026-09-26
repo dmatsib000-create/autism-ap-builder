@@ -33,10 +33,6 @@ The recommendations below identify clinically established needs and the indicate
 
 2. OCCUPATIONAL THERAPY (OT)
   • ADL training: dressing, using task analysis and visual supports.
-  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. Behavioral safety skills training (stopping at a caregiver's signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists. Additional OT-scope supports:
-    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, 'If I am found' information card in backpack or worn on person.
-    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.
-    Primary community safety concern(s) driving this recommendation: {specify — elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}. Cross-reference Safety Counseling section for specific items addressed with family at this visit.
   • Fine motor skill development: Targets include pencil grip and graphomotor control, bilateral hand coordination, scissor skills, in-hand manipulation, eye-hand coordination, and self-care fasteners (buttons, zippers, shoe-tying). Praxis and motor planning deficits evaluated and addressed as contributing factors.
   • Visual perceptual skills: OT evaluation of visual-perceptual skills, which affect reading, math, written output, and navigation of the visual classroom environment; treatment integrated with academic and fine motor goals.
   • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.
@@ -59,7 +55,13 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     - Written expression: speech-to-text, keyboarding alternative to handwriting, extended time, reduced written output requirements
   Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
 
-4. FAMILY RESOURCES & NEXT STEPS
+4. SAFETY COUNSELING
+  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. Behavioral safety skills training (stopping at a caregiver's signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.
+    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, 'If I am found' information card in backpack or worn on person.
+    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.
+    - Primary community safety concern(s): {specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}.
+
+5. FAMILY RESOURCES & NEXT STEPS
 
   Finding Therapies / Navigating the System:
     1. Call your insurance company and ask to be assigned a case manager.

@@ -726,7 +726,7 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 3 | `rulePsychotherapy` | 1370 | Age ∈ {schoolAge, adolescent, youngAdult} AND verbal AND (anxiety/depression/OCD/trauma/emotional reg/boundary) | `psychotherapy` |
 | 4 | `ruleSocialSkills` | 1376 | Age ∈ {preschool, schoolAge, adolescent} AND not minimally verbal AND (social needs OR boundary) | `socialSkills` |
 | 5 | `ruleSLP` | 1381 | Communication needs OR language disorder OR pragmatic/articulation/echolalic modifiers | `slp` |
-| 6 | `ruleOT` | 1388 | Sensory needs OR fine motor needs OR adaptive needs OR DCD comorbid | `ot` |
+| 6 | `ruleOT` | 1388 | Sensory needs OR fine motor needs OR any adaptive need other than community safety OR DCD comorbid | `ot` |
 | 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid | `pt` |
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (regression OR confirmed dysmorphism OR congenital anomaly OR either FASD flag §7.9)) | `genetics` |
 | 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression | `neurology` |
@@ -740,7 +740,7 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 17 | `ruleEEG` | 1434 | `S.seizureConcern === true` | `eeg` |
 | 18 | `ruleCARD` | 1435 | `S.diagStatus === 'confirmed'` | `card` |
 
-In the note's OT section, the Community Safety Skills bullet cross-references the ABA section only when `referralIncluded('aba')`; otherwise it names behavioral safety skills training with a behavioral provider (behavior analyst or psychologist).
+Community safety (`needsAdaptive.has('commSafety')`) alone does not trigger `ruleOT`: its supports (supervision, tracking device, medical ID, wandering registry) are family safety counseling, not OT work, matching the school OT decision (council 2026-09-26). The note prints them as a Community Safety bullet in the Safety Counseling section, which `commSafety` opens on its own (gate: `S.safety.size || needsAdaptive.has('commSafety')`; this also lets the stranger-safety line, which requires `commSafety`, always print). The bullet cross-references the ABA section only when `referralIncluded('aba')`; otherwise it names behavioral safety skills training with a behavioral provider (behavior analyst or psychologist). The equipment and registry sub-lines are skipped when `elopement_counsel` is checked, since the Elopement/Wandering line already names them. The concern line lists the checked elopement/road/water/fire counseling items, or a `{specify: ...}` placeholder when none is checked. The ABA section's community safety `{Clinician: ...}` reminder points to Safety Counseling for equipment supports.
 
 Each `rule*()` returns `{ include: boolean, reasons: string[] }`. The `reasons` array is consumed downstream by `_abaContent()` to compose the medical-necessity paragraph in the ABA letter — so adding a new trigger condition to `ruleABA` should also append a human-readable reason string.
 
@@ -1520,7 +1520,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Service | `schoolSvc` key | Content |
 |---|---|---|
 | Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder. Preschool wording differs (§2.1) |
-| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning (coordination box or DCD) + adaptive self-care. Auto-added by `syncSchoolSvcFromNeeds()` on sensory, fine/handwriting/coordination, DCD, or a school self-care box (`SCHOOL_SELF_CARE`: toileting, hygiene, dressing, feeding_adl). Community safety and community independence alone do not add it: school OT has no goal to write for them (follow-up council 2026-09-26). The note's outpatient `ruleOT` still fires on any adaptive need. Preschool wording differs (§2.1) |
+| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning (coordination box or DCD) + adaptive self-care. Auto-added by `syncSchoolSvcFromNeeds()` on sensory, fine/handwriting/coordination, DCD, or a school self-care box (`SCHOOL_SELF_CARE`: toileting, hygiene, dressing, feeding_adl). Community safety and community independence alone do not add it: school OT has no goal to write for them (follow-up council 2026-09-26). The note's outpatient `ruleOT` likewise ignores community safety alone (see §7), but still fires on community independence or menstrual care alone. Preschool wording differs (§2.1) |
 | Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
