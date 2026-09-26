@@ -45,8 +45,10 @@ default 60 s). Exit 2 means the app was **not** driven; say so in the report.
   the single-column layout (then click the "View Note" tab first, per Gotchas).
 - `--eval "return document.title"` runs a one-line snippet without a file.
 - `--page docs/branching-logic-for-clinicians.html` opens another repo page instead.
-- The browser is fully offline (the app makes no network requests by design), so a
-  snippet cannot fetch anything from the internet.
+- The browser cannot resolve hostnames, so a snippet cannot fetch anything from the
+  internet by name (the app makes no network requests by design). This is not a full
+  network sandbox: requests to a literal IP address have not been verified as blocked,
+  so do not point snippets at outside addresses.
 
 ## First run in a session
 

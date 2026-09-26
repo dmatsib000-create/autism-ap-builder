@@ -64,17 +64,32 @@ async function until(check, ms, what) {
   throw new Error(`${what} (gave up after ${ms / 1000}s)`);
 }
 
+const VERSION_RE = /^\d+\.\d+\.\d+\.\d+$/;
+
+// Returns null when the lookup fails, so the caller can tell "blocked" apart from
+// "the latest is the pin" and never trade a newer cached Chrome for the older pin.
 function latestVersion() {
   try {
     const v = execFileSync('curl', ['-fsS', '--max-time', '5',
       'https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE'],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    if (/^\d+\.\d+\.\d+\.\d+$/.test(v)) return v;
+    if (VERSION_RE.test(v)) return v;
   } catch {}
+  return null;
+}
+
+function pinnedVersion() {
   const days = Math.floor((Date.now() - Date.parse(PINNED_ON)) / DAY);
   console.error(`[drive] Latest Chrome version lookup blocked; using pinned ${PINNED_VERSION} (${days} days old).` +
     (days > 60 ? ' Consider updating PINNED_VERSION in drive.mjs.' : ''));
   return PINNED_VERSION;
+}
+
+// Numeric, part by part: '154.0.8037.57' is newer than '99.0.1.2'.
+function isNewer(a, b) {
+  const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+  for (let i = 0; i < 4; i++) if (pa[i] !== pb[i]) return pa[i] > pb[i];
+  return false;
 }
 
 const exeIn = dir => join(dir, `chrome-headless-shell-${PLATFORM}`,
@@ -85,6 +100,14 @@ const exeIn = dir => join(dir, `chrome-headless-shell-${PLATFORM}`,
 function install(version) {
   const final = join(CACHE_ROOT, version);
   mkdirSync(CACHE_ROOT, { recursive: true });
+  // A run killed mid-download (SIGKILL, container reclaimed) skips the finally
+  // below and leaves up to ~120 MB behind. An hour is far longer than a download,
+  // so this never touches a parallel run's folder that is still filling.
+  for (const d of readdirSync(CACHE_ROOT)) {
+    if (!d.startsWith('.tmp-')) continue;
+    const p = join(CACHE_ROOT, d);
+    try { if (Date.now() - statSync(p).mtimeMs > 3600000) rmSync(p, { recursive: true, force: true }); } catch {}
+  }
   const tmp = mkdtempSync(join(CACHE_ROOT, '.tmp-'));
   try {
     const zip = join(tmp, 'chrome.zip');
@@ -120,14 +143,24 @@ function findBrowser() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
   if (!PLATFORM) throw new Error(`No Chrome download for ${process.platform}; set CHROME_PATH`);
   const pinned = process.env.VERIFY_CHROME_VERSION;
-  if (pinned) return existsSync(exeIn(join(CACHE_ROOT, pinned))) ? exeIn(join(CACHE_ROOT, pinned)) : install(pinned);
+  if (pinned) {
+    // It becomes a folder name and part of a URL, so accept only a version number.
+    if (!VERSION_RE.test(pinned)) throw new Error(`VERIFY_CHROME_VERSION must look like 154.0.8037.57, got "${pinned}"`);
+    return existsSync(exeIn(join(CACHE_ROOT, pinned))) ? exeIn(join(CACHE_ROOT, pinned)) : install(pinned);
+  }
   // Reuse a recent download without a network call; once it is RECHECK_DAYS old,
   // look up the latest version again so an outdated Chrome does not linger.
-  const cached = existsSync(CACHE_ROOT) ? readdirSync(CACHE_ROOT).find(d => !d.startsWith('.tmp-') && existsSync(exeIn(join(CACHE_ROOT, d)))) : null;
+  const cached = existsSync(CACHE_ROOT) ? readdirSync(CACHE_ROOT).find(d => VERSION_RE.test(d) && existsSync(exeIn(join(CACHE_ROOT, d)))) : null;
   if (cached && Date.now() - statSync(join(CACHE_ROOT, cached)).mtimeMs < RECHECK_DAYS * DAY) return exeIn(join(CACHE_ROOT, cached));
-  const version = latestVersion();
-  if (version === cached) { const now = new Date(); utimesSync(join(CACHE_ROOT, cached), now, now); return exeIn(join(CACHE_ROOT, cached)); }
-  return install(version);
+  const latest = latestVersion();
+  // Keep the cached copy when it is the latest, or when the lookup failed and it is
+  // at least as new as the pin; a failed lookup must never downgrade Chrome.
+  if (cached && (latest ? latest === cached : !isNewer(PINNED_VERSION, cached))) {
+    if (!latest) console.error(`[drive] Latest Chrome version lookup blocked; keeping cached ${cached}.`);
+    const now = new Date(); utimesSync(join(CACHE_ROOT, cached), now, now);
+    return exeIn(join(CACHE_ROOT, cached));
+  }
+  return install(latest ?? pinnedVersion());
 }
 
 async function launch(bin, profile, isShell) {
@@ -135,9 +168,10 @@ async function launch(bin, profile, isShell) {
     // Cloud containers usually can't use Chrome's sandbox.
     ...(process.platform === 'linux' ? ['--no-sandbox'] : []),
     ...(isShell ? [] : ['--headless=new']),
-    // Fully offline: the app makes no network requests by design, so cutting the
-    // browser off means an out-of-date Chrome never sees untrusted content, which
-    // also makes --no-sandbox acceptable.
+    // Every hostname lookup fails and no proxy is used, so the page cannot reach the
+    // internet by name. That, plus the app making no network requests by design, is
+    // what makes an out-of-date Chrome and --no-sandbox acceptable here. It is not a
+    // full network block: URLs with a literal IP address have not been verified.
     '--host-resolver-rules=MAP * ~NOTFOUND', '--proxy-server=direct://',
     '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run',
     '--no-default-browser-check', '--disable-gpu', '--disable-dev-shm-usage', 'about:blank',
@@ -225,7 +259,9 @@ class CDP {
 }
 
 async function newPage(wsUrl) {
-  const res = await fetch(`http://${new URL(wsUrl).host}/json/new?about:blank`, { method: 'PUT' });
+  const res = await fetch(`http://${new URL(wsUrl).host}/json/new?about:blank`,
+    { method: 'PUT', signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error(`Could not open a browser tab: HTTP ${res.status}`);
   return (await res.json()).webSocketDebuggerUrl;
 }
 
