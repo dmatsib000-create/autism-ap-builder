@@ -23,7 +23,7 @@ are unmodified.
 Run once per clone, from the repo root, in Git Bash:
 
 ```bash
-MSYS_NO_PATHCONV=1 git sparse-checkout set --no-cone '/*' '!/.claude/commands/feature-dev.md' '!/.claude/agents/' '!/.claude/skills/engineering-code-review/'
+MSYS_NO_PATHCONV=1 git sparse-checkout set --no-cone '/*' '!/.claude/commands/feature-dev.md' '!/.claude/agents/code-architect.md' '!/.claude/agents/code-explorer.md' '!/.claude/agents/code-reviewer.md' '!/.claude/skills/engineering-code-review/'
 ```
 
 The files stay in git and on GitHub; they are only left off this machine's disk.

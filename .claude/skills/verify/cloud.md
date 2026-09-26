@@ -34,9 +34,11 @@ return cap;
 ```
 
 Output has three parts: `== result ==` (a returned string prints raw, anything else as
-JSON), the screenshot path if `--shot` was given, and `== page errors ==`. Exit code is
-1 if the snippet threw or the page raised an uncaught exception (for example, a smart
-quote in a JS string), 2 if the browser could not start.
+JSON), the screenshot path if `--shot` was given, and `== page errors ==` (printed only
+once the page has loaded). Exit code is 1 if the snippet threw or the page raised an
+uncaught exception (for example, a smart quote in a JS string), and 2 if the run itself
+failed (browser would not start, page would not load, snippet exceeded `--timeout`,
+default 60 s). Exit 2 means the app was **not** driven; say so in the report.
 
 - **Every run is a fresh page with a fresh profile.** Nothing carries over between runs,
   so each snippet sets up its whole case from scratch. Put a before/after comparison in
@@ -44,13 +46,21 @@ quote in a JS string), 2 if the browser could not start.
 - **Screenshots:** open the PNG with the Read tool to look at it. Use `--width 700` to see
   the single-column layout (then click the "View Note" tab first, per Gotchas).
 - `--eval "return document.title"` runs a one-line snippet without a file.
+- The browser is offline except for the local app, which makes no network requests by
+  design. A snippet cannot fetch anything from the internet.
 
 ## First run in a session
 
-The first run downloads `chrome-headless-shell` (about 100 MB, under a minute) into
-`~/.cache/verify-chrome` from Chrome for Testing (`storage.googleapis.com`, which is on
-the default cloud allowlist) using `npx @puppeteer/browsers`. Later runs in the same
-session reuse it. Nothing is added to `package.json`.
+The first run downloads `chrome-headless-shell` (about 120 MB, under a minute) into
+`~/.cache/verify-chrome/<version>` from Chrome for Testing on `storage.googleapis.com`,
+which is on the default cloud allowlist. Later runs in the same session reuse it.
+Nothing is added to `package.json`.
+
+It asks googlechromelabs.github.io for the latest stable version first. That host is not
+on the default allowlist, so usually the lookup is blocked and the driver falls back to
+the version pinned in `drive.mjs`, printing how old the pin is. If it reports more than
+60 days, mention in the report that `PINNED_VERSION` should be refreshed (current number
+at https://googlechromelabs.github.io/chrome-for-testing/).
 
 If the browser will not start, the error lists any missing system libraries. Install them
 with `npx -y playwright install-deps chromium` (uses apt only, needs root), then retry.
