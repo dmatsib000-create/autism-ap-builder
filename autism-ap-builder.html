@@ -2093,6 +2093,12 @@ function v3(w){
 // Article elision before vowel-initial noun: "a adolescent" → "an adolescent".
 // Conservative — only checks first character; doesn't handle silent-h edge cases.
 function aOr(n){ return /^[aeiouAEIOU]/.test((n||'').trim()) ? 'an '+n : 'a '+n; }
+// "a and b" / "a, b, and c" for prose lists built from checked boxes. Two items that already
+// contain "and" take a comma too, so "x and y, and z" doesn't read as one three-way list.
+const andList = a => a.length<2 ? a.join('') : (a.length===2&&!a.some(x=>/ and /.test(x))) ? a.join(' and ') : a.slice(0,-1).join(', ')+', and '+a[a.length-1];
+// The four school self-care boxes. Community safety/independence and menstrual care are adaptive
+// needs too, but they do not bring in school OT (follow-up council 2026-09-26).
+const SCHOOL_SELF_CARE=['toileting','hygiene','dressing','feeding_adl'];
 
 function getLangDescription() {
   const base = {
@@ -3401,7 +3407,11 @@ function generateNote() {
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
     if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
     if(S.needsAdaptive.has('commSafety')){
-      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training). Additional OT-scope supports:');
+      // The cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
+      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. '
+        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
+          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.')
+        +' Additional OT-scope supports:');
       if(S.safety.has('elopement_counsel')){
         L.push('    - Equipment and identification supports: See Safety Counseling section for GPS tracking, ID bracelet, and registry resources discussed with family at this visit.');
       } else {
@@ -3515,11 +3525,22 @@ function generateNote() {
       accomASD.push('Predictable daily schedule with advance written or visual notice before transitions');
       accomASD.push('Visual supports: written or pictorial schedule, visual cues for task steps and transitions');
       if(S.needsSensory.size) accomASD.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-      // Preschool wording mirrors the IEP letter's preschool switch in the note's own voice;
+      // Composed from the checked motor needs in the note's own voice, mirroring the IEP letter;
       // families read this note in the portal, so the two must not disagree on the motor plan.
-      if(S.needsMotor.size||S.comorbid.has('dcd')) accomASD.push(S.ageGroup==='preschool'
-        ? 'Motor accommodations: adapted fine motor materials, extra time and hands-on support for fine motor tasks, gross motor participation supports if indicated'
-        : 'Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted PE referral if indicated');
+      if(S.needsMotor.size||S.comorbid.has('dcd')){
+        const nHand=S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+        const nGross=S.needsMotor.has('gross')||S.needsMotor.has('hypotonia');
+        const nTone=S.needsMotor.has('hypotonia');
+        const nDcd=S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+        const pre=S.ageGroup==='preschool';
+        const nm=pre
+          ? [nHand&&'adapted fine motor materials, extra time and hands-on support for fine motor tasks', nGross&&'gross motor participation supports if indicated', nTone&&'supportive seating for circle and table time', nDcd&&'hands-on modeling for multi-step motor routines']
+          : [nHand&&(S.comorbid.has('ld_written')?'reduced copying demands and extended time on written tasks':'keyboarding or speech-to-text for longer written work, reduced copying demands, extended time on written tasks'),
+             nGross&&'support for PE participation and moving around campus, adapted PE evaluation if indicated',
+             nTone&&'supportive seating for sustained desk work',
+             nDcd&&'step-by-step modeling for new motor tasks'];
+        accomASD.push('Motor accommodations: '+nm.filter(Boolean).join('; '));
+      }
       // Group 2: Behavioral and Emotional
       const accomBeh=[];
       if(hasConfirmedADHD()||S.comorbid.has('adhd_suspected')) accomBeh.push('Attention: extended time on assessments and lengthy assignments, preferential seating away from distractors, chunked assignments with check-ins, movement breaks');
@@ -4031,8 +4052,11 @@ function generateNote() {
 
   if(hasLD()&&cpAny('ld_reading','ld_math','ld_written','ld_suspected')){
     const ldConfirmed=hasLDConfirmed();
-    const ldSubtype=S.comorbid.has('ld_reading')?'with impairment in reading':S.comorbid.has('ld_math')?'with impairment in mathematics':S.comorbid.has('ld_written')?'with impairment in written expression':null;
-    const ldICD=S.comorbid.has('ld_reading')?'F81.0':S.comorbid.has('ld_math')?'F81.2':S.comorbid.has('ld_written')?'F81.81':'F81.9';
+    // Every confirmed domain is named and coded, in DSM-5-TR order (reading, written expression,
+    // mathematics); the heading previously named only the first checked domain.
+    const ldDomains=[['ld_reading','reading','F81.0'],['ld_written','written expression','F81.81'],['ld_math','mathematics','F81.2']].filter(([k])=>S.comorbid.has(k));
+    const ldSubtype=ldDomains.length?andList(ldDomains.map(([,n])=>'with impairment in '+n)):null;
+    const ldICD=ldDomains.length?ldDomains.map(([,,c])=>c).join(', '):'F81.9';
     const ldLabel=ldConfirmed?'Specific Learning Disorder'+(ldSubtype?', '+ldSubtype:'')+' ('+ldICD+')':'Specific Learning Disorder: Suspected (F81.9)';
     L.push('── Problem '+probN+++': '+ldLabel+' ──');L.push('');
     L.push('Assessment:');
@@ -4058,11 +4082,18 @@ function generateNote() {
         L.push('  • Phoenix Comprehensive Care Group (Lindamood Phoneme Sequencing Program, LiPS): 2114 NW 40th Terrace, Suite C3, Gainesville FL 32605 | (352) 812-3080 | phoenixcomprehensivecare.com');
         L.push('  • SLP phonological awareness evaluation and intervention: Phonological awareness (phoneme segmentation, blending, manipulation) is the language-based foundation of reading acquisition and falls within SLP scope of practice. SLP evaluation of phonological processing (e.g., CTOPP-2) is recommended to characterize the profile; phonological awareness intervention should be coordinated with reading instruction and Orton-Gillingham or structured literacy approaches. Refer to SLP with literacy specialization if not already involved.');
       }
+      // Matched to the confirmed domain(s); this block can print without the note's general
+      // accommodation list (that list needs school info entered), so it must stand alone.
+      const ldR=S.comorbid.has('ld_reading'), ldW=S.comorbid.has('ld_written'), ldM=S.comorbid.has('ld_math');
       L.push('  Classroom accommodations (regardless of services):');
       L.push('  • Extended time on assignments and assessments');
-      L.push('  • Reduced written output; keyboarding as alternative to handwriting');
-      L.push('  • Text-to-speech tools and audiobooks for reading-dependent tasks');
-      if(S.comorbid.has('ld_reading')) L.push('  • Multisensory reading instruction (e.g., Orton-Gillingham approach)');
+      if(ldR) L.push('  • Text-to-speech tools and audiobooks for reading-dependent tasks; oral response option');
+      // Spelling is often folded under a reading diagnosis in school reports, so offer it
+      // conditionally rather than asserting a spelling deficit.
+      if(ldR&&!ldW) L.push('  • If spelling is also affected on testing: spell-check, word prediction, or speech-to-text for written work, with spelling errors not penalized on assignments that do not assess spelling');
+      if(ldW) L.push('  • Reduced written output; keyboarding with spell-check, or speech-to-text, as alternative to handwriting');
+      if(ldM) L.push('  • Calculator access for fact-dependent tasks; manipulatives; graph paper for number alignment');
+      if(ldR) L.push('  • Multisensory reading instruction (e.g., Orton-Gillingham approach)');
     } else {
       L.push('  Specific learning disorder is suspected but formal diagnosis is not yet established. Options for psychoeducational evaluation:');
       L.push('  • IEP pathway (no cost to family): Parent submits a written evaluation request to the school district. Under IDEA, the district must evaluate within 60 days of written consent. Request should specify: academic achievement testing, cognitive processing assessment, and SLD eligibility determination. Family has the right to request this regardless of current IEP/504 status.');
@@ -4070,7 +4101,7 @@ function generateNote() {
       L.push('  • FLOAAT: Self-pay psychoeducational testing option for families seeking evaluation outside the school system.');
       L.push('  Interim accommodations while evaluation is pending:');
       L.push('  • Extended time on assignments and assessments');
-      L.push('  • Reduced written output; access to keyboarding and text-to-speech tools');
+      L.push('  • Assistive tools matched to the area of observed difficulty (text-to-speech for reading, keyboarding or speech-to-text for writing, calculator access for math facts); adjust once evaluation identifies the affected domain');
       L.push('  • Preferential seating; material presented in multiple modalities');
       L.push('  Reading/literacy resources while evaluation is pending:');
       L.push('  • ReadingRockets.org: free reading strategies and resources for parents');
@@ -4658,6 +4689,22 @@ function _iepLetterContent(){
   // (SLP / OT / ESE director / parent reviewer, independent voices). The word "preschool"
   // is kept out of the letter text on purpose: some kindergartners are entered as preschool.
   const preschool=S.ageGroup==='preschool';
+  // Age-banded wording for each checked school self-care box, in a fixed order.
+  const scBand=preschool?0:isTeenPlus()?2:1;
+  // Keys must match SCHOOL_SELF_CARE (module scope), which gates school OT.
+  const SELF_CARE_ITEMS=[
+    ['toileting',  ['toileting','bathroom independence','bathroom independence']],
+    ['hygiene',    ['handwashing','handwashing and personal hygiene routines','personal hygiene and grooming routines']],
+    ['dressing',   ['dressing tasks such as jackets and shoes','clothing management such as jackets and fasteners','clothing management and changing for physical education']],
+    ['feeding_adl',['snack and mealtime routines such as using utensils and cups','cafeteria routines such as opening containers and using utensils','cafeteria routines such as opening containers and using utensils']],
+  ];
+  const selfCareItems=SELF_CARE_ITEMS.filter(([k])=>S.needsAdaptive.has(k)).map(([,w])=>w[scBand]);
+  // Motor lines are composed from the checked motor needs so, e.g., low tone alone no longer
+  // produces handwriting text (follow-up council 2026-09-22).
+  const mHand=S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+  const mGross=S.needsMotor.has('gross')||S.needsMotor.has('hypotonia');
+  const mTone=S.needsMotor.has('hypotonia');
+  const mDcd=S.needsMotor.has('coordination')||S.comorbid.has('dcd');
   // One copy each: the instrument examples can print twice in one letter (psychoed block
   // and evalDomains), and the age limit is stated on both rule-out and autism letters.
   const devInstrumentEx='e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning';
@@ -4829,10 +4876,23 @@ function _iepLetterContent(){
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
   if(S.needsSensory.size) impacts.push('Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.');
-  if(S.needsMotor.size||S.comorbid.has('dcd')) impacts.push(preschool
-    ? 'Motor skills: Motor difficulties affecting pre-writing and handling of classroom materials, participation in playground and movement activities, and completion of classroom routines requiring fine or gross motor coordination.'
-    : 'Motor skills: Motor difficulties affecting handwriting, physical education participation, and completion of classroom tasks requiring fine or gross motor coordination.');
-  if(S.needsAdaptive.size) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
+  if(S.needsMotor.size||S.comorbid.has('dcd')){
+    const mi=preschool
+      ? [mHand&&'pre-writing and handling of classroom materials', mGross&&'participation in playground and movement activities', mTone&&'sitting endurance during circle time and table work', mDcd&&'learning new multi-step motor routines']
+      : [mHand&&'handwriting and written output', mGross&&'physical education participation and movement around campus', mTone&&'endurance for sustained seated work', mDcd&&'learning new multi-step motor tasks'];
+    impacts.push('Motor skills: Motor difficulties affecting '+andList(mi.filter(Boolean))+(preschool?', within the classroom.':', within the school setting.'));
+  }
+  if(selfCareItems.length) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
+  // Family-attributed: the physician has not observed the child's school behavior.
+  // The teaching sentence is the physician's, so it stands apart from the family's report. It sits
+  // here rather than in the supervision accommodation because an accommodation carries no
+  // measurable goal, and this line also prints when an elopement aide replaces that accommodation.
+  if(S.needsAdaptive.has('commSafety')) impacts.push('Safety awareness: The family reports limited awareness of hazards in community settings, which may affect safety during arrival and dismissal, field trips, and other less-structured school settings. Direct instruction in safety routines, such as staying with the group, '
+    +(isTeenPlus()?'crossing parking lots and streets safely, and knowing whom to contact if separated from the group':'stopping at streets and parking lots, and asking a trusted adult for help')
+    +', may be appropriate as an IEP goal, with the team determining who provides it.');
+  // Teens only: the checkbox's examples (errands, transit) are teen skills. No separate transition
+  // paragraph (maintainer decision 2026-09-26); the line itself points to the transition plan.
+  if(S.needsAdaptive.has('commIndependence')&&isTeenPlus()) impacts.push('Community living skills: The family reports that the student needs support with routines outside the home, such as finding the way to familiar places, completing errands, and using transportation. These skills are appropriate for the IEP team to address through community-based instruction and the student\'s transition plan.');
   if(S.comorbid.has('ld_reading')) impacts.push('Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.');
   if(S.comorbid.has('ld_math')) impacts.push('Mathematics: A specific learning disability in mathematics affecting computation, problem-solving, and access to grade-level math curriculum.');
   if(S.comorbid.has('ld_written')) impacts.push('Written expression: A specific learning disability in written expression affecting the ability to produce written work at grade level.');
@@ -4874,7 +4934,22 @@ function _iepLetterContent(){
       // Preschool tiers by language level: a nonverbal child gets 'expressive' auto-added from
       // langLevel, so a single line would put word-combining next to the AAC goal above. The
       // nonverbal tier omits AAC because isMinVerbal() always fires the AAC goal alongside it.
-      if(!preschool) goals.push('expressive language development: sentence formulation, topic maintenance, and narrative organization');
+      // School-age and older tier the same way (follow-up council 2026-09-22): a minimally verbal
+      // student otherwise got "narrative organization" beside the AAC goal. Teen add-ons name
+      // self-advocacy with unfamiliar adults; "vocational" is avoided because isTeenPlus() starts at 12.
+      if(!preschool){
+        const teen=isTeenPlus();
+        const teenSA=teen?', and requesting help, asking for clarification, and expressing personal needs and preferences to unfamiliar adults (self-advocacy)':'';
+        if(isMinVerbal()) goals.push('expressive communication: increasing spontaneous, functional communication using spoken words, signs, pictures, or AAC to request, refuse, ask for help or a break, make choices, comment, and share information '
+          +(teen?'across school and community settings, including work-based learning where it is part of the student\'s program, with emphasis on communicating personal information, needs, and preferences to unfamiliar adults':'across classroom routines and instruction'));
+        else if(S.langLevel==='phrase') goals.push('expressive language development: expanding phrases into complete sentences, and using language to request help, ask and answer questions, comment, and describe needs and experiences during classroom routines and academic tasks'+teenSA);
+        else if(S.langLevel==='simpleSentence') goals.push('expressive language development: expanding sentence length and grammatical complexity, asking and answering questions about classroom content, and retelling events, short stories, and classroom activities in sequence, with visual supports as needed'+teenSA);
+        // "Mixed / hard to characterize" defers to the school SLP evaluation, per its own label.
+        else if(S.langLevel==='unclearSLP') goals.push('expressive language development: expanding expressive language for classroom participation, with specific targets and communication modality to be determined by the school SLP evaluation');
+        else goals.push(teen
+          ? 'expressive language development: sentence formulation, topic maintenance, narrative organization, and organizing explanations for coursework and self-advocacy'
+          : 'expressive language development: sentence formulation, topic maintenance, and narrative organization');
+      }
       else if(isMinVerbal()) goals.push('expressive communication: increasing spontaneous, functional communication (spoken words, signs, gestures, or pictures) to request, protest, gain attention, and share interest across classroom routines and play');
       else if(S.langLevel==='phrase') goals.push('expressive language development: combining words into phrases and longer utterances, and using language to request, comment, protest, and answer simple questions during play and classroom routines');
       else if(S.langLevel==='simpleSentence') goals.push('expressive language development: expanding sentence length and grammar, asking and answering wh- questions, and talking about familiar and recent events with adult support');
@@ -4914,14 +4989,14 @@ function _iepLetterContent(){
     if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) goals.push(preschool
       ? 'fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes'
       : 'fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
-    if(S.needsMotor.has('coordination')) goals.push(preschool
+    if(S.needsMotor.has('coordination')||S.comorbid.has('dcd')) goals.push(preschool
       ? 'motor planning and praxis: imitation of new motor actions, sequencing of multi-step play and classroom routines, and use of simple tools'
       : 'motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
-    // Fixed list (not only the checked areas) matches the school-age line; it names parts of
-    // the day without asserting a deficit in each.
-    if(S.needsAdaptive.size) goals.push(preschool
-      ? 'adaptive self-care skills relevant to the school day: toileting, handwashing, dressing tasks such as jackets and shoes, and snack and mealtime routines'
-      : 'adaptive self-care skills relevant to the school day: cafeteria routines, clothing management, and bathroom independence');
+    // Names only the checked school self-care areas, closed with a short tail so a single named
+    // area does not read as singling the child out (follow-up council 2026-09-22). Community
+    // safety/independence and menstrual care do not feed it: safety has its own impact line and
+    // supervision accommodation, menstrual care its own private accommodation.
+    if(selfCareItems.length) goals.push('adaptive self-care skills relevant to the school day: '+andList(selfCareItems.concat('related self-care routines')));
     if(goals.length) s+=' Goals: '+goals.join('; ')+'.';
     svContent.ot_school=s;
   }
@@ -4962,7 +5037,9 @@ function _iepLetterContent(){
     if(S.needsBehavior.has('elopement')) reasons.push('active elopement risk requiring continuous proximity supervision');
     if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) reasons.push('behavioral safety needs requiring capacity for immediate adult intervention');
     if(isMinVerbal()) reasons.push('communication access requiring adult facilitation for AAC use and participation in instruction');
-    if(S.needsAdaptive.size>1) reasons.push('significant adaptive skill deficits requiring adult support throughout the school day');
+    // Self-care only: community safety has its own supervision accommodation, and community
+    // independence is not a school-day support need (follow-up council 2026-09-26).
+    if(selfCareItems.length) reasons.push('hands-on adult support during the school day with '+andList(selfCareItems));
     if(reasons.length) s+=' Specific rationale: '+reasons.join('; ')+'.';
     s+=' The aide\'s role and prompting hierarchy should be explicitly specified in the IEP to promote independence and prevent prompt dependency.';
     svContent.aide=s;
@@ -5059,9 +5136,24 @@ function _iepLetterContent(){
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-  if(S.needsMotor.size||S.comorbid.has('dcd')) accomIndividual.push(preschool
-    ? 'Motor accommodations: adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks, and support for gross motor and playground participation, with physical therapy or adapted physical education consultation if the team finds it indicated'
-    : 'Motor accommodations: keyboarding as alternative to handwriting, extended time on written tasks, adapted physical education referral if indicated');
+  if(S.needsMotor.size||S.comorbid.has('dcd')){
+    // A confirmed written-expression SLD prints its own keyboarding line (accomAcad below), so the
+    // motor line drops keyboarding to avoid saying it twice.
+    const ma=preschool
+      ? [mHand&&'adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks',
+         mGross&&'support for gross motor and playground participation, with physical therapy or adapted physical education consultation if the team finds it indicated',
+         mTone&&'supportive seating and positioning for circle time and table work',
+         mDcd&&'hands-on modeling and extra time for multi-step motor routines']
+      : [mHand&&(S.comorbid.has('ld_written')?'reduced copying and handwriting demands, and extended time on written tasks':'keyboarding or speech-to-text for longer written work, reduced copying and handwriting demands, and extended time on written tasks'),
+         mGross&&'extra time and support for moving safely around campus, support for participation in physical education, and adapted physical education evaluation if the team finds it indicated',
+         mTone&&'supportive seating and positioning for sustained desk work, with breaks from sustained sitting',
+         mDcd&&'step-by-step modeling and extra time for learning multi-step motor tasks, including in physical education'];
+    accomIndividual.push('Motor accommodations: '+ma.filter(Boolean).join('; '));
+  }
+  // Community safety leaves the OT self-care goal, so it gets its own supervision accommodation.
+  // Skipped when a 1:1 aide is already requested for elopement (continuous supervision).
+  if(S.needsAdaptive.has('commSafety')&&!(S.schoolSvc.has('aide')&&S.needsBehavior.has('elopement')))
+    accomIndividual.push('Safety supervision: planned adult supervision during arrival and dismissal, transitions between areas, and off-campus activities such as field trips, with the level of supervision determined by the school team and reduced as the student shows safe routines in these settings');
   // Curriculum and assessment modifications — only when intellectual disability is confirmed
   // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
   // academic instruction; those are placement-defining recommendations that require formal
@@ -6921,7 +7013,9 @@ function syncSchoolSvcFromNeeds(){
     }
   };
   if(S.needsComm.size>0||(S.langLevel&&S.langLevel!=='ageAppropriate'&&!isLangAgeAppropriate())||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()||S.langModifiers.has('echolalic')) add('slp_school');
-  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.needsAdaptive.size>0||S.comorbid.has('dcd')) add('ot_school');
+  // Only the school self-care boxes feed the OT goal; community safety/independence and menstrual
+  // care alone would recommend OT with no goals.
+  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||SCHOOL_SELF_CARE.some(k=>S.needsAdaptive.has(k))||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');

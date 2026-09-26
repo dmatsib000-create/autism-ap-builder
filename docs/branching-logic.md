@@ -330,6 +330,9 @@ The branches below all read `S.ageGroup` directly or via one of four module-scop
 | Early Steps rule | 1426 | `'toddler'` | Part C referral |
 | Preschool SLP/OT goals and motor lines (IEP letter) | `_iepLetterContent()` `preschool` | `ageGroup === 'preschool'` | Swaps the school-age wording (narrative organization, figurative language, academic vocabulary, pencil grip, letter formation, keyboarding, cafeteria routines, written tasks) for routine- and play-anchored goals, a pre-writing motor impact line, and an adapted-materials motor accommodation with PT or adapted PE *consultation*. The preschool expressive goal is tiered by language level: `isMinVerbal()` (no AAC mention, because the AAC goal always fires alongside it), `'phrase'`, `'simpleSentence'`, `'conversational'`/`'ageAppropriate'` (only reachable when the clinician checks Expressive by hand, since the language-level sync never auto-adds it at those levels), anything else (unclear or blank level). No letter line says "preschool" (kindergartners are sometimes entered as preschool). Council 2026-09-22 |
 | Preschool motor accommodation (A&P note) | IEP/504 accommodations block | `ageGroup === 'preschool'` | Note-voice counterpart of the letter's preschool motor accommodation; families read the note in the portal, so the two must agree |
+| School-age+ expressive goal tiers (IEP letter) | `_iepLetterContent()` SLP block | not preschool; `isTeenPlus()` adds teen wording | Tiered like preschool: `isMinVerbal()` (functional communication; no AAC repeat), `'phrase'`, `'simpleSentence'`, `'unclearSLP'` (neutral line deferring to the school SLP evaluation), anything else (the narrative line). Teens: minimally verbal ends "across school and community settings, including work-based learning where it is part of the student's program…"; phrase/sentence add a self-advocacy clause; fluent adds "organizing explanations for coursework and self-advocacy". "Vocational" is avoided because `isTeenPlus()` starts at 12. Follow-up council 2026-09-22 |
+| OT self-care goal (IEP letter) | `_iepLetterContent()` `selfCareItems` | toileting / hygiene / dressing / feeding_adl checked | Names only the checked areas in age-banded wording (preschool / school-age / teen; 6+ says "bathroom independence", never "toileting"), closed with "and related self-care routines". Community safety/independence and menstrual care do not feed it, and (since 2026-09-26) do not auto-add school OT either, so OT never prints without a goal on their account. `SELF_CARE_ITEMS` keys must match the module-scope `SCHOOL_SELF_CARE` |
+| LD problem block (A&P note) | `generateNote()` LD block | confirmed domains | Heading, codes, and assessment sentence name every confirmed domain in DSM-5-TR order (reading, written expression, mathematics), e.g. "with impairment in reading and with impairment in written expression (F81.0, F81.81)". Classroom accommodations are domain-matched; reading without written expression gets a conditional spelling line; the suspected interim line is matched to the area of observed difficulty. The block prints even without the note's general IEP/504 list, so it stands alone |
 | Audiology — speech-driven | 1419–1420 | `isYoung() && speechConcern` | Audiology fires; older children assumed already screened |
 | QbTest age gate | 1424 | `['schoolAge','adolescent','youngAdult'].includes(ageGroup)` | Excludes toddler/preschool (instrument norms start at 6) |
 | ABA target labels | 3149–3155 | `isOlderForABA()` | "play skills" → "social-pragmatic skills for workplace"; "self-help" → "independent living" |
@@ -736,6 +739,8 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 16 | `ruleFDLRS` | 1429 | Age = preschool AND not in public school AND diagStatus ∈ {confirmed, suspected} | `fdlrs` |
 | 17 | `ruleEEG` | 1434 | `S.seizureConcern === true` | `eeg` |
 | 18 | `ruleCARD` | 1435 | `S.diagStatus === 'confirmed'` | `card` |
+
+In the note's OT section, the Community Safety Skills bullet cross-references the ABA section only when `referralIncluded('aba')`; otherwise it names behavioral safety skills training with a behavioral provider (behavior analyst or psychologist).
 
 Each `rule*()` returns `{ include: boolean, reasons: string[] }`. The `reasons` array is consumed downstream by `_abaContent()` to compose the medical-necessity paragraph in the ABA letter — so adding a new trigger condition to `ruleABA` should also append a human-readable reason string.
 
@@ -1501,8 +1506,10 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Social | `needsSocial.size > 0` | Social comprehension, perspective-taking |
 | Behavior | `needsBehavior.size > 0` | Concatenates sub-bullets per behavior type (aggression → safety; elopement → risk; tantrums → regulation; rigidity → inflexibility; vocal disruption → classroom disruption; pica → supervision) |
 | Sensory | `needsSensory.size > 0` | Sensory processing affecting attention/regulation |
-| Motor | `needsMotor.size > 0 \|\| comorbid.has('dcd')` | Handwriting, PE, classroom-task motor demands |
-| Adaptive | `needsAdaptive.size > 0` | Self-care, daily living |
+| Motor | `needsMotor.size > 0 \|\| comorbid.has('dcd')` | Composed from the checked needs (hand skills: fine/handwriting/coordination/DCD; gross or low tone; low tone; coordination/DCD), joined with `andList()`; preschool and 6+ wording differ |
+| Adaptive | a checked school self-care box (toileting, dressing, feeding_adl, hygiene) | Self-care, daily living. Community safety, community independence, and menstrual care do not trigger it |
+| Safety awareness | `needsAdaptive.has('commSafety')` | Family-attributed: limited hazard awareness in community settings affecting arrival/dismissal and field trips. A separate physician sentence follows: direct instruction in safety routines may be appropriate as an IEP goal, team decides who provides it; examples are age-banded (`isTeenPlus()` gets parking lots/streets and whom to contact if separated). It lives here, not in the accommodation, because an accommodation carries no measurable goal and this line also prints when an elopement aide replaces the supervision accommodation |
+| Community living skills | `needsAdaptive.has('commIndependence') && isTeenPlus()` | Family-attributed need for support with routines outside the home (way-finding, errands, transportation), pointed to community-based instruction and the transition plan. Teens and young adults only; no standalone transition paragraph (maintainer decision 2026-09-26) |
 | SLD (confirmed) | `comorbid.has('ld_reading' \| 'ld_math' \| 'ld_written')` | Domain-specific SLD impact |
 | SLD (suspected) | `comorbid.has('ld_suspected')` + no confirmed domains | Recommend psychoed eval to characterize domain |
 
@@ -1513,11 +1520,11 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Service | `schoolSvc` key | Content |
 |---|---|---|
 | Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder. Preschool wording differs (§2.1) |
-| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning + adaptive self-care. Preschool wording differs (§2.1) |
+| Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning (coordination box or DCD) + adaptive self-care. Auto-added by `syncSchoolSvcFromNeeds()` on sensory, fine/handwriting/coordination, DCD, or a school self-care box (`SCHOOL_SELF_CARE`: toileting, hygiene, dressing, feeding_adl). Community safety and community independence alone do not add it: school OT has no goal to write for them (follow-up council 2026-09-26). The note's outpatient `ruleOT` still fires on any adaptive need. Preschool wording differs (§2.1) |
 | Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
-| 1:1 Paraprofessional | `aide` | Elopement risk + behavior safety + communication access + adaptive deficits |
+| 1:1 Paraprofessional | `aide` | Elopement risk + behavior safety + communication access + school self-care (one or more `selfCareItems`, named in the age-banded wording: "hands-on adult support during the school day with ..."). Community boxes never feed the aide rationale |
 | Extended School Year | `esy` | Regression risk over long breaks. When `ruledOut`, the argument re-anchors to documented level of need rather than to ASD |
 | Low Student-to-Teacher Ratio | `lowRatio` | Sensory regulation + individualized pacing + behavioral consistency |
 | Sensory accommodations | `sensory` | Developed with OT; noise-canceling, sensory breaks, calm space |
@@ -1552,7 +1559,10 @@ only the on-screen preview, so the rule-out rationale never appeared in the plai
 pastes into Epic, and no lane could see it because the golden lane snapshots only that plain
 surface.
 
-**`accomIndividual`** (`autism-ap-builder.html:3561–3564`) — Triggered by specific need or comorbidity findings. Sensory accommodations, motor accommodations, language-specific accommodations.
+**`accomIndividual`** — Triggered by specific need or comorbidity findings. Sensory accommodations, motor accommodations, language-specific accommodations.
+
+- **Motor accommodations** are composed from the checked motor needs (follow-up council 2026-09-22), one part each, joined with semicolons: hand skills (fine, handwriting, coordination, or DCD), gross/low tone (adapted PE *evaluation* at 6+, PT or adapted PE *consultation* at preschool), low-tone seating, and coordination/DCD step-by-step modeling. When `comorbid.has('ld_written')`, the 6+ hand-skills part drops keyboarding because the written-expression SLD accommodation already carries it. The A&P note's IEP/504 list composes the same parts in the note's shorter voice, with the same de-duplication.
+- **Safety supervision** fires on `needsAdaptive.has('commSafety')`, except when a 1:1 aide is requested for elopement (continuous supervision already covered). It ends "reduced as the student shows safe routines in these settings" so supervision reads as fading, not permanent; the teaching itself is in the Safety awareness impact line.
 
 **`accomIDMod`** (`autism-ap-builder.html:3569–3573`) — Gated by **both** `hasID() === true` *and* `specifiers.has('withID')`:
 - Modified curriculum

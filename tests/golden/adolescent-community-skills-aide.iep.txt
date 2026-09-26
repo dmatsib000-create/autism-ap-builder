@@ -1,5 +1,5 @@
 PHYSICIAN RECOMMENDATION FOR SPECIAL EDUCATION SERVICES
-IEP Review Request
+Initial Special Education Evaluation Request
 
 Date: {Date}
 
@@ -7,35 +7,39 @@ Date: {Date}
 {School Name}
 {School Address}
 
-Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 1 (requiring support)
+Re: {Student Name} | Autism Spectrum Disorder (ICD-10: F84.0) — Level 2 (requiring substantial support)
 
 Dear {Principal / Special Education Coordinator Name}:
 
 I am a pediatrician at the UF Behavior and Development Clinic. I evaluated {Student Name} on {Date of Evaluation} and am writing to provide a formal medical recommendation in support of the family's request for special education services under the Individuals with Disabilities Education Act (IDEA).
 
-Specifically, I am requesting that the IEP Team convene to review and update the current IEP in light of the findings described below, together with the services and accommodations I recommend.
+Specifically, I am requesting a comprehensive multidisciplinary evaluation to determine eligibility for special education services. Florida allows 60 calendar days from written parental consent for that evaluation, with the exclusions the rule provides. The findings supporting that request are set out below, together with the services and accommodations I recommend.
 
-He has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 1 (requiring support), confirmed at the evaluation referenced above.
+She has received a diagnosis of Autism Spectrum Disorder (ASD) (ICD-10-CM: F84.0), classified as Level 2 (requiring substantial support), confirmed at the evaluation referenced above.
 
 ────────────────────────────────────────────────────────────
 EDUCATIONAL IMPACT
 ────────────────────────────────────────────────────────────
 These conditions result in the following challenges that require specialized support in the educational setting:
-  • Motor skills: Motor difficulties affecting physical education participation and movement around campus, and endurance for sustained seated work, within the school setting.
+  • Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.
+  • Safety awareness: The family reports limited awareness of hazards in community settings, which may affect safety during arrival and dismissal, field trips, and other less-structured school settings. Direct instruction in safety routines, such as staying with the group, crossing parking lots and streets safely, and knowing whom to contact if separated from the group, may be appropriate as an IEP goal, with the team determining who provides it.
+  • Community living skills: The family reports that the student needs support with routines outside the home, such as finding the way to familiar places, completing errands, and using transportation. These skills are appropriate for the IEP team to address through community-based instruction and the student's transition plan.
 
 ────────────────────────────────────────────────────────────
-REQUEST FOR IEP TEAM MEETING
+REQUEST FOR SPECIAL EDUCATION EVALUATION
 ────────────────────────────────────────────────────────────
-I understand that {Student Name} currently has an Individualized Education Program (IEP) in place. I respectfully request that the IEP team convene to review and update the IEP in light of the current evaluation findings documented above.
+Based on the above diagnosis and identified educational impact, I strongly recommend that {Student Name} receive a comprehensive evaluation for special education eligibility under IDEA, including consideration of the Autism Spectrum Disorder eligibility category (34 C.F.R. §300.8(c)(1); Florida Rule 6A-6.03023) and any additional eligibility categories supported by the evaluation results.
 
-Florida Rule 6A-6.03028(3)(j)2.c. asks the IEP Team to revise the IEP as appropriate to address information about the student provided by the parents, and I hope the enclosed evaluation is useful in that review. I ask that a meeting be scheduled at the family's earliest convenience to consider the following updates.
+The evaluation should include assessment of: cognitive abilities, academic achievement, adaptive behavior, communication skills, behavioral and social-emotional functioning, and sensory-motor development.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED SERVICES
 ────────────────────────────────────────────────────────────
-I recommend the following updates to the current IEP:
+If eligible for special education services, I recommend the IEP include the following:
 
-Physical Therapy (PT): School-based PT services are recommended to address motor needs that affect safe navigation of the school environment and access to physical education. Goals: postural control and core strengthening to address low muscle tone affecting endurance, positioning, and sustained classroom participation; safe navigation of the school campus (stairs, hallways, playground equipment).
+Occupational Therapy (OT): School-based OT services are recommended to address sensory, fine motor, and/or adaptive needs that affect classroom participation and academic output. Goals: adaptive self-care skills relevant to the school day: bathroom independence and related self-care routines.
+
+Paraprofessional Support (1:1 Aide): A dedicated paraprofessional is recommended based on the documented support needs identified in this evaluation. Specific rationale: hands-on adult support during the school day with bathroom independence. The aide's role and prompting hierarchy should be explicitly specified in the IEP to promote independence and prevent prompt dependency.
 
 ────────────────────────────────────────────────────────────
 RECOMMENDED ACCOMMODATIONS
@@ -48,7 +52,7 @@ The following accommodations have broad evidence support across the autism spect
   • Visual supports (format calibrated to developmental level and literacy): pictorial schedule and visual transition cues for younger or non-reading students; written agenda, task checklists, or digital planner for older or verbal students — visual representation of schedules, task steps, and expectations reduces transition anxiety and supports regulation across the autism spectrum
 
 Individually Indicated Accommodations:
-  • Motor accommodations: extra time and support for moving safely around campus, support for participation in physical education, and adapted physical education evaluation if the team finds it indicated; supportive seating and positioning for sustained desk work, with breaks from sustained sitting
+  • Safety supervision: planned adult supervision during arrival and dismissal, transitions between areas, and off-campus activities such as field trips, with the level of supervision determined by the school team and reduced as the student shows safe routines in these settings
 
 ────────────────────────────────────────────────────────────
 Questions about this evaluation or these recommendations are welcome at our office, as are requests for physician input at the IEP meeting.
