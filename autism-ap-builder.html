@@ -88,6 +88,10 @@
   --border-subtle:#edeef1;
   --border-default:var(--gray-200);
   --border-strong:var(--gray-300);
+  /* Edge of a text box / small select. Kept >=3:1 against the field fill and the panel behind it
+     (WCAG 1.4.11): an empty text box has no other cue for where to type. Chips don't need it; their
+     text identifies them. Re-check all three themes if you lighten it. */
+  --border-control:#85858f;
   /* Radii */
   --radius-sm:4px;--radius:6px;--radius-md:8px;--radius-lg:12px;--radius-pill:999px;
   /* Shadows — calm, layered */
@@ -130,6 +134,7 @@
   /* warm paper + ink scale */
   --gray-50:#f6f0e2; --gray-100:#efe7d6; --gray-200:#ddd2bd; --gray-300:#c9bca2;
   --gray-400:#6f6650; --gray-500:#6c6253; --gray-600:#564c3d; --gray-700:#41392d; /* gray-400 darkened (was #938876) for WCAG AA, incl. the warm panel surface */
+  --border-control:#8f846d;
   --gray-800:#2a251d; --gray-900:#211d16;
   --surface:#f3ecdc; --bg-card:#fbf6ea; --bg-elevated:#fffdf7;
   --border-subtle:#e7ddc8;
@@ -155,6 +160,7 @@
   /* cool slate paper + graphite ink scale */
   --gray-50:#f4f4f2; --gray-100:#ececea; --gray-200:#dcdcd8; --gray-300:#bcbcb6;
   --gray-400:#6b707b; --gray-500:#5a5f68; --gray-600:#454a52; --gray-700:#2c2f35; /* gray-400 darkened (was #878d97) for WCAG AA, incl. the slate panel surface */
+  --border-control:#858a93;
   --gray-800:#191b1f; --gray-900:#15171a;
   --surface:#f6f6f4; --bg-card:#fcfcfb; --bg-elevated:#ffffff;
   --border-subtle:#e6e6e2;
@@ -293,8 +299,8 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){[data-theme="warm"] .btn-blue:hover{background:var(--blue-darker)}}
 .btn-gray{background:var(--gray-200);color:var(--gray-700)}
 @media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
-.btn-green{background:#16a34a;color:white}
-@media (hover:hover){.btn-green:hover{background:#15803d}}
+.btn-green{background:#15803d;color:white} /* not #16a34a: white text on it is 3.3:1, under WCAG AA */
+@media (hover:hover){.btn-green:hover{background:#166534}}
 .btn-epic{background:#6d28d9;color:white;border-color:#6d28d9}
 @media (hover:hover){.btn-epic:hover{background:#5b21b6}}
 .btn-sm{padding:3px 9px;font-size:var(--text-11)}
@@ -418,6 +424,11 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
+/* Hint text inside a chip (age ranges). Muted grey at rest; the chip's hover/selected tint drops
+   muted grey under 4.5:1, so there the hint takes the chip's own text color. */
+.r-opt small{font-size:var(--text-10);color:var(--gray-500)}
+.r-opt.is-on small{color:inherit}
+@media (hover:hover){.r-opt:hover small{color:inherit}}
 .r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
 /* The real radio/checkbox behind a chip, toggle, or card is visually hidden, NOT display:none:
    display:none drops it from the tab order and the accessibility tree, so keyboard and
@@ -430,7 +441,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){.cb-row:hover{background:var(--gray-100)}}
 .cb-row input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
 .beh-freq-row{margin:2px 0 4px 24px}
-.beh-freq-inp{width:100%;max-width:400px;font-size:var(--text-11);padding:3px 7px;border:1px solid var(--gray-300);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
+.beh-freq-inp{width:100%;max-width:400px;font-size:var(--text-11);padding:3px 7px;border:1px solid var(--border-control);border-radius:4px;color:var(--gray-700);font-family:var(--font);background:var(--gray-50)}
 .beh-freq-inp::placeholder{color:var(--gray-400);font-style:italic}
 /* ── .chip: shared primitive for selectable chip controls (tech-debt #4) ──
    One token-driven base generalizing the chip family (.r-opt, .mod-chip,
@@ -465,11 +476,11 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .chip-grp-hd:first-child{border-top:none;padding-top:0;margin-top:0}
 .strength-chips{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:6px}
 /* .str-chip migrated to the .chip primitive (chip chip--sm chip--success); see Phase 2. */
-.strengths-area{width:100%;font-size:var(--text-12);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
+.strengths-area{width:100%;font-size:var(--text-12);font-family:var(--font);color:var(--gray-700);border:1px solid var(--border-control);border-radius:3px;padding:6px 8px;resize:vertical;min-height:48px;line-height:1.5}
 .strengths-area:focus{outline:none;border-color:var(--blue)}
 .strengths-area::placeholder{color:var(--gray-400);font-style:italic}
 .evidence-wrap{margin:3px 0 3px 28px}
-.evidence-area{width:100%;font-size:var(--text-11);font-family:var(--font);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:3px;padding:5px 7px;resize:vertical;min-height:40px;background:var(--gray-50);line-height:1.5}
+.evidence-area{width:100%;font-size:var(--text-11);font-family:var(--font);color:var(--gray-700);border:1px solid var(--border-control);border-radius:3px;padding:5px 7px;resize:vertical;min-height:40px;background:var(--gray-50);line-height:1.5}
 .evidence-area:focus{outline:none;border-color:var(--blue);background:white}
 .evidence-area::placeholder{color:var(--gray-400);font-style:italic}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:var(--text-10-5);font-weight:600;margin-top:5px}
@@ -590,9 +601,9 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    year granularity but not finer for dates directly related to an individual.
    width:54px sized for a 4-digit year; -webkit-appearance:none strips the spinner
    on Chromium since the keyboard +/- is more useful in clinical workflow. */
-.prior-date-input{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);width:54px;-moz-appearance:textfield}
+.prior-date-input{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--border-control);background:var(--gray-50);color:var(--gray-600);width:54px;-moz-appearance:textfield}
 .prior-date-input::-webkit-outer-spin-button,.prior-date-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.prior-mod-sel{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--gray-300);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
+.prior-mod-sel{font-size:var(--text-10);padding:1px 4px;border-radius:4px;border:1px solid var(--border-control);background:var(--gray-50);color:var(--gray-600);cursor:pointer}
 .plan-pill.pill-off{display:inline-flex;background:var(--gray-100);color:var(--gray-400);border-color:var(--gray-300)}
 .cr-wrap.cr-suspected{margin-top:5px;padding-top:5px;border-top:1px dashed var(--gray-200)}
 .cr-wrap.cr-suspected .cb-row{color:var(--gray-500);font-style:italic}
@@ -822,11 +833,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Age Group</span>
         <div class="radio-grid">
-          <label class="r-opt"><input type="radio" name="ageGroup" value="toddler">Toddler<br><small style="font-size:var(--text-10);color:#9ca3af">(12–35 mo)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="preschool">Preschool<br><small style="font-size:var(--text-10);color:#9ca3af">(3–5 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="schoolAge">School-age<br><small style="font-size:var(--text-10);color:#9ca3af">(6–11 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="adolescent">Adolescent<br><small style="font-size:var(--text-10);color:#9ca3af">(12–17 y)</small></label>
-          <label class="r-opt"><input type="radio" name="ageGroup" value="youngAdult">Young adult<br><small style="font-size:var(--text-10);color:#9ca3af">(18+ y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="toddler">Toddler<br><small>(12–35 mo)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="preschool">Preschool<br><small>(3–5 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="schoolAge">School-age<br><small>(6–11 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="adolescent">Adolescent<br><small>(12–17 y)</small></label>
+          <label class="r-opt"><input type="radio" name="ageGroup" value="youngAdult">Young adult<br><small>(18+ y)</small></label>
         </div>
       </div>
 
@@ -1059,7 +1070,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row" data-tm-returned="gars3" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="gars3"> Returned and reviewed</label>
           <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="assq"> ASSQ (Autism Spectrum Screening Questionnaire)</label>
           <label class="cb-row" data-tm-returned="assq" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="assq"> Returned and reviewed</label>
-          <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="other_teacher"> Other: <input type="text" id="teacherMaterialOtherField" aria-label="Other teacher material: specify" placeholder="specify..." style="margin-left:6px;font-size:var(--text-11);border:1px solid var(--gray-300);border-radius:3px;padding:2px 5px;width:160px;font-family:var(--font)"></label>
+          <label class="cb-row"><input type="checkbox" data-key="teacherMaterials" value="other_teacher"> Other: <input type="text" id="teacherMaterialOtherField" aria-label="Other teacher material: specify" placeholder="specify..." style="margin-left:6px;font-size:var(--text-11);border:1px solid var(--border-control);border-radius:3px;padding:2px 5px;width:160px;font-family:var(--font)"></label>
           <label class="cb-row" data-tm-returned="other_teacher" style="display:none;margin-left:18px;font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" data-key="teacherMaterialsReturned" value="other_teacher"> Returned and reviewed</label>
         </div>
       </div>
@@ -1565,7 +1576,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <hr class="divider" style="margin-top:10px">
       <div class="field-group" style="margin-top:8px">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
-        <input type="text" id="rtcIntervalField" aria-label="Return to clinic interval" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:var(--text-12);font-family:var(--font);border:1px solid var(--gray-200);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
+        <input type="text" id="rtcIntervalField" aria-label="Return to clinic interval" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:var(--text-12);font-family:var(--font);border:1px solid var(--border-control);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
       </div>
     </div>
   </div>
