@@ -3775,16 +3775,18 @@ function generateNote() {
     if(S.prenatalAlcohol||S.fasdFeatures){L.push('  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center\'s FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org');}
     if(anyTherapyInPlan){
       L.push('');L.push('  Finding Therapies / Navigating the System:');
-      L.push('    1. Call your insurance company and ask to be assigned a case manager.');
-      L.push('    2. Request a list of all recommended providers.');
+      // Steps 3 (ABA) and 5 (confirmed diagnosis) are conditional, so number as we go.
+      let stepN=1;const step=t=>'    '+(stepN++)+'. '+t;
+      L.push(step('Call your insurance company and ask to be assigned a case manager.'));
+      L.push(step('Request a list of all recommended providers.'));
       if(referralIncluded('aba')){const pendingTesting=evalPathSteps().pendingTesting;
-        if(pendingTesting){L.push('    3. [ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously');L.push('       - no matter how long the lists appear.');}
-        else{L.push('    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.');}}
-      L.push('    4. Use Google Maps to search for nearby providers and call to confirm insurance.');
-      if(S.diagStatus==='confirmed'){L.push('    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.');L.push('       Please reach out for assistance.');}
-      L.push('    6. Follow up with providers every 3 weeks until a spot is secured;');
+        if(pendingTesting){L.push(step('[ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously'));L.push('       - no matter how long the lists appear.');}
+        else{L.push(step('[ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.'));}}
+      L.push(step('Use Google Maps to search for nearby providers and call to confirm insurance.'));
+      if(S.diagStatus==='confirmed'){L.push(step('[Autism diagnosis] Your local CARD center is also a resource for locating therapy services.'));L.push('       Please reach out for assistance.');}
+      L.push(step('Follow up with providers every 3 weeks until a spot is secured;'));
       L.push('       consider appearing in person if phone calls go unanswered.');
-      L.push('    7. When a spot is obtained, notify other waitlists so another child may benefit.');
+      L.push(step('When a spot is obtained, notify other waitlists so another child may benefit.'));
     }
     const hasAtHome=under6||S.highlyMotivated||over5ABA||behaviorconcern||referralIncluded('aba');
     if(hasAtHome){
