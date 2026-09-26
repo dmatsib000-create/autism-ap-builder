@@ -3744,14 +3744,16 @@ function generateNote() {
       L.push('  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. '
         +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
           :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.'));
-      // The elopement line above already names GPS tracking and the registry, but not the
-      // medical ID or "If I am found" card, so those still print when it is checked.
-      if(S.safety.has('elopement_counsel')){
-        L.push('    - Identification supports: medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
-      } else {
-        L.push('    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, \'If I am found\' information card in backpack or worn on person.');
+      // The elopement line above already names GPS tracking and the registry, and the Medical ID
+      // line names the ID, so each is dropped here when its counseling box is checked; the
+      // "If I am found" card is named nowhere else and always prints.
+      const _id=[];
+      if(!S.safety.has('elopement_counsel')) _id.push('GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker)');
+      if(!S.safety.has('medID')) _id.push('medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure');
+      _id.push('\'If I am found\' information card in backpack or worn on person');
+      L.push('    - '+(S.safety.has('elopement_counsel')?'Identification supports: ':'Equipment and identification supports: ')+_id.join(', ')+'.');
+      if(!S.safety.has('elopement_counsel'))
         L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
-      }
       const _sc=[];if(S.safety.has('elopement_counsel'))_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
       L.push('    - Primary community safety concern(s): '+(_sc.length?_sc.join('; '):'{specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'.');
     }
