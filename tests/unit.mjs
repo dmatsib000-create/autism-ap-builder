@@ -271,6 +271,24 @@ const CASES = [
     setup(S){ },
     check(a){ const st=a.evalPathSteps();
               assert.equal(st.hasProfile, false); assert.equal(st.hasDx, false); assert.equal(st.pendingTesting, false); } },
+
+  // ── appendEvidence(): observation chip text joined onto evidence prose (reaches the note) ──
+  { name: 'appendEvidence: empty box takes the chip text alone',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('   ', 'Hand flapping'), 'Hand flapping'); } },
+  { name: 'appendEvidence: after a source heading joins with a space, not "; "',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('Direct observation: ', 'Hand flapping'), 'Direct observation: Hand flapping'); } },
+  { name: 'appendEvidence: heading on a later line keeps earlier text intact',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('Toe walking\nParent report: ', 'Lines up toys'), 'Toe walking\nParent report: Lines up toys'); } },
+  { name: 'appendEvidence: after existing text joins with "; "',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('Direct observation: Hand flapping', 'Toe walking'), 'Direct observation: Hand flapping; Toe walking'); } },
+  { name: 'appendEvidence: after typed trailing ";" or "," does not double the separator',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('Hand flapping;', 'Toe walking'), 'Hand flapping; Toe walking');
+              assert.equal(a.appendEvidence('Hand flapping,', 'Toe walking'), 'Hand flapping, Toe walking'); } },
 ];
 
 let pass = 0;

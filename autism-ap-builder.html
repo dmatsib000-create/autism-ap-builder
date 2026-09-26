@@ -5806,6 +5806,15 @@ function initSectionToggles(){
   });
 }
 
+// Join an observation chip's text onto a criterion's evidence text. Normally "; "-separated,
+// but right after a source heading ("Parent report:") or existing punctuation it joins with a
+// space, so the note reads "Parent report: Hand flapping", not "Parent report:; Hand flapping".
+function appendEvidence(cur,text){
+  const t=cur.trim();
+  if(!t) return text;
+  return /[:;,]$/.test(t)?t+' '+text:t+'; '+text;
+}
+
 function updateEvChips(){
   const ag=S.ageGroup, mv=isMinVerbal();
   const olderAge=ag==='schoolAge'||ag==='adolescent'||ag==='youngAdult';
@@ -7659,7 +7668,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         chip.dataset.age=ageKey;
         if(typeof entry!=='string'&&entry.lang) chip.dataset.lang=entry.lang;
         chip.addEventListener('click',()=>{
-          ta.value=ta.value.trim()?(ta.value.trim()+'; '+text):text;
+          ta.value=appendEvidence(ta.value,text);
           S.ev[k]=ta.value;render();
         });
         obsStrip.appendChild(chip);
