@@ -68,6 +68,16 @@ for headings and emphasis. Presence may not.
   assert the Warm and Slate blocks define the same token *set* — they
   intentionally differ (Warm's letterpress `--key-*`/`--emboss` vs Slate's
   `--radius-lg`/`--shadow-card`), so set-equality would be a false positive.
+  Section F adds **contrast floors**: for each theme (tokens it doesn't redefine
+  are inherited from base `:root`) it computes the WCAG ratio of the token pairs
+  the CSS is known to render together — the text-box edge (`--border-control`)
+  against the field fill, card, and page surface (≥ 3:1), the chip hint colors
+  (≥ 4.5:1), and white on the copy-button greens (`--btn-green` / `-hover`,
+  ≥ 4.5:1) — so retuning a neighbouring token can't quietly drop one under AA.
+  It also fails if a text box or menu sets an inline `border`, since the base
+  `:where(textarea,select,input…)` rule is what gives every field its edge. It
+  sees token pairs only, not arbitrary rules, so it doesn't replace a contrast
+  audit of the rendered page.
 
 ## Running
 

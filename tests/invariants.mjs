@@ -295,6 +295,85 @@ for (const field of IEP_SHARED_FIELDS) {
   }
 }
 
+// ── F. Contrast floors for hand-tuned theme tokens ───────────────────────────
+// Several tokens were picked per theme to JUST clear WCAG 2.1 AA (the field edge
+// clears 3:1 by ~0.15 in Slate; the selected-chip hint clears 4.5:1 by ~0.1 in
+// Warm). Retuning a neighbouring token (a paler --gray-50, a new --accent-soft)
+// can drop them under the line with nothing visibly "broken", so the ratios are
+// computed here from the token values in base :root and each theme block. A
+// theme inherits any token it doesn't redefine. This checks the TOKEN pairs the
+// CSS is known to render together; it can't see a rule that pairs other colors
+// (that remains the contrast audit's job, see tests/README.md).
+const declsOf = block => Object.fromEntries(
+  [...block.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--[\w-]+)\s*:\s*([^;}]+)/g)]
+    .map(m => [m[1], m[2].trim()])
+);
+// ':root ' (trailing space, no brace): cssBlockAfter searches for the first '{'
+// AFTER the selector, so including the brace would skip to the next rule.
+const baseTokens = declsOf(cssBlockAfter(':root '));
+if (!baseTokens['--border-control']) throw new Error(
+  'invariants.mjs: base :root block not found or lacks --border-control; update the contrast check.'
+);
+const resolveColor = (tokens, value, seen = []) => {
+  const v = value.trim();
+  const ref = v.match(/^var\((--[\w-]+)\)$/);
+  if (ref) {
+    if (seen.includes(ref[1]) || !(ref[1] in tokens)) throw new Error(
+      `invariants.mjs: contrast check can't resolve ${ref[1]} (${[...seen, ref[1]].join(' -> ')}).`
+    );
+    return resolveColor(tokens, tokens[ref[1]], [...seen, ref[1]]);
+  }
+  if (!/^#[0-9a-f]{6}$/i.test(v)) throw new Error(
+    `invariants.mjs: contrast check expects a 6-digit hex, got "${v}". ` +
+    `If a token became a color-mix()/rgba(), extend resolveColor or drop that pair.`
+  );
+  return v;
+};
+const relLum = hex => {
+  const [r, g, b] = [1, 3, 5].map(i => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => {
+  const [hi, lo] = [relLum(a), relLum(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+// [what, foreground, background, minimum]. '#ffffff' is literal white text.
+const CONTRAST_PAIRS = [
+  ['text-box edge on field fill',   '--border-control', '--gray-50',  3],
+  ['text-box edge on card',         '--border-control', '--bg-card',  3],
+  ['text-box edge on page surface', '--border-control', '--surface',  3],
+  ['age hint on a resting chip',    '--gray-500',       '--bg-card',  4.5],
+  // Base and Warm render the selected chip (and its hint, via color:inherit) as
+  // --accent-hover on --accent-soft. Slate overrides that rule; checked anyway.
+  ['hint on a selected chip',       '--accent-hover',   '--accent-soft', 4.5],
+  ['white text on copy button',     '#ffffff',          '--btn-green', 4.5],
+  ['white text on copy button hover', '#ffffff',        '--btn-green-hover', 4.5],
+];
+const contrastThemes = [['Current', baseTokens], ...themeBlocks.map(([n, b]) => [n, { ...baseTokens, ...declsOf(b) }])];
+for (const [themeName, tokens] of contrastThemes) {
+  for (const [what, fg, bg, min] of CONTRAST_PAIRS) {
+    const col = t => t.startsWith('#') ? t : resolveColor(tokens, `var(${t})`);
+    const label = t => t.startsWith('#') ? t : `${t} ${col(t)}`;
+    const r = contrast(col(fg), col(bg));
+    if (r < min) failures.push(
+      `Contrast (${themeName} theme): ${what} is ${r.toFixed(2)}:1, under the ${min}:1 WCAG AA floor ` +
+      `(${label(fg)} on ${label(bg)}).`
+    );
+  }
+}
+
+// Text-entry fields get their edge from the base :where(...) rule. An inline
+// `border` on one re-opens the per-field drift that rule exists to prevent.
+const inlineBorderFields = [...html.matchAll(/<(?:textarea|select|input\b(?=[^>]*type="(?:text|number|search)"))[^>]*style="[^"]*\bborder(?:-color)?:[^"]*"[^>]*>/g)]
+  .map(m => (m[0].match(/id="([^"]+)"/) || [, m[0].slice(0, 60)])[1]);
+for (const f of inlineBorderFields) failures.push(
+  `Text-entry field "${f}" sets an inline border; drop it so the base :where(textarea,select,input…) ` +
+  `rule supplies the accessible --border-control edge.`
+);
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
@@ -303,6 +382,7 @@ console.log(
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
   `prior tests ${priorTestCheckboxKeys.length} checkboxes = ${priorTestLabelKeys.length} labels (${adaptiveTestKeys.length} adaptive); ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
+  `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`
 );
 for (const f of failures) console.log('✗ ' + f);
