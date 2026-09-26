@@ -2171,7 +2171,9 @@ function ruleSLP() {
   return {include:S.needsComm.size>0||langTrigger||S.comorbid.has('language_disorder')};
 }
 // Community safety alone does not refer to OT: its supports are family safety counseling
-// (printed in Safety Counseling), not OT work. Same call as school OT (council 2026-09-26).
+// (printed in Safety Counseling), not OT work (council 2026-09-26). Only commSafety is
+// excluded; community independence and menstrual care still refer, so this is not the
+// school OT list (SCHOOL_SELF_CARE).
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||[...S.needsAdaptive].some(k=>k!=='commSafety')||S.comorbid.has('dcd')}; }
 function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
 function ruleGenetics() {
@@ -3728,7 +3730,8 @@ function generateNote() {
   // Safety — before Resources
   // Community safety opens this section on its own: its supports are family counseling,
   // and it is the only way the stranger-safety line (gated behind commSafety) can print.
-  if(S.safety.size||S.needsAdaptive.has('commSafety')){
+  const commSafety=S.needsAdaptive.has('commSafety');
+  if(S.safety.size||commSafety){
     L.push(n+++'. SAFETY COUNSELING');
     if(S.safety.has('elopement_counsel')){L.push('  • Elopement/Wandering: Door alarms, keyed locks, fenced yard, GPS tracking (AngelSense, Apple Watch + Find My, Tile), law enforcement ASD registry, and Project Lifesaver enrollment discussed with family.');}
     if(S.safety.has('water_counsel')){L.push('  • Water Safety: Elevated drowning risk counseled. Pool fencing/barrier, alarm, adapted swim lessons, and life vest near open water recommended.');}
@@ -3739,7 +3742,7 @@ function generateNote() {
     if(S.safety.has('internet')) L.push('  • Internet/Social Media Safety: Privacy, appropriate online relationships, digital stranger safety discussed.');
     if(S.safety.has('fire_counsel')) L.push('  • Fire/Environmental Hazards: Home fire safety plan and smoke detector placement reviewed.');
     if(S.strangerDanger) L.push('  • Stranger Safety / Reduced Protective Response: Absence of age-appropriate stranger wariness discussed with family. Patient approaches unfamiliar adults without appropriate caution, creating significant safety risk and vulnerability to exploitation. Counseling provided regarding: continued direct supervision in community and school settings; stranger discrimination training (addressed via ABA programming); and caregiver strategies to minimize unsupervised access to unfamiliar adults. Family instructed to notify school staff and ensure supervision requirements are documented in the IEP/504 plan.');
-    if(S.needsAdaptive.has('commSafety')){
+    if(commSafety){
       // The ABA cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
       L.push('  • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. '
         +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
@@ -3747,14 +3750,15 @@ function generateNote() {
       // The elopement line above already names GPS tracking and the registry, and the Medical ID
       // line names the ID, so each is dropped here when its counseling box is checked; the
       // "If I am found" card is named nowhere else and always prints.
+      const elo=S.safety.has('elopement_counsel');
       const _id=[];
-      if(!S.safety.has('elopement_counsel')) _id.push('GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker)');
+      if(!elo) _id.push('GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker)');
       if(!S.safety.has('medID')) _id.push('medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure');
       _id.push('\'If I am found\' information card in backpack or worn on person');
-      L.push('    - '+(S.safety.has('elopement_counsel')?'Identification supports: ':'Equipment and identification supports: ')+_id.join(', ')+'.');
-      if(!S.safety.has('elopement_counsel'))
+      L.push('    - '+(elo?'Identification supports: ':'Equipment and identification supports: ')+_id.join(', ')+'.');
+      if(!elo)
         L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
-      const _sc=[];if(S.safety.has('elopement_counsel'))_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
+      const _sc=[];if(elo)_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
       L.push('    - Primary community safety concern(s): '+(_sc.length?_sc.join('; '):'{specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'.');
     }
     L.push('');
@@ -4393,8 +4397,7 @@ function generateRichHTML(isPreview=false) {
     // 6 spaces (not 4) so this branch only matches lines we intentionally emit
     // as bullet-continuation — 4-space-indented sub-items used elsewhere in
     // the note (ADHD med tables, AAC, safety targets, accommodations) close
-    // the list and render as their own <p> (dash sub-items get the indented
-    // branch below).
+    // the list and render as their own indented <p> (final branch below).
     else if(inUL && /^      \S/.test(line)){
       html+=`<li style="list-style:none;margin:1px 0 3px 18px;font-size:10.5pt;color:#374151">${linkify(line.trim())}</li>`;
     }
@@ -4410,16 +4413,14 @@ function generateRichHTML(isPreview=false) {
     // 9.5pt matches the ABA letter's .aba-ref convention so references
     // render at the same scale across all three output documents.
     else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
-    // Numbered steps ("    1. ...", e.g. Finding Therapies) and their 7-space wrapped
-    // continuations. Continuations come first: "       - no matter how long..." would
-    // otherwise be caught by the dash branch below.
-    else if(/^ {7}\S/.test(line)){closeUL();html+=`<p style="margin:0 0 1px 56px">${linkify(line.trim())}</p>`;}
-    else if(/^ {4}\d+\. /.test(line)){closeUL();html+=`<p style="margin:1px 0 1px 36px">${linkify(line.trim())}</p>`;}
-    // Dash sub-items under a bullet ("    - ..."). HTML collapses the leading spaces,
-    // so without a margin they sit flush left and read as detached from their bullet.
-    // Kept as <p> (not nested <li>) so the rich paste keeps the same block structure.
-    else if(/^ {4,}- /.test(line)){closeUL();html+=`<p style="margin:1px 0 2px 36px">${linkify(line.trim())}</p>`;}
-    else{closeUL();html+=`<p style="margin:3px 0">${linkify(line)}</p>`;}
+    // Any other line indented 4+ spaces (dash sub-items, numbered steps, their wrapped
+    // continuations). HTML collapses leading spaces, so without a margin these sit flush
+    // left and read as detached from the bullet above; 7+ spaces is a continuation of an
+    // indented line and sits one step deeper. Kept as <p> (not nested <li>) so the rich
+    // paste keeps the same block structure. 2-space lines (sub-headers, reference lists)
+    // stay flush by design.
+    else{closeUL();const ind=/^ */.exec(line)[0].length;
+      html+=ind>=4?`<p style="margin:1px 0 2px ${ind>=7?56:36}px">${linkify(line.trim())}</p>`:`<p style="margin:3px 0">${linkify(line)}</p>`;}
   });
   closeUL();
   html+='</div>';
