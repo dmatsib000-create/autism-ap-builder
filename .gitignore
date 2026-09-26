@@ -1,5 +1,10 @@
-# Claude Code per-project tooling config (launch.json, settings, etc.) — machine-local
-.claude/
+# Claude Code: .claude/ is local by default (this repo is public); only the parts
+# cloud sessions need are shared. Anything new Claude Code writes there stays local.
+.claude/*
+!.claude/skills/
+!.claude/commands/
+!.claude/agents/
+!.claude/third-party/
 
 # Local-only projects and artifacts, per CLAUDE.md repo layout — never pushed
 clinicalnotes/
