@@ -1,13 +1,11 @@
 # /verify in a cloud session
 
-Use this file only when `echo $CLAUDE_CODE_REMOTE` prints `true`. On the desktop, the
-Launch section of SKILL.md applies and this file does not.
+Cloud replacement for SKILL.md's Launch section; everything else in SKILL.md still
+applies, and its `document.querySelector(...)` snippets work unchanged.
 
-Cloud sessions have no browser pane, no `preview_start`, and no `.claude/launch.json`.
-Instead, `scripts/drive.mjs` serves the repo on loopback, opens the app in a headless
-Chromium, runs one snippet of page JavaScript, and prints what it returned. The Drive it,
-Capture the real copy output, and Gotchas sections of SKILL.md still apply: the same
-`document.querySelector(...)` snippets work unchanged.
+There is no browser pane in the cloud, so `scripts/drive.mjs` opens the app from disk
+(`file://`, as clinicians do) in a headless Chromium, runs one snippet of page
+JavaScript, and prints what it returned.
 
 ## Run a check
 
@@ -46,24 +44,17 @@ default 60 s). Exit 2 means the app was **not** driven; say so in the report.
 - **Screenshots:** open the PNG with the Read tool to look at it. Use `--width 700` to see
   the single-column layout (then click the "View Note" tab first, per Gotchas).
 - `--eval "return document.title"` runs a one-line snippet without a file.
-- The browser is offline except for the local app, which makes no network requests by
-  design. A snippet cannot fetch anything from the internet.
+- `--page docs/branching-logic-for-clinicians.html` opens another repo page instead.
+- The browser is fully offline (the app makes no network requests by design), so a
+  snippet cannot fetch anything from the internet.
 
 ## First run in a session
 
-The first run downloads `chrome-headless-shell` (about 120 MB, under a minute) into
-`~/.cache/verify-chrome/<version>` from Chrome for Testing on `storage.googleapis.com`,
-which is on the default cloud allowlist. Later runs in the same session reuse it.
-Nothing is added to `package.json`.
-
-It asks googlechromelabs.github.io for the latest stable version first. That host is not
-on the default allowlist, so usually the lookup is blocked and the driver falls back to
-the version pinned in `drive.mjs`, printing how old the pin is. If it reports more than
-60 days, mention in the report that `PINNED_VERSION` should be refreshed (current number
-at https://googlechromelabs.github.io/chrome-for-testing/).
-
-If the browser will not start, the error lists any missing system libraries. Install them
-with `npx -y playwright install-deps chromium` (uses apt only, needs root), then retry.
+The first run downloads `chrome-headless-shell` (about 120 MB, under a minute) from
+`storage.googleapis.com` into `~/.cache/verify-chrome/`; later runs reuse it. Nothing is
+added to `package.json`. If the driver says the pinned Chrome version is stale, mention
+that in the report. If the browser will not start, run the install command its error
+prints, then retry.
 If the download itself is blocked (a custom network setting), say so in the report.
 
 ## When the browser cannot be made to work

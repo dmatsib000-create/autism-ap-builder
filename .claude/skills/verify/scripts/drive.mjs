@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Headless driver for /verify in cloud sessions, where there is no browser pane.
-// Serves the repo over loopback, opens autism-ap-builder.html in a headless
-// Chromium via the DevTools protocol, runs a snippet of page JS, and prints the
-// result, any page errors, and (optionally) a screenshot. Each run is a fresh
-// page with a fresh profile, so every snippet must set up its own state.
+// Opens autism-ap-builder.html from disk (file://, the way clinicians open it) in
+// a headless Chromium via the DevTools protocol, runs a snippet of page JS, and
+// prints the result, any page errors, and (optionally) a screenshot. Each run is
+// a fresh page with a fresh profile, so every snippet must set up its own state.
 //
 // Zero npm dependencies on purpose (Node >= 22 ships a global WebSocket). The
-// browser is fetched once into ~/.cache/verify-chrome/<version> unless
-// CHROME_PATH points at an existing Chrome/Edge.
+// browser is fetched into ~/.cache/verify-chrome/<version> unless CHROME_PATH
+// points at an existing Chrome/Edge (handy for testing the driver on a desktop).
 //
 // Usage:
 //   node .claude/skills/verify/scripts/drive.mjs [steps.js] [--eval "js"]
@@ -15,11 +15,11 @@
 //        [--page autism-ap-builder.html]
 
 import { spawn, execFileSync } from 'node:child_process';
-import { createServer } from 'node:http';
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, rmSync, chmodSync } from 'node:fs';
-import { join, resolve, dirname, extname, sep } from 'node:path';
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync,
+  rmSync, renameSync, chmodSync, utimesSync } from 'node:fs';
+import { join, resolve, dirname } from 'node:path';
 import { tmpdir, homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 // The latest stable version number is published only on googlechromelabs.github.io,
@@ -29,22 +29,10 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 
 // VERIFY_CHROME_VERSION overrides both.
 const PINNED_VERSION = '154.0.8037.57';
 const PINNED_ON = '2026-09-26';
+const RECHECK_DAYS = 7;
 const CACHE_ROOT = join(homedir(), '.cache', 'verify-chrome');
 const PLATFORM = { linux: 'linux64', win32: 'win64' }[process.platform];
-
-function chromeVersion() {
-  if (process.env.VERIFY_CHROME_VERSION) return process.env.VERIFY_CHROME_VERSION;
-  try {
-    const v = execFileSync('curl', ['-fsS', '--max-time', '5',
-      'https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE'],
-      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    if (/^\d+\.\d+\.\d+\.\d+$/.test(v)) return v;
-  } catch {}
-  const days = Math.floor((Date.now() - Date.parse(PINNED_ON)) / 86400000);
-  console.error(`[drive] Latest Chrome version lookup blocked; using pinned ${PINNED_VERSION} (${days} days old).` +
-    (days > 60 ? ' Consider updating PINNED_VERSION in drive.mjs.' : ''));
-  return PINNED_VERSION;
-}
+const DAY = 86400000;
 
 function parseArgs(argv) {
   const o = { width: 1400, height: 1000, timeout: 60, page: 'autism-ap-builder.html' };
@@ -63,76 +51,97 @@ function parseArgs(argv) {
   return o;
 }
 
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+// Polls check() until it returns a truthy value (returned) or throws (propagated).
+async function until(check, ms, what) {
+  const deadline = Date.now() + ms;
+  while (Date.now() < deadline) {
+    const v = await check();
+    if (v) return v;
+    await delay(100);
+  }
+  throw new Error(`${what} (gave up after ${ms / 1000}s)`);
+}
+
+function latestVersion() {
+  try {
+    const v = execFileSync('curl', ['-fsS', '--max-time', '5',
+      'https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (/^\d+\.\d+\.\d+\.\d+$/.test(v)) return v;
+  } catch {}
+  const days = Math.floor((Date.now() - Date.parse(PINNED_ON)) / DAY);
+  console.error(`[drive] Latest Chrome version lookup blocked; using pinned ${PINNED_VERSION} (${days} days old).` +
+    (days > 60 ? ' Consider updating PINNED_VERSION in drive.mjs.' : ''));
+  return PINNED_VERSION;
+}
+
+const exeIn = dir => join(dir, `chrome-headless-shell-${PLATFORM}`,
+  process.platform === 'win32' ? 'chrome-headless-shell.exe' : 'chrome-headless-shell');
+
+// Downloads into a private temp folder and renames it into place, so a version
+// folder exists only once complete and parallel first runs cannot clobber each other.
+function install(version) {
+  const final = join(CACHE_ROOT, version);
+  mkdirSync(CACHE_ROOT, { recursive: true });
+  const tmp = mkdtempSync(join(CACHE_ROOT, '.tmp-'));
+  try {
+    const zip = join(tmp, 'chrome.zip');
+    const url = `https://storage.googleapis.com/chrome-for-testing-public/${version}/${PLATFORM}/chrome-headless-shell-${PLATFORM}.zip`;
+    console.error(`[drive] Downloading chrome-headless-shell ${version} (~120 MB)...`);
+    // curl rather than fetch(): curl honours the cloud's proxy environment variables.
+    execFileSync('curl', ['-fsSL', '--retry', '2', '-o', zip, url], { stdio: ['ignore', 'ignore', 'inherit'] });
+    if (process.platform === 'win32') {
+      execFileSync('tar', ['-xf', zip, '-C', tmp], { stdio: 'inherit' });
+    } else {
+      try { execFileSync('unzip', ['-q', zip, '-d', tmp], { stdio: 'inherit' }); }
+      catch {
+        // Python's zipfile drops the executable bit, so restore it afterwards.
+        execFileSync('python3', ['-m', 'zipfile', '-e', zip, tmp], { stdio: 'inherit' });
+        const dir = dirname(exeIn(tmp));
+        for (const f of readdirSync(dir)) { try { chmodSync(join(dir, f), 0o755); } catch {} }
+      }
+    }
+    rmSync(zip, { force: true });
+    if (!existsSync(exeIn(tmp))) throw new Error(`Download finished but ${exeIn(tmp)} is missing`);
+    try { renameSync(tmp, final); } catch { if (!existsSync(exeIn(final))) throw new Error(`Could not place ${final}`); }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+  // Drop superseded downloads so an older Chrome is never picked up again.
+  for (const d of readdirSync(CACHE_ROOT)) {
+    if (d !== version && !d.startsWith('.tmp-')) rmSync(join(CACHE_ROOT, d), { recursive: true, force: true });
+  }
+  return exeIn(final);
+}
+
 function findBrowser() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
   if (!PLATFORM) throw new Error(`No Chrome download for ${process.platform}; set CHROME_PATH`);
-  const CHROME_VERSION = chromeVersion();
-  const CACHE = join(CACHE_ROOT, CHROME_VERSION);
-  const exe = join(CACHE, `chrome-headless-shell-${PLATFORM}`,
-    process.platform === 'win32' ? 'chrome-headless-shell.exe' : 'chrome-headless-shell');
-  // The marker is written only after a complete extraction, so an interrupted
-  // download is re-fetched instead of being trusted forever.
-  const marker = join(CACHE, '.complete');
-  if (existsSync(marker) && existsSync(exe)) return exe;
-
-  rmSync(CACHE, { recursive: true, force: true });
-  mkdirSync(CACHE, { recursive: true });
-  const zip = join(CACHE, 'chrome.zip');
-  const url = `https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/${PLATFORM}/chrome-headless-shell-${PLATFORM}.zip`;
-  console.error(`[drive] Downloading chrome-headless-shell ${CHROME_VERSION} (one time, ~120 MB)...`);
-  // curl rather than fetch(): curl honours the cloud's proxy environment variables.
-  execFileSync('curl', ['-fsSL', '--retry', '2', '-o', zip, url], { stdio: ['ignore', 'ignore', 'inherit'] });
-  if (process.platform === 'win32') {
-    execFileSync('tar', ['-xf', zip, '-C', CACHE], { stdio: 'inherit' });
-  } else {
-    try { execFileSync('unzip', ['-q', zip, '-d', CACHE], { stdio: 'inherit' }); }
-    catch {
-      // Python's zipfile drops the executable bit, so restore it afterwards.
-      execFileSync('python3', ['-m', 'zipfile', '-e', zip, CACHE], { stdio: 'inherit' });
-      const dir = join(CACHE, `chrome-headless-shell-${PLATFORM}`);
-      for (const f of readdirSync(dir)) { try { chmodSync(join(dir, f), 0o755); } catch {} }
-    }
-  }
-  rmSync(zip, { force: true });
-  if (!existsSync(exe)) throw new Error(`Download finished but ${exe} is missing`);
-  writeFileSync(marker, url);
-  // Drop older downloads so a superseded Chrome is never picked up again.
-  for (const d of readdirSync(CACHE_ROOT)) {
-    if (d !== CHROME_VERSION) rmSync(join(CACHE_ROOT, d), { recursive: true, force: true });
-  }
-  return exe;
+  const pinned = process.env.VERIFY_CHROME_VERSION;
+  if (pinned) return existsSync(exeIn(join(CACHE_ROOT, pinned))) ? exeIn(join(CACHE_ROOT, pinned)) : install(pinned);
+  // Reuse a recent download without a network call; once it is RECHECK_DAYS old,
+  // look up the latest version again so an outdated Chrome does not linger.
+  const cached = existsSync(CACHE_ROOT) ? readdirSync(CACHE_ROOT).find(d => !d.startsWith('.tmp-') && existsSync(exeIn(join(CACHE_ROOT, d)))) : null;
+  if (cached && Date.now() - statSync(join(CACHE_ROOT, cached)).mtimeMs < RECHECK_DAYS * DAY) return exeIn(join(CACHE_ROOT, cached));
+  const version = latestVersion();
+  if (version === cached) { const now = new Date(); utimesSync(join(CACHE_ROOT, cached), now, now); return exeIn(join(CACHE_ROOT, cached)); }
+  return install(version);
 }
 
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript',
-  '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
-
-function serve() {
-  const server = createServer((req, res) => {
-    let rel;
-    try { rel = decodeURIComponent(new URL(req.url, 'http://x').pathname); }
-    catch { res.writeHead(400); return res.end(); }
-    // The app ships no favicon; a 404 here would read as a page error.
-    if (rel === '/favicon.ico') { res.writeHead(204); return res.end(); }
-    const p = resolve(REPO, '.' + rel);
-    if (!(p + sep).startsWith(REPO + sep) || !existsSync(p) || statSync(p).isDirectory()) {
-      res.writeHead(404); return res.end();
-    }
-    res.writeHead(200, { 'content-type': TYPES[extname(p)] || 'application/octet-stream' });
-    res.end(readFileSync(p));
-  });
-  return new Promise(r => server.listen(0, '127.0.0.1', () => r(server)));
-}
-
-function launch(bin, profile) {
-  const args = ['--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run',
-    '--no-default-browser-check', '--disable-gpu', '--disable-dev-shm-usage', 'about:blank'];
-  if (!/headless-shell/.test(bin)) args.unshift('--headless=new');
-  // Offline except for loopback: the app makes no network requests by design, and
-  // cutting the browser off from the internet means an out-of-date Chrome never
-  // sees untrusted content, which also makes --no-sandbox below acceptable.
-  args.unshift('--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1', '--proxy-server=direct://');
-  // Cloud containers usually can't use Chrome's sandbox.
-  if (process.platform === 'linux') args.unshift('--no-sandbox');
+async function launch(bin, profile, isShell) {
+  const args = [
+    // Cloud containers usually can't use Chrome's sandbox.
+    ...(process.platform === 'linux' ? ['--no-sandbox'] : []),
+    ...(isShell ? [] : ['--headless=new']),
+    // Fully offline: the app makes no network requests by design, so cutting the
+    // browser off means an out-of-date Chrome never sees untrusted content, which
+    // also makes --no-sandbox acceptable.
+    '--host-resolver-rules=MAP * ~NOTFOUND', '--proxy-server=direct://',
+    '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run',
+    '--no-default-browser-check', '--disable-gpu', '--disable-dev-shm-usage', 'about:blank',
+  ];
   const proc = spawn(bin, args, { stdio: ['ignore', 'ignore', 'pipe'] });
   let log = '', exited = null;
   proc.stderr.on('data', d => { log += d; });
@@ -143,21 +152,19 @@ function launch(bin, profile) {
   // profile (stderr is not reliably attached on Windows).
   proc.on('exit', (c, sig) => { if (c || sig) exited = sig ? `killed by ${sig}` : `exited with code ${c}`; });
   const portFile = join(profile, 'DevToolsActivePort');
-  return new Promise((res, rej) => {
-    const start = Date.now();
-    const fail = msg => { clearInterval(poll); try { proc.kill(); } catch {} rej(launchError(bin, msg)); };
-    const poll = setInterval(() => {
-      if (exited) return fail(`${exited}\n${log}`);
-      if (existsSync(portFile)) {
-        const [port, path] = readFileSync(portFile, 'utf8').trim().split(/\r?\n/);
-        if (port && path) { clearInterval(poll); return res({ proc, wsUrl: `ws://127.0.0.1:${port}${path}` }); }
-      }
-      if (Date.now() - start > 30000) fail(log || 'timed out waiting for DevTools');
-    }, 100);
-  });
+  try {
+    const wsUrl = await until(() => {
+      if (exited) throw new Error(`${exited}\n${log}`);
+      if (!existsSync(portFile)) return null;
+      const [port, path] = readFileSync(portFile, 'utf8').trim().split(/\r?\n/);
+      return port && path ? `ws://127.0.0.1:${port}${path}` : null;
+    }, 30000, 'timed out waiting for DevTools');
+    return { proc, wsUrl };
+  } catch (e) {
+    try { proc.kill(); } catch {}
+    throw launchError(bin, `${e.message}\n${log}`);
+  }
 }
-
-const delay = ms => new Promise(r => setTimeout(r, ms).unref());
 
 async function closeBrowser(browser) {
   if (!browser) return;
@@ -169,7 +176,8 @@ async function closeBrowser(browser) {
   } catch {}
   const { proc } = browser;
   if (proc.exitCode === null && proc.signalCode === null) {
-    await Promise.race([new Promise(r => proc.once('exit', r)), delay(3000)]);
+    // unref'd so a browser that exits promptly doesn't leave Node idling for 3 s.
+    await Promise.race([new Promise(r => proc.once('exit', r)), new Promise(r => setTimeout(r, 3000).unref())]);
   }
   try { proc.kill(); } catch {}
 }
@@ -197,8 +205,7 @@ class CDP {
         m.error ? p.rej(new Error(m.error.message)) : p.res(m.result);
       } else this.listeners.forEach(fn => fn(m));
     };
-    // A closed socket (browser or tab crashed) must fail every pending call,
-    // otherwise the run hangs with the HTTP server keeping Node alive.
+    // A closed socket (browser or tab crashed) must fail every pending call, not hang.
     this.ws.onclose = () => {
       for (const p of this.pending.values()) { clearTimeout(p.timer); p.rej(new Error('Browser connection closed (crash?)')); }
       this.pending.clear();
@@ -217,15 +224,9 @@ class CDP {
   on(fn) { this.listeners.push(fn); }
 }
 
-async function pageTarget(wsUrl) {
-  const base = 'http://' + new URL(wsUrl).host;
-  for (let i = 0; i < 20; i++) {
-    const list = await (await fetch(`${base}/json/list`)).json();
-    const page = list.find(t => t.type === 'page');
-    if (page) return page.webSocketDebuggerUrl;
-    await delay(150);
-  }
-  return (await (await fetch(`${base}/json/new?about:blank`, { method: 'PUT' })).json()).webSocketDebuggerUrl;
+async function newPage(wsUrl) {
+  const res = await fetch(`http://${new URL(wsUrl).host}/json/new?about:blank`, { method: 'PUT' });
+  return (await res.json()).webSocketDebuggerUrl;
 }
 
 // Only Windows needs this: Edge there can hold profile files for several seconds
@@ -244,16 +245,13 @@ async function loadApp(cdp, url) {
   const nav = await cdp.send('Page.navigate', { url });
   if (nav.errorText) throw new Error(`Could not open ${url}: ${nav.errorText}`);
   // Poll the document instead of waiting for a load event, which could belong
-  // to the startup about:blank page rather than this navigation.
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    // Evaluating mid-navigation can hit a destroyed context; just retry.
+  // to the startup about:blank page rather than this navigation. Evaluating
+  // mid-navigation can hit a destroyed context, so errors just mean "not yet".
+  await until(async () => {
     const r = await cdp.send('Runtime.evaluate',
       { expression: 'location.href + "|" + document.readyState', returnByValue: true }).catch(() => null);
-    if (r?.result?.value === `${url}|complete`) return;
-    await delay(100);
-  }
-  throw new Error(`Page did not finish loading within 20s: ${url}`);
+    return r?.result?.value === `${url}|complete`;
+  }, 20000, `Page did not finish loading: ${url}`);
 }
 
 async function main() {
@@ -262,19 +260,22 @@ async function main() {
   }
   const o = parseArgs(process.argv.slice(2));
   const body = o.eval ?? (o.file ? readFileSync(o.file, 'utf8') : null);
+  const page = resolve(REPO, o.page);
+  if (!existsSync(page)) throw new Error(`No such page: ${page}`);
   const bin = findBrowser();
-  const server = await serve();
+  const isShell = /headless-shell/.test(bin);
   sweepOldProfiles();
   const profile = mkdtempSync(join(tmpdir(), 'verify-profile-'));
   let browser, cdp, loaded = false, failed = false;
   const errors = [];
   try {
-    browser = await launch(bin, profile);
-    cdp = new CDP(await pageTarget(browser.wsUrl));
+    browser = await launch(bin, profile, isShell);
+    cdp = new CDP(await newPage(browser.wsUrl));
     await cdp.open();
     cdp.on(m => {
       if (m.method === 'Runtime.exceptionThrown') {
         const d = m.params.exceptionDetails;
+        failed = true;
         errors.push(`exception: ${d.exception?.description || d.text} (line ${d.lineNumber + 1})`);
       } else if (m.method === 'Runtime.consoleAPICalled' && ['error', 'warning', 'assert'].includes(m.params.type)) {
         errors.push(`console.${m.params.type}: ${m.params.args.map(a => a.value ?? a.description).join(' ')}`);
@@ -282,13 +283,11 @@ async function main() {
         errors.push(`log: ${m.params.entry.text}`);
       }
     });
-    await Promise.all([cdp.send('Page.enable'), cdp.send('Runtime.enable'), cdp.send('Log.enable')]);
-    await cdp.send('Emulation.setDeviceMetricsOverride',
-      { width: o.width, height: o.height, deviceScaleFactor: 1, mobile: false });
-    await loadApp(cdp, `http://127.0.0.1:${server.address().port}/${o.page}`);
+    await Promise.all([cdp.send('Page.enable'), cdp.send('Runtime.enable'), cdp.send('Log.enable'),
+      cdp.send('Emulation.setDeviceMetricsOverride', { width: o.width, height: o.height, deviceScaleFactor: 1, mobile: false })]);
+    await loadApp(cdp, pathToFileURL(page).href);
     loaded = true;
-    await delay(300);
-    console.log(`[drive] loaded ${o.page} (${bin.includes('headless-shell') ? 'chrome-headless-shell' : bin})`);
+    console.log(`[drive] loaded ${o.page} (${isShell ? 'chrome-headless-shell' : bin})`);
 
     if (body) {
       const r = await cdp.send('Runtime.evaluate', {
@@ -316,12 +315,11 @@ async function main() {
     else if (errors.length) console.log(`== errors before the page finished loading ==\n${errors.join('\n')}`);
     cdp?.close();
     await closeBrowser(browser);
-    server.close();
-    // On Windows this can fail while Edge releases its files; sweepOldProfiles()
+    // No retries: on Windows Edge may still hold files, and sweepOldProfiles()
     // removes the folder on a later run.
-    try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
+    try { rmSync(profile, { recursive: true, force: true }); } catch {}
   }
-  if (failed || errors.some(e => e.startsWith('exception'))) process.exitCode = 1;
+  if (failed) process.exitCode = 1;
 }
 
 // exitCode rather than process.exit(): exiting while sockets are still closing
