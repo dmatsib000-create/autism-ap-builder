@@ -1,5 +1,8 @@
-# Claude Code per-project tooling config (launch.json, settings, etc.) — machine-local
-.claude/
+# Claude Code: machine-local pieces only. Project skills, commands, and
+# .claude/settings.json are tracked so cloud sessions get them too.
+.claude/settings.local.json
+.claude/launch.json
+.claude/worktrees/
 
 # Local-only projects and artifacts, per CLAUDE.md repo layout — never pushed
 clinicalnotes/
