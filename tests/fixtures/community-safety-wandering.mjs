@@ -1,7 +1,7 @@
 // Confirmed ASD, school-age, community safety as the only functional need, with elopement and
 // road safety counseling checked. Covers the Community Safety block dropping the GPS and
 // registry lines (the Elopement/Wandering line names them) while keeping the medical ID and
-// "If I am found" card line, and the concern line listing the checked counseling items.
+// "If I am found" card line, and no concern line (the counseling bullets above name it).
 export default {
   name: 'community-safety-wandering',
   describe: 'Confirmed ASD, school-age, community safety + elopement/road counseling (ID line kept)',

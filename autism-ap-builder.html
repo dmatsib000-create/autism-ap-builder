@@ -3758,8 +3758,10 @@ function generateNote() {
       L.push('    - '+(elo?'Identification supports: ':'Equipment and identification supports: ')+_id.join(', ')+'.');
       if(!elo)
         L.push('    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.');
-      const _sc=[];if(elo)_sc.push('elopement and wandering risk');if(S.safety.has('road_counsel'))_sc.push('limited traffic hazard awareness');if(S.safety.has('water_counsel'))_sc.push('water and drowning risk in community settings');if(S.safety.has('fire_counsel'))_sc.push('impaired judgment around environmental hazards');
-      L.push('    - Primary community safety concern(s): '+(_sc.length?_sc.join('; '):'{specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}')+'.');
+      // A checked elopement/road/water/fire counseling item already names the concern in its
+      // own bullet above, so the concern line only prints as a prompt when none is checked.
+      if(!['elopement_counsel','road_counsel','water_counsel','fire_counsel'].some(k=>S.safety.has(k)))
+        L.push('    - Primary community safety concern(s): {specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}.');
     }
     L.push('');
   }
