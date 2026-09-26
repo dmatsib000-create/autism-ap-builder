@@ -2096,6 +2096,9 @@ function aOr(n){ return /^[aeiouAEIOU]/.test((n||'').trim()) ? 'an '+n : 'a '+n;
 // "a and b" / "a, b, and c" for prose lists built from checked boxes. Two items that already
 // contain "and" take a comma too, so "x and y, and z" doesn't read as one three-way list.
 const andList = a => a.length<2 ? a.join('') : (a.length===2&&!a.some(x=>/ and /.test(x))) ? a.join(' and ') : a.slice(0,-1).join(', ')+', and '+a[a.length-1];
+// The four school self-care boxes. Community safety/independence and menstrual care are adaptive
+// needs too, but they do not bring in school OT (follow-up council 2026-09-26).
+const SCHOOL_SELF_CARE=['toileting','hygiene','dressing','feeding_adl'];
 
 function getLangDescription() {
   const base = {
@@ -3404,7 +3407,11 @@ function generateNote() {
     if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: '+x.join(', ')+'.');}
     if(S.needsAdaptive.size){const x=[];if(S.needsAdaptive.has('toileting'))x.push('toilet training');if(S.needsAdaptive.has('dressing'))x.push('dressing');if(S.needsAdaptive.has('feeding_adl'))x.push('self-feeding');if(S.needsAdaptive.has('hygiene'))x.push('hygiene');if(S.needsAdaptive.has('menstrualCare'))x.push('menstrual hygiene management');if(x.length)L.push('  • ADL training: '+x.join(', ')+', using task analysis and visual supports.');}
     if(S.needsAdaptive.has('commSafety')){
-      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training). Additional OT-scope supports:');
+      // The cross-reference only holds when ABA is in the plan; otherwise name the training and a provider.
+      L.push('  • Community Safety Skills: Direct supervision is required in community settings at this time due to significant safety risk. '
+        +(referralIncluded('aba')?'See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).'
+          :'Behavioral safety skills training (stopping at a caregiver\'s signal, staying near a caregiver in public, and, for older children, knowing whom to ask for help if separated) with a behavioral provider such as a behavior analyst or psychologist may be considered if community safety risk persists.')
+        +' Additional OT-scope supports:');
       if(S.safety.has('elopement_counsel')){
         L.push('    - Equipment and identification supports: See Safety Counseling section for GPS tracking, ID bracelet, and registry resources discussed with family at this visit.');
       } else {
@@ -4684,6 +4691,7 @@ function _iepLetterContent(){
   const preschool=S.ageGroup==='preschool';
   // Age-banded wording for each checked school self-care box, in a fixed order.
   const scBand=preschool?0:isTeenPlus()?2:1;
+  // Keys must match SCHOOL_SELF_CARE (module scope), which gates school OT.
   const SELF_CARE_ITEMS=[
     ['toileting',  ['toileting','bathroom independence','bathroom independence']],
     ['hygiene',    ['handwashing','handwashing and personal hygiene routines','personal hygiene and grooming routines']],
@@ -4876,7 +4884,15 @@ function _iepLetterContent(){
   }
   if(selfCareItems.length) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
   // Family-attributed: the physician has not observed the child's school behavior.
-  if(S.needsAdaptive.has('commSafety')) impacts.push('Safety awareness: family reports limited awareness of hazards in community settings, which may affect safety during arrival and dismissal, field trips, and other less-structured school settings.');
+  // The teaching sentence is the physician's, so it stands apart from the family's report. It sits
+  // here rather than in the supervision accommodation because an accommodation carries no
+  // measurable goal, and this line also prints when an elopement aide replaces that accommodation.
+  if(S.needsAdaptive.has('commSafety')) impacts.push('Safety awareness: The family reports limited awareness of hazards in community settings, which may affect safety during arrival and dismissal, field trips, and other less-structured school settings. Direct instruction in safety routines, such as staying with the group, '
+    +(isTeenPlus()?'crossing parking lots and streets safely, and knowing whom to contact if separated from the group':'stopping at streets and parking lots, and asking a trusted adult for help')
+    +', may be appropriate as an IEP goal, with the team determining who provides it.');
+  // Teens only: the checkbox's examples (errands, transit) are teen skills. No separate transition
+  // paragraph (maintainer decision 2026-09-26); the line itself points to the transition plan.
+  if(S.needsAdaptive.has('commIndependence')&&isTeenPlus()) impacts.push('Community living skills: The family reports that the student needs support with routines outside the home, such as finding the way to familiar places, completing errands, and using transportation. These skills are appropriate for the IEP team to address through community-based instruction and the student\'s transition plan.');
   if(S.comorbid.has('ld_reading')) impacts.push('Reading: A specific learning disability in reading affecting access to grade-level text and reading-dependent tasks across content areas.');
   if(S.comorbid.has('ld_math')) impacts.push('Mathematics: A specific learning disability in mathematics affecting computation, problem-solving, and access to grade-level math curriculum.');
   if(S.comorbid.has('ld_written')) impacts.push('Written expression: A specific learning disability in written expression affecting the ability to produce written work at grade level.');
@@ -4973,7 +4989,7 @@ function _iepLetterContent(){
     if(S.needsMotor.has('fine')||S.needsMotor.has('handwriting')) goals.push(preschool
       ? 'fine motor and pre-writing development: grasp and manipulation of age-appropriate tools and materials such as crayons, scissors, blocks, and fasteners, and imitation of pre-writing strokes and simple shapes'
       : 'fine motor and graphomotor development: pencil grip, letter formation, and/or keyboarding as a compensatory strategy for written output');
-    if(S.needsMotor.has('coordination')) goals.push(preschool
+    if(S.needsMotor.has('coordination')||S.comorbid.has('dcd')) goals.push(preschool
       ? 'motor planning and praxis: imitation of new motor actions, sequencing of multi-step play and classroom routines, and use of simple tools'
       : 'motor planning and praxis: task sequencing, tool use, and coordination of multi-step school tasks');
     // Names only the checked school self-care areas, closed with a short tail so a single named
@@ -5021,7 +5037,9 @@ function _iepLetterContent(){
     if(S.needsBehavior.has('elopement')) reasons.push('active elopement risk requiring continuous proximity supervision');
     if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property')) reasons.push('behavioral safety needs requiring capacity for immediate adult intervention');
     if(isMinVerbal()) reasons.push('communication access requiring adult facilitation for AAC use and participation in instruction');
-    if(S.needsAdaptive.size>1) reasons.push('significant adaptive skill deficits requiring adult support throughout the school day');
+    // Self-care only: community safety has its own supervision accommodation, and community
+    // independence is not a school-day support need (follow-up council 2026-09-26).
+    if(selfCareItems.length) reasons.push('hands-on adult support during the school day with '+andList(selfCareItems));
     if(reasons.length) s+=' Specific rationale: '+reasons.join('; ')+'.';
     s+=' The aide\'s role and prompting hierarchy should be explicitly specified in the IEP to promote independence and prevent prompt dependency.';
     svContent.aide=s;
@@ -5135,7 +5153,7 @@ function _iepLetterContent(){
   // Community safety leaves the OT self-care goal, so it gets its own supervision accommodation.
   // Skipped when a 1:1 aide is already requested for elopement (continuous supervision).
   if(S.needsAdaptive.has('commSafety')&&!(S.schoolSvc.has('aide')&&S.needsBehavior.has('elopement')))
-    accomIndividual.push('Safety supervision: planned adult supervision during arrival and dismissal, transitions between areas, and off-campus activities such as field trips, with the level of supervision determined by the school team');
+    accomIndividual.push('Safety supervision: planned adult supervision during arrival and dismissal, transitions between areas, and off-campus activities such as field trips, with the level of supervision determined by the school team and reduced as the student shows safe routines in these settings');
   // Curriculum and assessment modifications — only when intellectual disability is confirmed
   // (withID specifier set). Suspected ID does NOT trigger FAA / alternate curriculum / specialized
   // academic instruction; those are placement-defining recommendations that require formal
@@ -6995,9 +7013,9 @@ function syncSchoolSvcFromNeeds(){
     }
   };
   if(S.needsComm.size>0||(S.langLevel&&S.langLevel!=='ageAppropriate'&&!isLangAgeAppropriate())||S.comorbid.has('language_disorder')||S.needsSocial.has('conversation')||S.needsSocial.has('reciprocity')||hasPragmaticDeficit()||hasPedanticSpeech()||S.langModifiers.has('echolalic')) add('slp_school');
-  // Only the school self-care boxes (the keys of SELF_CARE_ITEMS in _iepLetterContent) feed the
-  // OT goal; community safety/independence and menstrual care alone would recommend OT with no goals.
-  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||['toileting','hygiene','dressing','feeding_adl'].some(k=>S.needsAdaptive.has(k))||S.comorbid.has('dcd')) add('ot_school');
+  // Only the school self-care boxes feed the OT goal; community safety/independence and menstrual
+  // care alone would recommend OT with no goals.
+  if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||SCHOOL_SELF_CARE.some(k=>S.needsAdaptive.has(k))||S.comorbid.has('dcd')) add('ot_school');
   if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
