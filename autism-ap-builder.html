@@ -4408,6 +4408,11 @@ function generateRichHTML(isPreview=false) {
     // 9.5pt matches the ABA letter's .aba-ref convention so references
     // render at the same scale across all three output documents.
     else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
+    // Numbered steps ("    1. ...", e.g. Finding Therapies) and their 7-space wrapped
+    // continuations. Continuations come first: "       - no matter how long..." would
+    // otherwise be caught by the dash branch below.
+    else if(/^ {7}\S/.test(line)){closeUL();html+=`<p style="margin:0 0 1px 56px">${linkify(line.trim())}</p>`;}
+    else if(/^ {4}\d+\. /.test(line)){closeUL();html+=`<p style="margin:1px 0 1px 36px">${linkify(line.trim())}</p>`;}
     // Dash sub-items under a bullet ("    - ..."). HTML collapses the leading spaces,
     // so without a margin they sit flush left and read as detached from their bullet.
     // Kept as <p> (not nested <li>) so the rich paste keeps the same block structure.
