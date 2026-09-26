@@ -4390,8 +4390,9 @@ function generateRichHTML(isPreview=false) {
     // doesn't fragment into separate <ul> blocks when copied as rich text.
     // 6 spaces (not 4) so this branch only matches lines we intentionally emit
     // as bullet-continuation — 4-space-indented sub-items used elsewhere in
-    // the note (ADHD med tables, AAC, safety targets, accommodations) keep
-    // falling through to the default <p> branch as they did pre-genetics.
+    // the note (ADHD med tables, AAC, safety targets, accommodations) close
+    // the list and render as their own <p> (dash sub-items get the indented
+    // branch below).
     else if(inUL && /^      \S/.test(line)){
       html+=`<li style="list-style:none;margin:1px 0 3px 18px;font-size:10.5pt;color:#374151">${linkify(line.trim())}</li>`;
     }
@@ -4407,6 +4408,10 @@ function generateRichHTML(isPreview=false) {
     // 9.5pt matches the ABA letter's .aba-ref convention so references
     // render at the same scale across all three output documents.
     else if(/^    \d+\. .*\bdoi:/i.test(line)){closeUL();html+=`<p style="font-size:9.5pt;color:#4b5563;margin:1px 0 1px 14px">${linkify(line.trim())}</p>`;}
+    // Dash sub-items under a bullet ("    - ..."). HTML collapses the leading spaces,
+    // so without a margin they sit flush left and read as detached from their bullet.
+    // Kept as <p> (not nested <li>) so the rich paste keeps the same block structure.
+    else if(/^ {4,}- /.test(line)){closeUL();html+=`<p style="margin:1px 0 2px 36px">${linkify(line.trim())}</p>`;}
     else{closeUL();html+=`<p style="margin:3px 0">${linkify(line)}</p>`;}
   });
   closeUL();
