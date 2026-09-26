@@ -419,7 +419,12 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 .r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
-.r-opt input{display:none}
+/* The real radio/checkbox behind a chip, toggle, or card is visually hidden, NOT display:none:
+   display:none drops it from the tab order and the accessibility tree, so keyboard and
+   screen-reader users could not operate the chip at all. The visible focus ring moves to
+   the chip itself via :has(). Outline (not box-shadow) so it doesn't fight .is-on's inset ring. */
+.r-opt input,.tog input,.lang-qual-card input{position:absolute;width:1px;height:1px;margin:0;padding:0;overflow:hidden;clip:rect(0,0,0,0);opacity:0;pointer-events:none}
+.r-opt:has(input:focus-visible),.lang-qual-card:has(input:focus-visible),.tog:has(input:focus-visible) .tog-sl{outline:2px solid var(--accent);outline-offset:2px}
 .cb-list{display:flex;flex-direction:column;gap:3px}
 .cb-row{display:flex;align-items:flex-start;gap:var(--space-2);font-size:var(--text-12);cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);line-height:1.4;transition:background var(--dur-fast) var(--ease)}
 @media (hover:hover){.cb-row:hover{background:var(--gray-100)}}
@@ -448,7 +453,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .mod-chip{padding:4px 10px;border-color:var(--border-strong);color:inherit;font-size:var(--text-11-5);font-weight:500}
 @media (hover:hover){.mod-chip:hover{color:inherit}}
 .mod-chip.is-on::before{content:'✓ '}
-.lang-qual-card{display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
+.lang-qual-card{position:relative;display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
 .lang-qual-inner{display:flex;align-items:center;gap:var(--space-4)}
@@ -473,7 +478,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .note-err{background:var(--red-light);border-left:4px solid var(--red);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--red-dark);line-height:1.5}
 .note-ok{background:var(--green-light);border-left:4px solid var(--green);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--green-dark)}
 .tog{position:relative;width:32px;height:18px;flex-shrink:0}
-.tog input{display:none}
 .tog-sl{position:absolute;inset:0;background:var(--gray-300);border-radius:9px;transition:background .2s;cursor:pointer}
 .tog-sl::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:white;border-radius:50%;transition:transform .2s}
 input:checked+.tog-sl{background:var(--blue)}
@@ -849,7 +853,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="r-opt"><input type="radio" name="langLevel" value="unclearSLP">Mixed / hard to<br>characterize — SLP eval</label>
         </div>
         <label class="lang-qual-card">
-          <input type="checkbox" id="mod_langAgeAppropriate" style="display:none" onchange="if(this.checked)S.langModifiers.add('langAgeAppropriate');else S.langModifiers.delete('langAgeAppropriate');syncCommNeedsFromLangLevel();syncSchoolSvcFromNeeds();render()">
+          <input type="checkbox" id="mod_langAgeAppropriate" onchange="if(this.checked)S.langModifiers.add('langAgeAppropriate');else S.langModifiers.delete('langAgeAppropriate');syncCommNeedsFromLangLevel();syncSchoolSvcFromNeeds();render()">
           <div class="lang-qual-inner">
             <div class="lang-qual-icon">&#10003;</div>
             <div>
@@ -5904,12 +5908,15 @@ function syncTherapyStatusFromActivity(){
   });
 }
 // Called near the end of render() — toggles the .inactive class on each therapy-status row
-// based on its corresponding referral's current active state. Visual + pointer-events both
-// handled in CSS (.therapy-status-row.inactive).
+// based on its corresponding referral's current active state. Visual + pointer-events are
+// handled in CSS (.therapy-status-row.inactive); CSS can't stop the keyboard, so the radios
+// are also disabled, which removes them from the tab order and announces them as unavailable.
 function updateTherapyStatusEnablement(){
   document.querySelectorAll('.therapy-status-row[data-therapy-key]').forEach(row=>{
     const key = row.getAttribute('data-therapy-key');
-    row.classList.toggle('inactive', !referralIncluded(key));
+    const inactive = !referralIncluded(key);
+    row.classList.toggle('inactive', inactive);
+    row.querySelectorAll('input[type=radio]').forEach(r=>{ r.disabled = inactive; });
   });
 }
 // Labels for socialWorkReasons sub-options. Single source of truth — also consumed by
@@ -7126,11 +7133,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     // radio circle), mousedown fires on the label, not on the label-forwarded input. Without
     // the label listener, _wasChecked stays undefined and the re-click deselect path never
     // triggers for any data-bind radio.
+    // Space on a checked radio is the keyboard equivalent of the re-click. Chrome fires no
+    // 'click' for it, so trigger one ourselves (preventDefault stops browsers that do from
+    // firing a second). Arrow keys fire 'click' on the newly selected radio; _wasChecked is
+    // consumed (reset) on every click so a stale true left over from an earlier mouse
+    // deselect can't un-check that selection.
     inp.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
+    inp.addEventListener('keydown',e=>{
+      if(e.key!==' '||!inp.checked) return;
+      e.preventDefault();
+      inp._wasChecked=true;
+      inp.click();
+    });
     const lbl=inp.closest('label');
     if(lbl) lbl.addEventListener('mousedown',()=>{ inp._wasChecked=inp.checked; });
     inp.addEventListener('click',()=>{
-      if(!inp._wasChecked) return; // normal selection — change handler takes over
+      const was=inp._wasChecked; inp._wasChecked=false;
+      if(!was) return; // normal selection — change handler takes over
       inp.checked=false;
       inp.closest('.r-opt').classList.remove('is-on');
       const nm=inp.name;
