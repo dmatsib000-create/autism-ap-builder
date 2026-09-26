@@ -27,14 +27,14 @@ claude_code/
 │   ├── fixtures/                                One *.mjs per clinical scenario (sets up S)
 │   └── golden/                                  Committed expected note/letter output
 ├── package.json                 Tracked: `test` (all four lanes) / `test:golden` / `test:unit` / `test:wiring` / `test:invariants` / `test:update`
-├── .claude/                     Partly tracked: `skills/` (/verify, incl. cloud.md + scripts/drive.mjs headless driver), `commands/` (/council);
-│                                settings.local.json, launch.json, worktrees/ stay local
+├── .claude/                     Partly tracked: `skills/` (/verify, incl. cloud.md + scripts/drive.mjs headless driver), `commands/` (/council),
+│                                plus cloud-only plugin copies (see .claude/third-party/README.md); settings.local.json, launch.json, worktrees/ stay local
 ├── clinicalnotes/               Local-only Python CLI project (untracked)
 ├── backups/                     Snapshots of autism-ap-builder.html + zip (untracked)
 └── scratch/                     Working drafts: skill updates, prompts, test files (untracked)
 ```
 
-Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, `package.json`, and the shared parts of `.claude/` (skills, commands) are tracked in git and pushed to GitHub. Everything else is local. The `.claude/` pieces are tracked so cloud sessions, which start from a fresh clone, get /verify and /council. Cloud sessions do **not** install plugins listed in a repo's `.claude/settings.json`, so plugin skills (/feature-dev, /engineering:code-review) are desktop-only unless copied into `.claude/`.
+Only `autism-ap-builder.html`, `README.md`, `CLAUDE.md`, `docs/`, `tests/`, `package.json`, and the shared parts of `.claude/` (skills, commands) are tracked in git and pushed to GitHub. Everything else is local. The `.claude/` pieces are tracked so cloud sessions, which start from a fresh clone, get /verify and /council. Cloud sessions do **not** install plugins, so /feature-dev (with its three agents) and /engineering-code-review are committed as copies; `.claude/third-party/README.md` lists their sources and license, and the local sparse-checkout command that hides them on a desktop where the real plugins are installed. Do not edit those copies except to refresh them from upstream.
 
 **`backups/autism-ap-builder_2026-05-16_pre-git.zip` must not be deleted.** Git history for this repo starts at the initial commit on 2026-05-18, where the app is already 343,953 bytes. That zip holds a 90,537-byte version from 2026-05-16 — two days earlier and roughly a quarter the size — so it is the only surviving copy of the tool from before it was placed under version control. `git` cannot reproduce it and no other backup comes close. Every other file in `backups/` is a routine dated snapshot of a state git already has; this one is not, which is why it carries `pre-git` in its name.
 
