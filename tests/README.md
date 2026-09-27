@@ -42,8 +42,11 @@ for headings and emphasis. Presence may not.
   Greenspan 2017) directly. It also covers the one DOM wrapper whose state cleanup
   is load-bearing — `toggleBifSpecifierGate` removing an unsupported `withBIF` — by
   handing `makeApp({ querySelector })` a mutable fake checkbox so the cleanup branch
-  runs and can be asserted. These lanes share `makeApp()` and the real, unmodified
-  shipped script.
+  runs and can be asserted. It also tests pure text helpers whose output reaches
+  the note but that only run from a click handler: `appendEvidence`, which joins a
+  DSM-5 evidence chip's text onto a criterion's evidence (so a source heading or
+  a typed sentence never ends up as "Parent report:; …" or "….; …"). These lanes
+  share `makeApp()` and the real, unmodified shipped script.
 - **Wiring lane** (`tests/wiring.mjs`, `npm run test:wiring`) — a source-text lint
   (no script eval) that checks the chip/state class contract: every state class
   JS toggles has a CSS rule, and every chip-family CSS rule is actually applied or

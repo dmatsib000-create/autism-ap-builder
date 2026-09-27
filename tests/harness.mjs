@@ -48,6 +48,8 @@ const EXPORTS = [
   // by the unit lane via an injected querySelector (see makeStubs opts) — the one
   // wrapper the unit lane drives directly rather than through its pure core.
   'toggleBifSpecifierGate',
+  // Pure string join behind the DSM-5 evidence observation chips; its text reaches the note.
+  'appendEvidence',
   // Add-only ABA-target sync. DOM-driven (fires from onchange/render) and mutates
   // S.abaTargets via add(); its querySelector/cb.checked step is best-effort, so the
   // Set mutation runs under the harness's null DOM and the unit lane can assert on

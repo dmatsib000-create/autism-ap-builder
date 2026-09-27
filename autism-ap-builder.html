@@ -428,6 +428,10 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    remembering to set one. Zero specificity: a class needing a different edge still wins
    (.outcome-sel keeps its heavier 1.5px edge on purpose; it is the prominent must-answer menu). */
 :where(textarea,select,input[type=text],input[type=number],input[type=search]){border:1px solid var(--border-control)}
+/* Chips and section toggles are <button>s so keyboards and screen readers can operate them.
+   This zero-specificity reset removes the browser's button look (system font, grey fill,
+   border, centered text); each class's own rules outrank :where() and supply the real style. */
+:where(button.chip,button.ev-src-chip,button.ev-obs-chip,button.plan-pill,button.sec-btn){font:inherit;color:inherit;letter-spacing:inherit;word-spacing:inherit;text-transform:inherit;text-shadow:inherit;text-align:inherit;line-height:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
@@ -792,8 +796,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <button class="mnav-btn" id="mnav-output" onclick="showMobilePanel('output')">&#128203; View Note</button>
 </div>
 
-<div class="main">
-<div class="left-panel">
+<div class="main" role="main">
+<div class="left-panel" role="region" aria-label="Input form">
 
   <!-- Quick-start archetype presets (in-visit scaffolding, PROTOTYPE). Each button
        drives the real form controls via applyPreset() so all branching/bridges fire
@@ -834,7 +838,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 1. Patient Profile -->
   <div class="section">
-    <div id="sh-profile" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">1</span><span class="sec-kicker">Profile</span><span class="sec-title">Patient Profile</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-profile" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">1</span><span class="sec-kicker">Profile</span><span class="sec-title">Patient Profile</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
 
       <div class="field-group">
@@ -881,19 +885,19 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           </div>
         </label>
         <span class="field-sublabel" style="margin-top:10px">Language Features / Concerns</span>
-        <div class="modifier-strip">
+        <div class="modifier-strip" role="toolbar" aria-label="Language features and concerns">
           <span class="chip-grp-hd">Pragmatics</span>
-          <div class="chip mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')">Pragmatic deficits (social use)</div>
-          <div class="chip mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')">Scripted / echolalic speech</div>
+          <button type="button" class="chip mod-chip" id="mod_pragmatic" onclick="toggleMod('pragmatic')" aria-pressed="false">Pragmatic deficits (social use)</button>
+          <button type="button" class="chip mod-chip" id="mod_echolalic" onclick="toggleMod('echolalic')" aria-pressed="false">Scripted / echolalic speech</button>
           <span class="chip-grp-hd">Language Form</span>
-          <div class="chip mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')">Grammar / morphosyntax errors</div>
-          <div class="chip mod-chip" id="mod_semantic" onclick="toggleMod('semantic')">Semantic deficits / literal thinking</div>
+          <button type="button" class="chip mod-chip" id="mod_morphosyntactic" onclick="toggleMod('morphosyntactic')" aria-pressed="false">Grammar / morphosyntax errors</button>
+          <button type="button" class="chip mod-chip" id="mod_semantic" onclick="toggleMod('semantic')" aria-pressed="false">Semantic deficits / literal thinking</button>
           <span class="chip-grp-hd">Speech</span>
-          <div class="chip mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')">Speech-sound errors</div>
-          <div class="chip mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')">Reduced intelligibility</div>
+          <button type="button" class="chip mod-chip" id="mod_speechSound" onclick="toggleMod('speechSound')" aria-pressed="false">Speech-sound errors</button>
+          <button type="button" class="chip mod-chip" id="mod_reducedIntell" onclick="toggleMod('reducedIntell')" aria-pressed="false">Reduced intelligibility</button>
           <span class="chip-grp-hd">Other</span>
-          <div class="chip mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')">Formal / pedantic speech</div>
-          <div class="chip mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')">Advanced vocabulary for age</div>
+          <button type="button" class="chip mod-chip" id="mod_pedanticSpeech" onclick="toggleMod('pedanticSpeech')" aria-pressed="false">Formal / pedantic speech</button>
+          <button type="button" class="chip mod-chip" id="mod_advVocab" onclick="toggleMod('advVocab')" aria-pressed="false">Advanced vocabulary for age</button>
         </div>
       </div>
 
@@ -1021,28 +1025,28 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
       <div class="field-group">
         <span class="field-label">Identified Strengths</span>
-        <div class="strength-chips" id="strengthChips">
-          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')">Visual memory</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')">Rote memory</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')">Music</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')">Affectionate</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')">Technology</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')">Persistent</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')">Social praise</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')">Detail-oriented</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')">Creative/artistic</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')">Honest/direct</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')">Sense of humor</span>
-          <span class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</span>
+        <div class="strength-chips" id="strengthChips" role="toolbar" aria-label="Common strengths">
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')">Visual memory</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')">Rote memory</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')">Music</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')">Affectionate</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')">Technology</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')">Persistent</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')">Social praise</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')">Detail-oriented</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')">Creative/artistic</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')">Honest/direct</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')">Sense of humor</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</button>
         </div>
         <textarea class="strengths-area" id="strengthsField" aria-label="Identified strengths" placeholder="Click chips above or type freely..." rows="2"></textarea>
         <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -1053,7 +1057,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 2. Diagnostic Workup -->
   <div id="dxWorkupSection" class="section">
-    <div id="sh-dxWorkup" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup, Testing &amp; Next Steps</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-dxWorkup" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">2</span><span class="sec-kicker">Workup</span><span class="sec-title">Diagnostic Workup, Testing &amp; Next Steps</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <div id="evalProfileDoneHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Cognitive/developmental testing is complete — update <strong>Cognitive Profile</strong> and its data source in Patient Profile.</div>
@@ -1138,7 +1142,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 3. DSM-5 Criteria -->
   <div class="section">
-    <div id="sh-dsm5" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">3</span><span class="sec-kicker">Criteria</span><span class="sec-title">DSM-5 Criteria Evidence</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-dsm5" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">3</span><span class="sec-kicker">Criteria</span><span class="sec-title">DSM-5 Criteria Evidence</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
       <!-- Severity & Specifiers — shown only when Confirmed ASD -->
@@ -1244,7 +1248,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 4. Functional Need Domains -->
   <div class="section">
-    <div id="sh-needs" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">4</span><span class="sec-kicker">Needs</span><span class="sec-title">Functional Need Domains</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-needs" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">4</span><span class="sec-kicker">Needs</span><span class="sec-title">Functional Need Domains</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Communication</span>
@@ -1351,7 +1355,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 5. Co-occurring Medical Flags & Referrals (work-up triggers, exam findings, referrals — filled from exam/records, not parent report) -->
   <div class="section">
-    <div id="sh-medflags" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">5</span><span class="sec-kicker">Referrals</span><span class="sec-title">Medical &amp; Referral Flags</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-medflags" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">5</span><span class="sec-kicker">Referrals</span><span class="sec-title">Medical &amp; Referral Flags</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <div class="grp-sep" style="margin-top:2px">Work-up &amp; referrals</div>
@@ -1428,17 +1432,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 6. Comorbid Conditions -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">6</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-comorbid" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">6</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
         <div class="grp-sep" style="margin-top:2px">Psychiatric / Behavioral Health</div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_combined"> ADHD, Combined presentation</label><span class="plan-pill" data-cv="adhd_combined">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_inattentive"> ADHD, Predominantly inattentive</label><span class="plan-pill" data-cv="adhd_inattentive">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_hyperactive"> ADHD, Predominantly hyperactive-impulsive</label><span class="plan-pill" data-cv="adhd_hyperactive">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_suspected"> ADHD suspected (confounding variables / insufficient data)</label><span class="plan-pill" data-cv="adhd_suspected">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="anxiety"> Anxiety disorder</label><span class="plan-pill" data-cv="anxiety">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="depression"> Depression / mood disorder</label><span class="plan-pill" data-cv="depression">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_combined"> ADHD, Combined presentation</label><button type="button" class="plan-pill" data-cv="adhd_combined">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_inattentive"> ADHD, Predominantly inattentive</label><button type="button" class="plan-pill" data-cv="adhd_inattentive">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_hyperactive"> ADHD, Predominantly hyperactive-impulsive</label><button type="button" class="plan-pill" data-cv="adhd_hyperactive">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="adhd_suspected"> ADHD suspected (confounding variables / insufficient data)</label><button type="button" class="plan-pill" data-cv="adhd_suspected">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="anxiety"> Anxiety disorder</label><button type="button" class="plan-pill" data-cv="anxiety">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="depression"> Depression / mood disorder</label><button type="button" class="plan-pill" data-cv="depression">Include plan</button></div>
         <div id="depressionSafetyRow" class="sub-options" style="display:none">
           <span class="sub-label">Safety screening result</span>
           <div class="radio-grid">
@@ -1446,23 +1450,23 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
             <label class="r-opt"><input type="radio" name="depressionSafety" data-bind="depressionSafety" value="positive"> Positive</label>
           </div>
         </div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><span class="plan-pill" data-cv="ocd">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><span class="plan-pill" data-cv="trauma">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ocd"> OCD / obsessive-compulsive features</label><button type="button" class="plan-pill" data-cv="ocd">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="trauma"> Trauma / adverse childhood experiences</label><button type="button" class="plan-pill" data-cv="trauma">Include plan</button></div>
         <div id="traumaIepGateRow" class="sub-options" style="display:none"><label class="cb-row" style="font-size:var(--text-11);color:var(--gray-600)"><input type="checkbox" id="traumaIncludeInIEP"> Include in IEP letter <span style="color:var(--gray-400);font-style:italic">(off by default; verify family has consented to share with school)</span></label></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia"> Catatonia — features present at this visit (F06.1)</label><span class="plan-pill" data-cv="catatonia">Include plan</span></div>
-        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia_history"> Catatonia — prior episode (recovered or partial; F06.1 by history)</label><span class="plan-pill" data-cv="catatonia_history">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia"> Catatonia — features present at this visit (F06.1)</label><button type="button" class="plan-pill" data-cv="catatonia">Include plan</button></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="catatonia_history"> Catatonia — prior episode (recovered or partial; F06.1 by history)</label><button type="button" class="plan-pill" data-cv="catatonia_history">Include plan</button></div>
 
         <div class="grp-sep">Neurodevelopmental</div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><span class="plan-pill" data-cv="language_disorder">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_reading"> Specific learning disorder — reading / dyslexia (F81.0)</label><span class="plan-pill" data-cv="ld_reading">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_math"> Specific learning disorder — mathematics / dyscalculia (F81.2)</label><span class="plan-pill" data-cv="ld_math">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_written"> Specific learning disorder — written expression / dysgraphia (F81.81)</label><span class="plan-pill" data-cv="ld_written">Include plan</span></div>
-        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><span class="plan-pill" data-cv="ld_suspected">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><span class="plan-pill" data-cv="dcd">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="language_disorder"> Language disorder (distinct from ASD)</label><button type="button" class="plan-pill" data-cv="language_disorder">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_reading"> Specific learning disorder — reading / dyslexia (F81.0)</label><button type="button" class="plan-pill" data-cv="ld_reading">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_math"> Specific learning disorder — mathematics / dyscalculia (F81.2)</label><button type="button" class="plan-pill" data-cv="ld_math">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_written"> Specific learning disorder — written expression / dysgraphia (F81.81)</label><button type="button" class="plan-pill" data-cv="ld_written">Include plan</button></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="ld_suspected"> Specific learning disorder — suspected, pending evaluation (F81.9)</label><button type="button" class="plan-pill" data-cv="ld_suspected">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="dcd"> Developmental coordination disorder (DCD)</label><button type="button" class="plan-pill" data-cv="dcd">Include plan</button></div>
 
         <div class="grp-sep">Medical diagnoses</div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><span class="plan-pill" data-cv="epilepsy">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="sleep_disorder"> Sleep disorder (insomnia / circadian)</label><span class="plan-pill" data-cv="sleep_disorder">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="epilepsy"> Epilepsy / seizure disorder</label><button type="button" class="plan-pill" data-cv="epilepsy">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="sleep_disorder"> Sleep disorder (insomnia / circadian)</label><button type="button" class="plan-pill" data-cv="sleep_disorder">Include plan</button></div>
         <div id="sleepFactorsRow" class="sub-options" style="display:none">
           <span class="sub-label">Contributing factors (check all that apply)</span>
           <label class="cb-row"><input type="checkbox" data-key="sleepFactors" value="melatonin"> Dysregulated melatonin secretion</label>
@@ -1470,9 +1474,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="sleepFactors" value="anxiety"> Anxiety / bedtime resistance</label>
           <label class="cb-row"><input type="checkbox" data-key="sleepFactors" value="stimulant"> Stimulant timing effects</label>
         </div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="gi"> GI issues (constipation / GERD / abdominal pain)</label><span class="plan-pill" data-cv="gi">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_chronic"> Pediatric Feeding Disorder (PFD) — Chronic, ≥3 months (R63.32)</label><span class="plan-pill" data-cv="pfd_chronic">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_acute"> Pediatric Feeding Disorder (PFD) — Acute, &lt;3 months (R63.31)</label><span class="plan-pill" data-cv="pfd_acute">Include plan</span></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="gi"> GI issues (constipation / GERD / abdominal pain)</label><button type="button" class="plan-pill" data-cv="gi">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_chronic"> Pediatric Feeding Disorder (PFD) — Chronic, ≥3 months (R63.32)</label><button type="button" class="plan-pill" data-cv="pfd_chronic">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_acute"> Pediatric Feeding Disorder (PFD) — Acute, &lt;3 months (R63.31)</label><button type="button" class="plan-pill" data-cv="pfd_acute">Include plan</button></div>
         <div id="pfdDomainsRow" class="sub-options" style="display:none">
           <span class="sub-label">PFD domains affected (check all that apply)</span>
           <label class="cb-row"><input type="checkbox" data-key="pfdDomains" value="medical"> Medical/organic (dysphagia, GERD, anatomic, neurologic)</label>
@@ -1480,8 +1484,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="pfdDomains" value="skill"> Feeding skill (oral-motor dysfunction, sensory-motor disorganization)</label>
           <label class="cb-row"><input type="checkbox" data-key="pfdDomains" value="psychosocial"> Psychosocial (mealtime behavioral refusal, caregiver-child interaction disruption)</label>
         </div>
-        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_suspected"> Pediatric Feeding Disorder (PFD) — Suspected, evaluation pending (R63.30)</label><span class="plan-pill" data-cv="pfd_suspected">Include plan</span></div>
-        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="arfid"> ARFID — Confirmed (F50.82)</label><span class="plan-pill" data-cv="arfid">Include plan</span></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="pfd_suspected"> Pediatric Feeding Disorder (PFD) — Suspected, evaluation pending (R63.30)</label><button type="button" class="plan-pill" data-cv="pfd_suspected">Include plan</button></div>
+        <div class="cr-wrap"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="arfid"> ARFID — Confirmed (F50.82)</label><button type="button" class="plan-pill" data-cv="arfid">Include plan</button></div>
         <div id="arfidDetailsRow" class="sub-options" style="display:none">
           <span class="sub-label">Primary mechanism (check all that apply)</span>
           <label class="cb-row"><input type="checkbox" data-key="arfidMechanism" value="sensory"> Sensory sensitivity (texture, taste, smell, appearance)</label>
@@ -1493,14 +1497,14 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="arfidImpact" value="supplement_dep"> Reliance on nutritional supplements</label>
           <label class="cb-row"><input type="checkbox" data-key="arfidImpact" value="psychosocial"> Marked interference with psychosocial functioning</label>
         </div>
-        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="arfid_suspected"> ARFID — Suspected, evaluation pending (F50.82 provisional)</label><span class="plan-pill" data-cv="arfid_suspected">Include plan</span></div>
+        <div class="cr-wrap cr-suspected"><label class="cb-row"><input type="checkbox" data-key="comorbid" value="arfid_suspected"> ARFID — Suspected, evaluation pending (F50.82 provisional)</label><button type="button" class="plan-pill" data-cv="arfid_suspected">Include plan</button></div>
       </div>
     </div>
   </div>
 
   <!-- 7. School -->
   <div class="section">
-    <div id="sh-school" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">7</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-school" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">7</span><span class="sec-kicker">School</span><span class="sec-title">School &amp; Educational Supports</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div class="field-group">
         <span class="field-label">Current Placement</span>
@@ -1548,7 +1552,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 8. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">8</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-safety" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">8</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
@@ -1565,7 +1569,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 9. Anticipatory Guidance -->
   <div class="section">
-    <div id="sh-ag" class="sec-head" onclick="toggleSec(this,event)"><span class="sec-label"><span class="sec-folio">9</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></span><span class="sec-chevron">&#9660;</span></div>
+    <div id="sh-ag" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">9</span><span class="sec-kicker">Guidance</span><span class="sec-title">Anticipatory Guidance</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="ag" value="caregiver_support"> Caregiver mental health &amp; support resources</label>
@@ -1590,7 +1594,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- ABA Parameters (shown when ABA is included in plan) -->
   <div id="abaParamsSection" class="section" style="display:none;border-color:var(--accent)">
-    <div class="sec-head" style="background:var(--accent-soft);color:var(--accent-hover)" onclick="toggleSec(this,event)">&#9733; ABA Letter of Medical Necessity Parameters <span>&#9660;</span></div>
+    <div class="sec-head" role="heading" aria-level="2" style="background:var(--accent-soft);color:var(--accent-hover)" onclick="toggleSec(this,event)"><button type="button" class="sec-btn"><span aria-hidden="true">&#9733;</span> ABA Letter of Medical Necessity Parameters</button> <span aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">These fields generate a standalone insurance-facing Letter of Medical Necessity. Use the <strong>ABA Letter</strong> tab in the preview to review and copy.</p>
 
@@ -1662,7 +1666,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)">&#9881; Adjust Referrals <span>&#9660;</span></div>
+    <div id="sh-overrides" class="sec-head" role="heading" aria-level="2" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)"><button type="button" class="sec-btn"><span aria-hidden="true">&#9881;</span> Adjust Referrals</button> <span aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
       <div id="overridePanel"></div>
@@ -1702,7 +1706,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
 </div><!-- /left-panel -->
 
-<div class="right-panel">
+<div class="right-panel" role="region" aria-label="Note preview">
   <div class="rp-header">
     <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
       <h2>&#128196; Live Note Preview</h2>
@@ -1932,7 +1936,7 @@ function applyPreset(key,opts){
     const r=document.querySelector(`input[name="${name}"][value="${val}"]`);
     if(r && !r.checked) r.click();
   });
-  // langModifier chips are .mod-chip divs with onclick=toggleMod(key); guard on S
+  // langModifier chips are .mod-chip buttons with onclick=toggleMod(key); guard on S
   // (toggleMod manages the Set + is-on class) so re-application can't toggle one off.
   // WARY: do NOT add 'echolalic' to any preset's mods — toggleMod('echolalic') auto-
   // checks DSM criterion B1 (see toggleMod ~:4968), which would violate the cross-preset
@@ -5753,6 +5757,60 @@ function renderManualSpecCaptions(){
   });
 }
 
+// ─── CHIP TOOLBARS (keyboard) ────────────────────────────────────────────────
+// Each chip strip (role="toolbar") is ONE Tab stop; Left/Right/Home/End move between its
+// visible chips (the ARIA toolbar pattern). Without this, the ~260 evidence, strength and
+// language chips would each be a Tab stop and a keyboard user would tab through all of them
+// to get down the form. The Tab stop must sit on a VISIBLE chip: updateEvChips() hides chips
+// by age and language level, so syncRoving() re-picks after every visibility change.
+const TB_ITEM='button:not([disabled])';
+// Visible = not hidden by updateEvChips' inline display:none. Deliberately NOT a layout
+// check: a strip inside a collapsed section would have no laid-out chips, lose its Tab stop,
+// and not get it back when the section opens (toggleSec doesn't re-render).
+const tbItems=tb=>[...tb.querySelectorAll(TB_ITEM)].filter(b=>b.style.display!=='none');
+// Make `stop` the strip's only Tab stop. Writes only on change: syncAllRoving() runs from
+// render(), which fires on every keystroke in a text box.
+function setStop(tb,stop){
+  tb.querySelectorAll(TB_ITEM).forEach(b=>{const t=b===stop?0:-1;if(b.tabIndex!==t)b.tabIndex=t;});
+}
+function syncRoving(tb){
+  const vis=tbItems(tb);
+  setStop(tb,vis.find(b=>b.tabIndex===0)||vis[0]);
+}
+const syncAllRoving=()=>document.querySelectorAll('[role="toolbar"]').forEach(syncRoving);
+function initChipToolbars(){
+  document.addEventListener('keydown',e=>{
+    const tb=e.target.closest&&e.target.closest('[role="toolbar"]');
+    if(!tb||e.target.tagName!=='BUTTON'||!['ArrowRight','ArrowLeft','Home','End'].includes(e.key)) return;
+    const items=tbItems(tb); let i=items.indexOf(e.target);
+    if(i<0) return;
+    e.preventDefault();
+    i=e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowRight'?1:-1)+items.length)%items.length;
+    setStop(tb,items[i]);items[i].focus();
+  });
+  // Remember the last chip used (mouse or keyboard) as the strip's Tab stop.
+  document.addEventListener('focusin',e=>{
+    const tb=e.target.closest&&e.target.closest('[role="toolbar"]');
+    if(tb&&e.target.tagName==='BUTTON') setStop(tb,e.target);
+  });
+  syncAllRoving();
+}
+// Sections render expanded or collapsed from markup; mirror that onto each toggle button.
+function initSectionToggles(){
+  document.querySelectorAll('.sec-head').forEach(h=>{
+    h.querySelector('.sec-btn')?.setAttribute('aria-expanded',String(!h.classList.contains('collapsed')));
+  });
+}
+
+// Join an observation chip's text onto a criterion's evidence text. Normally "; "-separated,
+// but right after a source heading ("Parent report:") or text that already ends in punctuation
+// it joins with a space, so the note never reads "Parent report:; ..." or "concerns.; ...".
+function appendEvidence(cur,text){
+  const t=cur.trim();
+  if(!t) return text;
+  return /[:;,.]$/.test(t)?t+' '+text:t+'; '+text;
+}
+
 // Toggle DSM evidence chips by two axes (chips are built once at init):
 //  - Age: 'base' always shows; an age-keyed chip shows only when it matches S.ageGroup;
 //    the 'minVerbal' group shows only when min-verbal AND school-age or older. It is gated
@@ -5774,6 +5832,7 @@ function updateEvChips(){
   document.querySelectorAll('.ev-src-chip[data-src-ages]').forEach(chip=>{
     chip.style.display=chip.dataset.srcAges.split(' ').includes(ag)?'':'none';
   });
+  syncAllRoving();
 }
 
 // Set while applyPreset() drives many controls in a row: each .click() fires a change
@@ -6231,7 +6290,9 @@ function toggleMod(key){
       if(ta&&!ta.value.trim()){ta.value='Scripted/echolalic speech';S.ev.b1=ta.value;}
     }
   }
-  document.getElementById('mod_'+key).classList.toggle('is-on',S.langModifiers.has(key));
+  const modEl=document.getElementById('mod_'+key);
+  modEl.classList.toggle('is-on',S.langModifiers.has(key));
+  modEl.setAttribute('aria-pressed',String(S.langModifiers.has(key)));
   render();
 }
 
@@ -6240,7 +6301,13 @@ function syncStrengthChips(){
   const val=(document.getElementById('strengthsField')||{}).value||'';
   document.querySelectorAll('#strengthChips .chip').forEach(c=>{
     const m=c.getAttribute('onclick').match(/addStrength\('([^']+)'\)/);
-    if(m) c.classList.toggle('is-on',val.includes(m[1]));
+    if(!m) return;
+    const on=val.includes(m[1]);
+    c.classList.toggle('is-on',on);
+    // An "add" button, not a toggle: pressing an added strength does nothing (addStrength
+    // returns early), so announce it as unavailable and say why, rather than as "pressed".
+    if(on){c.setAttribute('aria-disabled','true');c.setAttribute('aria-label',c.textContent.trim()+', already added');}
+    else{c.removeAttribute('aria-disabled');c.removeAttribute('aria-label');}
   });
 }
 function addStrength(text){
@@ -6313,6 +6380,7 @@ function toggleSec(h,e){
   // the DOM, unlike display:none, so without inert tab would land on hidden fields).
   if(hidden) b.setAttribute('inert',''); else b.removeAttribute('inert');
   h.classList.toggle('collapsed',hidden);
+  h.querySelector('.sec-btn')?.setAttribute('aria-expanded',String(!hidden));
 }
 
 // ─── TOAST NOTIFICATIONS ─────────────────────────────────────────────────────
@@ -6369,7 +6437,7 @@ function clearAll(opts){
   document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
   document.querySelectorAll('textarea').forEach(t=>{t.value='';});
   syncStrengthChips();
-  document.querySelectorAll('.mod-chip').forEach(c=>c.classList.remove('is-on'));
+  document.querySelectorAll('.mod-chip').forEach(c=>{c.classList.remove('is-on');c.setAttribute('aria-pressed','false');});
   const ucw=document.getElementById('unevenCogWrap');if(ucw)ucw.style.display='none';
   // Reset every field from the one initializer. Fresh Sets/objects are fine: every consumer
   // reads S.x at call time and nothing holds a reference into S. If that ever changes,
@@ -7566,11 +7634,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     const wrap=ta.parentElement;
 
     // Source label strip — chips insert a "Label: " header into the textarea
+    // Criterion name for the toolbar labels, from the textarea's accessible name.
+    const critName=(ta.getAttribute('aria-label')||'').replace(/^Evidence for /,'');
     const srcStrip=document.createElement('div');
     srcStrip.className='ev-source-strip';
+    srcStrip.setAttribute('role','toolbar');
+    srcStrip.setAttribute('aria-label','Add a source heading to evidence for '+critName);
     Object.entries(EV_SRC_LABELS).forEach(([key,label])=>{
-      const chip=document.createElement('span');
-      chip.className='ev-src-chip';chip.textContent=label+' ▸';
+      const chip=document.createElement('button');chip.type='button';
+      chip.className='ev-src-chip';chip.textContent=label;
+      const arrow=document.createElement('span');arrow.setAttribute('aria-hidden','true');arrow.textContent=' ▸';
+      chip.appendChild(arrow);
       // Age-gated sources (self-report) carry their allowed ageGroups; updateEvChips() toggles them.
       if(EV_SRC_AGES[key]) chip.dataset.srcAges=EV_SRC_AGES[key].join(' ');
       chip.addEventListener('click',()=>{
@@ -7588,6 +7662,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     // updateEvChips() (called from render) toggles visibility.
     const obsStrip=document.createElement('div');
     obsStrip.className='ev-obs-strip';
+    obsStrip.setAttribute('role','toolbar');
+    obsStrip.setAttribute('aria-label','Example observations for '+critName);
     const def=EV_CHIPS[k]||{};
     const groups=Array.isArray(def)?{base:def}:def;
     Object.entries(groups).forEach(([ageKey,arr])=>{
@@ -7596,12 +7672,12 @@ document.addEventListener('DOMContentLoaded',()=>{
         // when the patient is min-verbal (see updateEvChips); the 'minVerbal' ageKey group
         // is the reverse, shown only when min-verbal and school-age or older.
         const text=typeof entry==='string'?entry:entry.t;
-        const chip=document.createElement('span');
+        const chip=document.createElement('button');chip.type='button';
         chip.className='ev-obs-chip';chip.textContent=text;
         chip.dataset.age=ageKey;
         if(typeof entry!=='string'&&entry.lang) chip.dataset.lang=entry.lang;
         chip.addEventListener('click',()=>{
-          ta.value=ta.value.trim()?(ta.value.trim()+'; '+text):text;
+          ta.value=appendEvidence(ta.value,text);
           S.ev[k]=ta.value;render();
         });
         obsStrip.appendChild(chip);
@@ -7612,6 +7688,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     wrap.insertBefore(obsStrip,ta);
   });
   updateEvChips(); // set initial chip visibility for the default age + language level
+  initChipToolbars();
+  initSectionToggles();
   document.querySelectorAll('.beh-freq-inp').forEach(inp=>{
     inp.addEventListener('input',()=>{S.behavFreq[inp.dataset.freqkey]=inp.value.trim();render();});
   });
@@ -7625,6 +7703,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{
     pill.addEventListener('click',()=>toggleComorbidPlan(pill.dataset.cv));
+    // The pill's own text ("Include plan" / "Note only") never names the condition, so its
+    // accessible name is the sibling checkbox label followed by that text. Self-reference in
+    // aria-labelledby picks up the text live as toggleComorbidPlan() rewrites it.
+    const lbl=pill.parentElement.querySelector('label');
+    if(lbl){
+      lbl.id=lbl.id||'crl-'+pill.dataset.cv;
+      pill.id=pill.id||'pp-'+pill.dataset.cv;
+      pill.setAttribute('aria-labelledby',lbl.id+' '+pill.id);
+    }
   });
   updateAgeBasedVisibility();
   renderOverrides();
