@@ -289,6 +289,9 @@ const CASES = [
     setup(S){ },
     check(a){ assert.equal(a.appendEvidence('Hand flapping;', 'Toe walking'), 'Hand flapping; Toe walking');
               assert.equal(a.appendEvidence('Hand flapping,', 'Toe walking'), 'Hand flapping, Toe walking'); } },
+  { name: 'appendEvidence: after a typed sentence ending in "." joins with a space, not ".; "',
+    setup(S){ },
+    check(a){ assert.equal(a.appendEvidence('Concerns since 18 months. ', 'Hand flapping'), 'Concerns since 18 months. Hand flapping'); } },
 ];
 
 let pass = 0;

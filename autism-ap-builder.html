@@ -428,9 +428,9 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    remembering to set one. Zero specificity: a class needing a different edge still wins
    (.outcome-sel keeps its heavier 1.5px edge on purpose; it is the prominent must-answer menu). */
 :where(textarea,select,input[type=text],input[type=number],input[type=search]){border:1px solid var(--border-control)}
-/* Chips and section toggles are real <button>s (keyboard + screen-reader operable) but were
-   styled as spans/divs. This zero-specificity reset removes the browser's button look so each
-   class's own rules (which all outrank :where) style them exactly as before. */
+/* Chips and section toggles are <button>s so keyboards and screen readers can operate them.
+   This zero-specificity reset removes the browser's button look (system font, grey fill,
+   border, centered text); each class's own rules outrank :where() and supply the real style. */
 :where(button.chip,button.ev-src-chip,button.ev-obs-chip,button.plan-pill,button.sec-btn){font:inherit;color:inherit;letter-spacing:inherit;word-spacing:inherit;text-transform:inherit;text-shadow:inherit;text-align:inherit;line-height:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .r-opt{position:relative;display:flex;align-items:center;gap:var(--space-1);padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);background:var(--bg-card);line-height:1.3}
@@ -1026,27 +1026,27 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       <div class="field-group">
         <span class="field-label">Identified Strengths</span>
         <div class="strength-chips" id="strengthChips" role="toolbar" aria-label="Common strengths">
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')" aria-pressed="false">Visual memory</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')" aria-pressed="false">Rote memory</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')" aria-pressed="false">Motivated by interests</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')" aria-pressed="false">Music</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')" aria-pressed="false">Affectionate</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')" aria-pressed="false">1:1 cooperative</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')" aria-pressed="false">Routine-driven</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')" aria-pressed="false">Technology</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')" aria-pressed="false">Math/patterns</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')" aria-pressed="false">Visual-spatial</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')" aria-pressed="false">Receptive > expressive</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')" aria-pressed="false">Hyperlexia</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')" aria-pressed="false">Caring/empathetic</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')" aria-pressed="false">Persistent</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')" aria-pressed="false">Special-topic expertise</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')" aria-pressed="false">Social praise</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')" aria-pressed="false">Detail-oriented</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')" aria-pressed="false">Creative/artistic</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')" aria-pressed="false">Honest/direct</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')" aria-pressed="false">Sense of humor</button>
-          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')" aria-pressed="false">Long-term memory</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual memory')">Visual memory</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Exceptional rote memory')">Rote memory</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by preferred topics and activities')">Motivated by interests</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responsive to music')">Music</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Affectionate with familiar adults')">Affectionate</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Cooperative in structured 1:1 settings')">1:1 cooperative</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Responds well to routine and predictability')">Routine-driven</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong technology and computer skills')">Technology</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Mathematical/pattern recognition ability')">Math/patterns</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong visual-spatial skills')">Visual-spatial</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Receptive language exceeds expressive language')">Receptive > expressive</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Hyperlexia (precocious word reading/decoding ability)')">Hyperlexia</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Caring toward familiar people')">Caring/empathetic</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Persistent and determined')">Persistent</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Detailed knowledge of special topics')">Special-topic expertise</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Motivated by social praise')">Social praise</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong attention to detail')">Detail-oriented</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Creative or artistic ability')">Creative/artistic</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Honest and direct communication style')">Honest/direct</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Playful sense of humor')">Sense of humor</button>
+          <button type="button" class="chip chip--sm chip--success" onclick="addStrength('Strong long-term memory for events and facts')">Long-term memory</button>
         </div>
         <textarea class="strengths-area" id="strengthsField" aria-label="Identified strengths" placeholder="Click chips above or type freely..." rows="2"></textarea>
         <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
@@ -5757,13 +5757,6 @@ function renderManualSpecCaptions(){
   });
 }
 
-// Toggle DSM evidence chips by two axes (chips are built once at init):
-//  - Age: 'base' always shows; an age-keyed chip shows only when it matches S.ageGroup;
-//    the 'minVerbal' group shows only when min-verbal AND school-age or older. It is gated
-//    to older ages because its job is to replace the conversational chips that get suppressed
-//    at schoolAge+; toddler/preschool chips are already preverbal, so the cluster would only
-//    duplicate them there.
-//  - Language: a chip tagged lang:'verbal' (conversation-dependent) is hidden when min-verbal.
 // ─── CHIP TOOLBARS (keyboard) ────────────────────────────────────────────────
 // Each chip strip (role="toolbar") is ONE Tab stop; Left/Right/Home/End move between its
 // visible chips (the ARIA toolbar pattern). Without this, the ~260 evidence, strength and
@@ -5775,10 +5768,14 @@ const TB_ITEM='button:not([disabled])';
 // check: a strip inside a collapsed section would have no laid-out chips, lose its Tab stop,
 // and not get it back when the section opens (toggleSec doesn't re-render).
 const tbItems=tb=>[...tb.querySelectorAll(TB_ITEM)].filter(b=>b.style.display!=='none');
+// Make `stop` the strip's only Tab stop. Writes only on change: syncAllRoving() runs from
+// render(), which fires on every keystroke in a text box.
+function setStop(tb,stop){
+  tb.querySelectorAll(TB_ITEM).forEach(b=>{const t=b===stop?0:-1;if(b.tabIndex!==t)b.tabIndex=t;});
+}
 function syncRoving(tb){
-  const all=[...tb.querySelectorAll(TB_ITEM)], vis=tbItems(tb);
-  const cur=vis.find(b=>b.tabIndex===0)||vis[0];
-  all.forEach(b=>{b.tabIndex=b===cur?0:-1;});
+  const vis=tbItems(tb);
+  setStop(tb,vis.find(b=>b.tabIndex===0)||vis[0]);
 }
 const syncAllRoving=()=>document.querySelectorAll('[role="toolbar"]').forEach(syncRoving);
 function initChipToolbars(){
@@ -5789,13 +5786,12 @@ function initChipToolbars(){
     if(i<0) return;
     e.preventDefault();
     i=e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowRight'?1:-1)+items.length)%items.length;
-    items.forEach(b=>{b.tabIndex=-1;});items[i].tabIndex=0;items[i].focus();
+    setStop(tb,items[i]);items[i].focus();
   });
   // Remember the last chip used (mouse or keyboard) as the strip's Tab stop.
   document.addEventListener('focusin',e=>{
     const tb=e.target.closest&&e.target.closest('[role="toolbar"]');
-    if(!tb||e.target.tagName!=='BUTTON') return;
-    tb.querySelectorAll(TB_ITEM).forEach(b=>{b.tabIndex=b===e.target?0:-1;});
+    if(tb&&e.target.tagName==='BUTTON') setStop(tb,e.target);
   });
   syncAllRoving();
 }
@@ -5807,14 +5803,21 @@ function initSectionToggles(){
 }
 
 // Join an observation chip's text onto a criterion's evidence text. Normally "; "-separated,
-// but right after a source heading ("Parent report:") or existing punctuation it joins with a
-// space, so the note reads "Parent report: Hand flapping", not "Parent report:; Hand flapping".
+// but right after a source heading ("Parent report:") or text that already ends in punctuation
+// it joins with a space, so the note never reads "Parent report:; ..." or "concerns.; ...".
 function appendEvidence(cur,text){
   const t=cur.trim();
   if(!t) return text;
-  return /[:;,]$/.test(t)?t+' '+text:t+'; '+text;
+  return /[:;,.]$/.test(t)?t+' '+text:t+'; '+text;
 }
 
+// Toggle DSM evidence chips by two axes (chips are built once at init):
+//  - Age: 'base' always shows; an age-keyed chip shows only when it matches S.ageGroup;
+//    the 'minVerbal' group shows only when min-verbal AND school-age or older. It is gated
+//    to older ages because its job is to replace the conversational chips that get suppressed
+//    at schoolAge+; toddler/preschool chips are already preverbal, so the cluster would only
+//    duplicate them there.
+//  - Language: a chip tagged lang:'verbal' (conversation-dependent) is hidden when min-verbal.
 function updateEvChips(){
   const ag=S.ageGroup, mv=isMinVerbal();
   const olderAge=ag==='schoolAge'||ag==='adolescent'||ag==='youngAdult';
@@ -6298,7 +6301,13 @@ function syncStrengthChips(){
   const val=(document.getElementById('strengthsField')||{}).value||'';
   document.querySelectorAll('#strengthChips .chip').forEach(c=>{
     const m=c.getAttribute('onclick').match(/addStrength\('([^']+)'\)/);
-    if(m){c.classList.toggle('is-on',val.includes(m[1]));c.setAttribute('aria-pressed',String(val.includes(m[1])));}
+    if(!m) return;
+    const on=val.includes(m[1]);
+    c.classList.toggle('is-on',on);
+    // An "add" button, not a toggle: pressing an added strength does nothing (addStrength
+    // returns early), so announce it as unavailable and say why, rather than as "pressed".
+    if(on){c.setAttribute('aria-disabled','true');c.setAttribute('aria-label',c.textContent.trim()+', already added');}
+    else{c.removeAttribute('aria-disabled');c.removeAttribute('aria-label');}
   });
 }
 function addStrength(text){
@@ -7694,6 +7703,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{
     pill.addEventListener('click',()=>toggleComorbidPlan(pill.dataset.cv));
+    // The pill's own text ("Include plan" / "Note only") never names the condition, so its
+    // accessible name is the sibling checkbox label followed by that text. Self-reference in
+    // aria-labelledby picks up the text live as toggleComorbidPlan() rewrites it.
+    const lbl=pill.parentElement.querySelector('label');
+    if(lbl){
+      lbl.id=lbl.id||'crl-'+pill.dataset.cv;
+      pill.id=pill.id||'pp-'+pill.dataset.cv;
+      pill.setAttribute('aria-labelledby',lbl.id+' '+pill.id);
+    }
   });
   updateAgeBasedVisibility();
   renderOverrides();
