@@ -3464,7 +3464,10 @@ function generateNote() {
     therapyIntro();
     L.push(n+++'. PHYSICAL THERAPY (PT)');
     {const sl=therapyStatusLine('pt','PT');if(sl){L.push(sl);L.push('');}}
-    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination'))x.push('motor coordination/DCD');
+    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination')||S.comorbid.has('dcd'))x.push('motor coordination/DCD');
+    // rulePT also fires on a DCD comorbid alone or a forced Include, so the list can
+    // otherwise be empty and print "targeting: ."
+    if(!x.length)x.push('gross motor function and mobility');
     L.push('Evaluation and treatment targeting: '+x.join(', ')+'. Goal: improve participation in PE, playground activities, and daily physical function.');
     // C2: when motor coordination/DCD drives BOTH therapies, name the co-management
     // split so the dual OT+PT referral does not read as redundant. Only fires when OT
