@@ -35,7 +35,7 @@ The four citations in this section are the complete reference set the tool surfa
 
 Hyman SL, Levy SE, Myers SM, et al.; Council on Children with Disabilities, Section on Developmental and Behavioral Pediatrics. **Identification, Evaluation, and Management of Children With Autism Spectrum Disorder.** *Pediatrics.* 2020;145(1):e20193447. doi:10.1542/peds.2019-3447 (PMID 31843864)
 
-- **Used for:** A&P note reference #1 ([autism-ap-builder.html:2125](../autism-ap-builder.html#L2125)); ABA letter reference #1 ([autism-ap-builder.html:3231](../autism-ap-builder.html#L3231)).
+- **Used for:** A&P note reference #1 ([autism-ap-builder.html:3305](../autism-ap-builder.html#L3305)); ABA letter reference #1 ([autism-ap-builder.html:4554](../autism-ap-builder.html#L4554)).
 - **Supports the claim:** AAP-endorsed standard of care for identification, evaluation, and management of ASD — the canonical citation for medical-necessity arguments in the ABA letter.
 - **Verified:** bibliographic details confirmed against PubMed PMID 31843864 on 2026-10-31 (Claude session; published online 2019-12-16, print issue January 2020) — maintainer initials pending
 
@@ -43,7 +43,7 @@ Hyman SL, Levy SE, Myers SM, et al.; Council on Children with Disabilities, Sect
 
 Weitlauf AS, McPheeters ML, Peters B, et al. **Therapies for Children with Autism Spectrum Disorder: Behavioral Interventions Update.** Comparative Effectiveness Review No. 137. Rockville, MD: Agency for Healthcare Research and Quality; 2014. <https://www.ncbi.nlm.nih.gov/books/NBK241444> (PMID 25210724)
 
-- **Used for:** A&P note reference #2 ([autism-ap-builder.html:2126](../autism-ap-builder.html#L2126)); ABA letter reference #2 ([autism-ap-builder.html:3232](../autism-ap-builder.html#L3232)).
+- **Used for:** A&P note reference #2 ([autism-ap-builder.html:3306](../autism-ap-builder.html#L3306)); ABA letter reference #2 ([autism-ap-builder.html:4555](../autism-ap-builder.html#L4555)).
 - **Supports the claim:** AHRQ-level evidence base for ABA-class behavioral interventions; the federal-agency citation that strengthens medical-necessity arguments for payors.
 - **Verified:** partially, 2026-10-31 (Claude session). A PubMed search on author Weitlauf AS plus the exact title returns PMID 25210724, the NCBI Bookshelf record for this report, so the report exists under this title and lead author. PubMed's metadata service does not return Bookshelf records and the Bookshelf page blocked automated reading, so report number, co-authors, and year were not re-read. Maintainer to open NBK241444 and initial.
 
@@ -51,7 +51,7 @@ Weitlauf AS, McPheeters ML, Peters B, et al. **Therapies for Children with Autis
 
 Reichow B, Hume K, Barton EE, Boyd BA. **Early intensive behavioral intervention (EIBI) for young children with autism spectrum disorders (ASD).** *Cochrane Database Syst Rev.* 2018;(5):CD009260. doi:10.1002/14651858.CD009260.pub3 (PMID 29742275; PMC6494600)
 
-- **Used for:** A&P note reference #3 and ABA letter reference #3 — only when the patient is `young` (toddler or preschool). ([autism-ap-builder.html:2127, 3233](../autism-ap-builder.html#L2127)).
+- **Used for:** A&P note reference #3 and ABA letter reference #3 — only when the patient is `young` (toddler or preschool). ([autism-ap-builder.html:3307, 4556](../autism-ap-builder.html#L3307)).
 - **Supports the claim:** Cochrane-level evidence base for EIBI in the under-6 cohort specifically. Citing this for an older patient would overstate scope, which is why the tool age-gates the reference.
 - **Caution for payer-facing use:** the review itself rates the evidence low to very low quality (GRADE) and concludes there is "weak evidence" that EIBI may help some children; five studies, one of them randomized. It is a fair citation for "EIBI has a systematic-review evidence base in under-6s" but not for "strong evidence." A reviewer who reads the abstract will see that wording.
 - **Verified:** bibliographic details confirmed against PubMed PMID 29742275 on 2026-10-31 (Claude session) — maintainer initials pending
@@ -60,7 +60,7 @@ Reichow B, Hume K, Barton EE, Boyd BA. **Early intensive behavioral intervention
 
 National Academies of Sciences, Engineering, and Medicine. **The Comprehensive Autism Care Demonstration: Solutions for Military Families.** Washington, DC: National Academies Press; 2025. doi:10.17226/29139
 
-- **Used for:** A&P note reference and ABA letter reference — only when `isMilitary` is true ([autism-ap-builder.html:2128, 3234, 3271](../autism-ap-builder.html#L2128)).
+- **Used for:** A&P note reference and ABA letter reference — only when `isMilitary` is true ([autism-ap-builder.html:3308, 4557, 4592](../autism-ap-builder.html#L3308)).
 - **Supports the claim:** NASEM evaluation reaffirming medical necessity and effectiveness of ABA for military-connected ASD; gated to TRICARE/ChampVA patients because that is where the rebuttal value sits.
 - **Verified:** title, publisher, year, and DOI confirmed on the National Academies publication page (nationalacademies.org/publications/29139) on 2026-10-31 (Claude session). The page's summary is consistent with the claim: it finds ABA meets the Department of Defense's own standard for reliable medical evidence and recommends ABA be authorized as a TRICARE Basic benefit. Not a PubMed-indexed source. Maintainer initials pending.
 
@@ -70,7 +70,7 @@ Referenced in an inline comment as `AAP-2025` ([autism-ap-builder.html:3660](../
 
 - **Used for:** rationale comment only; no patient-facing output.
 - **Supports the claim:** unclear — pending maintainer verification.
-- **Likely identity (2026-10-31 PubMed pass):** probably `[rodan-2025]`, not a separate ASD statement. The comment sits inside the genetics-referral block and concerns developmental regression as a genetics/metabolic red flag, which is Rodan's subject; Rodan is a 2025 AAP report, and no separate 2025 AAP ASD statement turned up. Rodan's full text is not in PubMed Central, so whether it distinguishes ongoing from distant regression was not checked. If the maintainer confirms, re-point the comment to `[rodan-2025]` and retire this entry.
+- **Likely identity (2026-10-31 PubMed pass):** possibly `[rodan-2025]`, but this is an inference from location, not a match. The comment sits inside the genetics-referral block, and Rodan is the 2025 AAP report the tool already cites for genetic evaluation. Rodan's abstract does not mention regression, and its full text is not in PubMed Central, so whether it discusses regression at all was not checked. One narrow PubMed search (AAP-authored *Pediatrics* items with "autism" or "regression" in the title) found no 2025 statement; that does not rule one out. If the maintainer confirms, re-point the comment to `[rodan-2025]` and retire this entry.
 - **Verified:** **needs verification**
 
 ---
@@ -90,7 +90,7 @@ Pitts CH, Mervis CB. **Performance on the Kaufman Brief Intelligence Test-2 by C
 
 Greenspan S. **Borderline intellectual functioning: an update.** *Current Opinion in Psychiatry.* 2017;30(2):113–122. doi:10.1097/YCO.0000000000000317 (PMID 28079674)
 
-- **Used for:** BIF asymmetry rationale comment ([autism-ap-builder.html:4524](../autism-ap-builder.html#L4524)); branching-logic.md §11.7 BIF asymmetry; branching-logic-for-clinicians.html.
+- **Used for:** BIF never-auto-bridge rationale comments in autism-ap-builder.html (grep "Greenspan 2017"; several sites, around the specifier bridge and the withSuspected* degradation path); branching-logic.md §11.7 BIF asymmetry; branching-logic-for-clinicians.html.
 - **Supports the claim:** BIF (R41.83) is a contested clinical-attention category. Greenspan argues for dropping BIF entirely. Drives the no-auto-bridge rule for `borderline` → `withBIF` and the prohibition on a `withSuspectedBIF` specifier.
 - **Verified:** bibliographic details confirmed against PubMed PMID 28079674 on 2026-10-31 (Claude session). The abstract supports the claim directly: it argues the BIF category be dropped rather than elevated to a formal disorder. Note it is a single-author opinion review, not a consensus statement. Maintainer initials pending.
 
@@ -123,13 +123,13 @@ Wexler D, Pritchard AE, Ludwig NN. **Characterizing and comparing adaptive and a
 
 ## 3. Genetic evaluation
 
-The two citations below are the **only** two genetics citations the tool emits (superscripts ¹ and ² in the A&P note Plan section at [autism-ap-builder.html:2439–2440](../autism-ap-builder.html#L2439)). Other clinical concepts mentioned in the genetics referral prose — Fragile X (FMR1) testing, chromosomal microarray (CMA), exome/genome sequencing as first-tier, screening for treatable inborn errors of metabolism — are framed as deriving from `[rodan-2025]` and `[srivastava-2019]` rather than being separately cited. If a future edit adds a Plan-section claim that cannot be sourced to one of these two papers, add the new citation here and add an inline superscript marker in the Plan text.
+The two citations below are the **only** two genetics citations the tool emits (superscripts ¹ and ² in the A&P note Plan section at [autism-ap-builder.html:3698–3699](../autism-ap-builder.html#L3698); the reference lines themselves are the `gxCitations` array at 3749–3750). Other clinical concepts mentioned in the genetics referral prose — Fragile X (FMR1) testing, chromosomal microarray (CMA), exome/genome sequencing as first-tier, screening for treatable inborn errors of metabolism — are framed as deriving from `[rodan-2025]` and `[srivastava-2019]` rather than being separately cited. If a future edit adds a Plan-section claim that cannot be sourced to one of these two papers, add the new citation here and add an inline superscript marker in the Plan text.
 
 ### `[rodan-2025]` — AAP Council on Genetics clinical report on ID/GDD
 
 Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. **Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report.** *Pediatrics.* 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219 (PMID 40545261)
 
-- **Used for:** A&P note Plan section, genetic evaluation rationale ([autism-ap-builder.html:2488](../autism-ap-builder.html#L2488)).
+- **Used for:** A&P note Plan section, genetic evaluation rationale ([autism-ap-builder.html:3749](../autism-ap-builder.html#L3749)).
 - **Supports the claim:** AAP guidance on genetic evaluation indications for children with ID or GDD — drives the genetic referral recommendation when cogProfile is in the ID/GDD tiers.
 - **Verified:** bibliographic details confirmed against PubMed PMID 40545261 on 2026-10-31 (Claude session) — maintainer initials pending
 
@@ -137,7 +137,7 @@ Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. **Genetic evaluation
 
 Srivastava S, Love-Nichols JA, Dies KA, et al. **Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders.** *Genet Med.* 2019;21(11):2413–2421. doi:10.1038/s41436-019-0554-6 (PMID 31182824; PMC6831729)
 
-- **Used for:** A&P note Plan section, genetic evaluation rationale ([autism-ap-builder.html:2489](../autism-ap-builder.html#L2489)).
+- **Used for:** A&P note Plan section, genetic evaluation rationale ([autism-ap-builder.html:3750](../autism-ap-builder.html#L3750)).
 - **Supports the claim:** Multidisciplinary consensus that exome sequencing should be a first-tier test in NDD evaluation. Strengthens the genetic referral language for payors.
 - **Verified:** bibliographic details confirmed against PubMed PMID 31182824 on 2026-10-31 (Claude session). The abstract supports the claim directly (exome yield 36% vs 15–20% for microarray; proposes exome first). Maintainer initials pending.
 
@@ -149,13 +149,13 @@ Srivastava S, Love-Nichols JA, Dies KA, et al. **Meta-analysis and multidiscipli
 
 American Psychiatric Association. **Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5).** Arlington, VA: American Psychiatric Publishing; 2013.
 
-- **Used for:** ABA letter opening paragraph ([autism-ap-builder.html:3243](../autism-ap-builder.html#L3243)).
+- **Used for:** ABA letter opening paragraph ([autism-ap-builder.html:4564](../autism-ap-builder.html#L4564)).
 - **Supports the claim:** Standard diagnostic reference cited in the ABA letter opening for medical-necessity framing. The tool uses 2013 in the letter rather than DSM-5-TR (2022) because the 2013 edition is the originally-named reference for the ASD criteria.
 - **Verified:**
 
 ### `[nasem-2025]` (re-used)
 
-See §1 above. Cited additionally in the ABA letter evidence paragraph for military-connected patients ([autism-ap-builder.html:3271](../autism-ap-builder.html#L3271)).
+See §1 above. Cited additionally in the ABA letter evidence paragraph for military-connected patients ([autism-ap-builder.html:4592](../autism-ap-builder.html#L4592)).
 
 ---
 
@@ -165,7 +165,7 @@ See §1 above. Cited additionally in the ABA letter evidence paragraph for milit
 
 Florida Behavioral Health Center (FL BHC). **Children & Adolescent Best Practice Psychotherapeutic Medication Guidelines.** 2022. (Florida organizational guideline. Full citation/URL **needs verification** — this is an organizational source, not a peer-reviewed publication.)
 
-- **Used for:** ADHD stimulant recommendations ([autism-ap-builder.html:2639](../autism-ap-builder.html#L2639)); anxiety SSRI/SNRI recommendations ([2680](../autism-ap-builder.html#L2680)); depression medication recommendations ([2711](../autism-ap-builder.html#L2711)); sleep pharmacotherapy ([2882](../autism-ap-builder.html#L2882)).
+- **Used for:** ADHD stimulant recommendations ([autism-ap-builder.html:3929](../autism-ap-builder.html#L3929)); anxiety SSRI/SNRI recommendations ([3970](../autism-ap-builder.html#L3970)); depression medication recommendations ([4001](../autism-ap-builder.html#L4001)); sleep pharmacotherapy ([4182](../autism-ap-builder.html#L4182)).
 - **Supports the claim:** Florida-jurisdiction medication guidance — locally relevant because the practice is at UF Behavior and Developmental Clinic. Distinct from national guidance; do not substitute AAP or AACAP citations here.
 - **Likely identity (2026-10-31 web search):** the *2022–2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents*, published by the University of South Florida's Florida Medicaid Drug Therapy Management Program (hosted at floridabhcenter.cbcs.usf.edu and listed on the Florida AHCA behavioral-health medication resources page). The 2022–2023 cycle was issued as separate condition guides (ADHD, major depression, anxiety, insomnia, and others) rather than one document. The USF site refused the connection, so no guide was opened and the "Level 1" wording the note uses for ADHD was not checked against the source. Not PubMed-indexed.
 - **Note:** this is the one citation in this file that appears in the chart note itself ("FL BHC 2022"), so it carries more weight than the comment-only entries above. "FL BHC" may also not be an abbreviation a reader can trace; consider whether the note should name the guideline more fully.
