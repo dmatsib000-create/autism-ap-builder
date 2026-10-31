@@ -2303,10 +2303,10 @@ const LEVEL_DESC={
 };
 // GDD severity rendering: F88 has no severity sub-coding in ICD-10, so the prose
 // adjective ("mild" / "moderate" / "severe") is the only place where the severity
-// tier the clinician selected on cogProfile actually surfaces in output. Mehler
-// 2016 (JAMA Pediatrics) endorses descriptive severity language for the under-6
-// DQ band, and the audit framework treats absence-of-severity in formal output
-// as a state-3 finding. Helper + wrapper applied at all three spec-label
+// tier the clinician selected on cogProfile actually surfaces in output. The
+// descriptive adjective is a maintainer clinical-judgment call, not a sourced
+// rule; the audit framework treats absence-of-severity in formal output as a
+// state-3 finding. Helper + wrapper applied at all three spec-label
 // consumers (A&P note, ABA letter, IEP letter) and at the F88 dx lines.
 function gddSevWord(){
   return {gdd_mild:'mild',gdd_moderate:'moderate',gdd_severe:'severe'}[S.cogProfile]||'';

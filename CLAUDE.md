@@ -58,7 +58,7 @@ For requests where the deliverable shape depends on choices Claude shouldn't mak
 Two living docs in `docs/` carry an "update in the same commit" rule:
 
 - **`docs/branching-logic.md`** — see its own §12 Maintenance protocol for the list of files/constructs that trigger an update obligation.
-- **`docs/references.md`** — the centralized bibliography. **When you add or remove a citation in any tracked file** (inline JS comment in `autism-ap-builder.html`, an A&P note reference line, an ABA letter reference line, an IEP letter reference, or anywhere in `docs/`), update `docs/references.md` in the same commit. When you remove a citation, first grep for its short handle (e.g., `grep -rn "\[mehler-2016\]"`) to find every consumer and decide whether each needs updating, replacing, or removing too. Do not invent bibliographic details — if a full citation is not in hand, mark the entry `needs verification` and surface that to the maintainer.
+- **`docs/references.md`** — the centralized bibliography. **When you add or remove a citation in any tracked file** (inline JS comment in `autism-ap-builder.html`, an A&P note reference line, an ABA letter reference line, an IEP letter reference, or anywhere in `docs/`), update `docs/references.md` in the same commit. When you remove a citation, first grep for its short handle (e.g., `grep -rn "\[greenspan-2017\]"`) to find every consumer and decide whether each needs updating, replacing, or removing too. Do not invent bibliographic details — if a full citation is not in hand, mark the entry `needs verification` and surface that to the maintainer.
 
 ---
 
