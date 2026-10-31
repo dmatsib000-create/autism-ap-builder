@@ -699,7 +699,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   .app-header{flex-wrap:wrap;padding:8px 12px}
   .app-header h1{font-size:var(--text-13)}
   .header-badge{font-size:7px;padding:1px 5px}
-  .header-actions{width:100%;justify-content:flex-end;gap:var(--space-1)}
+  .header-actions{width:100%;justify-content:flex-end;gap:var(--space-1);flex-wrap:wrap} /* wrap: with flex-end and no wrap, overflow spills off the LEFT edge, where it can't be scrolled to */
   /* Touch target minimums */
   .cb-row{min-height:44px;padding:7px 6px}
   .cb-row input[type=checkbox]{width:18px;height:18px}
@@ -770,6 +770,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 <script data-theme-boot>try{var _t=localStorage.getItem('apTheme');if(_t==='warm'||_t==='slate')document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
 <body>
+<!-- Screen-reader-only announcements for transient feedback; see announce(). -->
+<div id="srAnnounce" class="sr-only" role="status" aria-live="polite"></div>
 <header class="app-header">
   <div>
     <h1>Autism A&amp;P Builder — Developmental-Behavioral Pediatrics</h1>
@@ -781,7 +783,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" aria-label="Switch color theme" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
+    <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
     <div class="header-sep"></div>
     <button class="btn btn-outline" onclick="window.print()">Print</button>
     <button class="btn btn-outline" onclick="copyNote('plain','all',this)">Copy Plain</button>
@@ -791,9 +793,9 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   </div>
 </header>
 
-<div id="mobile-nav">
-  <button class="mnav-btn is-on" id="mnav-input" onclick="showMobilePanel('input')">&#9998; Input Form</button>
-  <button class="mnav-btn" id="mnav-output" onclick="showMobilePanel('output')">&#128203; View Note</button>
+<div id="mobile-nav" role="group" aria-label="Panel shown">
+  <button class="mnav-btn is-on" id="mnav-input" onclick="showMobilePanel('input')" aria-pressed="true">&#9998; Input Form</button>
+  <button class="mnav-btn" id="mnav-output" onclick="showMobilePanel('output')" aria-pressed="false">&#128203; View Note</button>
 </div>
 
 <div class="main" role="main">
@@ -1716,12 +1718,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
-      <div class="preview-tabs">
-        <button class="tab-btn is-on" id="tabNote" onclick="setPreviewMode('note')">A&amp;P Note</button>
-        <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" style="display:none">&#9733; ABA Letter</button>
-        <button class="tab-btn" id="tabIEP" onclick="setPreviewMode('iep')" style="display:none">&#9733; IEP Letter</button>
+      <div class="preview-tabs" role="group" aria-label="Output shown">
+        <button class="tab-btn is-on" id="tabNote" onclick="setPreviewMode('note')" aria-pressed="true">A&amp;P Note</button>
+        <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" aria-pressed="false" style="display:none">&#9733; ABA Letter</button>
+        <button class="tab-btn" id="tabIEP" onclick="setPreviewMode('iep')" aria-pressed="false" style="display:none">&#9733; IEP Letter</button>
       </div>
-      <button class="rev-eye-btn" id="revEyeBtn" type="button" onclick="toggleReviewerEye()" title="Toggle reviewer's-eye view (strip {placeholder} highlighting to preview what the payer or school will see)">
+      <button class="rev-eye-btn" id="revEyeBtn" type="button" onclick="toggleReviewerEye()" aria-pressed="false" title="Toggle reviewer's-eye view (strip {placeholder} highlighting to preview what the payer or school will see)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         <span class="rev-eye-label">Reviewer view</span>
       </button>
@@ -5649,9 +5651,9 @@ async function copyIEPLetter(format){
 
 function setPreviewMode(mode){
   S.previewMode=mode;
-  document.getElementById('tabNote').classList.toggle('is-on',mode==='note');
-  document.getElementById('tabABA').classList.toggle('is-on',mode==='aba');
-  document.getElementById('tabIEP').classList.toggle('is-on',mode==='iep');
+  [['tabNote','note'],['tabABA','aba'],['tabIEP','iep']].forEach(([id,m])=>{
+    const t=document.getElementById(id);t.classList.toggle('is-on',mode===m);t.setAttribute('aria-pressed',String(mode===m));
+  });
   document.getElementById('noteStickyBar').style.display=mode==='note'?'':'none';
   document.getElementById('abaStickyBar').style.display=mode==='aba'?'':'none';
   document.getElementById('iepStickyBar').style.display=mode==='iep'?'':'none';
@@ -6256,8 +6258,9 @@ function toggleCogDataSourceVisibility(){
 // ─── MOBILE PANEL TOGGLE ─────────────────────────────────────────────────────
 function showMobilePanel(which){
   document.body.classList.toggle('mob-output',which==='output');
-  document.getElementById('mnav-input').classList.toggle('is-on',which==='input');
-  document.getElementById('mnav-output').classList.toggle('is-on',which==='output');
+  [['mnav-input','input'],['mnav-output','output']].forEach(([id,w])=>{
+    const b=document.getElementById(id);b.classList.toggle('is-on',which===w);b.setAttribute('aria-pressed',String(which===w));
+  });
   if(which==='input')window.scrollTo(0,0);
 }
 
@@ -6347,12 +6350,21 @@ async function copyNote(format,part,btn){
   await writeClipboardText(plain);
   flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
+// Speak a short status to screen readers. Needed for flashBtn: it only swaps the button's
+// text, which assistive tech doesn't reliably read out. Cleared first so the same message
+// twice in a row ("Copied!") is announced again; the check-mark glyph is dropped from speech.
+function announce(msg){
+  const r=document.getElementById('srAnnounce');if(!r)return;
+  r.textContent='';
+  setTimeout(()=>{r.textContent=msg.replace(/^\u2713\s*/,'');},50);
+}
 // Momentary button feedback (label + green tint); restores after 1.8 s. Text is forced white
 // because the flash also lands on white- and grey-background buttons whose own text is dark.
 // Originals are stashed on the element and the timer reset, so a second click inside the window
 // can't capture the flash state as the "original" and leave the button stuck on "Copied!".
 function flashBtn(msg,b){
   if(!b)return;
+  announce(msg);
   if(!b._flashOrig)b._flashOrig={text:b.textContent,bg:b.style.background,color:b.style.color};
   clearTimeout(b._flashTimer);
   b.textContent=msg;b.style.background='var(--btn-green)';b.style.color='#fff';
@@ -6402,7 +6414,8 @@ function toast(msg,type){
 function toggleReviewerEye(){
   document.body.classList.toggle('reviewer-eye');
   const btn=document.getElementById('revEyeBtn');
-  if(btn) btn.classList.toggle('is-on',document.body.classList.contains('reviewer-eye'));
+  const on=document.body.classList.contains('reviewer-eye');
+  if(btn){btn.classList.toggle('is-on',on);btn.setAttribute('aria-pressed',String(on));}
 }
 
 function toggleComorbidPlan(cv){
