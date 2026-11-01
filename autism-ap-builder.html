@@ -2263,8 +2263,11 @@ function gaitFindings(){
   // A family request, or an ankle that could not be examined and was never seen with heels
   // flat, sends the child to outpatient PT only. Both are kept out of ptIndicated so they
   // never reach school PT, the IEP letter, or the clinical summary.
-  const notAssessed=ex('notAssessed'),heelsFlat=ex('heelsFlat');
-  const familyPT=observeOnly&&ex('familyPT'),ptMeasure=observeOnly&&notAssessed&&!heelsFlat;
+  // A checked contracture means the ankle was examined, so "not assessed" is ignored then.
+  const notAssessed=ex('notAssessed')&&!contracture,heelsFlat=ex('heelsFlat');
+  // The family's request counts whenever PT is not already recommended, including when a
+  // red flag sends the child to neurology; it must never be dropped silently.
+  const familyPT=!ptIndicated&&ex('familyPT'),ptMeasure=observeOnly&&notAssessed&&!heelsFlat;
   return {active,toeWalk,gait,contracture,impact,redFlags,ptIndicated,ckWeakness,ckTone,
     needsCK:ckWeakness||ckTone,findings:['contracture','impact',...GAIT_RED_FLAGS].filter(ex),
     needsNeuro:redFlags.length>0,needsMRI:ex('umn'),observeOnly,
@@ -4201,6 +4204,8 @@ function generateNote() {
       L.push('  A tight heel cord alone does not indicate a neurologic cause.'+c('haynes'));
     }
     L.push('');L.push('Plan:');
+    const ptPlan='; any treatment plan to be agreed with the family, taking the child\'s sensory tolerance into account.';
+    const familyPTLine='  • PT: outpatient evaluation for '+(gf.toeWalk?'toe walking':'gait concerns')+' at the family\'s request after counseling'+ptPlan;
     if(gf.observeOnly){
       // Watch-only path, per the 2026-10-31 council: the default stays no treatment, the
       // consensus offer to neurodivergent children is stated, and the family's decision is
@@ -4210,9 +4215,8 @@ function generateNote() {
       else if(gf.heelsFlat) L.push('  • Observation: ankle range could not be reliably assessed today; the child was seen standing with heels flat, so a contracture is unlikely but not excluded. No pain or functional impact is reported.');
       else L.push('  • Observation: ankle range could not be reliably assessed today, and the child was not seen with heels flat, so a contracture is not excluded. No pain or functional impact is reported.');
       L.push('  • Treatment offer: expert consensus also recommends offering treatment to autistic and other neurodivergent children who toe walk, with counseling that toe walking may persist or return after treatment.'+c('gelfer','leyden')+' Evidence for these treatments is of very low certainty.'+c('caserta'));
-      const ptPlan='; any treatment plan to be agreed with the family, taking the child\'s sensory tolerance into account.';
       if(gf.ptMeasure) L.push('  • PT: outpatient evaluation to measure ankle range'+ptPlan);
-      if(gf.familyPT) L.push('  • PT: outpatient evaluation for toe walking at the family\'s request after counseling'+ptPlan);
+      if(gf.familyPT) L.push(familyPTLine);
       else if(!gf.ptMeasure) L.push('  • Outpatient PT evaluation: {offered, family declined / offered, family undecided / not discussed today}');
       // The clinician's own Return to Clinic interval times the recheck; with none set (or
       // "as needed"), the recheck goes to primary care with a 12-month ceiling.
@@ -4234,6 +4238,7 @@ function generateNote() {
     }
     if(gf.needsNeuro){
       L.push(referralIncluded('neurology')?'  • Pediatric neurology: referral for the features above (see Medical Referrals).':'  • Pediatric neurology referral is recommended for the features above.');
+      if(gf.familyPT) L.push(familyPTLine);
     }
     if(gf.needsMRI) L.push('  • Neuroimaging: brain MRI to be considered by neurology given upper motor neuron signs.'+c('noritz'));
     if(gf.needsCK){

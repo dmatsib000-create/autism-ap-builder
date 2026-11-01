@@ -237,6 +237,19 @@ check('Prior testing (checkboxes vs PRIOR_TEST_LABELS)',
 check('Prior testing (ADAPTIVE_TEST_KEYS are real instruments)',
   subset('ADAPTIVE_TEST_KEYS', adaptiveTestKeys, 'PRIOR_TEST_LABELS', priorTestLabelKeys));
 
+// ── D3. Gait exam: every finding checkbox has note wording ───────────────────
+// The gait problem and the neurology clause print GAIT_FINDING_LABELS[key]; a finding
+// checkbox with no label would print "undefined" in the note. The three watch-only
+// inputs are plan controls, not findings, so they have no label; every red flag must.
+const GAIT_PLAN_INPUTS = ['notAssessed', 'heelsFlat', 'familyPT'];
+const gaitExamKeys = [...html.matchAll(/data-key="gaitExam"\s+value="([^"]+)"/g)].map(m => m[1]);
+const gaitLabelKeys = flatObjectKeys(balancedAfter('const GAIT_FINDING_LABELS='));
+const gaitRedFlags = [...(html.match(/const GAIT_RED_FLAGS=\[([^\]]*)\]/)?.[1] ?? '').matchAll(/'([^']+)'/g)].map(m => m[1]);
+check('Gait exam finding checkboxes ⇄ GAIT_FINDING_LABELS',
+  diff('finding checkboxes', gaitExamKeys.filter(k => !GAIT_PLAN_INPUTS.includes(k)), 'GAIT_FINDING_LABELS', gaitLabelKeys));
+check('GAIT_RED_FLAGS ⊆ GAIT_FINDING_LABELS', subset('GAIT_RED_FLAGS', gaitRedFlags, 'GAIT_FINDING_LABELS', gaitLabelKeys));
+if (!gaitRedFlags.length) failures.push('Gait: could not read GAIT_RED_FLAGS; update the D3 parse if it was renamed.');
+
 // ── E. IEP letter: three surfaces must consume the same content fields ───────
 // The IEP letter is rendered THREE times from one `_iepLetterContent()` object:
 // the on-screen preview (generateIEPLetterHTML), the plain text the clinician
@@ -381,6 +394,7 @@ console.log(
   `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
   `prior tests ${priorTestCheckboxKeys.length} checkboxes = ${priorTestLabelKeys.length} labels (${adaptiveTestKeys.length} adaptive); ` +
+  `gait exam ${gaitExamKeys.length - GAIT_PLAN_INPUTS.length} findings = ${gaitLabelKeys.length} labels; ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`

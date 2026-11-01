@@ -284,6 +284,17 @@ const CASES = [
     check(a){ assert.equal(a.gaitFindings().ptMeasure, true);
               a.S.gaitExam.add('heelsFlat');
               assert.equal(a.gaitFindings().ptMeasure, false, 'heels seen flat: recheck instead of PT now'); } },
+  { name: 'gait: family PT request survives a red flag (neurology path)',
+    setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('familyPT'); S.gaitExam.add('history'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.observeOnly, false); assert.equal(g.needsNeuro, true);
+              assert.equal(g.familyPT, true, 'a checked family request must not be dropped by a red flag');
+              const note=a.generateNote().main;
+              assert.match(note, /outpatient evaluation for toe walking at the family's request/); } },
+  { name: 'gait: a checked contracture overrides "not assessed"',
+    setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('contracture'); S.gaitExam.add('notAssessed'); },
+    check(a){ assert.equal(a.gaitFindings().notAssessed, false);
+              assert.doesNotMatch(a.generateNote().main, /not reliably assessed/); } },
   { name: 'gait: family PT request is ignored once PT is already indicated',
     setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('contracture'); S.gaitExam.add('familyPT'); },
     check(a){ const g=a.gaitFindings();
