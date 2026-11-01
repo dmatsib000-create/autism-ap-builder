@@ -134,7 +134,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `needsBehavior` | §7 (ABA, PCIT rules), §9 (multiple targets), §10 (FBA, BSP accommodations) |
 | `needsAdaptive` | §7 (OT rule), §9 (self_help, safety_skills, menstrual_care targets) |
 | `needsSensory` | §7 (OT rule), §10 (sensory accommodations) |
-| `needsMotor` | §7 (OT/PT rules), §10 (PT services) |
+| `needsMotor` | §7 (OT/PT rules), §7.10 (`toeWalk`, `gait`: gait problem), §10 (PT services) |
 | `needsSocial` | §7 (social skills, ABA rules), §10 (social skills service) |
 
 **Safety & clinical flags (Sets and booleans):**
@@ -156,6 +156,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `fasdFeatures` | boolean — §7.9 (FASD flag 2, independent of exposure; same wiring) |
 | `paeEvidence` (Set) | §7.9 — NIAAA evidence categories composed into the exposure documentation line |
 | `fasdDomains` (Set) | §7.9 — optional Hoyme/NIAAA diagnostic domains under `fasdFeatures`; enrich the features line only |
+| `gaitExam` (Set) | §7.10 — gait exam findings (`contracture`, `impact`, and red flags `asymmetric`, `umn`, `lmn`, `lateOnset`, `history`), plus watch-only path inputs `notAssessed`, `heelsFlat`, `familyPT`; shown and counted only while `needsMotor` has `toeWalk` or `gait` |
 | `paeQuantity` / `paeFrequency` / `paeTiming` | strings — §7.9 optional pattern detail under the `quantityFrequency` evidence category |
 | `paeDetail` | string — §7.9 optional free-text sentence appended to the exposure line (PHI-hinted) |
 
@@ -258,6 +259,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `fasdDomains` | Set | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `fasdFeatures` | boolean | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `focalNeuroFindings` | boolean | [§1.2](#12-the-s-object--property-reference) |
+| `gaitExam` | Set | [§7.10](#710-toe-walking--gait) |
 | `insuranceType` | string | [§1.2](#12-the-s-object--property-reference) |
 | `langLevel` | string | [§1.2](#12-the-s-object--property-reference) |
 | `needsAdaptive` | Set | [§1.2](#12-the-s-object--property-reference) |
@@ -727,9 +729,9 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 4 | `ruleSocialSkills` | 1376 | Age ∈ {preschool, schoolAge, adolescent} AND not minimally verbal AND (social needs OR boundary) | `socialSkills` |
 | 5 | `ruleSLP` | 1381 | Communication needs OR language disorder OR pragmatic/articulation/echolalic modifiers | `slp` |
 | 6 | `ruleOT` | 1388 | Sensory needs OR fine motor needs OR any adaptive need other than community safety OR DCD comorbid | `ot` |
-| 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid | `pt` |
+| 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid OR `gaitFindings().ptIndicated` (§7.10) | `pt` |
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (regression OR confirmed dysmorphism OR congenital anomaly OR either FASD flag §7.9)) | `genetics` |
-| 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression | `neurology` |
+| 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression OR a gait red flag (§7.10) | `neurology` |
 | 10 | `rulePsychiatry` | 1410 | Confirmed ADHD/anxiety/depression/OCD, OR (severe behavior AND age school+) | `psychiatry` |
 | 11 | `ruleGI` | 1415 | GI comorbid OR feeding OR PFD OR ARFID OR pica OR fecal smearing (only when its medical cause is **not** marked ruled-out via `S.smearWorkup`) | `gi` |
 | 12 | `ruleSleepRef` | 1416 | `S.sleepStudy === true` | `sleep_ref` |
@@ -893,6 +895,27 @@ Two independent flags in the Medical & Referral Flags section, under the **"Pren
 **Test lock:** `fasd-both-flags-confirmed` (full wiring, R6b + R6c firing, letter fence, enriched features line, `fasd_support` reason), `fasd-features-only-suspected` (exposure-independent path, R6a, no ophthalmology, domain-less features line), `fasd-exposure-confirmed-a2-gap` (R6c gate staying silent on an a2 documentation gap).
 
 **Deferred (P2, ratified spec):** FASD comorbid rows (Q86.0 / ND-PAE) once a receiving evaluation returns; criteria-aware prose beyond the R6c gate; other prenatal exposure flags under the same group separator. (The former P1 items — domain sub-select, threshold hint, `fasd_support` — shipped 2026-07-16.)
+
+### 7.10 Toe walking & gait
+
+**Form and state.** Two parent-reported boxes in §4 Motor: `toeWalk` ("Persistent toe walking") and `gait` ("Gait concerns: frequent falls, tripping, or unusual walking pattern"). Either one reveals the **Gait exam** group in Medical & Referral Flags (`#gaitExamRow`, Set `S.gaitExam`). `updateGaitExamVisibility()` runs on every `render()` and hides the group and clears the Set when neither box is checked; it is recompute-style (like `updateAgeBasedVisibility`) because the group has two parents and presets/Clear All write `S` without change events. `gaitExamRow` is in `clearAll`'s hidden-row list.
+
+**One owner.** `gaitFindings()` (next to `rulePT`) derives every gait decision, and exam findings count only while a gait box is checked, so a stale `S.gaitExam` cannot reach output. Fields: `active`, `toeWalk`, `gait`, `contracture`, `impact`, `redFlags` (from `GAIT_RED_FLAGS`), `ptIndicated` (`gait` OR contracture OR impact), `needsNeuro` (any red flag), `needsMRI` (UMN signs), `ckWeakness` (LMN signs) and `ckTone` (hypotonia with a gait box) with `needsCK` their OR, `findings` (checked exam items in display order), `observeOnly`, and the watch-only path fields `notAssessed`, `heelsFlat`, `familyPT` (family requests PT after counseling; counts whenever PT is not already indicated, so a red-flag child sent to neurology still gets the outpatient PT line), `ptMeasure` (not assessed and heels never seen flat; `notAssessed` is ignored when `contracture` is checked, since the ankle was examined), and `outpatientPT` (their OR). `outpatientPT` feeds `rulePT` only; it never sets `ptIndicated`, so it never reaches the `pt_school` sync, the IEP letter, the clinical summary, or the ruled-out letter. `GAIT_FINDING_LABELS` (one wording per finding, shared by the problem block and the neurology clause) and `GAIT_REFS` sit beside it.
+
+| Decision | Rule | Source |
+|---|---|---|
+| Observe, offer, record, recheck | toe walking with no contracture, impact, or red flag. Prints "does not require treatment", the consensus offer to neurodivergent children (may persist or return; very low certainty), the family's decision (`familyPT` checkbox → outpatient PT line; otherwise a `{offered, family declined / offered, family undecided / not discussed today}` fill-in), and a recheck timed by the clinician's Return to Clinic interval (blank or "as needed" → next well visit with `{primary care or this clinic}`, no later than 12 months). `notAssessed` swaps the first line for "contracture is not excluded" (or "unlikely but not excluded" with `heelsFlat`); `ptMeasure` prints outpatient PT to measure range. The PT section prints an outpatient-evaluation line with no PE/playground goal when this is the only PT driver | `[gelfer-2024]` (no treatment; offer to neurodiverse children), `[leyden-2019]`, `[caserta-cochrane-2019]`; council 2026-10-31 |
+| PT | `ptIndicated` → `rulePT`, PT targeting list, `pt_school` sync | `[gelfer-2024]`; evidence for treatments rated low certainty `[caserta-cochrane-2019]` |
+| Orthopaedics | contracture: wording only ("if the ankle does not reach neutral after a course of PT, or toe walking persists"), no referral line or override key | `[gelfer-2024]`, `[van-kuijk-2014]` |
+| Neurology | any red flag → `ruleNeurology` and a gait clause in the neurology bullet (with MRI / CK suffixes) | `[haynes-2018]` (contracture alone is not predictive) |
+| MRI | UMN signs, deferred to neurology | `[noritz-2013]` |
+| CK | LMN signs → "recommended"; hypotonia with a gait box and no LMN signs → "reasonable"; never routine | `[gelfer-2024]` (not needed at primary assessment), `[noritz-2013]`, `[ciafaloni-2009]` |
+
+**Note.** A problem block after the DCD block: "Persistent Toe Walking (R26.89)" when `toeWalk`, else "Gait Abnormality (R26.89)". No plan pill (not a comorbid key). Assessment cites `[gelfer-2024]`, `[barrow-2011]`, `[leyden-2019]`; when `S.ev.b1` text mentions toe walking (the B1 evidence chip), a sentence names both readings (feature of the autism profile vs musculoskeletal/neurologic) without asserting either. That match is on free text, so an edited chip drops the sentence. The "Examination and history" line lists the checked findings and ends with a `{specify the findings present}` placeholder (each label groups several findings); with none checked it is a `{...}` documentation prompt. Superscripts are comma-separated. References are numbered in order of first use and printed as "References (gait):". The motor needs line, PT targeting list, and the note's school motor-accommodation line also learn the gait keys; the accommodation line, the IEP motor impact/accommodation lines, the IEP toe-walking PT goal, the clinical summary's "motor development", and the ruled-out letter's motor concern and related-services domain all count gait only when `ptIndicated` (observation-only toe walking has no school impact). School supports print in the school section, not in the problem block.
+
+**ABA fence.** `hasCoreMotor()` replaces `needsMotor.size` in the note's ABA medical-necessity reasons and the ABA letter's domain list, so gait boxes alone never add a motor line to ABA output. Locked by `gait-falls-aba-fence`.
+
+**Test lock:** goldens `toewalk-idiopathic-preschool` (observation path, B1 sentence), `toewalk-contracture-school` (PT, recurrence counseling, orthopaedics wording, IEP goal), `toewalk-red-flags-ck` (neurology clause, MRI, CK, CP sentence), `gait-falls-aba-fence` (gait-only title, ABA fence, IEP), `toewalk-family-pt-pcp` (family request, primary-care recheck, IEP fence), `toewalk-not-assessed` (measurement PT), the invariants-lane D3 check (every finding checkbox has a `GAIT_FINDING_LABELS` entry, and `GAIT_RED_FLAGS` is a subset), and `forced-pt-no-motor` (the PT targeting fallback, "gross motor function and mobility", when PT is forced on with no motor need); unit lane `gait:` cases for every `gaitFindings()` branch and the `pt_school` sync.
 
 ---
 
@@ -1098,7 +1121,7 @@ const domainPairs = [
   [S.needsSocial.size > 0, 'social communication, joint attention, peer interaction'],
   [S.needsAdaptive.size > 0, 'adaptive functioning, self-care, and daily living skills'],
   [S.needsSensory.size > 0, 'sensory processing'],
-  [S.needsMotor.size > 0, 'fine and gross motor skills'],
+  [hasCoreMotor(), 'motor coordination and planning'],  // toeWalk/gait excluded (§7.10 ABA fence)
   // ... more pairs
 ];
 const domains = domainPairs.filter(d => d[0]).map(d => d[1]);
@@ -1506,7 +1529,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 | Social | `needsSocial.size > 0` | Social comprehension, perspective-taking |
 | Behavior | `needsBehavior.size > 0` | Concatenates sub-bullets per behavior type (aggression → safety; elopement → risk; tantrums → regulation; rigidity → inflexibility; vocal disruption → classroom disruption; pica → supervision) |
 | Sensory | `needsSensory.size > 0` | Sensory processing affecting attention/regulation |
-| Motor | `needsMotor.size > 0 \|\| comorbid.has('dcd')` | Composed from the checked needs (hand skills: fine/handwriting/coordination/DCD; gross or low tone; low tone; coordination/DCD), joined with `andList()`; preschool and 6+ wording differ |
+| Motor | any motor group below is true (guarded on the groups, not `needsMotor.size`, so no key can print an empty list) | Composed from the checked needs (hand skills: fine/handwriting/coordination/DCD; gross or low tone; low tone; coordination/DCD; gait when `gaitFindings().ptIndicated`), joined with `andList()`; preschool and 6+ wording differ |
 | Adaptive | a checked school self-care box (toileting, dressing, feeding_adl, hygiene) | Self-care, daily living. Community safety, community independence, and menstrual care do not trigger it |
 | Safety awareness | `needsAdaptive.has('commSafety')` | Family-attributed: limited hazard awareness in community settings affecting arrival/dismissal and field trips. A separate physician sentence follows: direct instruction in safety routines may be appropriate as an IEP goal, team decides who provides it; examples are age-banded (`isTeenPlus()` gets parking lots/streets and whom to contact if separated). It lives here, not in the accommodation, because an accommodation carries no measurable goal and this line also prints when an elopement aide replaces the supervision accommodation |
 | Community living skills | `needsAdaptive.has('commIndependence') && isTeenPlus()` | Family-attributed need for support with routines outside the home (way-finding, errands, transportation), pointed to community-based instruction and the transition plan. Teens and young adults only; no standalone transition paragraph (maintainer decision 2026-09-26) |
@@ -1521,7 +1544,7 @@ Default behavior: trauma is **omitted** from the IEP letter even when present in
 |---|---|---|
 | Speech-Language Pathology | `slp_school` | Goals concatenated from needsComm, langLevel, pragmatics, articulation, language_disorder. Preschool wording differs (§2.1) |
 | Occupational Therapy | `ot_school` | Sensory plan + fine motor + motor planning (coordination box or DCD) + adaptive self-care. Auto-added by `syncSchoolSvcFromNeeds()` on sensory, fine/handwriting/coordination, DCD, or a school self-care box (`SCHOOL_SELF_CARE`: toileting, hygiene, dressing, feeding_adl). Community safety and community independence alone do not add it: school OT has no goal to write for them (follow-up council 2026-09-26). The note's outpatient `ruleOT` likewise ignores community safety alone (see §7), but still fires on community independence or menstrual care alone. Preschool wording differs (§2.1) |
-| Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone + safe navigation |
+| Physical Therapy | `pt_school` | Gross motor / hypotonia / low tone, toe walking (heel-toe pattern, ankle flexibility), gait (balance, fall prevention) + safe navigation. Auto-added by `syncSchoolSvcFromNeeds()` on gross, hypotonia, DCD, or `gaitFindings().ptIndicated` (not on toe walking alone) |
 | Counseling | `counseling` | Anxiety/depression/coping/boundary/social generalization goals |
 | Social Skills | `social_skills_school` | Structured ASD-specific group; age-calibrated content (vocational context for adolescent/young adult). Drops "autism-specific" when `ruledOut` |
 | 1:1 Paraprofessional | `aide` | Elopement risk + behavior safety + communication access + school self-care (one or more `selfCareItems`, named in the age-banded wording: "hands-on adult support during the school day with ..."). Community boxes never feed the aide rationale |

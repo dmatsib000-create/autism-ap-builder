@@ -1,10 +1,12 @@
 // DCD diagnosis with no motor box checked. DCD alone adds school OT and PT, so the OT paragraph
 // must still carry the motor planning goal (it previously checked only the coordination box,
-// leaving an OT recommendation with no goal).
+// leaving an OT recommendation with no goal). The note output locks the PT section's
+// targeting line for the same state, which used to print "targeting: ." (DCD fires
+// rulePT but no motor box feeds the list).
 export default {
   name: 'dcd-only-school-ot',
   describe: 'Suspected ASD, school-age, DCD comorbidity only, school OT + PT',
-  outputs: ['iep'],
+  outputs: ['note', 'iep'],
   apply(S) {
     S.ageGroup = 'schoolAge';
     S.pronouns = 'he';

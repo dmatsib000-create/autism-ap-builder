@@ -1340,6 +1340,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="fine"> Fine motor delays</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="coordination"> Motor coordination / DCD</label>
           <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="handwriting"> Handwriting difficulties</label>
+          <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="toeWalk"> Persistent toe walking (on toes most of the time)</label>
+          <label class="cb-row"><input type="checkbox" data-key="needsMotor" value="gait"> Gait concerns: frequent falls, tripping, or unusual walking pattern</label>
         </div>
       </div>
       <hr class="divider">
@@ -1368,6 +1370,22 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
+        <!-- Shown only while toe walking or gait concerns are checked in Functional Needs;
+             updateGaitExamVisibility() hides it and clears S.gaitExam otherwise. -->
+        <div id="gaitExamRow" style="display:none">
+          <div class="grp-sep">Gait exam</div>
+          <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Contracture, pain, or falls → PT. Any red flag (asymmetry, upper or lower motor neuron signs, later onset, concerning history) → neurology. Weakness signs, or low tone with toe walking → CK. None of these → observe and recheck.</div>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="contracture"> Cannot dorsiflex ankle to neutral (heel-cord contracture)</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="impact"> Pain, frequent falls, or fatigue limiting activity</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="asymmetric"> Unilateral or asymmetric toe walking or gait</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="umn"> Spasticity, brisk reflexes, or clonus</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="lmn"> Weakness, Gowers sign, calf enlargement, or reduced reflexes</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="lateOnset"> Began after a period of flat-footed walking, or loss of heel strike</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="history"> Concerning birth history or late independent walking</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="notAssessed"> Ankle range not reliably assessed today</label>
+          <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="gaitExam" value="heelsFlat"> Child seen standing or squatting with heels flat</label>
+          <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="familyPT"> Family requests PT after counseling (outpatient only; no school PT)</label>
+        </div>
         <div class="grp-sep">Genetics-relevant exam findings</div>
         <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
         <div class="radio-grid" style="margin:4px 0">
@@ -1790,6 +1808,8 @@ function initialState(){ return {
   behavFreq:{tantrums:'',noncompliance:'',property:'',vocalDisruption:'',emotionalReg:''},
   seizureConcern:false, neurologyNowForSeizure:false, focalNeuroFindings:false, highlyMotivated:false, sleepStudy:false, socialWork:false,
   dysmorphism:'', congenitalAnomalies:false, developmentalRegression:false, regressionTiming:'',
+  // Gait exam findings; meaningful only while needsMotor has toeWalk or gait (see gaitFindings).
+  gaitExam:new Set(),
   // Prenatal alcohol exposure / FASD flags. paeEvidence holds NIAAA consensus evidence
   // categories; the three pae* scalars are the optional pattern detail under
   // quantityFrequency. All categorical or placeholder-hinted — no dates, names, or
@@ -2204,7 +2224,58 @@ function ruleSLP() {
 // excluded; community independence and menstrual care still refer, so this is not the
 // school OT list (SCHOOL_SELF_CARE).
 function ruleOT() { return {include:S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||[...S.needsAdaptive].some(k=>k!=='commSafety')||S.comorbid.has('dcd')}; }
-function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')}; }
+function rulePT() { return {include:S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.needsMotor.has('coordination')||S.comorbid.has('dcd')||gaitFindings().ptIndicated||gaitFindings().outpatientPT}; }
+// Toe walking / gait: the single owner of every gait decision (rules, note problem block,
+// neurology clause, IEP content, school sync). Exam findings count only while a gait need
+// is checked, so a stale S.gaitExam can never reach output. Sources: docs/references.md.
+// keep docs/branching-logic.md §7.10 in sync
+const GAIT_KEYS=['toeWalk','gait'];
+const GAIT_RED_FLAGS=['asymmetric','umn','lmn','lateOnset','history'];
+// One wording per finding, shared by the note's gait problem and the neurology clause.
+const GAIT_FINDING_LABELS={contracture:'heel-cord contracture (cannot dorsiflex to neutral)',impact:'pain, frequent falls, or fatigue limiting activity',asymmetric:'unilateral or asymmetric toe walking or gait',umn:'spasticity, brisk reflexes, or clonus',lmn:'weakness, Gowers sign, calf enlargement, or reduced reflexes',lateOnset:'onset after a period of typical walking',history:'concerning birth history or late independent walking'};
+// Printed by the note's gait problem, numbered in order of first use. Every entry is in
+// docs/references.md §10: [gelfer-2024] [barrow-2011] [leyden-2019] [haynes-2018]
+// [noritz-2013] [ciafaloni-2009] [caserta-cochrane-2019] [van-kuijk-2014].
+const GAIT_REFS={
+  gelfer:'Gelfer Y, McNee AE, Harris JD, et al. The management of idiopathic toe walking. Bone Joint J. 2024;106-B(10):1190-1196. doi:10.1302/0301-620X.106B10.BJJ-2024-0466.R1',
+  barrow:'Barrow WJ, Jaworski M, Accardo PJ. Persistent toe walking in autism. J Child Neurol. 2011;26(5):619-621. doi:10.1177/0883073810385344',
+  leyden:'Leyden J, Fung L, Frick S. Autism and toe-walking: are they related? Trends and treatment patterns between 2005 and 2016. J Child Orthop. 2019;13(4):340-345. doi:10.1302/1863-2548.13.180160',
+  haynes:'Haynes KB, Wimberly RL, VanPelt JM, et al. Toe walking: a neurological perspective after referral from pediatric orthopaedic surgeons. J Pediatr Orthop. 2018;38(3):152-156. doi:10.1097/BPO.0000000000001115',
+  noritz:'Noritz GH, Murphy NA, et al. Motor delays: early identification and evaluation. Pediatrics. 2013;131(6):e2016-e2027. doi:10.1542/peds.2013-1056',
+  ciafaloni:'Ciafaloni E, Fox DJ, Pandya S, et al. Delayed diagnosis in Duchenne muscular dystrophy: data from the Muscular Dystrophy Surveillance, Tracking, and Research Network (MD STARnet). J Pediatr. 2009;155(3):380-385. doi:10.1016/j.jpeds.2009.02.007',
+  caserta:'Caserta AJ, Pacey V, Fahey M, et al. Interventions for idiopathic toe walking. Cochrane Database Syst Rev. 2019;10(10):CD012363. doi:10.1002/14651858.CD012363.pub2',
+  vankuijk:'van Kuijk AA, Kosters R, Vugts M, Geurts AC. Treatment for idiopathic toe walking: a systematic review of the literature. J Rehabil Med. 2014;46(10):945-957. doi:10.2340/16501977-1881'
+};
+function gaitFindings(){
+  const toeWalk=S.needsMotor.has('toeWalk'),gait=S.needsMotor.has('gait'),active=toeWalk||gait;
+  const ex=k=>active&&S.gaitExam.has(k);
+  const contracture=ex('contracture'),impact=ex('impact'),redFlags=GAIT_RED_FLAGS.filter(ex);
+  // [gelfer-2024]: toe walking without contracture, pain, or other impact needs no
+  // treatment. Reported gait concerns (falls, tripping) are themselves an impact.
+  const ptIndicated=gait||contracture||impact;
+  // CK is not routine for toe walking [gelfer-2024]. Weakness signs make it recommended;
+  // low tone alone makes it reasonable, since [noritz-2013] covers low tone generally,
+  // not a toe walker without weakness.
+  const ckWeakness=ex('lmn'),ckTone=active&&S.needsMotor.has('hypotonia');
+  const observeOnly=active&&!ptIndicated&&!redFlags.length;
+  // Watch-only path (council 2026-10-31): [gelfer-2024] also says neurodivergent children
+  // should be offered treatment, so the note offers PT and records the family's decision.
+  // A family request, or an ankle that could not be examined and was never seen with heels
+  // flat, sends the child to outpatient PT only. Both are kept out of ptIndicated so they
+  // never reach school PT, the IEP letter, or the clinical summary.
+  // A checked contracture means the ankle was examined, so "not assessed" is ignored then.
+  const notAssessed=ex('notAssessed')&&!contracture,heelsFlat=ex('heelsFlat');
+  // The family's request counts whenever PT is not already recommended, including when a
+  // red flag sends the child to neurology; it must never be dropped silently.
+  const familyPT=!ptIndicated&&ex('familyPT'),ptMeasure=observeOnly&&notAssessed&&!heelsFlat;
+  return {active,toeWalk,gait,contracture,impact,redFlags,ptIndicated,ckWeakness,ckTone,
+    needsCK:ckWeakness||ckTone,findings:['contracture','impact',...GAIT_RED_FLAGS].filter(ex),
+    needsNeuro:redFlags.length>0,needsMRI:ex('umn'),observeOnly,
+    notAssessed,heelsFlat,familyPT,ptMeasure,outpatientPT:familyPT||ptMeasure};
+}
+// ABA fence: gait is a PT matter, not ABA medical necessity, so toeWalk/gait must not
+// count as a motor need in the note's ABA justification or the ABA letter.
+function hasCoreMotor(){ return [...S.needsMotor].some(k=>!GAIT_KEYS.includes(k)); }
 function ruleGenetics() {
   // Fires when ASD is confirmed, OR when the clinician has staked out any
   // diagnostic position (diagStatus non-empty) AND at least one high-yield
@@ -2228,7 +2299,7 @@ function ruleGenetics() {
 // input regardless of whether autism evaluation has progressed. A genetics
 // referral can wait for more diagnostic context; a neurology referral for
 // regression should not.
-function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure||S.developmentalRegression}; }
+function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure||S.developmentalRegression||gaitFindings().needsNeuro}; }
 function rulePsychiatry() {
   const med=hasConfirmedADHD()||S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd');
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus();
@@ -2603,7 +2674,7 @@ function generateClinicalSummary(){
     if(S.needsAdaptive.size) needsD.push('adaptive skills');
     if(S.needsSocial.size) needsD.push('social development');
     if(S.needsSensory.size) needsD.push('sensory processing');
-    if(S.needsMotor.size) needsD.push('motor development');
+    if(hasCoreMotor()||gaitFindings().ptIndicated) needsD.push('motor development');
 
     body=`${subj} ${v3('demonstrates')} a persistent pattern of deficits in social communication and social interaction across ${aStr}, and restricted and repetitive patterns of behavior and interests across ${bStr}, as documented in the DSM-5 criteria table.`;
     body+=` These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment`;
@@ -2675,7 +2746,7 @@ function needsSummaryLines() {
   if(S.safety.size){const x=[];if(S.safety.has('elopement_counsel'))x.push('elopement/wandering');if(S.safety.has('sib_safety_counsel'))x.push('self-injury safety');if(S.safety.has('water_counsel'))x.push('water/drowning');if(S.safety.has('road_counsel'))x.push('road/traffic safety');if(S.safety.has('fire_counsel'))x.push('environmental hazard');if(S.safety.has('bullying'))x.push('bullying/victimization');if(S.safety.has('internet'))x.push('internet/social media safety');if(x.length)L.push('  • Safety: '+x.join(', '));}
   if(S.needsSocial.size){const x=[];if(S.needsSocial.has('peer'))x.push('peer interaction');if(S.needsSocial.has('play'))x.push('play skills');if(S.needsSocial.has('reciprocity'))x.push('social reciprocity');if(S.needsSocial.has('emotion'))x.push('emotion recognition');if(S.needsSocial.has('perspective'))x.push('perspective-taking/Theory of Mind');if(S.needsSocial.has('conversation'))x.push('conversation skills');L.push('  • Social/play: '+x.join(', '));}
   if(S.needsSensory.size){const x=[];if(S.needsSensory.has('hypersensitivity'))x.push('hypersensitivity');if(S.needsSensory.has('hyposensitivity'))x.push('hyposensitivity');if(S.needsSensory.has('seeking'))x.push('sensory-seeking');if(S.needsSensory.has('avoidance'))x.push('avoidance');L.push('  • Sensory: '+x.join(', '));}
-  if(S.needsMotor.size){const x=[];if(S.needsMotor.has('gross'))x.push('gross motor');if(S.needsMotor.has('hypotonia'))x.push('hypotonia');if(S.needsMotor.has('fine'))x.push('fine motor');if(S.needsMotor.has('coordination'))x.push('coordination/DCD');if(S.needsMotor.has('handwriting'))x.push('handwriting');L.push('  • Motor: '+x.join(', '));}
+  if(S.needsMotor.size){const x=[];if(S.needsMotor.has('gross'))x.push('gross motor');if(S.needsMotor.has('hypotonia'))x.push('hypotonia');if(S.needsMotor.has('fine'))x.push('fine motor');if(S.needsMotor.has('coordination'))x.push('coordination/DCD');if(S.needsMotor.has('handwriting'))x.push('handwriting');if(S.needsMotor.has('toeWalk'))x.push('persistent toe walking');if(S.needsMotor.has('gait'))x.push('gait concerns (falls, tripping)');L.push('  • Motor: '+x.join(', '));}
   const misc=[];if(S.emotionalReg)misc.push('emotional regulation');if(S.academic)misc.push('academic/learning');
   // Suppress the lightweight "Work-up & referrals" sleep echo when sleep_disorder is a full in-plan problem — the coded
   // problem block already documents it. Mirrors the SLEEP MANAGEMENT dedup guard; same in-plan condition.
@@ -3258,7 +3329,7 @@ function generateNote() {
       specR.push('adaptive skill impairments'+(adl.length?' ('+adl.join(', ')+')':''));
     }
     if(S.needsSensory.size>0) specR.push('sensory processing difficulties impacting regulation and participation');
-    if(S.needsMotor.size>0)   specR.push('motor skill impairments affecting daily functioning');
+    if(hasCoreMotor())   specR.push('motor skill impairments affecting daily functioning');
     // Confirmed-ID-only justification line. Suspected ID is intentionally NOT pushed
     // here — the ABA medical-necessity narrative should not assert confirmed ID when
     // the diagnosis line above says "suspected." Phase 2: revisit appropriate
@@ -3464,8 +3535,19 @@ function generateNote() {
     therapyIntro();
     L.push(n+++'. PHYSICAL THERAPY (PT)');
     {const sl=therapyStatusLine('pt','PT');if(sl){L.push(sl);L.push('');}}
-    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination'))x.push('motor coordination/DCD');
-    L.push('Evaluation and treatment targeting: '+x.join(', ')+'. Goal: improve participation in PE, playground activities, and daily physical function.');
+    const x=[];if(S.needsMotor.has('gross'))x.push('gross motor skill development');if(S.needsMotor.has('hypotonia'))x.push('core strengthening and postural control (low muscle tone)');if(S.needsMotor.has('coordination')||S.comorbid.has('dcd'))x.push('motor coordination/DCD');
+    const gfPT=gaitFindings();
+    if(gfPT.ptIndicated&&gfPT.toeWalk)x.push('persistent toe walking (see gait problem below)');if(gfPT.gait)x.push('gait, balance, and fall prevention');
+    // An elective (family-request) or measurement-only gait referral states no impairment,
+    // so when it is the only PT driver the line drops the PE/playground goal.
+    if(!x.length&&gfPT.outpatientPT){
+      L.push('Outpatient evaluation for '+(gfPT.familyPT?'persistent toe walking at the family\'s request':'ankle range measurement')+' (see gait problem below).');
+    } else {
+      // rulePT also fires on a DCD comorbid alone or a forced Include, so the list can
+      // otherwise be empty and print "targeting: ."
+      if(!x.length)x.push('gross motor function and mobility');
+      L.push('Evaluation and treatment targeting: '+x.join(', ')+'. Goal: improve participation in PE, playground activities, and daily physical function.');
+    }
     // C2: when motor coordination/DCD drives BOTH therapies, name the co-management
     // split so the dual OT+PT referral does not read as redundant. Only fires when OT
     // is also active (respecting an OT override-off).
@@ -3545,18 +3627,22 @@ function generateNote() {
       if(S.needsSensory.size) accomASD.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
       // Composed from the checked motor needs in the note's own voice, mirroring the IEP letter;
       // families read this note in the portal, so the two must not disagree on the motor plan.
-      if(S.needsMotor.size||S.comorbid.has('dcd')){
-        const nHand=S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.comorbid.has('dcd');
-        const nGross=S.needsMotor.has('gross')||S.needsMotor.has('hypotonia');
-        const nTone=S.needsMotor.has('hypotonia');
-        const nDcd=S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+      const nHand=S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+      const nGross=S.needsMotor.has('gross')||S.needsMotor.has('hypotonia');
+      const nTone=S.needsMotor.has('hypotonia');
+      const nDcd=S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+      // Fall-safety supports only when the gait problem needs treatment, not for observation alone.
+      const nGait=gaitFindings().ptIndicated;
+      // Guard on the groups, not needsMotor.size, so no motor key can print an empty list.
+      if(nHand||nGross||nTone||nDcd||nGait){
         const pre=S.ageGroup==='preschool';
         const nm=pre
-          ? [nHand&&'adapted fine motor materials, extra time and hands-on support for fine motor tasks', nGross&&'gross motor participation supports if indicated', nTone&&'supportive seating for circle and table time', nDcd&&'hands-on modeling for multi-step motor routines']
+          ? [nHand&&'adapted fine motor materials, extra time and hands-on support for fine motor tasks', nGross&&'gross motor participation supports if indicated', nTone&&'supportive seating for circle and table time', nDcd&&'hands-on modeling for multi-step motor routines', nGait&&'close supervision on stairs and playground equipment']
           : [nHand&&(S.comorbid.has('ld_written')?'reduced copying demands and extended time on written tasks':'keyboarding or speech-to-text for longer written work, reduced copying demands, extended time on written tasks'),
              nGross&&'support for PE participation and moving around campus, adapted PE evaluation if indicated',
              nTone&&'supportive seating for sustained desk work',
-             nDcd&&'step-by-step modeling for new motor tasks'];
+             nDcd&&'step-by-step modeling for new motor tasks',
+             nGait&&'extra transition time and attention to fall risk on stairs and playground equipment'];
         accomASD.push('Motor accommodations: '+nm.filter(Boolean).join('; '));
       }
       // Group 2: Behavioral and Emotional
@@ -3717,6 +3803,11 @@ function generateNote() {
       // neurologyNowForSeizure adds its own clause unless epilepsy is already
       // confirmed (in which case the urgency framing is implicit).
       if(S.neurologyNowForSeizure && !S.comorbid.has('epilepsy')) clauses.push('evaluation for seizure-concerning history, referral placed without awaiting EEG results');
+      const gf=gaitFindings();
+      if(gf.needsNeuro){
+        clauses.push('evaluation of '+(gf.toeWalk?'toe walking':'gait abnormality')+' with features suggesting a neurologic or neuromuscular cause ('+gf.redFlags.map(k=>GAIT_FINDING_LABELS[k]).join('; ')+')'
+          +(gf.needsMRI?'; brain MRI per neurology':'')+(gf.needsCK?'; serum creatine kinase '+(gf.ckWeakness?'recommended':'reasonable')+' (see gait problem)':''));
+      }
       const neuroBody = clauses.length ? clauses.map(cap).join('. ') + '.' : 'Evaluation/management of neurological concern.';
       L.push('  • Pediatric Neurology: ' + neuroBody);
     }
@@ -4082,6 +4173,83 @@ function generateNote() {
     L.push('  • School: PE accommodations, handwriting accommodations (keyboarding alternatives, extended time), adapted PE referral if indicated. DCD should be documented as a separate educational disability in IEP/504 as appropriate.');
     L.push('');
   }
+
+  // Toe walking / gait. Driven by gaitFindings(), not a comorbid key, so there is no plan
+  // pill: the block prints whenever a gait need is checked. GAIT_REFS are numbered in order
+  // of first use. School supports print in the school section, so they are not repeated here.
+  {const gf=gaitFindings();if(gf.active){
+    const used=[],SUP='¹²³⁴⁵⁶⁷⁸⁹';
+    const c=(...ks)=>ks.map(k=>{let i=used.indexOf(k);if(i<0){used.push(k);i=used.length-1;}return SUP[i];}).join(',');
+    const what=gf.toeWalk?'toe walking':'gait concerns';
+    L.push('── Problem '+probN+++': '+(gf.toeWalk?'Persistent Toe Walking':'Gait Abnormality')+' (R26.89) ──');L.push('');
+    L.push('Assessment:');
+    if(gf.toeWalk){
+      L.push('  Persistent toe walking reported'+(gf.gait?', with frequent falls, tripping, or an unusual walking pattern':'')+'. Toe walking is considered idiopathic only when it is bilateral, present from the start of walking, persists beyond age 2 years, and has no neurologic cause; co-occurring autism or ADHD does not exclude it.'+c('gelfer')+' Toe walking is more common in autistic children and is more likely to persist without treatment than in other children.'+c('barrow','leyden'));
+      // The B1 evidence chip "Persistent toe walking" fills S.ev.b1 as free text, so a text
+      // match is the only signal; an edited chip simply drops this sentence.
+      if(/toe walk/i.test(S.ev.b1||'')) L.push('  Toe walking is also documented under DSM-5 Criterion B1. It may reflect sensory or motor features of the autism profile, a musculoskeletal or neurologic process, or both; the examination below helps distinguish these.');
+    } else {
+      L.push('  Gait concerns reported: frequent falls, tripping, or an unusual walking pattern. Neurologic, neuromuscular, and orthopaedic causes are considered alongside developmental motor differences.'+c('noritz'));
+    }
+    // Each label groups several findings ("weakness, Gowers sign, ... or reduced reflexes"),
+    // so the placeholder makes the clinician name which ones before signing.
+    // Range is asked as a category because eyeballed degrees in a guarding child vary more
+    // between examiners than a real change would (council 2026-10-31).
+    const rangePrompt='{document passive ankle dorsiflexion with knee straight and bent (past neutral, to neutral only, or short of neutral; degrees if measured), symmetry, tone, strength, and reflexes}';
+    const notAssessedNote=gf.notAssessed?'ankle range not reliably assessed today'+(gf.heelsFlat?'; seen standing or squatting with heels flat':'')+'. {document symmetry, tone, strength, and reflexes}':'';
+    L.push('  Examination and history: '+(gf.findings.length?gf.findings.map(k=>GAIT_FINDING_LABELS[k]).join('; ')+'. {specify the findings present}'+(notAssessedNote?' '+notAssessedNote.charAt(0).toUpperCase()+notAssessedNote.slice(1):''):(notAssessedNote?notAssessedNote.charAt(0).toUpperCase()+notAssessedNote.slice(1):rangePrompt)));
+    if(gf.needsNeuro){
+      L.push('  Features suggesting a neurologic or neuromuscular cause are present.'+(gf.redFlags.includes('asymmetric')?' Unilateral or asymmetric '+(gf.toeWalk?'toe walking':'gait')+' can be the presenting sign of previously undiagnosed cerebral palsy.':'')+c('haynes'));
+    } else if(gf.contracture){
+      L.push('  A tight heel cord alone does not indicate a neurologic cause.'+c('haynes'));
+    }
+    L.push('');L.push('Plan:');
+    const ptPlan='; any treatment plan to be agreed with the family, taking the child\'s sensory tolerance into account.';
+    const familyPTLine='  • PT: outpatient evaluation for '+(gf.toeWalk?'toe walking':'gait concerns')+' at the family\'s request after counseling'+ptPlan;
+    if(gf.observeOnly){
+      // Watch-only path, per the 2026-10-31 council: the default stays no treatment, the
+      // consensus offer to neurodivergent children is stated, and the family's decision is
+      // recorded (the "not discussed today" choice keeps the note from charting an offer
+      // that was never made).
+      if(!gf.notAssessed) L.push('  • Observation: toe walking without contracture, pain, or functional impact does not require treatment.'+c('gelfer'));
+      else if(gf.heelsFlat) L.push('  • Observation: ankle range could not be reliably assessed today; the child was seen standing with heels flat, so a contracture is unlikely but not excluded. No pain or functional impact is reported.');
+      else L.push('  • Observation: ankle range could not be reliably assessed today, and the child was not seen with heels flat, so a contracture is not excluded. No pain or functional impact is reported.');
+      L.push('  • Treatment offer: expert consensus also recommends offering treatment to autistic and other neurodivergent children who toe walk, with counseling that toe walking may persist or return after treatment.'+c('gelfer','leyden')+' Evidence for these treatments is of very low certainty.'+c('caserta'));
+      if(gf.ptMeasure) L.push('  • PT: outpatient evaluation to measure ankle range'+ptPlan);
+      if(gf.familyPT) L.push(familyPTLine);
+      else if(!gf.ptMeasure) L.push('  • Outpatient PT evaluation: {offered, family declined / offered, family undecided / not discussed today}');
+      // The clinician's own Return to Clinic interval times the recheck; with none set (or
+      // "as needed"), the recheck goes to primary care with a 12-month ceiling.
+      const rtc=(S.rtcInterval||'').trim();
+      const when=rtc&&!/as needed|prn/i.test(rtc)?'at the return visit (see Return to Clinic)':'at the next well visit with {primary care or this clinic}, no later than 12 months';
+      L.push('  • Recheck: ankle range (knee straight and bent) and gait '+when+(gf.notAssessed&&gf.heelsFlat?'; measure ankle range then, and refer to PT for measurement if it still cannot be measured':'')+'. Refer to PT if the ankle no longer reaches neutral with the knee straight, has lost range since the last documented examination, or pain, falls, or functional impact develops.');
+    }
+    if(gf.ptIndicated&&gf.toeWalk){
+      L.push('  • PT: evaluation and treatment of toe walking'+(gf.gait?', gait, balance, and fall prevention':'')+', with stretching, strengthening, and splinting or serial casting as the therapist judges appropriate. Evidence for these treatments is of very low certainty, and adding botulinum toxin to casting has not shown clear benefit.'+c('caserta'));
+      L.push('  • Family counseling: toe walking may persist or return after treatment, including in autistic children.'+c('gelfer','leyden'));
+    } else if(gf.ptIndicated){
+      L.push('  • PT: evaluation and treatment for gait, balance, and fall prevention.');
+    }
+    if(gf.contracture){
+      // The casting/surgery evidence is from idiopathic toe walking only, so a gait-only
+      // contracture gets a plain referral without it.
+      if(gf.toeWalk) L.push('  • Orthopaedics: if the ankle does not reach neutral after a course of PT, or toe walking persists, refer to pediatric orthopaedics for serial casting or surgical evaluation.'+c('gelfer')+' Casting and surgery improve ankle range, but gait does not fully normalize and functional benefit is unproven.'+c('vankuijk'));
+      else L.push('  • Orthopaedics: if the ankle does not reach neutral after a course of PT, refer to pediatric orthopaedics for evaluation.');
+    }
+    if(gf.needsNeuro){
+      L.push(referralIncluded('neurology')?'  • Pediatric neurology: referral for the features above (see Medical Referrals).':'  • Pediatric neurology referral is recommended for the features above.');
+      if(gf.familyPT) L.push(familyPTLine);
+    }
+    if(gf.needsMRI) L.push('  • Neuroimaging: brain MRI to be considered by neurology given upper motor neuron signs.'+c('noritz'));
+    if(gf.needsCK){
+      const why=[gf.ckWeakness&&'weakness signs',gf.ckTone&&'low muscle tone with '+what].filter(Boolean).join(' and ');
+      L.push('  • Laboratory: serum creatine kinase '+(gf.ckWeakness?'recommended':'reasonable')+' given '+why+'. Diagnosis of muscle disease such as Duchenne muscular dystrophy is often delayed, and CK is the screening test.'+c('noritz','ciafaloni'));
+    }
+    L.push('');
+    L.push('  References (gait):');
+    used.forEach((k,i)=>L.push('    '+(i+1)+'. '+GAIT_REFS[k]));
+    L.push('');
+  }}
 
   if(S.comorbid.has('language_disorder')&&cp('language_disorder')){
     L.push('── Problem '+probN+++': Language Disorder (F80.9) ──');L.push('');
@@ -4492,7 +4660,7 @@ function _abaContent(){
     [S.needsSensory.size>0,'sensory processing and modulation'],
     [S.needsAdaptive.size>0,'adaptive and daily living skills'],
     [S.needsSocial.size>0,'social interaction and peer relationships'],
-    [S.needsMotor.size>0,'motor coordination and planning'],
+    [hasCoreMotor(),'motor coordination and planning'],
     [S.emotionalReg,'emotional regulation'],
     [S.feeding,'feeding and mealtime behaviors'],
     // S.academic intentionally excluded from ABA letter domains for school-age patients:
@@ -4756,6 +4924,8 @@ function _iepLetterContent(){
   const mGross=S.needsMotor.has('gross')||S.needsMotor.has('hypotonia');
   const mTone=S.needsMotor.has('hypotonia');
   const mDcd=S.needsMotor.has('coordination')||S.comorbid.has('dcd');
+  const mGait=gaitFindings().ptIndicated; // observation-only toe walking has no school impact
+  const mAny=mHand||mGross||mTone||mDcd||mGait;
   // One copy each: the instrument examples can print twice in one letter (psychoed block
   // and evalDomains), and the age limit is stated on both rule-out and autism letters.
   const devInstrumentEx='e.g., the Battelle Developmental Inventory 3rd ed. or the Mullen Scales of Early Learning';
@@ -4818,7 +4988,8 @@ function _iepLetterContent(){
   if(S.criteriaA.size||S.needsSocial.size||S.needsComm.size) roConcernParts.push('social communication and interaction');
   if(S.criteriaB.size||S.needsBehavior.size||S.needsSensory.size) roConcernParts.push('behavioral regulation and sensory processing');
   if(S.needsAdaptive.size) roConcernParts.push('adaptive functioning');
-  if(S.needsMotor.size) roConcernParts.push('motor development');
+  // Observation-only toe walking is not a school motor concern (see mGait).
+  if(hasCoreMotor()||gaitFindings().ptIndicated) roConcernParts.push('motor development');
   // Semicolons rather than commas for the multi-item case: each domain phrase already
   // contains its own "and", so a comma list reads as one run-on clause.
   const ruleOutReferralTail=!roConcernParts.length
@@ -4848,7 +5019,7 @@ function _iepLetterContent(){
   const roRelatedDomains=[];
   if(S.needsComm.size) roRelatedDomains.push('communication');
   if(S.needsSensory.size) roRelatedDomains.push('sensory');
-  if(S.needsMotor.size||S.comorbid.has('dcd')) roRelatedDomains.push('motor');
+  if(hasCoreMotor()||gaitFindings().ptIndicated||S.comorbid.has('dcd')) roRelatedDomains.push('motor');
   const roRelatedDomainStr=roRelatedDomains.length>1
     ? roRelatedDomains.slice(0,-1).join(', ')+' and '+roRelatedDomains[roRelatedDomains.length-1]
     : roRelatedDomains[0];
@@ -4927,10 +5098,10 @@ function _iepLetterContent(){
     impacts.push('Behavior: '+(bStr?bStr.charAt(0).toUpperCase()+bStr.slice(1)+'.':'Behavioral challenges affecting classroom participation, safety, and access to instruction.'));
   }
   if(S.needsSensory.size) impacts.push('Sensory processing: Sensory processing differences that interfere with the ability to sustain attention, remain regulated, and access the curriculum in a typical classroom environment.');
-  if(S.needsMotor.size||S.comorbid.has('dcd')){
+  if(mAny){
     const mi=preschool
-      ? [mHand&&'pre-writing and handling of classroom materials', mGross&&'participation in playground and movement activities', mTone&&'sitting endurance during circle time and table work', mDcd&&'learning new multi-step motor routines']
-      : [mHand&&'handwriting and written output', mGross&&'physical education participation and movement around campus', mTone&&'endurance for sustained seated work', mDcd&&'learning new multi-step motor tasks'];
+      ? [mHand&&'pre-writing and handling of classroom materials', mGross&&'participation in playground and movement activities', mTone&&'sitting endurance during circle time and table work', mDcd&&'learning new multi-step motor routines', mGait&&'safe movement on stairs, uneven surfaces, and playground equipment']
+      : [mHand&&'handwriting and written output', mGross&&'physical education participation and movement around campus', mTone&&'endurance for sustained seated work', mDcd&&'learning new multi-step motor tasks', mGait&&'safe movement on stairs and uneven surfaces, and participation in physical education'];
     impacts.push('Motor skills: Motor difficulties affecting '+andList(mi.filter(Boolean))+(preschool?', within the classroom.':', within the school setting.'));
   }
   if(selfCareItems.length) impacts.push('Adaptive skills: Difficulty with daily living and self-care skills that affect independent functioning within the school setting.');
@@ -5057,6 +5228,8 @@ function _iepLetterContent(){
     const goals=[];
     if(S.needsMotor.has('gross')) goals.push('gross motor skill development: balance, coordination, and age-appropriate locomotor skills');
     if(S.needsMotor.has('hypotonia')) goals.push('postural control and core strengthening to address low muscle tone affecting endurance, positioning, and sustained classroom participation');
+    if(gaitFindings().toeWalk&&gaitFindings().ptIndicated) goals.push('heel-toe walking pattern and ankle flexibility, following the home and school routine set by the treating physical therapist');
+    if(S.needsMotor.has('gait')) goals.push('balance and fall prevention on stairs, uneven surfaces, and playground equipment');
     goals.push('safe navigation of the school campus (stairs, hallways, playground equipment)');
     if(S.comorbid.has('dcd')) goals.push('motor planning and body awareness targeting the Developmental Coordination Disorder profile');
     s+=' Goals: '+goals.join('; ')+'.';
@@ -5187,18 +5360,20 @@ function _iepLetterContent(){
   // Individually indicated accommodations — conditional on documented evaluation findings
   const accomIndividual=[];
   if(S.needsSensory.size) accomIndividual.push('Sensory accommodations: reduced auditory and visual stimulation as needed; scheduled movement breaks; sensory toolkit (noise-canceling headphones, fidget tools, sunglasses); alternative seating options (wiggle cushion, standing desk)');
-  if(S.needsMotor.size||S.comorbid.has('dcd')){
+  if(mAny){
     // A confirmed written-expression SLD prints its own keyboarding line (accomAcad below), so the
     // motor line drops keyboarding to avoid saying it twice.
     const ma=preschool
       ? [mHand&&'adapted materials (for example, easy-grip crayons, adapted scissors, a slanted work surface), extra time and hands-on support for fine motor tasks',
          mGross&&'support for gross motor and playground participation, with physical therapy or adapted physical education consultation if the team finds it indicated',
          mTone&&'supportive seating and positioning for circle time and table work',
-         mDcd&&'hands-on modeling and extra time for multi-step motor routines']
+         mDcd&&'hands-on modeling and extra time for multi-step motor routines',
+         mGait&&'close supervision on stairs and playground equipment, and extra time during transitions']
       : [mHand&&(S.comorbid.has('ld_written')?'reduced copying and handwriting demands, and extended time on written tasks':'keyboarding or speech-to-text for longer written work, reduced copying and handwriting demands, and extended time on written tasks'),
          mGross&&'extra time and support for moving safely around campus, support for participation in physical education, and adapted physical education evaluation if the team finds it indicated',
          mTone&&'supportive seating and positioning for sustained desk work, with breaks from sustained sitting',
-         mDcd&&'step-by-step modeling and extra time for learning multi-step motor tasks, including in physical education'];
+         mDcd&&'step-by-step modeling and extra time for learning multi-step motor tasks, including in physical education',
+         mGait&&'extra transition time, attention to fall risk on stairs and playground equipment, and adapted physical education consultation if the team finds it indicated'];
     accomIndividual.push('Motor accommodations: '+ma.filter(Boolean).join('; '));
   }
   // Community safety leaves the OT self-care goal, so it gets its own supervision accommodation.
@@ -5851,6 +6026,7 @@ function render(){
   updateTherapyStatusEnablement();
   updatePriorTestOutcomeRequired();
   updateEvChips();
+  updateGaitExamVisibility();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -6481,7 +6657,7 @@ function clearAll(opts){
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
   // Hide sub-option rows and reset their inputs
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow'].forEach(id=>{
+  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow','gaitExamRow'].forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -6544,6 +6720,7 @@ function updateSectionHeaders(){
   if(S.feeding||S.sleep||S.hearingScreenFail||S.seizureConcern||S.sleepStudy||S.focalNeuroFindings)mf.push('Work-up');
   if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
   if(S.prenatalAlcohol||S.fasdFeatures)mf.push('FASD');
+  if(gaitFindings().active&&S.gaitExam.size)mf.push('Gait exam');
   if(S.socialWork)mf.push('Social work');
   setSH('sh-medflags',mf.length>0,mf.join(' · '));
   // 6 Comorbid
@@ -6801,6 +6978,16 @@ function toggleBifAdaptiveCrossCheck(){
   } else {
     el.style.display = 'none';
   }
+}
+
+// Gait exam group follows two parents (toeWalk, gait), so it is recomputed from S on
+// every render rather than toggled by one checkbox's click; this also covers presets
+// and Clear All, which write S without firing change events.
+function updateGaitExamVisibility(){
+  const row=document.getElementById('gaitExamRow');if(!row)return;
+  const on=gaitFindings().active;
+  row.style.display=on?'':'none';
+  if(!on&&S.gaitExam.size){S.gaitExam.clear();row.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});}
 }
 
 // ─── AGE-BASED VISIBILITY ────────────────────────────────────────────────────
@@ -7149,7 +7336,8 @@ function syncSchoolSvcFromNeeds(){
   // Only the school self-care boxes feed the OT goal; community safety/independence and menstrual
   // care alone would recommend OT with no goals.
   if(S.needsSensory.size>0||S.needsMotor.has('fine')||S.needsMotor.has('handwriting')||S.needsMotor.has('coordination')||SCHOOL_SELF_CARE.some(k=>S.needsAdaptive.has(k))||S.comorbid.has('dcd')) add('ot_school');
-  if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')) add('pt_school');
+  // Not rulePT: clinic PT also takes the coordination box, which goes to school OT only.
+  if(S.needsMotor.has('gross')||S.needsMotor.has('hypotonia')||S.comorbid.has('dcd')||gaitFindings().ptIndicated) add('pt_school');
   if(S.needsSocial.size>0||S.needsBehavior.has('boundaryViol')) add('social_skills_school');
   if(S.needsBehavior.size>0) add('fba');
   if(S.needsBehavior.has('elopement')||S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('vocalDisruption')||S.needsBehavior.has('pica')){add('aide');add('fba');}

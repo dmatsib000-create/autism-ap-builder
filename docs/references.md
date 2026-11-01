@@ -24,6 +24,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§7 Epidemiology & population prevalence](#7-epidemiology--population-prevalence)
 - [§8 Fetal alcohol spectrum disorders](#8-fetal-alcohol-spectrum-disorders)
 - [§9 Education law — IDEA and Florida ESE rules](#9-education-law--idea-and-florida-ese-rules)
+- [§10 Toe walking & gait](#10-toe-walking--gait)
 
 ---
 
@@ -305,6 +306,76 @@ Section 504 of the Rehabilitation Act of 1973, 29 U.S.C. §794; implementing reg
 - **Used for:** referenced by name, not by section number, in the `schoolDoc === '504'` branch, which argues a 504 accommodation plan may be insufficient to provide FAPE and asks the team to evaluate IEP eligibility.
 - **Supports the claim:** that a 504 plan and an IEP are different instruments with different scope and enforceability. The 504 disability definition is functional rather than diagnosis-dependent — 34 C.F.R. §104.3(j)(1) covers a person who "has a physical or mental impairment which substantially limits one or more major life activities," and §104.3(j)(2)(ii) lists learning among those activities. Part 104 still uses the term "handicapped person"; the tool does not reproduce that term.
 - **Verified:** DM 2026-08-21. §104.3 read in full on eCFR by Claude the same day; maintainer reviewed and confirmed. Cleared for clinical use.
+
+---
+
+## 10. Toe walking & gait
+
+Citations behind the toe-walking / gait problem in the A&P note (`gaitFindings()`, docs/branching-logic.md §7.10). They print in a numbered "References (gait):" list, in order of first use, only when that problem prints. They never reach the ABA or IEP letters. Gathered 2026-10-31 by a multi-agent research pass whose claims were cross-checked, then each confirmed against PubMed.
+
+### `[gelfer-2024]` — BSCOS/APCP Delphi consensus on idiopathic toe walking
+
+Gelfer Y, McNee AE, Harris JD, et al. **The management of idiopathic toe walking.** *Bone Joint J.* 2024;106-B(10):1190-1196. doi:10.1302/0301-620X.106B10.BJJ-2024-0466.R1 (PMID 39348908)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Definition (bilateral from walking onset, beyond age 2, no neurologic cause); autism/ADHD do not exclude the diagnosis; no treatment needed without contracture, pain, or other impact; non-surgical treatment first, orthopaedic referral when it fails; CK not required at primary assessment; neurodiverse children offered treatment with counseling about recurrence. Drives `gaitFindings().ptIndicated` / `observeOnly` / the no-routine-CK rule.
+- **Verified:** bibliographic details confirmed against PubMed PMID 39348908 on 2026-10-31 (Claude session) — maintainer initials pending. The 31 approved statements were read from the publisher's full text the same day; the abstract alone does not list them.
+
+### `[barrow-2011]` — Persistent toe walking in autism (clinic sample)
+
+Barrow WJ, Jaworski M, Accardo PJ. **Persistent toe walking in autism.** *J Child Neurol.* 2011;26(5):619-621. doi:10.1177/0883073810385344 (PMID 21285033)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Persistent toe walking in 20.1% and tight heel cords in 12.0% of 324 children with ASD at a developmental pediatrics clinic. Supports "toe walking is more common in autistic children."
+- **Verified:** bibliographic details confirmed against PubMed PMID 21285033 on 2026-10-31 (Claude session) — maintainer initials pending
+
+### `[leyden-2019]` — Autism and toe walking in US private-payer claims
+
+Leyden J, Fung L, Frick S. **Autism and toe-walking: are they related? Trends and treatment patterns between 2005 and 2016.** *J Child Orthop.* 2019;13(4):340-345. doi:10.1302/1863-2548.13.180160 (PMID 31489038)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** 8.4% of children with ASD vs 0.47% of typically developing children had a toe-walking code; without intervention 63.6% vs 19.3% still carried it within 10 years; persistence after treatment was similar in both groups. Supports "resolves without treatment less often" and the recurrence-counseling line. Caveat: outcome is a persisting billing code, not observed gait; private-payer only.
+- **Verified:** bibliographic details confirmed against PubMed PMID 31489038 on 2026-10-31 (Claude session) — maintainer initials pending
+
+### `[haynes-2018]` — Neurologic causes of toe walking after orthopaedic referral
+
+Haynes KB, Wimberly RL, VanPelt JM, et al. **Toe walking: a neurological perspective after referral from pediatric orthopaedic surgeons.** *J Pediatr Orthop.* 2018;38(3):152-156. doi:10.1097/BPO.0000000000001115 (PMID 29309384)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Red flags for a neurologic cause (concerning birth history, late walking, unilateral toe walking, upper or lower motor neuron signs); 71% of unilateral toe walkers had cerebral palsy; ankle contracture did not predict a neurologic cause. Drives `GAIT_RED_FLAGS` and the "tight heel cord alone" sentence. Caveat: tertiary pre-selected cohort.
+- **Verified:** bibliographic details confirmed against PubMed PMID 29309384 on 2026-10-31 (Claude session) — maintainer initials pending
+
+### `[noritz-2013]` — AAP clinical report on motor delays
+
+Noritz GH, Murphy NA, et al. **Motor delays: early identification and evaluation.** *Pediatrics.* 2013;131(6):e2016-e2027. doi:10.1542/peds.2013-1056 (PMID 23713113)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Brain MRI for children with high muscle tone; serum CK for those with decreased tone. Drives the MRI and low-tone CK lines and the gait-only assessment sentence.
+- **Verified:** bibliographic details confirmed against PubMed PMID 23713113 on 2026-10-31 (Claude session) — maintainer initials pending. The third author position is a collective panel name that PubMed did not return; the tool prints "et al."
+
+### `[ciafaloni-2009]` — Delayed diagnosis in Duchenne muscular dystrophy
+
+Ciafaloni E, Fox DJ, Pandya S, et al. **Delayed diagnosis in Duchenne muscular dystrophy: data from the Muscular Dystrophy Surveillance, Tracking, and Research Network (MD STARnet).** *J Pediatr.* 2009;155(3):380-385. doi:10.1016/j.jpeds.2009.02.007 (PMID 19394035)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** About 2.5-year delay from first symptoms to DMD diagnosis; authors recommend early CK in boys with unexplained developmental delay. Supports the CK line. Applying it to toe walking with weakness signs is an inference, not something the study tested.
+- **Verified:** bibliographic details confirmed against PubMed PMID 19394035 on 2026-10-31 (Claude session) — maintainer initials pending
+
+### `[caserta-cochrane-2019]` — Cochrane review of interventions for idiopathic toe walking
+
+Caserta AJ, Pacey V, Fahey M, et al. **Interventions for idiopathic toe walking.** *Cochrane Database Syst Rev.* 2019;10(10):CD012363. doi:10.1002/14651858.CD012363.pub2 (PMID 31587271; PMC6778693)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Four trials, one with usable data; casting plus botulinum toxin vs casting alone showed no clear difference, very low certainty. Supports "evidence is limited and of low certainty" and "adding botulinum toxin to casting has not shown clear benefit." Do not strengthen this to "botulinum toxin does not help."
+- **Verified:** bibliographic details confirmed against PubMed PMID 31587271 on 2026-10-31 (Claude session) — maintainer initials pending
+
+### `[van-kuijk-2014]` — Systematic review of treatment for idiopathic toe walking
+
+van Kuijk AA, Kosters R, Vugts M, Geurts AC. **Treatment for idiopathic toe walking: a systematic review of the literature.** *J Rehabil Med.* 2014;46(10):945-957. doi:10.2340/16501977-1881 (PMID 25223807)
+
+- **Used for:** autism-ap-builder.html, toe-walking/gait problem block (`GAIT_REFS`, after the DCD problem); docs/branching-logic.md §7.10.
+- **Supports the claim:** Preliminary evidence that casting and surgery improve passive dorsiflexion and walking mechanics, though gait does not normalize; functional benefit not demonstrated. Supports the orthopaedics line. The abstract also says botulinum toxin does not improve casting and that only surgery has effects beyond 1 year; the tool deliberately does not repeat either, because a cross-check against the Cochrane review rated them as stronger than the evidence supports.
+- **Verified:** bibliographic details confirmed against PubMed PMID 25223807 on 2026-10-31 (Claude session) — maintainer initials pending
 
 ---
 
