@@ -1146,54 +1146,6 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="section">
     <div id="sh-dsm5" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">3</span><span class="sec-kicker">Criteria</span><span class="sec-title">DSM-5 Criteria Evidence</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
     <div class="sec-body">
-      <div id="levelGroupHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
-      <!-- Severity & Specifiers — shown only when Confirmed ASD -->
-      <div id="levelGroup" style="display:none">
-        <div class="field-group">
-          <span class="field-label">Severity — Social Communication</span>
-          <div class="radio-grid">
-            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="1">Level 1</label>
-            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="2">Level 2</label>
-            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="3">Level 3</label>
-          </div>
-          <textarea id="levelJustificationSCField" aria-label="Social communication severity: justification" class="strengths-area" placeholder="Justification for SC level (optional) — e.g., requires adult prompting for all social initiations; responses to peers consistently atypical..." style="min-height:36px;margin-top:5px"></textarea>
-          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
-        </div>
-        <div class="field-group">
-          <span class="field-label">Severity — Restricted / Repetitive Behaviors</span>
-          <div class="radio-grid">
-            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="1">Level 1</label>
-            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="2">Level 2</label>
-            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="3">Level 3</label>
-          </div>
-          <textarea id="levelJustificationRRBField" aria-label="Restricted and repetitive behavior severity: justification" class="strengths-area" placeholder="Justification for RRB level (optional) — e.g., severe distress with any deviation from routine; stereotypies constant and disruptive across settings..." style="min-height:36px;margin-top:5px"></textarea>
-          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
-        </div>
-        <div class="field-group">
-          <span class="field-label">Specifiers</span>
-          <div class="cb-list">
-            <div id="spec-id-rows">
-              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withID"> With co-occurring intellectual disability (confirmed)</label>
-              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedID"> With suspected intellectual disability (evaluation pending)</label>
-            </div>
-            <div id="spec-gdd-rows">
-              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGDD"> With Global Developmental Delay (GDD) — confirmed</label>
-              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
-              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
-            </div>
-            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:var(--text-11);font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutLangImpairment"> Without language impairment</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGenetic"> With associated known genetic/medical condition</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withNDD"> With associated neurodevelopmental/behavioral/mental disorder</label>
-            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withCatatonia"> With catatonia (active features at this visit; auto-applies when Catatonia comorbid is checked)</label>
-          </div>
-        </div>
-        <hr class="divider">
-      </div>
-
       <div style="display:flex;gap:5px;margin-bottom:10px">
         <button class="btn btn-blue btn-sm" onclick="dsmCheckAll()">Check all criteria</button>
         <button class="btn btn-gray btn-sm" onclick="dsmClearAll()">Clear all criteria</button>
@@ -1244,6 +1196,53 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
           <span class="tog"><input type="checkbox" id="showDSMLines"><span class="tog-sl"></span></span>
           Include line-by-line criteria text in note output
         </label>
+      </div>
+      <div id="levelGroupHint" style="display:none;margin-top:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Set Diagnosis Status to <strong>Confirmed ASD</strong> above to unlock Severity Levels and Specifiers.</div>
+      <!-- Severity & Specifiers — shown only when Confirmed ASD -->
+      <div id="levelGroup" style="display:none">
+        <hr class="divider">
+        <div class="field-group">
+          <span class="field-label">Severity — Social Communication</span>
+          <div class="radio-grid">
+            <label class="r-opt" title="Without supports, noticeable social communication deficits; difficulty initiating interactions; atypical or unsuccessful responses to social overtures from others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="1">Level 1</label>
+            <label class="r-opt" title="Marked deficits in verbal and nonverbal social communication apparent even with supports in place; limited initiation of social interactions; reduced or abnormal responses to others"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="2">Level 2</label>
+            <label class="r-opt" title="Severe deficits in verbal and nonverbal social communication causing severe functional impairment; very limited initiation of social interactions; minimal response to social overtures"><input type="radio" name="asdLevelSC" data-bind="asdLevelSC" value="3">Level 3</label>
+          </div>
+          <textarea id="levelJustificationSCField" aria-label="Social communication severity: justification" class="strengths-area" placeholder="Justification for SC level (optional) — e.g., requires adult prompting for all social initiations; responses to peers consistently atypical..." style="min-height:36px;margin-top:5px"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Severity — Restricted / Repetitive Behaviors</span>
+          <div class="radio-grid">
+            <label class="r-opt" title="Behavioral inflexibility causes significant interference in ≥1 context; difficulty switching between activities; organization and planning difficulties hamper independence"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="1">Level 1</label>
+            <label class="r-opt" title="Inflexibility or RRBs appear frequently enough to be obvious to a casual observer and interfere with functioning across multiple contexts; distress and/or difficulty changing focus or action"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="2">Level 2</label>
+            <label class="r-opt" title="Extreme inflexibility or RRBs markedly interfere with functioning in all spheres; extreme difficulty coping with change; great distress and difficulty when redirected"><input type="radio" name="asdLevelRRB" data-bind="asdLevelRRB" value="3">Level 3</label>
+          </div>
+          <textarea id="levelJustificationRRBField" aria-label="Restricted and repetitive behavior severity: justification" class="strengths-area" placeholder="Justification for RRB level (optional) — e.g., severe distress with any deviation from routine; stereotypies constant and disruptive across settings..." style="min-height:36px;margin-top:5px"></textarea>
+          <span class="phi-hint">PHI-free zone — type "the child" or "the individual" or <code>[NAME]</code>; no specific dates, MRNs, or identifiers.</span>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Specifiers</span>
+          <div class="cb-list">
+            <div id="spec-id-rows">
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withID"> With co-occurring intellectual disability (confirmed)</label>
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedID"> With suspected intellectual disability (evaluation pending)</label>
+            </div>
+            <div id="spec-gdd-rows">
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGDD"> With Global Developmental Delay (GDD) — confirmed</label>
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedGDD"> With suspected GDD (evaluation pending)</label>
+              <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutGDD"> Without global developmental delay (development appropriate for age)</label>
+            </div>
+            <label class="cb-row" id="withBifRow" style="display:none" title="To document a BIF call grounded in a prior outside evaluation when records are not on hand, select Cognitive Profile = Borderline and Cognitive Data Source = Prior outside evaluation."><input type="checkbox" data-key="specifiers" value="withBIF" disabled> With borderline intellectual functioning (BIF) — sub-threshold for intellectual disability; clinical-attention category (R41.83) <span id="withBifGateNote" style="color:var(--gray-500);font-size:var(--text-11);font-style:italic;margin-left:4px">(requires a Cognitive Data Source selection)</span></label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutID"> Without intellectual impairment</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withLangImpairment"> With co-occurring language impairment (confirmed)</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withSuspectedLang"> With suspected language impairment (SLP eval pending)</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withoutLangImpairment"> Without language impairment</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withGenetic"> With associated known genetic/medical condition</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withNDD"> With associated neurodevelopmental/behavioral/mental disorder</label>
+            <label class="cb-row"><input type="checkbox" data-key="specifiers" value="withCatatonia"> With catatonia (active features at this visit; auto-applies when Catatonia comorbid is checked)</label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
