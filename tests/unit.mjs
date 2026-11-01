@@ -222,6 +222,73 @@ const CASES = [
     check(a){ a.syncSchoolSvcFromNeeds();
               assert.equal(a.S.schoolSvc.has('psychoed'), false, 'psychoed must not auto-fire without a driver'); } },
 
+  // ── gaitFindings(): toe walking / gait decisions ([gelfer-2024], [haynes-2018], [noritz-2013]) ──
+  { name: 'gait: no gait need -> inactive, and stale exam findings are inert',
+    setup(S){ S.gaitExam.add('lmn'); S.gaitExam.add('contracture'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.active, false);
+              assert.equal(g.needsCK||g.needsNeuro||g.ptIndicated, false, 'exam findings must not count without a gait need'); } },
+  { name: 'gait: toe walking alone -> observe only (no PT, neurology, or CK)',
+    setup(S){ S.needsMotor.add('toeWalk'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.observeOnly, true);
+              assert.equal(g.ptIndicated||g.needsNeuro||g.needsCK, false); } },
+  { name: 'gait: toe walking + contracture -> PT, not neurology',
+    setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('contracture'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.ptIndicated, true);
+              assert.equal(g.needsNeuro, false, 'contracture alone is not a neurologic red flag'); } },
+  { name: 'gait: gait concerns alone -> PT',
+    setup(S){ S.needsMotor.add('gait'); },
+    check(a){ assert.equal(a.gaitFindings().ptIndicated, true); } },
+  { name: 'gait: each red flag -> neurology',
+    setup(S){ S.needsMotor.add('toeWalk'); },
+    check(a){ for(const k of ['asymmetric','umn','lmn','lateOnset','history']){
+                a.S.gaitExam.clear(); a.S.gaitExam.add(k);
+                assert.equal(a.gaitFindings().needsNeuro, true, k+' should trigger neurology'); } } },
+  { name: 'gait: CK for LMN signs or hypotonia, not for UMN signs alone',
+    setup(S){ S.needsMotor.add('toeWalk'); },
+    check(a){ a.S.gaitExam.add('umn');
+              assert.equal(a.gaitFindings().needsCK, false, 'UMN alone: MRI, not CK');
+              assert.equal(a.gaitFindings().needsMRI, true);
+              a.S.gaitExam.add('lmn');
+              assert.equal(a.gaitFindings().needsCK, true, 'LMN signs -> CK');
+              a.S.gaitExam.clear(); a.S.needsMotor.add('hypotonia');
+              assert.equal(a.gaitFindings().needsCK, true, 'hypotonia + toe walking -> CK'); } },
+  { name: 'gait: hypotonia without a gait need does not trigger CK',
+    setup(S){ S.needsMotor.add('hypotonia'); },
+    check(a){ assert.equal(a.gaitFindings().needsCK, false); } },
+  { name: 'gait: ABA fence - gait needs alone are not core motor needs',
+    setup(S){ S.needsMotor.add('toeWalk'); S.needsMotor.add('gait'); },
+    check(a){ assert.equal(a.hasCoreMotor(), false);
+              a.S.needsMotor.add('fine');
+              assert.equal(a.hasCoreMotor(), true); } },
+  { name: 'gait: school PT added for gait concerns and for toe walking + contracture, not toe walking alone',
+    setup(S){ S.ageGroup='schoolAge'; S.needsMotor.add('toeWalk'); },
+    check(a){ a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('pt_school'), false, 'observation-only toe walking adds no school PT');
+              a.S.gaitExam.add('contracture'); a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('pt_school'), true); } },
+
+  // Watch-only path (council 2026-10-31): a family request or an unexaminable ankle sends
+  // the child to outpatient PT, but never through ptIndicated, so no school PT or IEP content.
+  { name: 'gait: family PT request -> outpatient PT only, no school PT',
+    setup(S){ S.ageGroup='schoolAge'; S.needsMotor.add('toeWalk'); S.gaitExam.add('familyPT'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.familyPT, true); assert.equal(g.outpatientPT, true);
+              assert.equal(g.ptIndicated, false, 'a family request must not set ptIndicated');
+              a.syncSchoolSvcFromNeeds();
+              assert.equal(a.S.schoolSvc.has('pt_school'), false, 'a family request must not add school PT'); } },
+  { name: 'gait: ankle not assessed and heels never seen flat -> PT to measure',
+    setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('notAssessed'); },
+    check(a){ assert.equal(a.gaitFindings().ptMeasure, true);
+              a.S.gaitExam.add('heelsFlat');
+              assert.equal(a.gaitFindings().ptMeasure, false, 'heels seen flat: recheck instead of PT now'); } },
+  { name: 'gait: family PT request is ignored once PT is already indicated',
+    setup(S){ S.needsMotor.add('toeWalk'); S.gaitExam.add('contracture'); S.gaitExam.add('familyPT'); },
+    check(a){ const g=a.gaitFindings();
+              assert.equal(g.ptIndicated, true); assert.equal(g.familyPT, false); } },
+
   // ── evalPathSteps(): the workup-completion resolver ──
   // Role mapping, completion booleans, and the pendingTesting predicate that drives the
   // Family Resources ABA-waitlist wording. The ''-status defaults must map 1:1 onto the

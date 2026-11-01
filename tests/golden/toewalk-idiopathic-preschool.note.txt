@@ -1,0 +1,106 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD), Level 2 (Social Communication) / Level 2 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
+
+── Clinical Summary ──
+
+The patient is a preschool-aged girl (3–5 years) who is using simple sentences and multi-word utterances. She demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Motor: persistent toe walking
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder [Level 2 (SC) / Level 2 (RRBs)] (F84.0) ──
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+1. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA therapy is recommended as the primary evidence-based behavioral intervention for her and is medically necessary given her confirmed diagnosis of Autism Spectrum Disorder, Level 2 (Social Communication) / Level 2 (Restricted/Repetitive Behaviors), with the following documented functional impairments establishing medical necessity: ASD Level 2 or 3 support needs. These impairments substantially limit her ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.
+Early Intensive Behavioral Intervention (EIBI) - a structured, comprehensive ABA-based program - is indicated for children under age 6. A Cochrane systematic review³ demonstrates robust improvement in language, cognitive, and adaptive behavior outcomes with EIBI. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria. Services should span home, clinic, and natural-environment settings; caregiver coaching is a core component of effective early intervention.
+Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA (embedding behavioral principles within naturalistic, relationship-focused, and play-based interactions) carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intensive intervention when accessible.
+
+Supporting References:
+  1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
+  2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
+  3. Reichow B, Hume K, Barton EE, Boyd BA. Early intensive behavioral intervention (EIBI) for young children with autism spectrum disorders (ASD). Cochrane Database Syst Rev. 2018;(5):CD009260. doi:10.1002/14651858.CD009260.pub3
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+
+2. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+3. SCHOOL / EDUCATIONAL SUPPORTS
+  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+4. MEDICAL REFERRALS
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
+      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
+      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
+      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
+
+  References (genetics):
+    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
+    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
+
+5. FAMILY RESOURCES & NEXT STEPS
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  OPT-In-Early (Online Parent Training in Early Intervention)
+  Free, comprehensive, self-guided online program from the University of Connecticut for families of young children with signs of autism or other developmental concerns, including those awaiting a diagnosis. Covers 14 modules: communication, social skills, behavior, daily routines, and more. Grounded in ABA and naturalistic developmental principles. Optional modules for picky eating and toilet training.
+  https://parenttraining.chip.uconn.edu
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+── Problem 2: Persistent Toe Walking (R26.89) ──
+
+Assessment:
+  Persistent toe walking reported. Toe walking is considered idiopathic only when it is bilateral, present from the start of walking, persists beyond age 2 years, and has no neurologic cause; co-occurring autism or ADHD does not exclude it.¹ Toe walking is more common in autistic children and is more likely to persist without treatment than in other children.²,³
+  Toe walking is also documented under DSM-5 Criterion B1. It may reflect sensory or motor features of the autism profile, a musculoskeletal or neurologic process, or both; the examination below helps distinguish these.
+  Examination and history: {document passive ankle dorsiflexion with knee straight and bent (past neutral, to neutral only, or short of neutral; degrees if measured), symmetry, tone, strength, and reflexes}
+
+Plan:
+  • Observation: toe walking without contracture, pain, or functional impact does not require treatment.¹
+  • Treatment offer: expert consensus also recommends offering treatment to autistic and other neurodivergent children who toe walk, with counseling that toe walking may persist or return after treatment.¹,³ Evidence for these treatments is of very low certainty.⁴
+  • Outpatient PT evaluation: {offered, family declined / offered, family undecided / not discussed today}
+  • Recheck: ankle range (knee straight and bent) and gait at the return visit (see Return to Clinic). Refer to PT if the ankle no longer reaches neutral with the knee straight, has lost range since the last documented examination, or pain, falls, or functional impact develops.
+
+  References (gait):
+    1. Gelfer Y, McNee AE, Harris JD, et al. The management of idiopathic toe walking. Bone Joint J. 2024;106-B(10):1190-1196. doi:10.1302/0301-620X.106B10.BJJ-2024-0466.R1
+    2. Barrow WJ, Jaworski M, Accardo PJ. Persistent toe walking in autism. J Child Neurol. 2011;26(5):619-621. doi:10.1177/0883073810385344
+    3. Leyden J, Fung L, Frick S. Autism and toe-walking: are they related? Trends and treatment patterns between 2005 and 2016. J Child Orthop. 2019;13(4):340-345. doi:10.1302/1863-2548.13.180160
+    4. Caserta AJ, Pacey V, Fahey M, et al. Interventions for idiopathic toe walking. Cochrane Database Syst Rev. 2019;10(10):CD012363. doi:10.1002/14651858.CD012363.pub2
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

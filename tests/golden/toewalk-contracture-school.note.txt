@@ -1,0 +1,89 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD), Level 1 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
+
+── Clinical Summary ──
+
+The patient is a school-aged boy who is conversational, with cognitive functioning in the average range. He demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including motor development. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Motor: persistent toe walking
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder [Level 1 (SC) / Level 1 (RRBs)] (F84.0) ──
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+1. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+2. PHYSICAL THERAPY (PT)
+Evaluation and treatment targeting: persistent toe walking (see gait problem below). Goal: improve participation in PE, playground activities, and daily physical function.
+
+3. SCHOOL / EDUCATIONAL SUPPORTS
+IEP in place; recommend review/update to reflect current evaluation findings.
+Recommended IEP updates based on current evaluation findings:
+  • Review current IEP to ensure physical therapy goals and services adequately address identified functional needs; update goals or increase intensity if indicated.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+    - Motor accommodations: extra transition time and attention to fall risk on stairs and playground equipment
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+4. MEDICAL REFERRALS
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
+      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
+      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
+      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
+
+  References (genetics):
+    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
+    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
+
+5. FAMILY RESOURCES & NEXT STEPS
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. Use Google Maps to search for nearby providers and call to confirm insurance.
+    4. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
+    5. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    6. When a spot is obtained, notify other waitlists so another child may benefit.
+
+── Problem 2: Persistent Toe Walking (R26.89) ──
+
+Assessment:
+  Persistent toe walking reported. Toe walking is considered idiopathic only when it is bilateral, present from the start of walking, persists beyond age 2 years, and has no neurologic cause; co-occurring autism or ADHD does not exclude it.¹ Toe walking is more common in autistic children and is more likely to persist without treatment than in other children.²,³
+  Examination and history: heel-cord contracture (cannot dorsiflex to neutral). {specify the findings present}
+  A tight heel cord alone does not indicate a neurologic cause.⁴
+
+Plan:
+  • PT: evaluation and treatment of toe walking, with stretching, strengthening, and splinting or serial casting as the therapist judges appropriate. Evidence for these treatments is of very low certainty, and adding botulinum toxin to casting has not shown clear benefit.⁵
+  • Family counseling: toe walking may persist or return after treatment, including in autistic children.¹,³
+  • Orthopaedics: if the ankle does not reach neutral after a course of PT, or toe walking persists, refer to pediatric orthopaedics for serial casting or surgical evaluation.¹ Casting and surgery improve ankle range, but gait does not fully normalize and functional benefit is unproven.⁶
+
+  References (gait):
+    1. Gelfer Y, McNee AE, Harris JD, et al. The management of idiopathic toe walking. Bone Joint J. 2024;106-B(10):1190-1196. doi:10.1302/0301-620X.106B10.BJJ-2024-0466.R1
+    2. Barrow WJ, Jaworski M, Accardo PJ. Persistent toe walking in autism. J Child Neurol. 2011;26(5):619-621. doi:10.1177/0883073810385344
+    3. Leyden J, Fung L, Frick S. Autism and toe-walking: are they related? Trends and treatment patterns between 2005 and 2016. J Child Orthop. 2019;13(4):340-345. doi:10.1302/1863-2548.13.180160
+    4. Haynes KB, Wimberly RL, VanPelt JM, et al. Toe walking: a neurological perspective after referral from pediatric orthopaedic surgeons. J Pediatr Orthop. 2018;38(3):152-156. doi:10.1097/BPO.0000000000001115
+    5. Caserta AJ, Pacey V, Fahey M, et al. Interventions for idiopathic toe walking. Cochrane Database Syst Rev. 2019;10(10):CD012363. doi:10.1002/14651858.CD012363.pub2
+    6. van Kuijk AA, Kosters R, Vugts M, Geurts AC. Treatment for idiopathic toe walking: a systematic review of the literature. J Rehabil Med. 2014;46(10):945-957. doi:10.2340/16501977-1881
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.

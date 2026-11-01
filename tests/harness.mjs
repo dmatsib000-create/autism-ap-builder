@@ -62,6 +62,11 @@ const EXPORTS = [
   // academic->psychoed wiring (and its preschool-and-up age gate), which the golden lane
   // can't reach because fixtures set S.schoolSvc directly and never invoke the sync.
   'syncSchoolSvcFromNeeds',
+  // Pure gait decider (reads S only): every toe-walking/gait branch in the note, IEP,
+  // referrals, and school sync reads it, so the unit lane locks its rules directly.
+  'gaitFindings',
+  // ABA fence predicate: true iff a motor need other than toeWalk/gait is checked.
+  'hasCoreMotor',
 ];
 
 function extractScript(html) {

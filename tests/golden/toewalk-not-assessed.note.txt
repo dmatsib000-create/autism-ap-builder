@@ -1,0 +1,89 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD) — under evaluation
+ICD-10-CM: Z03.89
+
+── Clinical Summary ──
+
+The patient is a preschool-aged boy (3–5 years). He shows developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Motor: persistent toe walking
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder — under evaluation (F84.0) ──
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+1. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+Early behavioral intervention is recommended given his age and the following documented developmental impairments: preschool age group. ABA-based services are the most extensively studied and supported intervention for young children with ASD or suspected ASD. Recommended intensity to be determined by the treating BCBA following individualized skills assessment; services should span home, clinic, and natural-environment settings, with caregiver coaching embedded throughout and coordination with Early Intervention services.
+Families who have access to Naturalistic Developmental Behavioral Intervention (NDBI) programs (e.g., Early Start Denver Model, Pivotal Response Training, JASPER) should engage or continue with these approaches. NDBI-based ABA carries a particularly strong evidence base for children in the infant-toddler-preschool period and represents a preferred style of early intervention when accessible.
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+
+2. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+3. PHYSICAL THERAPY (PT)
+Outpatient evaluation for ankle range measurement (see gait problem below).
+
+4. SCHOOL / EDUCATIONAL SUPPORTS
+  • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+5. FAMILY RESOURCES & NEXT STEPS
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    6. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  OPT-In-Early (Online Parent Training in Early Intervention)
+  Free, comprehensive, self-guided online program from the University of Connecticut for families of young children with signs of autism or other developmental concerns, including those awaiting a diagnosis. Covers 14 modules: communication, social skills, behavior, daily routines, and more. Grounded in ABA and naturalistic developmental principles. Optional modules for picky eating and toilet training.
+  https://parenttraining.chip.uconn.edu
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+── Problem 2: Persistent Toe Walking (R26.89) ──
+
+Assessment:
+  Persistent toe walking reported. Toe walking is considered idiopathic only when it is bilateral, present from the start of walking, persists beyond age 2 years, and has no neurologic cause; co-occurring autism or ADHD does not exclude it.¹ Toe walking is more common in autistic children and is more likely to persist without treatment than in other children.²,³
+  Examination and history: Ankle range not reliably assessed today. {document symmetry, tone, strength, and reflexes}
+
+Plan:
+  • Observation: ankle range could not be reliably assessed today, and the child was not seen with heels flat, so a contracture is not excluded. No pain or functional impact is reported.
+  • Treatment offer: expert consensus also recommends offering treatment to autistic and other neurodivergent children who toe walk, with counseling that toe walking may persist or return after treatment.¹,³ Evidence for these treatments is of very low certainty.⁴
+  • PT: outpatient evaluation to measure ankle range; any treatment plan to be agreed with the family, taking the child's sensory tolerance into account.
+  • Recheck: ankle range (knee straight and bent) and gait at the next well visit with {primary care or this clinic}, no later than 12 months. Refer to PT if the ankle no longer reaches neutral with the knee straight, has lost range since the last documented examination, or pain, falls, or functional impact develops.
+
+  References (gait):
+    1. Gelfer Y, McNee AE, Harris JD, et al. The management of idiopathic toe walking. Bone Joint J. 2024;106-B(10):1190-1196. doi:10.1302/0301-620X.106B10.BJJ-2024-0466.R1
+    2. Barrow WJ, Jaworski M, Accardo PJ. Persistent toe walking in autism. J Child Neurol. 2011;26(5):619-621. doi:10.1177/0883073810385344
+    3. Leyden J, Fung L, Frick S. Autism and toe-walking: are they related? Trends and treatment patterns between 2005 and 2016. J Child Orthop. 2019;13(4):340-345. doi:10.1302/1863-2548.13.180160
+    4. Caserta AJ, Pacey V, Fahey M, et al. Interventions for idiopathic toe walking. Cochrane Database Syst Rev. 2019;10(10):CD012363. doi:10.1002/14651858.CD012363.pub2
+
+RETURN TO CLINIC
+Return to clinic in as needed.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.
