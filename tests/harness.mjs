@@ -67,6 +67,10 @@ const EXPORTS = [
   'gaitFindings',
   // ABA fence predicate: true iff a motor need other than toeWalk/gait is checked.
   'hasCoreMotor',
+  // Labs & studies ordered: the pure parser behind the note's labs section, and the
+  // overlap check behind the tool-only warnings (which never reach any output).
+  'parseLabGroups',
+  'labOrderOverlap',
 ];
 
 function extractScript(html) {

@@ -408,6 +408,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    not under every field, to avoid visual noise. Inline <code> styles a small
    bracketed-placeholder hint like [NAME] so clinicians have a visible alternative. */
 .phi-hint{font-size:var(--text-10-5);color:#7f1d1d;font-style:italic;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
+.lab-warn{background:var(--amber-light);color:var(--amber-dark);border-left:3px solid var(--amber);border-radius:var(--radius-sm);padding:3px 8px;font-size:var(--text-11);line-height:1.4;margin:0 0 4px}
 .phi-hint::before{content:"🔒 ";font-style:normal;opacity:.75;margin-right:1px}
 .phi-hint code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;font-size:var(--text-10);background:rgba(127,29,29,.07);padding:0 4px;border-radius:2px;border:1px solid rgba(127,29,29,.16);color:#7f1d1d;letter-spacing:0}
 /* Keyboard-accessible disclosure for instrument-list info on Cog Data Source options (PR-K).
@@ -1369,6 +1370,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
+        <div class="grp-sep">Labs &amp; studies ordered</div>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Write the reason, end it with a colon, then list the tests under it one per line (pasting from Epic works). Leave a blank line between groups. A test with no reason can sit on its own line. Prints in the plan as its own section, exactly as typed.</div>
+        <textarea class="strengths-area" id="labsOrderedField" aria-label="Labs and studies ordered" rows="5" placeholder="Pica, screen for iron deficiency and lead exposure:&#10;CBC with differential&#10;Ferritin&#10;Lead level&#10;&#10;Vitamin D"></textarea>
+        <span class="phi-hint">PHI-free zone: no names, MRNs, dates, or result values. Avoid curly braces { }, which Epic treats as fill-in stops.</span>
+        <div id="labsWarnings" role="status" aria-live="polite"></div>
         <!-- Shown only while toe walking or gait concerns are checked in Functional Needs;
              updateGaitExamVisibility() hides it and clears S.gaitExam otherwise. -->
         <div id="gaitExamRow" style="display:none">
@@ -1809,6 +1815,8 @@ function initialState(){ return {
   dysmorphism:'', congenitalAnomalies:false, developmentalRegression:false, regressionTiming:'',
   // Gait exam findings; meaningful only while needsMotor has toeWalk or gait (see gaitFindings).
   gaitExam:new Set(),
+  // Clinician's labs/studies list, kept as typed; parseLabGroups() reads it for the note.
+  labsOrdered:'',
   // Prenatal alcohol exposure / FASD flags. paeEvidence holds NIAAA consensus evidence
   // categories; the three pae* scalars are the optional pattern detail under
   // quantityFrequency. All categorical or placeholder-hinted — no dates, names, or
@@ -2271,6 +2279,40 @@ function gaitFindings(){
     needsCK:ckWeakness||ckTone,findings:['contracture','impact',...GAIT_RED_FLAGS].filter(ex),
     needsNeuro:redFlags.length>0,needsMRI:ex('umn'),observeOnly,
     notAssessed,heelsFlat,familyPT,ptMeasure,outpatientPT:familyPT||ptMeasure};
+}
+// keep docs/branching-logic.md §7.11 in sync
+// Labs & studies ordered. Blank lines separate blocks; a block whose first line ends in a
+// colon is a reason with its tests beneath it, and every other line is an item of its own.
+// Text is never reworded, so a forgotten colon degrades to one bullet per line in the order
+// typed rather than losing or merging anything.
+function parseLabGroups(text){
+  const groups=[];
+  String(text||'').replace(/\r\n?/g,'\n').split(/\n\s*\n/).forEach(block=>{
+    // A pasted bulleted list would otherwise print as "• - CBC".
+    const lines=block.split('\n').map(l=>l.trim().replace(/^[•*·-](\s+|$)/,'')).filter(Boolean);
+    if(lines.length>1&&lines[0].endsWith(':')) groups.push({head:lines[0].replace(/:+$/,'').trim(),tests:lines.slice(1)});
+    else lines.forEach(l=>groups.push({head:l,tests:[]}));
+  });
+  return groups;
+}
+// Tool-only reminders, never note text: the typed list names a test the note already writes
+// on its own, or a genetic test while the genetics referral says the clinic defers those
+// draws. Keyword matching is advisory (a miss or a false hit changes nothing in the note),
+// so the patterns cover the common names rather than every synonym.
+const LAB_GENETIC_RE=/microarray|chromosom|\bCMA\b|fragile[\s-]*x|\bFMR1\b|exome|genome seq|\bWES\b|\bWGS\b|karyotype|genetic test/i;
+function labOrderOverlap(){
+  const t=S.labsOrdered||'';
+  if(!t.trim()) return {genetics:false,repeats:[]};
+  const gf=gaitFindings();
+  const repeats=[
+    [referralIncluded('eeg'),/\bEEG\b/i,'EEG (Medical Referrals)'],
+    [referralIncluded('sleep_ref'),/polysomnogra|sleep study|\bPSG\b/i,'sleep study (Medical Referrals)'],
+    [referralIncluded('audiology'),/audiolog|\bABR\b|\bOAE\b|hearing (test|eval)/i,'hearing testing (Medical Referrals)'],
+    [S.prenatalAlcohol&&S.fasdFeatures,/ophthalm|eye exam/i,'eye exam (Medical Referrals)'],
+    [gf.needsCK,/\bCK\b|\bCPK\b|creatine kinase/i,'CK (gait plan)'],
+    [gf.needsMRI,/\bMRI\b/i,'brain MRI (gait plan)'],
+  ].filter(([on,re])=>on&&re.test(t)).map(r=>r[2]);
+  return {genetics:referralIncluded('genetics')&&LAB_GENETIC_RE.test(t),repeats};
 }
 // ABA fence: gait is a PT matter, not ABA medical necessity, so toeWalk/gait must not
 // count as a motor need in the note's ABA justification or the ABA letter.
@@ -3843,6 +3885,15 @@ function generateNote() {
       L.push('  References (genetics):');
       gxCitations.forEach((c, i) => L.push('    ' + (i+1) + '. ' + c));
     }
+    L.push('');
+  }
+
+  // Labs & studies ordered (clinician free text; see parseLabGroups). Tests sit on the
+  // 6-space continuation indent so the rich renderer keeps them under their reason bullet.
+  const labGroups=parseLabGroups(S.labsOrdered);
+  if(labGroups.length){
+    L.push(n+++'. LABS & STUDIES ORDERED');
+    labGroups.forEach(g=>{L.push('  • '+g.head);g.tests.forEach(t=>L.push('      '+t));});
     L.push('');
   }
 
@@ -6026,6 +6077,7 @@ function render(){
   updatePriorTestOutcomeRequired();
   updateEvChips();
   updateGaitExamVisibility();
+  updateLabWarnings();
   const v=validateCriteria();
   const pre=document.getElementById('notePreview');
   renderPathwayPill();
@@ -6720,6 +6772,7 @@ function updateSectionHeaders(){
   if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
   if(S.prenatalAlcohol||S.fasdFeatures)mf.push('FASD');
   if(gaitFindings().active&&S.gaitExam.size)mf.push('Gait exam');
+  if(S.labsOrdered.trim())mf.push('Labs');
   if(S.socialWork)mf.push('Social work');
   setSH('sh-medflags',mf.length>0,mf.join(' · '));
   // 6 Comorbid
@@ -6987,6 +7040,18 @@ function updateGaitExamVisibility(){
   const on=gaitFindings().active;
   row.style.display=on?'':'none';
   if(!on&&S.gaitExam.size){S.gaitExam.clear();row.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});}
+}
+// Recomputed every render because the overlap depends on other sections' checkboxes, not
+// just the labs box. Rewritten only on change so the live region is not re-announced on
+// every keystroke.
+let labWarnHTML='';
+function updateLabWarnings(){
+  const box=document.getElementById('labsWarnings');if(!box)return;
+  const o=labOrderOverlap(),w=[];
+  if(o.genetics) w.push('<b>Genetics:</b> your list names a genetic test, but the Genetics referral in the note says the clinic defers genetic blood draws. Edit one so they agree.');
+  if(o.repeats.length) w.push('<b>Already in the note:</b> '+o.repeats.join(', ')+'. Both versions will print.');
+  const html=w.map(s=>'<div class="lab-warn">'+s+'</div>').join('');
+  if(html!==labWarnHTML){labWarnHTML=html;box.innerHTML=html;}
 }
 
 // ─── AGE-BASED VISIBILITY ────────────────────────────────────────────────────
@@ -7899,6 +7964,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('levelJustificationRRBField').addEventListener('input',function(){S.asdLevelJustificationRRB=this.value;render();});
   document.getElementById('teacherMaterialOtherField').addEventListener('input',function(){S.teacherMaterialOther=this.value;render();});
   document.getElementById('rtcIntervalField').addEventListener('input',function(){S.rtcInterval=this.value;render();});
+  document.getElementById('labsOrderedField').addEventListener('input',function(){S.labsOrdered=this.value;render();});
   document.getElementById('showDSMTable').addEventListener('change',function(){S.showDSMTable=this.checked;render();});
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{

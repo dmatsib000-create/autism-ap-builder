@@ -370,6 +370,46 @@ const CASES = [
   { name: 'appendEvidence: after a typed sentence ending in "." joins with a space, not ".; "',
     setup(S){ },
     check(a){ assert.equal(a.appendEvidence('Concerns since 18 months. ', 'Hand flapping'), 'Concerns since 18 months. Hand flapping'); } },
+
+  // ── parseLabGroups(): labs box text -> note groups (text is never reworded) ──
+  { name: 'parseLabGroups: empty or whitespace-only text yields no groups',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups(''), []); assert.deepEqual(a.parseLabGroups(' \n\n  \r\n'), []); } },
+  { name: 'parseLabGroups: a colon-ended first line is the reason for the lines beneath it',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups('Pica:\nCBC\nFerritin\n\nVitamin D'),
+              [{head:'Pica', tests:['CBC','Ferritin']}, {head:'Vitamin D', tests:[]}]); } },
+  { name: 'parseLabGroups: a forgotten colon gives one item per line, in order',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups('Pica\nCBC'), [{head:'Pica', tests:[]}, {head:'CBC', tests:[]}]); } },
+  { name: 'parseLabGroups: a one-line "reason: test" stays a single item as typed',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups('Hypotonia: CK'), [{head:'Hypotonia: CK', tests:[]}]); } },
+  { name: 'parseLabGroups: CRLF, stray spaces, and pasted list markers are tidied',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups('  GDD:  \r\n- Chromosomal microarray\r\n• Fragile X \r\n \r\n* EEG'),
+              [{head:'GDD', tests:['Chromosomal microarray','Fragile X']}, {head:'EEG', tests:[]}]); } },
+  { name: 'parseLabGroups: hyphens inside a test name are kept',
+    setup(S){ },
+    check(a){ assert.deepEqual(a.parseLabGroups('25-OH vitamin D'), [{head:'25-OH vitamin D', tests:[]}]); } },
+
+  // ── labOrderOverlap(): tool-only warnings for tests the note already writes ──
+  { name: 'labOrderOverlap: EEG typed while the seizure checkbox orders one is a repeat',
+    setup(S){ S.seizureConcern = true; S.labsOrdered = 'EEG'; },
+    check(a){ assert.deepEqual(a.labOrderOverlap(), {genetics:false, repeats:['EEG (Medical Referrals)']}); } },
+  { name: 'labOrderOverlap: EEG typed with no auto EEG line is not a repeat',
+    setup(S){ S.labsOrdered = 'EEG'; },
+    check(a){ assert.deepEqual(a.labOrderOverlap().repeats, []); } },
+  { name: 'labOrderOverlap: a genetic test flags only when the genetics referral prints',
+    setup(S){ S.labsOrdered = 'GDD:\nChromosomal microarray'; },
+    check(a){ assert.equal(a.labOrderOverlap().genetics, false);
+              a.S.diagStatus = 'confirmed';
+              assert.equal(a.labOrderOverlap().genetics, true); } },
+  { name: 'labOrderOverlap: CK repeats only when the gait plan recommends it',
+    setup(S){ S.labsOrdered = 'CK'; S.needsMotor.add('toeWalk'); },
+    check(a){ assert.deepEqual(a.labOrderOverlap().repeats, []);
+              a.S.gaitExam.add('lmn');
+              assert.deepEqual(a.labOrderOverlap().repeats, ['CK (gait plan)']); } },
 ];
 
 let pass = 0;
