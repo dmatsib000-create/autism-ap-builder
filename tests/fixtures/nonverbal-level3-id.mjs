@@ -45,8 +45,8 @@ export default {
     ['sped', 'slp_school', 'ot_school', 'aide', 'lowRatio', 'fba', 'esy', 'visual'].forEach(k => S.schoolSvc.add(k));
 
     S.insuranceType = 'medicaid';
-    S.abaHours = '40';
-    ['comm', 'sib', 'aggression', 'elopement'].forEach(k => S.abaTargets.add(k));
+    S.abaHours = '30plus';
+    ['functional_comm', 'reduce_sib', 'reduce_aggression', 'reduce_elopement'].forEach(k => S.abaTargets.add(k));
 
     S.rtcInterval = '3 months';
   },

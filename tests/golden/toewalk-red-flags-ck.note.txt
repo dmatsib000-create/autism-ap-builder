@@ -6,7 +6,7 @@ ICD-10-CM: Z03.89
 
 ── Clinical Summary ──
 
-The patient is a preschool-aged child (3–5 years). They show developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+The patient is a preschool-aged child (3–5 years) who is communicating primarily with single words. They show developmental concerns in social communication and interaction and behavioral flexibility and sensory processing that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
 
 ── DSM-5 Diagnostic Criteria ──
 
@@ -27,6 +27,10 @@ Families who have access to Naturalistic Developmental Behavioral Intervention (
   • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
 
 2. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • AAC Evaluation and Implementation (PRIORITY): Formal AAC evaluation by an SLP with AAC specialization is recommended to determine the optimal system(s) for this child. AAC systems span two tiers:
+    - Low-tech AAC: Core vocabulary boards, PODD (Pragmatic Organization Dynamic Display) communication books, and symbol-based communication boards (PCS/SymbolStix). Low-tech systems are high-evidence, immediately implementable, and appropriate as a primary or supplementary communication modality at any age.
+    - High-tech AAC (speech-generating devices): Evaluation for systems such as LAMP WFL (Language Acquisition through Motor Planning), TouchChat, Proloquo2Go, or Snap Core First. Device selection is individualized; funding requires an SLP-generated AAC report establishing medical necessity.
+    Research consistently demonstrates that AAC facilitates, rather than inhibits, speech development; implementation should not be delayed pending speech progress. All selected AAC systems must be implemented consistently across all settings and by all communication partners.
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
 3. PHYSICAL THERAPY (PT)

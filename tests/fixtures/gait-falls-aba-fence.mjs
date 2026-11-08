@@ -27,7 +27,7 @@ export default {
     ['sped', 'pt_school'].forEach(k => S.schoolSvc.add(k));
     S.insuranceType = 'commercial';
     S.abaHours = '20';
-    ['comm', 'transitions'].forEach(k => S.abaTargets.add(k));
+    ['functional_comm', 'transitions'].forEach(k => S.abaTargets.add(k));
     S.rtcInterval = '6 months';
   },
 };

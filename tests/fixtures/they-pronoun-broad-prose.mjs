@@ -54,10 +54,10 @@ export default {
     S.needsAdaptive.add('toileting');
     S.needsAdaptive.add('feeding_adl');
     S.needsSensory.add('seeking');
-    S.needsSensory.add('avoiding');
+    S.needsSensory.add('avoidance');
     S.needsMotor.add('coordination');
-    S.safety.add('elopement');
-    S.safety.add('aggression');
+    S.safety.add('elopement_counsel');
+    S.safety.add('sib_safety_counsel');
 
     // Comorbidities to exercise the comorbid plan prose.
     S.comorbid.add('adhd_combined');
@@ -69,8 +69,8 @@ export default {
     ['sped', 'slp_school', 'ot_school', 'aide', 'lowRatio', 'fba', 'esy', 'social_skills_school', 'visual'].forEach(k => S.schoolSvc.add(k));
 
     S.insuranceType = 'commercial';
-    S.abaHours = '30';
-    ['comm', 'sib', 'aggression', 'elopement', 'transitions'].forEach(k => S.abaTargets.add(k));
+    S.abaHours = '30plus';
+    ['functional_comm', 'reduce_sib', 'reduce_aggression', 'reduce_elopement', 'transitions'].forEach(k => S.abaTargets.add(k));
 
     S.rtcInterval = '3 months';
   },

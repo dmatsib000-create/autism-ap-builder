@@ -6,7 +6,7 @@ ICD-10-CM: Z03.89
 
 ── Clinical Summary ──
 
-The patient is a preschool-aged girl (3–5 years), with cognitive functioning not yet formally assessed and mildly impaired adaptive behavior relative to chronological age. She shows developmental concerns in social communication and interaction that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+The patient is a preschool-aged girl (3–5 years) who is communicating primarily with single words, with cognitive functioning not yet formally assessed and mildly impaired adaptive behavior relative to chronological age. She shows developmental concerns in social communication and interaction that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
 
 ── Functional Needs Identified ──
   • Communication: expressive language
@@ -36,19 +36,15 @@ Families who have access to Naturalistic Developmental Behavioral Intervention (
   • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
   • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
 
-3. SOCIAL SKILLS INTERVENTION
-Structured social skills intervention appropriate to developmental level. Options in the Gainesville area:
-  - Social Thinking (ages 4+): Available through Speech4Kids. Addresses social cognition, perspective-taking, and social communication in a structured group format.
-  - Play-based social skill groups: OT- or SLP-facilitated peer play groups targeting reciprocity, turn-taking, and joint attention.
-  Note: UF CARD social skills programming begins at age 6; refer at a future visit if social skills remain a treatment priority.
-Targets:
-  • Social reciprocity and balanced social exchange
-
-4. SPEECH-LANGUAGE PATHOLOGY (SLP)
+3. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • AAC Evaluation and Implementation (PRIORITY): Formal AAC evaluation by an SLP with AAC specialization is recommended to determine the optimal system(s) for this child. AAC systems span two tiers:
+    - Low-tech AAC: Core vocabulary boards, PODD (Pragmatic Organization Dynamic Display) communication books, and symbol-based communication boards (PCS/SymbolStix). Low-tech systems are high-evidence, immediately implementable, and appropriate as a primary or supplementary communication modality at any age.
+    - High-tech AAC (speech-generating devices): Evaluation for systems such as LAMP WFL (Language Acquisition through Motor Planning), TouchChat, Proloquo2Go, or Snap Core First. Device selection is individualized; funding requires an SLP-generated AAC report establishing medical necessity.
+    Research consistently demonstrates that AAC facilitates, rather than inhibits, speech development; implementation should not be delayed pending speech progress. All selected AAC systems must be implemented consistently across all settings and by all communication partners.
   • Language therapy: expressive/receptive language, vocabulary, morphosyntax, and semantic comprehension in functional, naturalistic contexts.
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
-5. SCHOOL / EDUCATIONAL SUPPORTS
+4. SCHOOL / EDUCATIONAL SUPPORTS
   • FDLRS (Florida Diagnostic and Learning Resources System): Referral recommended for comprehensive psychoeducational evaluation and IEP development prior to or upon school entry. FDLRS serves children ages 3–21 and coordinates with the school district under IDEA Part B. Family counseled on educational rights and IEP process.
 
 Recommended IEP/504 accommodations based on current evaluation findings:
@@ -59,7 +55,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     - Communication: AAC device access if applicable, visual and written directions in addition to verbal instructions, SLP consultation for classroom communication accommodations
   Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
 
-6. MEDICAL REFERRALS
+5. MEDICAL REFERRALS
   • Audiology: Audiologic evaluation recommended as part of the workup for a possible fetal alcohol spectrum disorder, per NIAAA consensus guidance. Refer for ABR (Auditory Brainstem Response) and/or OAE (Otoacoustic Emissions) testing; sedated ABR if compliance is insufficient. Hearing loss must be excluded prior to finalizing communication intervention planning.
   • Genetics: Referral to clinical genetics is medically necessary. The patient is under evaluation for a neurodevelopmental disorder, with clinical findings that warrant genetics input during the diagnostic workup, a clinical picture concerning for fetal alcohol spectrum disorder. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
       Fetal alcohol spectrum disorder is additionally under consideration; per NIAAA consensus guidelines, dysmorphology evaluation and genetic testing are indicated to exclude genetic conditions whose features can mimic FASD.
@@ -71,7 +67,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
     2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
 
-7. FAMILY RESOURCES & NEXT STEPS
+6. FAMILY RESOURCES & NEXT STEPS
   • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center's FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org
 
   Finding Therapies / Navigating the System:

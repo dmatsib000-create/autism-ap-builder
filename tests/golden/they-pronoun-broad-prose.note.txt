@@ -25,8 +25,9 @@ The patient is an adolescent who is using 2–3 word phrase-level communication,
   • Language modifiers: scripted/echolalic speech
   • Adaptive/self-care: toilet training, self-feeding, community safety
   • Behavior/interfering: aggression, self-injurious behavior (SIB), elopement, noncompliance/defiance, rigidity/inflexibility
+  • Safety: elopement/wandering, self-injury safety
   • Social/play: peer interaction, social reciprocity, perspective-taking/Theory of Mind
-  • Sensory: sensory-seeking
+  • Sensory: sensory-seeking, avoidance
   • Motor: coordination/DCD
 
 PLAN
@@ -44,6 +45,10 @@ Supporting References:
   1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
   2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
 ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):
+  • Functional communication / requesting (manding): expressive language delays and/or AAC needs documented; systematic teaching of functional communication reduces reliance on challenging behavior as a communication mechanism.
+  • Reduction of self-injurious behavior (SIB): SIB is a Behavior of Danger; even infrequent events carry risk of permanent injury. A function-based behavior intervention plan (BIP) is required; FBA must precede intervention. Medical and behavioral co-management indicated.
+  • Reduction of aggression toward others: aggression is a Behavior of Danger; any physical incident poses risk of injury to others and potential school/legal consequences. A function-based BIP is required; FBA must precede intervention.
+  • Elopement reduction and safety awareness: elopement is a Behavior of Danger; any elopement event near roads or water poses imminent risk of death or severe injury. Immediate safety priority; function-based intervention and environmental safety measures (GPS tracking, safety ID) required concurrently.
   • Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.
 
   • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
@@ -68,7 +73,7 @@ PEERS (Program for the Education and Enrichment of Relational Skills) or compara
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
 4. OCCUPATIONAL THERAPY (OT)
-  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: sensory-seeking.
+  • Sensory processing: Comprehensive sensory evaluation using standardized tools (Sensory Profile 2 and/or Sensory Processing Measure-2 [SPM-2]; SPM-2 provides separate home and school forms directly applicable to IEP planning). Individualized sensory support plan developed for home, school, and community environments. Targets: sensory-seeking, avoidance.
   • ADL training: toilet training, self-feeding, using task analysis and visual supports.
   • Seating and positioning: OT assessment of seating, postural support, and classroom ergonomics. Appropriate positioning is a prerequisite for sustained attention, fine motor output, and sensory regulation; inadequate seating is a modifiable barrier to academic participation.
   • ABA/OT collaboration for sensory-related behavior: Sensory-driven behaviors should be assessed collaboratively by OT (sensory integration framework) and the ABA team (functional behavior analysis). A behavior that appears sensory-driven may have operant functions (escape, attention, access to tangibles) that require behavioral intervention in addition to sensory supports. Coordinated assessment prevents siloed treatment and avoids targeting sensory behaviors without understanding their function.
@@ -115,10 +120,10 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
 
 8. SAFETY COUNSELING
+  • Elopement/Wandering: Door alarms, keyed locks, fenced yard, GPS tracking (AngelSense, Apple Watch + Find My, Tile), law enforcement ASD registry, and Project Lifesaver enrollment discussed with family.
+  • SIB Safety: Environmental modifications, FBA-guided intervention, and crisis plan recommended.
   • Community Safety: Direct supervision is required in community settings at this time due to significant safety risk. See ABA section for behavioral training targets (stop on command, proximity maintenance, boundary training).
-    - Equipment and identification supports: GPS tracking device (e.g., AngelSense, Apple Watch with Find My, Tile tracker), medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, 'If I am found' information card in backpack or worn on person.
-    - Family education and community registration: Register with local law enforcement autism/wandering registry (contact local police department for availability). National Autism Association Big Red Safety Box (free safety resource kit): nationalautismassociation.org/programs/big-red-safety-toolbox/.
-    - Primary community safety concern(s): {specify: elopement risk, limited traffic hazard awareness, impaired judgment around environmental hazards, or combination}.
+    - Identification supports: medical ID bracelet or MedicAlert tag with emergency contact information and autism disclosure, 'If I am found' information card in backpack or worn on person.
 
 9. FAMILY RESOURCES & NEXT STEPS
   • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517

@@ -9,7 +9,7 @@ export default {
   apply(S) {
     S.ageGroup = 'preschool';
     S.pronouns = 'he';
-    S.langLevel = 'phrases';
+    S.langLevel = 'phrase';
     S.cogProfile = 'unknown';
 
     S.diagStatus = 'suspected';
