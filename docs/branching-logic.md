@@ -159,6 +159,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `gaitExam` (Set) | §7.10 — gait exam findings (`contracture`, `impact`, and red flags `asymmetric`, `umn`, `lmn`, `lateOnset`, `history`), plus watch-only path inputs `notAssessed`, `heelsFlat`, `familyPT`; shown and counted only while `needsMotor` has `toeWalk` or `gait` |
 | `paeQuantity` / `paeFrequency` / `paeTiming` | strings — §7.9 optional pattern detail under the `quantityFrequency` evidence category |
 | `paeDetail` | string — §7.9 optional free-text sentence appended to the exposure line (PHI-hinted) |
+| `labsOrdered` | string — §7.11 clinician's labs & studies list, kept as typed; prints as its own plan section (PHI-hinted) |
 
 **Therapy & education status:**
 
@@ -261,6 +262,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `focalNeuroFindings` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `gaitExam` | Set | [§7.10](#710-toe-walking--gait) |
 | `insuranceType` | string | [§1.2](#12-the-s-object--property-reference) |
+| `labsOrdered` | string | [§7.11](#711-labs--studies-ordered) |
 | `langLevel` | string | [§1.2](#12-the-s-object--property-reference) |
 | `needsAdaptive` | Set | [§1.2](#12-the-s-object--property-reference) |
 | `needsBehavior` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§4.4](#44-side-effects-of-specific-criteria) |
@@ -916,6 +918,23 @@ Two independent flags in the Medical & Referral Flags section, under the **"Pren
 **ABA fence.** `hasCoreMotor()` replaces `needsMotor.size` in the note's ABA medical-necessity reasons and the ABA letter's domain list, so gait boxes alone never add a motor line to ABA output. Locked by `gait-falls-aba-fence`.
 
 **Test lock:** goldens `toewalk-idiopathic-preschool` (observation path, B1 sentence), `toewalk-contracture-school` (PT, recurrence counseling, orthopaedics wording, IEP goal), `toewalk-red-flags-ck` (neurology clause, MRI, CK, CP sentence), `gait-falls-aba-fence` (gait-only title, ABA fence, IEP), `toewalk-family-pt-pcp` (family request, primary-care recheck, IEP fence), `toewalk-not-assessed` (measurement PT), the invariants-lane D3 check (every finding checkbox has a `GAIT_FINDING_LABELS` entry, and `GAIT_RED_FLAGS` is a subset), and `forced-pt-no-motor` (the PT targeting fallback, "gross motor function and mobility", when PT is forced on with no motor need); unit lane `gait:` cases for every `gaitFindings()` branch and the `pt_school` sync.
+
+### 7.11 Labs & studies ordered
+
+**Form and state.** A free-text box (`#labsOrderedField`, string `S.labsOrdered`) in Medical & Referral Flags, directly under the Work-up & referrals checkboxes, with the standard PHI hint (no names, MRNs, dates, or result values; no curly braces). Clear All empties it with the other textareas; presets never write it. It adds "Labs" to the section header summary when non-blank. Note-only: it never reaches the ABA or IEP letter.
+
+**Parsing (`parseLabGroups`).** Labs are often ordered in clusters for one question, so the unit of output is a group, not a test. Blank lines split the text into blocks. A block of two or more lines whose first line ends in a colon is a group: that line (colon dropped) is the reason, the remaining lines are its tests. Every other line is an item of its own, so a one-line "Hypotonia: CK" or a bare "Vitamin D" prints as typed. Each line is trimmed and a leading pasted list marker (`-`, `*`, `•`, `·` followed by a space) is dropped; nothing else is reworded, so a forgotten colon degrades to one bullet per line in the order typed. This is deliberately free text over structured rows (the same reasoning as §10.6): one box takes both typing and an Epic paste.
+
+**Note.** When at least one item parses, a numbered plan section `LABS & STUDIES ORDERED` prints after MEDICAL REFERRALS and before SAFETY COUNSELING. Each group or item is a `  • ` bullet; a group's tests follow on 6-space continuation lines, which the rich renderer keeps inside the bullet (stacked layout, chosen by David over a one-line "reason: test, test" join). A blank box prints nothing, so notes without it are byte-stable.
+
+**Overlap warnings (`labOrderOverlap` → `updateLabWarnings`).** Tool-only amber lines under the box (`#labsWarnings`, a polite live region rewritten only when its text changes); they never alter the note, and both the typed line and the note's own line print. Keyword matching is advisory, covering common names only.
+
+| Warning | Fires when |
+|---|---|
+| Genetics | the genetics referral prints (`referralIncluded('genetics')`) and the text names a genetic test (`LAB_GENETIC_RE`: microarray/chromosome/CMA, Fragile X/FMR1, exome/genome sequencing, WES/WGS, karyotype, "genetic test"). The genetics paragraph says the clinic defers genetic draws, so the two would disagree; the clinician edits one |
+| Already in the note | the text names a test the note writes on its own: EEG (`eeg` referral), sleep study/PSG (`sleep_ref`), audiology/ABR/OAE (`audiology`), ophthalmology/eye exam (both FASD flags), CK (`gaitFindings().needsCK`), MRI (`gaitFindings().needsMRI`) |
+
+**Test lock:** golden `labs-studies-ordered` (a group with pasted markers and extra blank lines, a one-line entry, a standalone item, and the section number ahead of Safety with genetics on); unit lane `parseLabGroups:` and `labOrderOverlap:` cases.
 
 ---
 
