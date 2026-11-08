@@ -8,7 +8,7 @@ export default {
   apply(S) {
     S.ageGroup = 'preschool';
     S.pronouns = 'they';
-    S.langLevel = 'singleWords';
+    S.langLevel = 'singleWord';
     S.diagStatus = 'suspected';
     ['a1', 'a2'].forEach(k => S.criteriaA.add(k));
     S.criteriaB.add('b1');

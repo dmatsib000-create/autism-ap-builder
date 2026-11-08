@@ -29,7 +29,7 @@ IV. REQUESTED TREATMENT PARAMETERS
 ────────────────────────────────────────────────────────────
 Requested intensity: 20 hours per week
 Priority treatment targets:
-  • comm
+  • Functional communication and requesting (manding)
   • Imitation and observational learning
   • Play skills and peer interaction
   • Transition tolerance and behavioral flexibility

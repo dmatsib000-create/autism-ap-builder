@@ -6,7 +6,7 @@ ICD-10-CM: Z03.89
 
 ── Clinical Summary ──
 
-The patient is a preschool-aged boy (3–5 years), with cognitive functioning not yet formally assessed. He shows developmental concerns in social communication and interaction that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
+The patient is a preschool-aged boy (3–5 years) who is using 2–3 word phrase-level communication, with cognitive functioning not yet formally assessed. He shows developmental concerns in social communication and interaction that are consistent with but not yet confirmatory of a diagnosis of Autism Spectrum Disorder. Evaluation is ongoing; data collection is underway to characterize the full developmental profile and clarify the diagnostic formulation. Findings to date and next steps were reviewed with the family at today's visit.
 
 ── Functional Needs Identified ──
   • Communication: expressive language

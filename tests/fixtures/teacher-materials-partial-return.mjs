@@ -9,7 +9,7 @@ export default {
   apply(S) {
     S.ageGroup = 'preschool';
     S.pronouns = 'they';
-    S.langLevel = 'singleWords';
+    S.langLevel = 'singleWord';
     S.cogProfile = 'unknown';
 
     S.diagStatus = 'suspected';
@@ -19,7 +19,7 @@ export default {
     S.teacherMaterialOther = 'OT classroom sensory questionnaire';
 
     S.needsComm.add('expressive');
-    S.needsSensory.add('hyper');
+    S.needsSensory.add('hypersensitivity');
 
     S.rtcInterval = '3 months';
   },

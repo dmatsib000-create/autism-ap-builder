@@ -36,7 +36,7 @@ export default {
 
     S.insuranceType = 'commercial';
     S.abaHours = '20';
-    ['comm', 'imitation', 'play', 'transitions'].forEach(k => S.abaTargets.add(k));
+    ['functional_comm', 'imitation', 'play', 'transitions'].forEach(k => S.abaTargets.add(k));
 
     S.rtcInterval = '6 months';
   },

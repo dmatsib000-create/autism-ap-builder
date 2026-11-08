@@ -39,6 +39,7 @@ Supporting References:
   1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
   2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
 ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):
+  • Functional communication / requesting (manding): expressive language delays and/or AAC needs documented; systematic teaching of functional communication reduces reliance on challenging behavior as a communication mechanism.
   • Imitation and observational learning: prerequisite for social modeling and generalized skill acquisition; a core early intervention target.
   • Play skills and peer interaction: social skill deficits documented; play-based ABA programming supports language development, social cognition, and the foundation for peer relationships.
   • Transition tolerance and behavioral flexibility: behavioral rigidity and insistence on sameness documented (DSM-5 Criterion B2); transition supports are essential for school participation and daily functioning across environments.
