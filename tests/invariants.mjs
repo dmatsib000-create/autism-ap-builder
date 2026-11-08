@@ -250,6 +250,25 @@ check('Gait exam finding checkboxes ⇄ GAIT_FINDING_LABELS',
 check('GAIT_RED_FLAGS ⊆ GAIT_FINDING_LABELS', subset('GAIT_RED_FLAGS', gaitRedFlags, 'GAIT_FINDING_LABELS', gaitLabelKeys));
 if (!gaitRedFlags.length) failures.push('Gait: could not read GAIT_RED_FLAGS; update the D3 parse if it was renamed.');
 
+// ── D4. Behavior/interfering checkboxes: every one has a note summary label ──
+// The note's Functional Needs block prints '  • Behavior/interfering: ' followed by
+// a hand-maintained .has(key) → label chain inside needsSummaryLines(). A checkbox
+// with no entry there prints the heading with NOTHING after the colon when it is
+// the only behavior checked (exactly how 'smearing' and 'boundaryViol' shipped).
+// 'rigidity' is the one key with no checkbox on purpose: it is derived from DSM-5
+// criterion B2 (see the b2 → needsBehavior.add('rigidity') cascade), so it must
+// appear in the summary chain but is exempt from the checkbox side of the diff.
+const BEHAVIOR_DERIVED = ['rigidity'];
+const behaviorCheckboxKeys = [...html.matchAll(/data-key="needsBehavior"\s+value="([^"]+)"/g)].map(m => m[1]);
+const behaviorSummaryChain = balancedAfter('function needsSummaryLines')
+  .match(/if\(S\.needsBehavior\.size\)\{const x=\[\];(.*?)L\.push\('  • Behavior\/interfering: '/)?.[1] ?? '';
+const behaviorSummaryKeys = [...behaviorSummaryChain.matchAll(/S\.needsBehavior\.has\('([^']+)'\)/g)].map(m => m[1]);
+if (!behaviorSummaryKeys.length) failures.push('Behavior summary: could not read the needsBehavior chain in needsSummaryLines(); update the D4 parse if it was restructured.');
+check('Behavior/interfering checkboxes ⇄ note summary labels',
+  diff('checkboxes', behaviorCheckboxKeys, 'needsSummaryLines() labels', behaviorSummaryKeys.filter(k => !BEHAVIOR_DERIVED.includes(k))));
+check('Behavior/interfering derived keys have a summary label',
+  subset('derived keys', BEHAVIOR_DERIVED, 'needsSummaryLines() labels', behaviorSummaryKeys));
+
 // ── E. IEP letter: three surfaces must consume the same content fields ───────
 // The IEP letter is rendered THREE times from one `_iepLetterContent()` object:
 // the on-screen preview (generateIEPLetterHTML), the plain text the clinician
@@ -395,6 +414,7 @@ console.log(
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
   `prior tests ${priorTestCheckboxKeys.length} checkboxes = ${priorTestLabelKeys.length} labels (${adaptiveTestKeys.length} adaptive); ` +
   `gait exam ${gaitExamKeys.length - GAIT_PLAN_INPUTS.length} findings = ${gaitLabelKeys.length} labels; ` +
+  `behavior ${behaviorCheckboxKeys.length} checkboxes + ${BEHAVIOR_DERIVED.length} derived = ${behaviorSummaryKeys.length} summary labels; ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`

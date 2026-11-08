@@ -58,7 +58,11 @@ for headings and emphasis. Presence may not.
   same key set: the three social-work-reason tables (`SW_REASON_LABELS`, the note
   prose's own `swLbls` copy with intentionally different casing, and the §8 HTML
   checkboxes) and the override registry (`OV_DEFS` / `OV_GROUPS` / the `S.overrides`
-  init, where `socialWork` is intentionally absent from `S.overrides`). A
+  init, where `socialWork` is intentionally absent from `S.overrides`). Section D4 does the same for the Behavior/interfering
+  needs: every `needsBehavior` checkbox must have a label in the note's summary
+  chain, or a note with only that box checked prints "Behavior/interfering:"
+  with nothing after the colon (`rigidity` is derived from criterion B2, has no
+  checkbox on purpose, and is exempt from the checkbox side only). A
   half-finished edit that adds a key in one table but not another renders a
   referral reason or override pill in one place and silently drops it elsewhere;
   the output lanes can't see it because some tables live in unreachable scopes.
