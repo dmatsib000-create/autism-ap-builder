@@ -81,6 +81,19 @@ for headings and emphasis. Presence may not.
   `:where(textarea,select,input…)` rule is what gives every field its edge. It
   sees token pairs only, not arbitrary rules, so it doesn't replace a contrast
   audit of the rendered page.
+  Section G checks the **fixtures themselves**: every value a fixture writes
+  into `S` (`S.langLevel = 'phrase'`, `S.abaTargets.add('play')`, or the
+  `[...].forEach(k => S.x.add(k))` form) must be one the page's own controls can
+  produce, read from the checkbox/radio `value=` attributes and the `…Sel` menu
+  options in the markup. Fixtures bypass the form, so a typo or a stale key
+  (`'singleWords'` for `singleWord`, `'comm'` for `functional_comm`) used to fall
+  through to default prose and get snapshotted as if it were a real clinical
+  state; eleven fixtures had drifted that way before this check. Keys with no
+  control (free text, booleans, overrides, derived state) are not checked, `''`
+  is always allowed as the unset value, and `needsBehavior` `rigidity` is exempt
+  because the app derives it from criterion B2 rather than a checkbox. The
+  failure names the fixture file and line, the key, the bad value, and the list
+  of values the page offers.
 
 ## Running
 
