@@ -10,7 +10,7 @@ export default {
   apply(S) {
     S.ageGroup = 'preschool';
     S.pronouns = 'she';
-    S.langLevel = 'singleWords';
+    S.langLevel = 'singleWord';
     S.cogProfile = 'unknown';
     S.adaptProfile = 'mildlyImpaired';
 

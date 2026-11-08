@@ -30,7 +30,7 @@ export default {
     S.specifiers.add('withSuspectedID');
 
     S.needsComm.add('expressive');
-    S.needsAdaptive.add('selfCare');
+    S.needsAdaptive.add('hygiene');
     S.needsBehavior.add('noncompliance');
 
     S.rtcInterval = '3 months';

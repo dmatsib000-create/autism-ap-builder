@@ -17,7 +17,7 @@ Severe deficits in verbal and nonverbal social communication cause marked functi
 ────────────────────────────────────────────────────────────
 II. FUNCTIONAL IMPAIRMENT
 ────────────────────────────────────────────────────────────
-She demonstrates clinically significant functional impairments across the following domains: expressive and/or receptive communication; behavioral regulation and reduction of interfering behaviors; safety awareness and risk management; sensory processing and modulation; adaptive and daily living skills. With respect to communication, she is nonverbal/minimally verbal.
+She demonstrates clinically significant functional impairments across the following domains: expressive and/or receptive communication; behavioral regulation and reduction of interfering behaviors; safety awareness and risk management; sensory processing and modulation; adaptive and daily living skills. With respect to communication, she is nonverbal/minimally verbal. Of particular urgency, she exhibits self-injurious behavior (SIB) and elopement/wandering and aggression toward others, which further establish the medical necessity of ABA intervention with trained behavioral specialists who can implement evidence-based safety protocols and individualized behavioral support plans.
 
 ────────────────────────────────────────────────────────────
 III. TREATMENT NECESSITY & EVIDENCE BASE
@@ -27,12 +27,12 @@ ABA therapy, the most extensively studied behavioral intervention for ASD, is ex
 ────────────────────────────────────────────────────────────
 IV. REQUESTED TREATMENT PARAMETERS
 ────────────────────────────────────────────────────────────
-Requested intensity: 40 hours per week
+Requested intensity: 30 or more hours per week
 Priority treatment targets:
-  • comm
-  • sib
-  • aggression
-  • elopement
+  • Functional communication and requesting (manding)
+  • Reduction of self-injurious behavior (SIB)
+  • Reduction of aggression toward others
+  • Elopement reduction and safety training
 
 Treatment will be implemented by a Board Certified Behavior Analyst (BCBA) who will oversee program development, conduct ongoing assessment, and adjust treatment based on objective data. Direct therapy will be provided by trained Registered Behavior Technicians (RBTs) under BCBA supervision, consistent with BACB professional and ethical standards.
 
