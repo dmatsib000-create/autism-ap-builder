@@ -1,0 +1,103 @@
+ASSESSMENT
+════════════════════════════════════════════════════════
+
+Autism Spectrum Disorder (ASD), Level 2 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors)
+ICD-10-CM: F84.0
+
+── Clinical Summary ──
+
+The patient is an adolescent male who is conversational, with cognitive functioning in the average range. He demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including behavior. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+
+── DSM-5 Diagnostic Criteria ──
+
+── Functional Needs Identified ──
+  • Behavior/interfering: boundary violations / impaired personal space
+
+PLAN
+════════════════════════════════════════════════════════
+
+── Problem 1: Autism Spectrum Disorder [Level 2 (SC) / Level 1 (RRBs)] (F84.0) ──
+
+The recommendations below identify clinically established needs and the indicated services. Specific assessment detail, treatment selection, and service intensity rest with each treating therapist.
+
+1. APPLIED BEHAVIOR ANALYSIS (ABA) THERAPY
+ABA therapy is recommended as the primary evidence-based behavioral intervention for him and is medically necessary given his confirmed diagnosis of Autism Spectrum Disorder, Level 2 (Social Communication) / Level 1 (Restricted/Repetitive Behaviors), with the following documented functional impairments establishing medical necessity: boundary violations and failure to recognize personal space boundaries (creates risk of peer harm, disciplinary consequences, and vulnerability to exploitation — no safe-frequency threshold given safety and legal implications). These impairments substantially limit his ability to participate safely in daily activities, access educational programming, and benefit from less intensive interventions without individualized ABA support. ABA is explicitly endorsed by the American Academy of Pediatrics¹ and is supported by federal comparative effectiveness review² as effective for improving communication, adaptive behavior, social skills, and quality of life outcomes in individuals with ASD.
+The documented impairments noted above require individualized, function-based behavioral support that cannot be adequately addressed through less intensive consultation alone. ABA-based programming is recommended; services should be age-appropriate, prioritize self-determination and skill generalization across natural environments, and directly address the impairments established above. Recommended intensity to be determined by the treating BCBA following individualized skills assessment and per medical necessity criteria.
+
+Supporting References:
+  1. Hyman SL, Levy SE, Myers SM, et al. Identification, evaluation, and management of children with autism spectrum disorder. Pediatrics. 2020;145(1):e20193447. doi:10.1542/peds.2019-3447
+  2. Weitlauf AS, McPheeters ML, Peters B, et al. Therapies for children with autism spectrum disorder: behavioral interventions update. AHRQ Comparative Effectiveness Review No. 137. 2014. https://www.ncbi.nlm.nih.gov/books/NBK241444
+ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):
+  • Personal space and interpersonal boundary skills: documented boundary violations create risk of peer harm, disciplinary action, and exploitation; ABA-based explicit teaching of personal space concepts, appropriate touch by relationship type, and permission-seeking behaviors is indicated. All skills must be systematically generalized across school, home, and community settings.
+
+  • Parent/caregiver training: Caregiver-implemented intervention is a required and evidence-based component of ABA services; specific training content is determined by the treating BCBA and commonly spans the function of target behaviors, reinforcement strategies in natural routines, generalization of clinic and school skills to the home, and crisis response for high-intensity behaviors. Parent training should be documented as a distinct billable service, not subsumed under child direct therapy hours.
+  • Least restrictive and assent-based practice: We support programming that uses the least restrictive, most naturalistic procedures appropriate to the child's profile, seeks patient assent as developmentally appropriate, honors and documents assent withdrawal, and relies on positive-reinforcement-based strategies as first-line, with restrictive procedures reserved for documented justification and oversight, consistent with BACB ethical standards.
+  • Interpersonal Boundary and Personal Space Training: Structured ABA programming is indicated given documented boundary violations. This is a high-priority target given the risk of peer harm, disciplinary consequences, and exploitation. Recommended targets:
+    - Personal space concept: Explicit teaching of "personal space bubble" using visual supports (hula hoop, floor markers, social narratives), discrimination between appropriate proximity for strangers, acquaintances, and family members.
+    - Appropriate touch by relationship type: Discrete trial and video modeling to discriminate handshake (peer/acquaintance), side-hug or fist-bump (close friend/family), no-touch (stranger or non-consenting person). Discrimination must be probed across novel people and settings.
+    - Permission-seeking: Teaching "Can I hug you?" or equivalent social script before any physical contact; reinforcing the wait-for-response interval before acting.
+    - Consent education: ASD-adapted, age-appropriate instruction on consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, and self-advocacy when others violate one's own boundaries. Coordinate with school counseling and outpatient therapist.
+    - Legal and social consequence awareness: Psychoeducation (adapted to cognitive level) on the legal and disciplinary consequences of uninvited physical contact. Coordinate with outpatient therapist and family.
+    - Generalization: All boundary skills require systematic generalization probing across school, home, community, and (where applicable) vocational settings; do not assume transfer from clinic training alone.
+  • Treatment modality: Naturalistic Environment Teaching (NET) and functional skill-based programming should be the primary treatment modality for most targets. Discrete Trial Training (DTT) is appropriate for initial skill acquisition in structured teaching contexts; skills acquired via DTT must be generalized to natural settings.
+
+2. AUTISM-INFORMED PSYCHOTHERAPY
+CBT and/or acceptance-based psychotherapy adapted for ASD, targeting: boundary safety and social skill development.
+Therapist with ASD-specific training required. Approaches must account for his communication profile, cognitive style, and sensory differences.
+Self-advocacy and self-determination should be integrated into treatment.
+Boundary safety priority: Given documented boundary violations at this developmental stage, psychotherapy should explicitly address consent, appropriate vs. inappropriate touch in adolescent/adult social contexts, legal and social consequences of uninvited physical contact, and self-advocacy when one's own boundaries are violated. ASD-adapted sexuality and relationship education (e.g., FLASH curriculum, Safety Net program) should be coordinated with the school team and family.
+
+3. SOCIAL SKILLS INTERVENTION
+PEERS (Program for the Education and Enrichment of Relational Skills) or comparable evidence-based program for adolescents/young adults. Generalization to natural settings should be explicitly planned and monitored.
+
+4. SPEECH-LANGUAGE PATHOLOGY (SLP)
+  • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
+
+5. SCHOOL / EDUCATIONAL SUPPORTS
+IEP evaluation recommended. Under IDEA, district must evaluate within 60 days of written parental consent. Autism eligibility category should be pursued.
+
+Recommended IEP/504 accommodations based on current evaluation findings:
+  Core ASD-Related Accommodations:
+    - Predictable daily schedule with advance written or visual notice before transitions
+    - Visual supports: written or pictorial schedule, visual cues for task steps and transitions
+  Behavioral and Emotional Accommodations:
+    - Boundary and personal space: structured peer activities with adult proximity supervision; defined greeting procedures documented in BIP (e.g., handshake-only protocol with familiar peers); social skills instruction addressing personal space and appropriate touch integrated into daily schedule; all staff trained on consistent, calm redirection protocol; ABA BCBA consultation for school-based boundary skill generalization
+  Note: School-based therapy (OT, SLP, PT) and clinic-based therapy address different goals and environments; concurrent services are medically appropriate and billable when IEP goals and clinic goals are documented as distinct. Families should not be advised to choose one setting over the other without prior authorization review.
+
+6. MEDICAL REFERRALS
+  • Genetics: Referral to clinical genetics is medically necessary. The patient carries a confirmed neurodevelopmental diagnosis. No prior diagnostic genetic workup has been initiated; the underlying genetic etiology remains undetermined.
+      Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
+      Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
+      Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
+
+  References (genetics):
+    1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
+    2. Srivastava S, Love-Nichols JA, Dies KA, et al. Meta-analysis and multidisciplinary consensus statement: exome sequencing is a first-tier clinical diagnostic test for individuals with neurodevelopmental disorders. Genet Med. 2019;21(11):2413-2421. doi:10.1038/s41436-019-0554-6
+
+7. FAMILY RESOURCES & NEXT STEPS
+  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517
+
+  Finding Therapies / Navigating the System:
+    1. Call your insurance company and ask to be assigned a case manager.
+    2. Request a list of all recommended providers.
+    3. [ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.
+    4. Use Google Maps to search for nearby providers and call to confirm insurance.
+    5. [Autism diagnosis] Your local CARD center is also a resource for locating therapy services.
+       Please reach out for assistance.
+    6. Follow up with providers every 3 weeks until a spot is secured;
+       consider appearing in person if phone calls go unanswered.
+    7. When a spot is obtained, notify other waitlists so another child may benefit.
+
+  At-Home Strategies While Waiting for Formal Therapy:
+
+  Recommended Reading: Understanding ABA
+    • What Is Applied Behavior Analysis?
+    • The Controversy Around ABA
+    • How to Know If You're Getting Good ABA
+
+RETURN TO CLINIC
+Return to clinic in 6 months.
+
+────────────────────────────────────────────────────────
+Note generated by DBP Autism A&P Builder.
+All content requires clinician review and modification before incorporation into the patient's medical record.
