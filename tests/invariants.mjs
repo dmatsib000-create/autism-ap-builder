@@ -15,7 +15,7 @@
 //
 // When this fails, the message names the table and the exact keys that differ.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -406,6 +406,113 @@ for (const f of inlineBorderFields) failures.push(
   `rule supplies the accessible --border-control edge.`
 );
 
+// ── G. Golden fixtures only set values a page control can actually produce ───
+// Each fixture writes the state object `S` directly in its apply(S), bypassing
+// the form. That is what lets the golden lane run without a browser, but it also
+// means a typo or a stale key (`S.langLevel = 'singleWords'` when the radio is
+// `singleWord`; `S.abaTargets.add('comm')` when the checkbox is `functional_comm`)
+// is never rejected by anything: the value falls through to the default prose and
+// the golden faithfully snapshots a state no clinician can reach. Eleven fixtures
+// had drifted that way before this check existed (one of them was recommending a
+// preschool social-skills group for a child meant to be single-word, because the
+// stale key read as "no language level set"). This makes the class impossible to
+// reintroduce.
+//
+// The allowed values come from the page markup itself, read as text: every
+// checkbox/radio `<input>` keyed by data-key (multi-select Sets), data-bind or
+// name (scalar radios), and the handful of `<select id="…Sel">` menus whose
+// options the JS copies into S. Only keys the page defines are checked; a state
+// field with no control (free text, booleans, derived or override state) is
+// ignored, and '' is always allowed because it is every scalar's unset value.
+// Fixtures that import another fixture as a base only have their OWN source
+// scanned; the base is scanned when its own file comes up.
+//
+// Exemption: needsBehavior 'rigidity' has no checkbox on purpose. The app derives
+// it from DSM-5 criterion B2 (see the "rigidity has no standalone checkbox"
+// comment near syncABATargetsFromNeeds), so a fixture that checks b2 and sets
+// rigidity is reproducing exactly what the page would do.
+const FIXTURE_VALUE_EXEMPTIONS = [['needsBehavior', 'rigidity']];
+// `<select id="paeDrinksSel">` feeds S.paeQuantity, not S.paeDrinks; every other
+// `…Sel` menu feeds the S field of the same name (see the getElementById reads
+// in the eval-pathway and prenatal-alcohol handlers).
+const SELECT_ID_TO_KEY = { paeDrinksSel: 'paeQuantity' };
+// `data-key="single"` checkboxes are booleans whose VALUE names the S field
+// (S.feeding = true), so there is nothing to compare a value against.
+const BOOLEAN_CHECKBOX_KEY = 'single';
+
+const controlValues = new Map(); // S key -> Set of values the page can produce
+const addControlValue = (key, value) => {
+  if (value.includes('${')) return; // a JS template, not a literal option
+  if (!controlValues.has(key)) controlValues.set(key, new Set());
+  controlValues.get(key).add(value);
+};
+// (?<![\w-]) keeps `value=` from matching inside `data-value=` and `name=` from
+// matching inside `data-sw-reason-name=`-style attributes.
+const attrOf = (tag, name) => tag.match(new RegExp(`(?<![\\w-])${name}="([^"]*)"`))?.[1];
+for (const [tag] of html.matchAll(/<input\b[^>]*>/g)) {
+  const type = attrOf(tag, 'type');
+  if (type !== 'checkbox' && type !== 'radio') continue;
+  const key = attrOf(tag, 'data-key') ?? attrOf(tag, 'data-bind') ?? attrOf(tag, 'name');
+  const value = attrOf(tag, 'value');
+  if (!key || value === undefined || key === BOOLEAN_CHECKBOX_KEY) continue;
+  addControlValue(key, value);
+}
+for (const m of html.matchAll(/<select\b[^>]*\bid="(\w+Sel)"[^>]*>([\s\S]*?)<\/select>/g)) {
+  const key = SELECT_ID_TO_KEY[m[1]] ?? m[1].replace(/Sel$/, '');
+  for (const o of m[2].matchAll(/<option\b[^>]*\bvalue="([^"]*)"/g)) addControlValue(key, o[1]);
+}
+if (controlValues.size < 20) throw new Error(
+  `invariants.mjs: only ${controlValues.size} keyed controls were read from autism-ap-builder.html; ` +
+  `the <input>/<select> parse in section G no longer matches the markup.`
+);
+
+// Everything between `forEach(` and its matching `)`, skipping quoted strings so
+// a parenthesis inside a label can't end the scan early.
+const callBodyAfter = (src, openParenIdx) => {
+  let depth = 0, quote = null;
+  for (let k = openParenIdx; k < src.length; k++) {
+    const ch = src[k];
+    if (quote) { if (ch === '\\') k++; else if (ch === quote) quote = null; continue; }
+    if (ch === "'" || ch === '"' || ch === '`') quote = ch;
+    else if (ch === '(') depth++;
+    else if (ch === ')' && --depth === 0) return src.slice(openParenIdx, k);
+  }
+  return src.slice(openParenIdx);
+};
+const lineOf = (src, idx) => src.slice(0, idx).split('\n').length;
+
+const fixturesDir = join(HERE, 'fixtures');
+let fixtureWritesChecked = 0;
+for (const file of readdirSync(fixturesDir).filter(f => f.endsWith('.mjs')).sort()) {
+  const src = readFileSync(join(fixturesDir, file), 'utf8');
+  const writes = []; // [key, value, line]
+  // S.key = 'value'   (scalar; also dotted keys like S.therapyStatus.slp)
+  for (const m of src.matchAll(/\bS\.([\w.]+)\s*=\s*(['"])(.*?)\2/g)) writes.push([m[1], m[3], lineOf(src, m.index)]);
+  // S.key.add('value')
+  for (const m of src.matchAll(/\bS\.([\w.]+)\.add\(\s*(['"])(.*?)\2\s*\)/g)) writes.push([m[1], m[3], lineOf(src, m.index)]);
+  // ['a', 'b'].forEach(k => S.key.add(k))  — also the block form that adds to two Sets
+  for (const m of src.matchAll(/\[([^\]]*)\]\.forEach\(\s*(\w+)\s*=>/g)) {
+    const values = [...m[1].matchAll(/(['"])(.*?)\1/g)].map(x => x[2]);
+    const body = callBodyAfter(src, m.index + m[0].lastIndexOf('('));
+    const adds = [...body.matchAll(new RegExp(`\\bS\\.([\\w.]+)\\.add\\(\\s*${m[2]}\\s*\\)`, 'g'))].map(a => a[1]);
+    for (const key of adds) for (const value of values) writes.push([key, value, lineOf(src, m.index)]);
+  }
+  for (const [key, value, line] of writes) {
+    const allowed = controlValues.get(key);
+    if (!allowed || value === '') continue;
+    fixtureWritesChecked++;
+    if (allowed.has(value)) continue;
+    if (FIXTURE_VALUE_EXEMPTIONS.some(([k, v]) => k === key && v === value)) continue;
+    failures.push(
+      `Fixture tests/fixtures/${file}:${line} sets S.${key} to '${value}', which no page control can produce. ` +
+      `The page offers: ${[...allowed].filter(Boolean).map(v => `'${v}'`).join(', ')}.`
+    );
+  }
+}
+if (!fixtureWritesChecked) failures.push(
+  'Fixture values: no S.<key> writes were matched in tests/fixtures/*.mjs; update the section G fixture regexes.'
+);
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
@@ -417,7 +524,8 @@ console.log(
   `behavior ${behaviorCheckboxKeys.length} checkboxes + ${BEHAVIOR_DERIVED.length} derived = ${behaviorSummaryKeys.length} summary labels; ` +
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
-  `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces`
+  `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces; ` +
+  `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');
