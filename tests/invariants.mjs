@@ -513,10 +513,27 @@ if (!fixtureWritesChecked) failures.push(
   'Fixture values: no S.<key> writes were matched in tests/fixtures/*.mjs; update the section G fixture regexes.'
 );
 
+// ── H. Collapsed-by-default sections: SEC_TABLE and the markup agree ────────
+// SEC_TABLE is the runtime authority for which form sections start collapsed, but
+// the markup carries the same state (`sec-head collapsed` + `sec-body hidden` inert)
+// so the first paint is right before the script runs. A row added to one side and
+// not the other would flash open-then-shut on load, or stay open despite the table.
+const secTableKeys = [...balancedAfter('const SEC_TABLE=').matchAll(/key:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+const markupCollapsedKeys = [...html.matchAll(/id="sh-([^"]+)" class="sec-head collapsed"/g)].map(m => m[1]);
+check('Collapsed sections (SEC_TABLE vs markup `sec-head collapsed`)',
+  diff('SEC_TABLE', secTableKeys, 'markup', markupCollapsedKeys));
+for (const k of secTableKeys) {
+  const head = html.match(new RegExp(`id="sh-${k}" class="sec-head collapsed"[^\\n]*\\n\\s*<div class="([^"]*)"([^>]*)>`));
+  if (!head) check('Collapsed sections', `no sec-body line follows the #sh-${k} head`);
+  else if (head[1] !== 'sec-body hidden' || !/\binert\b/.test(head[2]))
+    check('Collapsed sections', `#sh-${k}: body must be <div class="sec-body hidden" inert> to match its collapsed head (found class="${head[1]}"${head[2]})`);
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
   `invariants: SW reasons ${swLabelKeys.length} keys; ` +
+  `collapsed sections ${secTableKeys.length} table rows = ${markupCollapsedKeys.length} marked heads; ` +
   `overrides ${ovDefKeys.length} defs / ${ovInitKeys.length} state keys; ` +
   `ABA targets ${abaCheckboxKeys.length} checkboxes = ${tlKeys.length} TL labels; ` +
   `prior tests ${priorTestCheckboxKeys.length} checkboxes = ${priorTestLabelKeys.length} labels (${adaptiveTestKeys.length} adaptive); ` +

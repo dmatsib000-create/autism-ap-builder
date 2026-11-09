@@ -786,6 +786,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   <div class="header-actions">
     <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
     <div class="header-sep"></div>
+    <button class="btn btn-outline" id="secToggleAllBtn" type="button" onclick="toggleAllSections()" aria-label="Expand all sections" title="Open or close every form section">Expand all</button>
+    <div class="header-sep"></div>
     <button class="btn btn-outline" onclick="window.print()">Print</button>
     <button class="btn btn-outline" onclick="copyNote('plain','all',this)">Copy Plain</button>
     <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
@@ -1359,8 +1361,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 5. Co-occurring Medical Flags & Referrals (work-up triggers, exam findings, referrals — filled from exam/records, not parent report) -->
   <div class="section">
-    <div id="sh-medflags" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">5</span><span class="sec-kicker">Referrals</span><span class="sec-title">Medical &amp; Referral Flags</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
-    <div class="sec-body">
+    <div id="sh-medflags" class="sec-head collapsed" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">5</span><span class="sec-kicker">Referrals</span><span class="sec-title">Medical &amp; Referral Flags</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body hidden" inert>
       <div class="cb-list">
         <div class="grp-sep" style="margin-top:2px">Work-up &amp; referrals</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="feeding"> Feeding difficulties / food selectivity</label>
@@ -1457,8 +1459,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 6. Comorbid Conditions -->
   <div class="section">
-    <div id="sh-comorbid" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">6</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
-    <div class="sec-body">
+    <div id="sh-comorbid" class="sec-head collapsed" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">6</span><span class="sec-kicker">Comorbidity</span><span class="sec-title">Comorbid Conditions</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body hidden" inert>
       <p style="font-size:var(--text-11);color:var(--gray-500);margin-bottom:7px">Check a condition to note it. Each checked item shows an <strong>Include plan</strong> pill — click to toggle between full A&amp;P block and co-occurring note only.</p>
       <div class="cb-list">
         <div class="grp-sep" style="margin-top:2px">Psychiatric / Behavioral Health</div>
@@ -1577,8 +1579,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- 8. Safety -->
   <div class="section">
-    <div id="sh-safety" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">8</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
-    <div class="sec-body">
+    <div id="sh-safety" class="sec-head collapsed" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">8</span><span class="sec-kicker">Safety</span><span class="sec-title">Safety Counseling</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body hidden" inert>
       <div class="cb-list">
         <label class="cb-row"><input type="checkbox" data-key="safety" value="elopement_counsel"> Elopement / wandering (door alarms, GPS, law enforcement registration)</label>
         <label class="cb-row"><input type="checkbox" data-key="safety" value="water_counsel"> Water / drowning safety</label>
@@ -1691,8 +1693,8 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 
   <!-- Overrides (review layer — not a sequential input step) -->
   <div class="section">
-    <div id="sh-overrides" class="sec-head" role="heading" aria-level="2" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)"><button type="button" class="sec-btn"><span aria-hidden="true">&#9881;</span> Adjust Referrals</button> <span aria-hidden="true">&#9660;</span></div>
-    <div class="sec-body">
+    <div id="sh-overrides" class="sec-head collapsed" role="heading" aria-level="2" style="background:var(--amber-light);color:var(--amber-dark)" onclick="toggleSec(this,event)"><button type="button" class="sec-btn"><span aria-hidden="true">&#9881;</span> Adjust Referrals</button> <span aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body hidden" inert>
       <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:8px">Rules engine auto-selects referrals from clinical inputs. Click any tile to cycle Auto → Include → Exclude → Auto. SLP, OT, PT, ABA appear first because they're most often modified by current-therapy status below.</p>
       <div id="overridePanel"></div>
       <hr class="divider">
@@ -6022,11 +6024,17 @@ function initChipToolbars(){
   });
   syncAllRoving();
 }
-// Sections render expanded or collapsed from markup; mirror that onto each toggle button.
+// Re-applies each section's starting state through setSecOpen so aria-expanded is
+// set. A section in SEC_TABLE starts collapsed; any other keeps its markup state.
+// The markup already carries the collapsed state for the table's sections so the
+// first paint is right before this runs (the invariants lane checks they agree),
+// which makes this a no-op for the body classes and only the aria mirror matters.
 function initSectionToggles(){
   document.querySelectorAll('.sec-head').forEach(h=>{
-    h.querySelector('.sec-btn')?.setAttribute('aria-expanded',String(!h.classList.contains('collapsed')));
+    const inTable=SEC_TABLE.some(r=>'sh-'+r.key===h.id);
+    setSecOpen(h,inTable?false:!h.classList.contains('collapsed'));
   });
+  syncSecToggleAll();
 }
 
 // Join an observation chip's text onto a criterion's evidence text. Normally "; "-separated,
@@ -6613,13 +6621,86 @@ function toggleSec(h,e){
     e.stopPropagation();
     return;
   }
-  const b=h.nextElementSibling;
-  const hidden=b.classList.toggle('hidden');
-  // inert keeps tab-nav out of collapsed bodies (the animation leaves them in
-  // the DOM, unlike display:none, so without inert tab would land on hidden fields).
-  if(hidden) b.setAttribute('inert',''); else b.removeAttribute('inert');
-  h.classList.toggle('collapsed',hidden);
-  h.querySelector('.sec-btn')?.setAttribute('aria-expanded',String(!hidden));
+  setSecOpen(h,h.nextElementSibling.classList.contains('hidden'));
+  syncSecToggleAll();
+}
+// keep docs/branching-logic.md §1.5 in sync
+// The ONLY writer of a section's open/closed state. Three things must change
+// together or the UI drifts (a rotated chevron over a visible body, or a hidden
+// body that Tab still lands in): .sec-body.hidden, inert on the body, and
+// .sec-head.collapsed, plus aria-expanded on the button. inert keeps tab-nav out
+// of collapsed bodies (the mobile animation leaves them in the DOM, unlike
+// display:none, so without inert Tab would land on hidden fields).
+function setSecOpen(h,open){
+  const b=h&&h.nextElementSibling;if(!b)return;
+  b.classList.toggle('hidden',!open);
+  if(open) b.removeAttribute('inert'); else b.setAttribute('inert','');
+  h.classList.toggle('collapsed',!open);
+  h.querySelector('.sec-btn')?.setAttribute('aria-expanded',String(open));
+}
+
+// ─── SECTION DEFAULTS + AUTO-OPEN ────────────────────────────────────────────
+// keep docs/branching-logic.md §1.5 in sync
+// One row per form section that starts collapsed because most visits never need
+// it (the measurement is in the doc). `content` is "holds data" and also drives
+// the header dot/summary; `relevant` is "the visit's other findings make this
+// section the next step" (toe walking makes the gait exam due; elopement or
+// self-injury makes safety counseling due). Both are pure reads of S. A section
+// opens itself ONCE when either turns false->true (see secAutoOpenKeys) and is
+// never auto-closed, so a clinician who folds a section stays in charge of it.
+// Sections not listed here keep whatever the markup says (open).
+const SEC_TABLE=[
+  {key:'medflags',content:()=>medflagsLabels().length>0,relevant:()=>gaitFindings().active},
+  {key:'comorbid',content:()=>S.comorbid.size>0},
+  {key:'safety',content:()=>S.safety.size>0,
+    relevant:()=>S.needsBehavior.has('elopement')||S.needsBehavior.has('sib')||S.needsBehavior.has('aggression')||S.needsAdaptive.has('commSafety')||!!S.strangerDanger},
+  {key:'overrides',content:()=>overrideCount()>0},
+];
+// PURE (reads S only): {medflags:{content,relevant}, comorbid:{...}, safety:{...}, overrides:{...}}
+function sectionRelevance(){
+  const out={};
+  SEC_TABLE.forEach(r=>{out[r.key]={content:!!r.content(),relevant:!!(r.relevant&&r.relevant())};});
+  return out;
+}
+// PURE: keys whose content or relevance rose false->true between prev and cur.
+// true->true yields nothing (so a per-keystroke render never re-opens a section
+// the clinician closed) and true->false yields nothing (one-way: the app only
+// ever opens). A key missing from prev counts as all-false.
+function secAutoOpenKeys(prev,cur){
+  return Object.keys(cur).filter(k=>{
+    const p=prev[k]||{content:false,relevant:false};
+    return (cur[k].content&&!p.content)||(cur[k].relevant&&!p.relevant);
+  });
+}
+let secPrev={}; // edge memory; replaced wholesale each pass, emptied by resetSections()
+function autoOpenSections(){ // called last in updateSectionHeaders, so it runs on every render path
+  const cur=sectionRelevance();
+  secAutoOpenKeys(secPrev,cur).forEach(k=>setSecOpen(document.getElementById('sh-'+k),true));
+  secPrev=cur;
+  syncSecToggleAll();
+}
+function applySecDefaults(){
+  SEC_TABLE.forEach(r=>setSecOpen(document.getElementById('sh-'+r.key),false));
+}
+// Clear All only: a fresh form gets the default layout back, and the emptied edge
+// memory means the render that follows sees no rising edge and opens nothing.
+function resetSections(){secPrev={};applySecDefaults();}
+// Heads of sections that are actually on screen (a display-gated section like the
+// ABA parameters block is skipped, so a hidden section can't make the toolbar
+// button read "Expand all" while everything visible is open).
+function allSecHeads(){
+  return [...document.querySelectorAll('.sec-head')].filter(h=>h.nextElementSibling?.classList.contains('sec-body')&&h.closest('.section')?.style.display!=='none');
+}
+function toggleAllSections(){
+  const heads=allSecHeads(),anyClosed=heads.some(h=>h.classList.contains('collapsed'));
+  heads.forEach(h=>setSecOpen(h,anyClosed));
+  syncSecToggleAll();
+}
+function syncSecToggleAll(){
+  const btn=document.getElementById('secToggleAllBtn');if(!btn)return;
+  const anyClosed=allSecHeads().some(h=>h.classList.contains('collapsed'));
+  btn.textContent=anyClosed?'Expand all':'Collapse all';
+  btn.setAttribute('aria-label',anyClosed?'Expand all sections':'Collapse all sections');
 }
 
 // ─── TOAST NOTIFICATIONS ─────────────────────────────────────────────────────
@@ -6715,11 +6796,27 @@ function clearAll(opts){
   const adapStdCb=document.getElementById('adaptiveStandardizedCb');if(adapStdCb)adapStdCb.checked=false;
   toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
+  resetSections();
   render();
 }
 
 // ─── SECTION HEADER SUMMARIES ────────────────────────────────────────────────
+// Medical & Referral Flags summary labels. Pure (reads S only); shared by the header
+// summary and SEC_TABLE's content signal so the dot and the auto-open can't disagree.
+function medflagsLabels(){
+  const mf=[];
+  if(S.feeding||S.sleep||S.hearingScreenFail||S.seizureConcern||S.sleepStudy||S.focalNeuroFindings)mf.push('Work-up');
+  if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
+  if(S.prenatalAlcohol||S.fasdFeatures)mf.push('FASD');
+  if(gaitFindings().active&&S.gaitExam.size)mf.push('Gait exam');
+  if(S.labsOrdered.trim())mf.push('Labs');
+  if(S.socialWork)mf.push('Social work');
+  return mf;
+}
+// socialWork is deliberately absent from S.overrides (see OV_DEFS), so it is not counted here.
+const overrideCount=()=>Object.values(S.overrides).filter(v=>v!=='auto').length;
 function updateSectionHeaders(){
+  const sig=sectionRelevance();
   const setSH=(id,hasData,summary)=>{
     const h=document.getElementById(id);if(!h)return;
     let dot=h.querySelector('.sec-dot');
@@ -6767,17 +6864,11 @@ function updateSectionHeaders(){
   if(S.needsSocial.size)nd.push('Social');if(S.emotionalReg||S.academic)nd.push('Other');
   setSH('sh-needs',nd.length>0,nd.slice(0,4).join(' · ')+(nd.length>4?' +'+( nd.length-4):''));
   // 5 Medical & Referral Flags (work-up triggers, exam findings, social-work referral — moved out of §4)
-  const mf=[];
-  if(S.feeding||S.sleep||S.hearingScreenFail||S.seizureConcern||S.sleepStudy||S.focalNeuroFindings)mf.push('Work-up');
-  if(S.dysmorphism||S.congenitalAnomalies||S.developmentalRegression)mf.push('Genetics');
-  if(S.prenatalAlcohol||S.fasdFeatures)mf.push('FASD');
-  if(gaitFindings().active&&S.gaitExam.size)mf.push('Gait exam');
-  if(S.labsOrdered.trim())mf.push('Labs');
-  if(S.socialWork)mf.push('Social work');
-  setSH('sh-medflags',mf.length>0,mf.join(' · '));
+  const mf=medflagsLabels();
+  setSH('sh-medflags',sig.medflags.content,mf.join(' · '));
   // 6 Comorbid
   const cc=S.comorbid.size;
-  setSH('sh-comorbid',cc>0,cc>0?cc+' condition'+(cc>1?'s':''):'');
+  setSH('sh-comorbid',sig.comorbid.content,cc>0?cc+' condition'+(cc>1?'s':''):'');
   // 7 School
   const sc=[];const spShort={notYet:'Not yet in school',daycare:'Daycare',genEd:'Gen ed',genEdSupport:'Gen ed+support',selfContained:'Self-contained',therapDay:'Therapeutic day',privateNoIEP:'Private (no IEP)',privateWithIEP:'Private (IEP svcs)',home:'Homeschool'};
   if(S.schoolPlacement)sc.push(spShort[S.schoolPlacement]||'');
@@ -6785,8 +6876,8 @@ function updateSectionHeaders(){
   if(S.schoolDoc)sc.push(sdShort[S.schoolDoc]||'');
   setSH('sh-school',!!(S.schoolPlacement||S.schoolDoc||S.schoolSvc.size),sc.join(' · '));
   // 7 Overrides
-  const mo=Object.values(S.overrides).filter(v=>v!=='auto').length;
-  setSH('sh-overrides',mo>0,mo>0?mo+' manual override'+(mo>1?'s':''):'all auto');
+  const mo=overrideCount();
+  setSH('sh-overrides',sig.overrides.content,mo>0?mo+' manual override'+(mo>1?'s':''):'all auto');
   const ovBadge=document.getElementById('override-badge-rp');
   if(ovBadge){ovBadge.className=mo>0?'status-chip chip-amber visible':'status-chip chip-amber';if(mo>0)ovBadge.textContent='⚠ '+mo+' override'+(mo>1?'s':'');}
   const ovDot=document.getElementById('sh-overrides')?.querySelector('.sec-dot');
@@ -6843,9 +6934,10 @@ function updateSectionHeaders(){
   const edsHint=document.getElementById('evalDxSupportHint');
   if(edsHint)edsHint.style.display=(wcSt.dxOutcome==='consistent'&&S.diagStatus==='suspected')?'':'none';
   // 8 Safety
-  const sf=S.safety.size;setSH('sh-safety',sf>0,sf>0?sf+' item'+(sf>1?'s':''):'');
+  const sf=S.safety.size;setSH('sh-safety',sig.safety.content,sf>0?sf+' item'+(sf>1?'s':''):'');
   // 9 AG
   const ag=S.ag.size;setSH('sh-ag',ag>0,ag>0?ag+' item'+(ag>1?'s':''):'');
+  autoOpenSections();
 }
 
 // ─── COG PROFILE → SPECIFIER BRIDGE ─────────────────────────────────────────
