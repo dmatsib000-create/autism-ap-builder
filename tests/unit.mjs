@@ -410,6 +410,65 @@ const CASES = [
     check(a){ assert.deepEqual(a.labOrderOverlap().repeats, []);
               a.S.gaitExam.add('lmn');
               assert.deepEqual(a.labOrderOverlap().repeats, ['CK (gait plan)']); } },
+
+  // ── Form-section defaults and auto-open (SEC_TABLE / sectionRelevance / secAutoOpenKeys) ──
+  // Four rarely-entered sections start collapsed and open themselves once when they
+  // gain content or become relevant. The DOM applier can't run here; these lock the
+  // pure deciders it reads.
+  { name: 'sections: the four collapsed-by-default sections, and only those',
+    setup(){},
+    check(a){ assert.deepEqual(a.SEC_TABLE.map(r=>r.key), ['medflags','comorbid','safety','overrides']); } },
+  { name: 'sections: empty form -> nothing has content, nothing is relevant',
+    setup(){},
+    check(a){ const s=a.sectionRelevance();
+              for (const k of Object.keys(s)) assert.deepEqual(s[k], {content:false, relevant:false}, k); } },
+  { name: 'sections: elopement, self-injury, aggression, community safety, stranger danger each make Safety relevant',
+    setup(){},
+    check(a){ for (const set of [s=>s.needsBehavior.add('elopement'), s=>s.needsBehavior.add('sib'), s=>s.needsBehavior.add('aggression'),
+                                 s=>s.needsAdaptive.add('commSafety'), s=>{s.strangerDanger=true;}]) {
+                const fresh=makeApp(); set(fresh.S);
+                assert.equal(fresh.sectionRelevance().safety.relevant, true);
+                assert.equal(fresh.sectionRelevance().safety.content, false, 'relevance is not content');
+              } } },
+  { name: 'sections: an unrelated behavior (pica) does not make Safety relevant',
+    setup(S){ S.needsBehavior.add('pica'); },
+    check(a){ assert.equal(a.sectionRelevance().safety.relevant, false); } },
+  { name: 'sections: a ticked safety box is content, independent of relevance',
+    setup(S){ S.safety.add('water_counsel'); },
+    check(a){ assert.deepEqual(a.sectionRelevance().safety, {content:true, relevant:false}); } },
+  { name: 'sections: toe walking makes Medical Flags relevant; exam findings become content only once a gait need exists',
+    setup(S){ S.gaitExam.add('contracture'); },
+    check(a){ assert.deepEqual(a.sectionRelevance().medflags, {content:false, relevant:false}, 'stale exam findings alone');
+              a.S.needsMotor.add('toeWalk');
+              assert.deepEqual(a.sectionRelevance().medflags, {content:true, relevant:true}); } },
+  { name: 'sections: labs typed or social work ticked is Medical Flags content',
+    setup(S){ S.labsOrdered='CBC'; },
+    check(a){ assert.equal(a.sectionRelevance().medflags.content, true);
+              const b=makeApp(); b.S.socialWork=true;
+              assert.equal(b.sectionRelevance().medflags.content, true); } },
+  { name: 'sections: a comorbidity is Comorbid content',
+    setup(S){ S.comorbid.add('anxiety'); },
+    check(a){ assert.equal(a.sectionRelevance().comorbid.content, true); } },
+  { name: 'sections: overrides count only a manual yes/no, never auto',
+    setup(){},
+    check(a){ assert.equal(a.sectionRelevance().overrides.content, false);
+              a.S.overrides.pt='no';
+              assert.equal(a.sectionRelevance().overrides.content, true); } },
+  { name: 'secAutoOpenKeys: opens on a rising edge, never on steady or falling',
+    setup(){},
+    check(a){ const off={content:false,relevant:false}, c={content:true,relevant:false}, r={content:false,relevant:true};
+              assert.deepEqual(a.secAutoOpenKeys({}, {safety:c}), ['safety'], 'first appearance of content');
+              assert.deepEqual(a.secAutoOpenKeys({safety:c}, {safety:c}), [], 'steady content (a keystroke render)');
+              assert.deepEqual(a.secAutoOpenKeys({safety:c}, {safety:off}), [], 'content removed: one-way, nothing closes');
+              assert.deepEqual(a.secAutoOpenKeys({safety:c}, {safety:{content:true,relevant:true}}), ['safety'], 'relevance rises while content already true');
+              assert.deepEqual(a.secAutoOpenKeys({}, {safety:r, medflags:c, comorbid:off}), ['safety','medflags'], 'two edges at once');
+              assert.deepEqual(a.secAutoOpenKeys({safety:c}, {safety:off, medflags:c}), ['medflags'], 'a key missing from prev counts as all-false'); } },
+  { name: 'secAutoOpenKeys: the keystroke sequence opens Safety exactly once',
+    setup(S){ S.needsBehavior.add('elopement'); },
+    check(a){ const c1=a.sectionRelevance();
+              assert.deepEqual(a.secAutoOpenKeys({}, c1), ['safety']);
+              a.S.strengths='loves trains';            // an unrelated keystroke
+              assert.deepEqual(a.secAutoOpenKeys(c1, a.sectionRelevance()), []); } },
 ];
 
 let pass = 0;

@@ -71,6 +71,12 @@ const EXPORTS = [
   // overlap check behind the tool-only warnings (which never reach any output).
   'parseLabGroups',
   'labOrderOverlap',
+  // Form-section defaults and auto-open: the declaring table, the pure relevance
+  // reader (S only), and the pure edge detector. The DOM applier (setSecOpen,
+  // autoOpenSections) stays untested here; these deciders are what decide.
+  'SEC_TABLE',
+  'sectionRelevance',
+  'secAutoOpenKeys',
 ];
 
 function extractScript(html) {

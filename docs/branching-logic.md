@@ -299,6 +299,31 @@ For Ctrl-F navigation when you remember a property name but not its category:
 
 ---
 
+### 1.5 Form-section defaults and auto-open (UI only)
+
+Four form sections start **collapsed** on load and after Clear All: Medical & Referral Flags (`#sh-medflags`), Comorbid Conditions (`#sh-comorbid`), Safety Counseling (`#sh-safety`), and Adjust Referrals (`#sh-overrides`). Measured against the golden fixtures on 2026-11-08, each is entered by fewer than one scenario in five, yet all sat fully open for every visit; collapsing them roughly halves the visible form for a typical visit. This never touches `S` or any output: the golden lane is blind to it by design.
+
+**Declared in one place.** `SEC_TABLE` (just after `setSecOpen()`, under the SECTION DEFAULTS + AUTO-OPEN banner) has one row per collapsed-by-default section; being in the table is what makes a section start collapsed. Each row carries two pure predicates that read only `S`:
+
+| Row | `content` ("holds data"; also drives the header dot/summary) | `relevant` ("the visit's other findings make this section the next step") |
+|---|---|---|
+| `medflags` | `medflagsLabels().length>0` (work-up flags, genetics flags, FASD, gait exam findings, labs text, social work) | `gaitFindings().active` (toe walking or gait concern under motor needs makes the gait exam due) |
+| `comorbid` | `S.comorbid.size>0` | none |
+| `safety` | `S.safety.size>0` | elopement, self-injury, or aggression under behavior needs; `commSafety` under adaptive needs; `strangerDanger` |
+| `overrides` | `overrideCount()>0` (a manual yes/no on any pill; `socialWork` is not in `S.overrides` and is not counted) | none |
+
+The markup carries the same state (`class="sec-head collapsed"` on the head, `class="sec-body hidden" inert` on the body) so the first paint is right before the script runs; `initSectionToggles()` re-applies the table at init, and the invariants lane (section H) fails if the table and the markup disagree.
+
+**Auto-open is edge-triggered and one-way.** `updateSectionHeaders()` ends with `autoOpenSections()`, which runs on every `render()` path (including the ABA/IEP preview early returns). `sectionRelevance()` reads the table into `{key:{content,relevant}}`; `secAutoOpenKeys(prev,cur)` returns the keys whose `content` or `relevant` rose false→true since the previous pass; each opens once via `setSecOpen()`. A steady true never re-opens (so the per-keystroke renders from the text boxes cannot fight a clinician who folded a section), and nothing is ever auto-closed. Presets go through the same path: they click real controls with render suspended, so the one final `render()` opens whatever they populated (P5 and the ADHD modifier tick comorbidities). `setSecOpen(head, open)` is the only writer of the three attributes that must move together (`hidden` + `inert` on the body, `collapsed` on the head, `aria-expanded` on the button); `toggleSec()`, init, auto-open, Clear All, and the toolbar all route through it.
+
+**Clear All** calls `resetSections()` before its final `render()`: the edge memory is emptied and the four defaults re-collapse; since `S` is already blank, that render sees no rising edge. Sections outside the table keep whatever state the clinician left them in.
+
+**Toolbar.** The "Expand all" / "Collapse all" button (`#secToggleAllBtn`, `toggleAllSections()`) acts on every on-screen section head; a display-gated section (the ABA parameters block) is skipped so it cannot make the label read "Expand all" while everything visible is open. The label is re-synced by `syncSecToggleAll()` after any open/close.
+
+Adding a fifth collapsed section is one `SEC_TABLE` row plus the two markup classes on its head and body; adding a relevance trigger is one more clause in that row's `relevant`. Both are unit-tested in `tests/unit.mjs` ("sections:" and "secAutoOpenKeys:" cases).
+
+---
+
 ## 2. Age-group routing
 
 `S.ageGroup` is the most widely-consulted property in the app — more than fifteen distinct output branches read it. The five values map to clinical-developmental windows, not strict age ranges, but the tool labels them with conventional ages for clinician convenience:
@@ -1858,6 +1883,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - Adding/removing/renaming any property on `S`
 - Adding/removing any HTML control that mutates a `Set` on `S`
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
+- `SEC_TABLE` (adding/removing a collapsed-by-default section, or changing a `content`/`relevant` predicate), `secAutoOpenKeys()`, `setSecOpen()` — the form-section defaults and auto-open rules (§1.5). The markup classes on the section's head and body must change in the same commit (the invariants lane enforces it).
 - `PRESETS` / `MODIFIERS` / `applyPreset()` / `formHasInput()` — the archetype-preset engine (§11.17). Adding, removing, or retuning a preset, or changing how `applyPreset` drives controls, requires re-confirming the cross-preset invariant and updating §11.17.
 
 If you're not sure whether your change qualifies, check [§1.2](#12-the-s-object--property-reference) — if your change touches anything listed there, update this doc.

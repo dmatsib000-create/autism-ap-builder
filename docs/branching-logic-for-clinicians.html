@@ -467,6 +467,12 @@ flowchart LR
 
       <p>The dashed boxes for the ABA and IEP letters reflect that they only appear as tabs when your patient is eligible for them. (Section <a href="#s5">5</a> covers exactly when they appear and disappear.) The A&amp;P note tab is always visible.</p>
 
+      <h2>Why some sections start folded</h2>
+
+      <p>Four parts of the form start closed when the page loads: Medical &amp; Referral Flags, Comorbid Conditions, Safety Counseling, and Adjust Referrals. When the tool's test scenarios were run against the form, each of those was needed in fewer than one scenario in five, yet all four sat fully open for every patient and made up close to half of what was on screen. Folding them keeps the common path short. Nothing inside a folded section is lost or switched off; click its header to open it at any time, or use the <strong>Expand all</strong> button in the toolbar to open everything at once (the same button then reads <strong>Collapse all</strong>).</p>
+
+      <p>A folded section opens itself when something gives it a reason to. That happens when it gains content from elsewhere (a preset that ticks an anxiety or ADHD diagnosis opens Comorbid Conditions; the social-work tile opens Medical &amp; Referral Flags) and when another finding makes it the natural next step: toe walking or a gait concern opens Medical &amp; Referral Flags because the gait exam lives there, and elopement, self-injury, aggression, community safety, or stranger danger opens Safety Counseling. Each section opens itself only once when a trigger appears. If you fold it again, it stays folded while you keep typing, even if more content lands in it, and the tool never closes a section on you. Clear All puts the four back to folded for the next patient.</p>
+
       <h2>Three practical consequences</h2>
 
       <p><strong>1. Changing an input changes everything that depends on it.</strong> If you copy the note to Epic, then go back and uncheck a comorbidity, your next copy will reflect the change — including in places you might not have expected, like the ABA letter's medical-necessity paragraph.</p>
