@@ -100,6 +100,15 @@ const EXPORTS = [
   // element step is best-effort), so the unit lane can drive a real age change and
   // assert that an age-invalid cognitive profile does not survive it.
   'onAgeGroupChange',
+  // Primary care list: the row table, the pure builder (reads S only) behind the note
+  // section, the PCP Recs tab and both copies, and the S-only edit pruner. The tab's
+  // click handlers and its workspace markup are browser-only.
+  'PCP_DEFS',
+  'pcpBuild',
+  'pcpSections',
+  'pcpPruneEdits',
+  'generatePCPPlain',
+  'generatePCPHTML',
 ];
 
 function extractScript(html) {

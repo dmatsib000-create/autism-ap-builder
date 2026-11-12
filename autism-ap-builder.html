@@ -672,6 +672,27 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* When reviewer's-eye is on, mute placeholder highlights */
 body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
 
+/* ── Primary care list workspace (PCP Recs tab) ──────────────────────────
+   Each row carries its own leave-out and move-up buttons. Reviewer view hides the
+   controls, the status strip and the left-out rows, leaving what a copy carries. */
+.pcp-doc .pcp-title{font-size:13pt;font-weight:700;margin:0 0 4px}
+.pcp-doc .pcp-group{font-weight:700;font-size:10.5pt;margin:16px 0 4px;color:var(--gray-700)}
+.pcp-doc .pcp-list{list-style:none;margin:0;padding:0}
+.pcp-row{display:flex;align-items:flex-start;gap:10px;padding:5px 6px;border-radius:var(--radius-sm);font-size:10.5pt;line-height:1.55}
+.pcp-row + .pcp-row{border-top:1px solid var(--border-subtle)}
+.pcp-row.is-omitted .pcp-text{color:var(--gray-500);text-decoration:line-through}
+.pcp-ctl{display:inline-flex;gap:4px;flex-shrink:0;min-width:62px;padding-top:1px}
+.pcp-text{flex:1;min-width:0}
+.pcp-btn{width:28px;height:26px;border-radius:var(--radius-sm);border:1px solid var(--border-control);background:var(--bg-card);color:var(--gray-600);cursor:pointer;font-size:var(--text-12);font-family:var(--font);line-height:1;padding:0}
+.pcp-btn.is-on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);font-weight:700}
+.pcp-btn:disabled{opacity:.45;cursor:not-allowed}
+@media (hover:hover){.pcp-btn:not(:disabled):hover{border-color:var(--accent)}}
+.pcp-tag{display:inline-block;min-width:60px;text-align:center;font-size:var(--text-10);font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-500);border:1px dashed var(--border-control);border-radius:var(--radius-sm);padding:4px 0;cursor:help}
+.pcp-status.pcp-off{background:var(--gray-100);border-left:4px solid var(--gray-300);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--gray-600)}
+.pcp-doc .pcp-hint{font-size:var(--text-11);color:var(--gray-500);margin:18px 0 0;border-top:1px dashed var(--border-subtle);padding-top:9px;line-height:1.5}
+body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-hint,body.reviewer-eye .pcp-row.is-omitted{display:none}
+@media (max-width:800px){.pcp-btn{width:40px;height:40px}.pcp-ctl{min-width:86px}.pcp-tag{min-width:84px;padding:10px 0}}
+
 /* ── Toast notifications (replaces alert) ────────────────────────────── */
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:var(--space-3);pointer-events:none;max-width:380px}
 .toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:var(--space-3)}
@@ -1671,10 +1692,36 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row"><input type="checkbox" data-key="ag" value="screen_time"> Screen time guidance</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="highlyMotivated"> Family is highly motivated for home learning resources</label>
       </div>
-      <hr class="divider" style="margin-top:10px">
-      <div class="field-group" style="margin-top:8px">
+    </div>
+  </div>
+
+  <!-- 10. Follow-up & Primary Care: the follow-up plan, the return interval, and the
+       clinician's own lines for the primary care list. The list itself (with its
+       leave-out and move-up controls) is the "PCP Recs" output tab. -->
+  <div class="section">
+    <div id="sh-followup" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">10</span><span class="sec-kicker">Handoff</span><span class="sec-title">Follow-up &amp; Primary Care</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="field-group">
+        <span class="field-label" id="dbpFollowUpLabel">DBP follow-up plan</span>
+        <div class="radio-grid" role="group" aria-labelledby="dbpFollowUpLabel">
+          <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="pcp">No routine DBP follow-up</label>
+          <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="dbp">DBP follow-up continues</label>
+        </div>
+        <div class="field-hint" style="margin:5px 0 0;font-size:var(--text-11);color:var(--gray-500)">Choosing a plan finishes the primary care list and adds it to the note. With "No routine DBP follow-up", anything in the form that still needs this clinic (testing to finish, forms to review) is named as the one reason to return.</div>
+      </div>
+      <div class="field-group">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
         <input type="text" id="rtcIntervalField" aria-label="Return to clinic interval" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:var(--text-12);font-family:var(--font);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
+      </div>
+      <div class="field-group">
+        <span class="field-label">Your own lines for primary care <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">One recommendation per line. They print after the generated actions, exactly as typed, and are not saved in a selections string.</div>
+        <textarea class="strengths-area" id="pcpExtraField" aria-label="Your own recommendations for primary care" rows="3" placeholder="PCP (next visit): recheck weight after the medication change"></textarea>
+        <span class="phi-hint">PHI-free zone: no names, MRNs, dates, or result values. Avoid curly braces { }, which Epic treats as fill-in stops.</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <label class="cb-row" style="margin:0"><input type="checkbox" id="pcpInNoteCb" checked> Add the list to the A&amp;P note</label>
+        <button class="btn btn-gray btn-sm" type="button" onclick="setPreviewMode('pcp')">Review the list</button>
       </div>
     </div>
   </div>
@@ -1807,6 +1854,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button class="tab-btn is-on" id="tabNote" onclick="setPreviewMode('note')" aria-pressed="true">A&amp;P Note</button>
         <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" aria-pressed="false" style="display:none">&#9733; ABA Letter</button>
         <button class="tab-btn" id="tabIEP" onclick="setPreviewMode('iep')" aria-pressed="false" style="display:none">&#9733; IEP Letter</button>
+        <button class="tab-btn" id="tabPCP" onclick="setPreviewMode('pcp')" aria-pressed="false">PCP Recs</button>
       </div>
       <button class="rev-eye-btn" id="revEyeBtn" type="button" onclick="toggleReviewerEye()" aria-pressed="false" title="Toggle reviewer's-eye view (strip {placeholder} highlighting to preview what the payer or school will see)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1835,6 +1883,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
+  <div class="note-sticky-bar" id="pcpStickyBar" style="display:none">
+    <button class="btn btn-gray btn-sm" id="pcpResetBtn" onclick="resetPcpEdits()" title="Put back every line you left out and return the list to its standard order.">Undo my edits</button>
+    <button class="btn btn-green btn-sm" id="copyPCPBtn" onclick="copyPCP('rich')">&#9733; Copy List (rich)</button>
+    <button class="btn btn-epic btn-sm" id="copyPCPEpicBtn" onclick="copyPCP('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
+  </div>
 </div>
 </div><!-- /main -->
 
@@ -1851,6 +1904,11 @@ function initialState(){ return {
   diagStatus:'', asdLevelSC:'', asdLevelRRB:'', asdLevelJustificationSC:'', asdLevelJustificationRRB:'',
   visitType:'',
   rtcInterval:'',
+  // Primary care list (see PCP_DEFS). dbpFollowUp: ''=not chosen | 'pcp'=no routine DBP
+  // follow-up | 'dbp'=DBP follow-up continues; the list reaches the note only once one is
+  // chosen and pcpInNote is on. pcpOmit / pcpFirst hold PCP_DEFS row ids the clinician left
+  // out or moved up (pcpFirst in click order). pcpExtra is typed, one line per row.
+  dbpFollowUp:'', pcpInNote:true, pcpOmit:new Set(), pcpFirst:new Set(), pcpExtra:'',
   specifiers:new Set(),
   // PR-K + PR-L: COG_SPEC_EXCL keys (withID/withSuspectedID/withGDD/withSuspectedGDD/
   // withBIF/withoutID/withoutGDD) the clinician has manually toggled. Bridge respects
@@ -2897,6 +2955,11 @@ function evalPathSteps(){
   return {hasProfile,hasDx,dxTodayAllowed,profileDone,dxStatus,dxDone,dxOutcome:hasDx&&dxDone?S.evalDxOutcome:'',pendingTesting};
 }
 
+// A suspected ID/GDD specifier whose confirming evaluation is not already in hand, and the
+// wider test that also counts a screener-level borderline finding. Shared by the note's
+// workup section and the primary care list so the two cannot disagree about what is pending.
+function suspectedIDorGDDPending(){ return (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'; }
+function cogEvalReferralPending(){ return suspectedIDorGDDPending()||bifIdRisk(); }
 function generateNote() {
   const pr=getPron();
   const L=[];
@@ -3079,11 +3142,11 @@ function generateNote() {
   // Diagnostic Workup — also fires when ID/GDD is suspected so the comprehensive evaluation
   // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
   // documented but the suspected-ID gating still demands a formal evaluation recommendation).
-  const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
+  const hasSuspectedIDorGDD = suspectedIDorGDDPending();
   // Screener/clinical borderline routes to the SAME confirmatory-evaluation referral
   // (ID is not yet excluded), without asserting suspected ID. bifIdRisk() already
   // excludes priorExternal, so no extra source guard is needed here.
-  const hasCogEvalReferral = hasSuspectedIDorGDD || bifIdRisk();
+  const hasCogEvalReferral = cogEvalReferralPending();
   // Evaluation-path output survives a Confirmed diagnosis only when it documents SUPPORT for
   // the established diagnosis rather than an in-progress workup: the "fairly certain" CARS-2
   // pathways (certainYoung/certainOlder) always qualify, and — approved 2026-07-16, same
@@ -4214,7 +4277,9 @@ function generateNote() {
       L.push('  • Monitor for behavioral activation syndrome (agitation, hyperactivity, impulsivity) and suicidality (black box warning) at each dose change and during the first weeks of treatment. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.');
     }
     L.push('  • Psychiatry referral: strongly recommended for medication management and ongoing safety monitoring.');
-    L.push('  • Shortened return-to-clinic interval: 4–6 weeks.');
+    // Under a hand-back the 4-6 week recheck belongs to primary care (attending decision
+    // 2026-11-12), so the note must not promise a clinic return the follow-up plan denies.
+    L.push(S.dbpFollowUp==='pcp'?'  • Mood and safety recheck in 4–6 weeks with primary care.':'  • Shortened return-to-clinic interval: 4–6 weeks.');
     L.push('');
   }
 
@@ -4338,8 +4403,9 @@ function generateNote() {
       else if(!gf.ptMeasure) L.push('  • Outpatient PT evaluation: {offered, family declined / offered, family undecided / not discussed today}');
       // The clinician's own Return to Clinic interval times the recheck; with none set (or
       // "as needed"), the recheck goes to primary care with a 12-month ceiling.
-      const rtc=(S.rtcInterval||'').trim();
-      const when=rtc&&!/as needed|prn/i.test(rtc)?'at the return visit (see Return to Clinic)':'at the next well visit with {primary care or this clinic}, no later than 12 months';
+      // Once the follow-up plan hands the child back, the recheck has one owner and the
+      // {primary care or this clinic} choice is no longer the clinician's to fill in.
+      const when=rtcVisitPlanned()?'at the return visit (see Return to Clinic)':'at the next well visit with '+(S.dbpFollowUp==='pcp'?'primary care':'{primary care or this clinic}')+', no later than 12 months';
       L.push('  • Recheck: ankle range (knee straight and bent) and gait '+when+(gf.notAssessed&&gf.heelsFlat?'; measure ankle range then, and refer to PT for measurement if it still cannot be measured':'')+'. Refer to PT if the ankle no longer reaches neutral with the knee straight, has lost range since the last documented examination, or pain, falls, or functional impact develops.');
     }
     if(gf.ptIndicated&&gf.toeWalk){
@@ -4629,8 +4695,18 @@ function generateNote() {
     L.push('  • Follow up on evaluation completion at next clinic visit.');
     L.push('');
   }
+  // Primary care list: its own block after the last problem, directly above Return to
+  // Clinic, so the follow-up line and the return visit are read together.
+  if(pcpInNoteActive()){
+    L.push('── Recommendations for Primary Care ──');
+    pcpSectionLines().forEach(l=>L.push(l));
+    L.push('');
+  }
   L.push('RETURN TO CLINIC');
-  L.push(S.rtcInterval?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic: {interval}');
+  // "No routine DBP follow-up" with nothing left open and no visit typed is a complete
+  // answer, so say it instead of leaving an {interval} stop for the clinician to delete.
+  if(S.dbpFollowUp==='pcp'&&!pcpReturnExpected(pcpCtx())) L.push('No routine return visit is scheduled'+(S.pcpInNote?' (see Recommendations for Primary Care for when and how to return)':'')+'.');
+  else L.push(S.rtcInterval?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic: {interval}');
   L.push('');
 
   L.push('────────────────────────────────────────────────────────');
@@ -4742,6 +4818,304 @@ function generateRichHTML(isPreview=false) {
   closeUL();
   html+='</div>';
   return html;
+}
+
+// ─── RECOMMENDATIONS FOR PRIMARY CARE ────────────────────────────────────────
+// keep docs/branching-logic.md §13 in sync
+// A fourth reader (the child's primary care clinician), so this wording is written for that
+// reader and is deliberately NOT shared with the note, ABA or IEP prose (CLAUDE.md audience
+// rule). The aim is a hand-back the PCP can act on, so that routine DBP return visits are
+// not needed and those slots stay open for new children.
+//
+// Every row comes from a selection: it prints only while its `on` test holds, and no row
+// restates a diagnosis. Row ids are saved in selections strings (pcpOmit, pcpFirst), so
+// renaming or removing one needs a SEL_VERSION bump like any other saved value.
+//   group  act    = one action, with its owner and (where one applies) a timeframe
+//          manage = a condition primary care can follow without routine DBP visits
+//          refer  = a change that should bring the child back to this clinic
+//          other  = a change that goes straight to another service (neurology, psychiatry,
+//                   crisis care), because sending it back here first would only add delay
+//   keep: for a row whose `on` test reads typed text, the part of that test that does NOT.
+//   Typed text is never restored, so pcpPruneEdits() judges such a row by `keep` and holds
+//   on to its saved edits instead of reporting them as lost after every restore.
+// Timeframes are limited to ones the note already states or that a guideline gives; where
+// neither exists the row names the visit ("next visit") and no number. Sources and what was
+// and was not verified: docs/branching-logic.md §13.6 and docs/references.md §11.
+const PCP_THERAPY_NAMES={aba:'ABA',slp:'speech-language therapy',ot:'occupational therapy',pt:'physical therapy',pcit:'PCIT',psychotherapy:'psychotherapy',socialSkills:'a social skills group'};
+const PCP_REFERRAL_NAMES={genetics:'clinical genetics',audiology:'audiology',neurology:'pediatric neurology',psychiatry:'child psychiatry',gi:'pediatric gastroenterology',sleep_ref:'a sleep study'};
+// The clinician's own Return to Clinic text names a visit unless it is blank or "as needed".
+function rtcVisitPlanned(){ const rtc=(S.rtcInterval||'').trim(); return !!rtc&&!/as needed|prn/i.test(rtc); }
+// PURE (reads S only). The facts the rows share, worked out once per build.
+function pcpCtx(){
+  const inPlan=(...ks)=>ks.some(k=>S.comorbid.has(k)&&S.comorbidInPlan.has(k));
+  // A therapy already under way (a status set under Adjust Referrals) needs no start check.
+  // Preschool social skills is "refer at a future visit" in the note, so nothing has started,
+  // and ABA cannot start before the diagnosis is confirmed (payers require it).
+  const therapies=Object.keys(PCP_THERAPY_NAMES).filter(k=>referralIncluded(k)&&!S.therapyStatus[k]
+    &&!(k==='socialSkills'&&S.ageGroup==='preschool')&&!(k==='aba'&&S.diagStatus!=='confirmed'));
+  const referrals=Object.keys(PCP_REFERRAL_NAMES).filter(k=>referralIncluded(k)).map(k=>PCP_REFERRAL_NAMES[k]);
+  if(S.prenatalAlcohol&&S.fasdFeatures) referrals.push('ophthalmology');
+  // What this clinic still has to finish. Each entry is something the note itself leaves
+  // with DBP, and any entry overrides the standing "no routine DBP follow-up" line.
+  const open=[];
+  if(S.diagStatus==='suspected'||S.diagStatus==='ruleOut') open.push('complete the autism diagnostic evaluation');
+  else if(S.diagStatus==='confirmed'&&(S.dxEvalPath==='certainYoung'||S.dxEvalPath==='certainOlder')&&evalPathSteps().pendingTesting) open.push('complete the standardized autism testing already scheduled');
+  if([...S.teacherMaterials].some(k=>!S.teacherMaterialsReturned.has(k))) open.push('review the rating forms requested from school');
+  if(inPlan('adhd_suspected')) open.push('complete the ADHD evaluation');
+  if(cogEvalReferralPending()) open.push('review the cognitive and adaptive testing once it is completed');
+  if(inPlan('pfd_suspected','arfid_suspected')) open.push('review the feeding evaluation');
+  // While DBP follow-up continues, the note's depression plan keeps its own shortened
+  // return, so the recheck stays here; under a hand-back it is the PCP's ("mood" row).
+  if(S.dbpFollowUp==='dbp'&&inPlan('depression')) open.push('recheck mood and safety');
+  // Not in this list on purpose (attending decisions, 2026-11-12): the sleep recheck, the
+  // mood and safety recheck after a depression plan, constipation, growth checks, and ADHD
+  // medication at a stable dose are handed to primary care as "manage" rows.
+  return {inPlan,therapies,referrals,open,gf:gaitFindings(),who:isTeenPlus()?'patient':'child',
+    psychRx:hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')||inPlan('anxiety','depression','ocd'),
+    genetics:referralIncluded('genetics'),
+    urgentNeuro:referralIncluded('neurology')&&S.developmentalRegression&&S.regressionTiming==='ongoing',
+    sleep:S.sleep||S.comorbid.has('sleep_disorder'),sleepInPlan:inPlan('sleep_disorder'),
+    feedingDx:inPlan('pfd_chronic','pfd_acute','arfid'),feedingSuspected:inPlan('pfd_suspected','arfid_suspected'),
+    adhdRx:hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')};
+}
+const PCP_GROUPS=[
+  ['act',()=>'Actions:'],
+  ['manage',()=>'Primary care can monitor and manage (no routine DBP follow-up needed for these):'],
+  // While a return visit is still expected these are reasons to call sooner, not to re-refer.
+  ['refer',c=>pcpReturnExpected(c)?'Contact DBP before the return visit if:':'Re-refer to DBP if:'],
+  ['other',()=>'Refer directly to another service if:'],
+];
+function pcpReturnExpected(c){ return S.dbpFollowUp==='dbp'||(S.dbpFollowUp==='pcp'&&(rtcVisitPlanned()||c.open.length>0)); }
+const PCP_DEFS=[
+  {id:'therapyStart',group:'act',owner:'PCP',when:'next visit',
+    on:c=>c.therapies.length>0,
+    text:c=>'Confirm that '+andList(c.therapies.map(k=>PCP_THERAPY_NAMES[k]))+' '+(c.therapies.length>1?'have':'has')+' started. If not, the family should ask the insurance case manager for in-network providers and keep calling the waitlists.'},
+  {id:'referrals',group:'act',owner:'PCP',when:'next visit',
+    on:c=>c.referrals.length>0,
+    text:c=>'Confirm that '+(c.referrals.length>1?'these referrals are':'this referral is')+' scheduled or completed: '+andList(c.referrals)+'.'
+      +(c.genetics?' Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.':'')
+      +(c.urgentNeuro?' The neurology referral is urgent because skills are being lost now.':'')},
+  {id:'earlySteps',group:'act',owner:'PCP and family',when:'now',
+    on:()=>referralIncluded('earlySteps'),
+    text:()=>'Confirm that the Florida Early Steps (Part C) referral has been submitted. Eligibility must be established before the third birthday.'},
+  {id:'fdlrs',group:'act',owner:'Family',when:'now',
+    on:()=>referralIncluded('fdlrs'),
+    text:()=>'Contact FDLRS Child Find for a preschool evaluation and IEP planning through the school district.'},
+  {id:'schoolEval',group:'act',owner:'Family',when:'now',
+    on:()=>isPartBAge()&&(S.schoolDoc==='iep_needed'||(S.schoolDoc==='neither'&&!['privateNoIEP','privateWithIEP'].includes(S.schoolPlacement))),
+    text:()=>'Send the school district a written request for a special education evaluation.'+(S.schoolDoc==='iep_needed'?' The district must evaluate within 60 days of written consent.':'')},
+  // Printed only where the note itself sends the recheck to primary care: no return visit
+  // typed, and DBP follow-up not continuing (the note then leaves the owner as a fill-in).
+  {id:'gaitRecheck',group:'act',owner:'PCP',when:'next well visit, no later than 12 months',
+    keep:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp',
+    on:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp'&&!rtcVisitPlanned(),
+    text:()=>'Recheck ankle range (knee straight and bent) and gait. Refer to PT if the ankle no longer reaches neutral with the knee straight, or if pain, falls, or functional impact develops.'},
+  {id:'eeg',group:'act',owner:'DBP',
+    on:()=>referralIncluded('eeg'),
+    text:()=>'Will review the EEG ordered at this visit and refer to pediatric neurology if it is abnormal.'},
+  {id:'labs',group:'act',owner:'DBP',
+    keep:()=>true,
+    on:()=>!!S.labsOrdered.trim(),
+    text:()=>'Will review the results of the labs and studies ordered at this visit and act on them.'},
+  {id:'sibling',group:'act',owner:'PCP',when:'well visits',
+    on:()=>S.ag.has('sibling'),
+    text:()=>'Watch the development of younger siblings closely, with autism screening at the 18- and 24-month visits and early referral for any concern. Autism is more likely in siblings.'},
+  {id:'transition',group:'act',owner:'PCP',when:()=>isTeenPlus()?'now':'starting in early adolescence',
+    on:()=>S.ag.has('transition'),
+    text:()=>'Start health care transition planning with the family: adult providers, decision-making supports, and benefits.'},
+  {id:'safety',group:'act',owner:'PCP',when:'well visits',
+    on:()=>S.safety.has('elopement_counsel')||S.safety.has('water_counsel'),
+    text:()=>'Revisit '+andList([S.safety.has('elopement_counsel')&&'wandering',S.safety.has('water_counsel')&&'water-safety'].filter(Boolean))+' precautions with the family.'},
+
+  {id:'sleep',group:'manage',
+    on:c=>c.sleep,
+    text:c=>'Sleep: Continue the behavioral sleep plan'+(c.sleepInPlan
+      ?', with melatonin as outlined in the plan, and reassess in 4 to 6 weeks.'+(referralIncluded('sleep_ref')?'':' Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.')
+      :'. Low-dose melatonin can be used alongside it.')},
+  {id:'gi',group:'manage',
+    on:c=>c.inPlan('gi'),
+    text:()=>'GI symptoms: Treat constipation in primary care with polyethylene glycol dosed by weight. A change in behavior or sleep may be the only sign of abdominal pain.'},
+  {id:'growth',group:'manage',
+    on:c=>c.feedingDx||c.feedingSuspected,
+    text:c=>c.feedingDx
+      ?'Feeding and growth: Check weight, height, and BMI at every visit. Escalate to the feeding team or GI for weight loss, falling growth percentiles, or a BMI below the 5th percentile.'
+      :'Feeding and growth: Check weight and height at the next visit while the feeding evaluation is pending, and escalate urgently if growth falters.'},
+  {id:'adhd',group:'manage',
+    on:c=>c.adhdRx,
+    text:()=>'ADHD medication: Once the dose is stable, primary care continues prescribing and monitoring, with height, weight, blood pressure, heart rate, sleep, and appetite checked at each medication visit.'},
+  // The suicide-risk screen named here is the NIMH ASQ, validated in primary care and
+  // outpatient specialty clinics for ages 10 to 21 [aguinaldo-2021] [horowitz-2012].
+  {id:'mood',group:'manage',
+    on:c=>c.inPlan('depression')&&S.dbpFollowUp!=='dbp',
+    text:()=>'Mood and safety: Recheck mood and safety in 4 to 6 weeks, screening for suicide risk at that visit with the NIMH ASQ (Ask Suicide-Screening Questions). A positive screen is followed by the brief suicide safety assessment in the ASQ toolkit.'},
+
+  {id:'tNewConcern',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'A new developmental, learning, attention, or mood concern needs diagnostic evaluation.'},
+  {id:'tBehavior',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'Self-injury, aggression, or unsafe behavior persists despite the current supports, or medication for behavior is being considered.'},
+  {id:'tDocs',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.'},
+  {id:'tGdd',group:'refer',
+    on:()=>S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD'),
+    text:()=>'School age is reached. Global developmental delay is a provisional diagnosis, and cognitive and adaptive testing should be repeated then, through the school or by re-referral.'},
+  {id:'tSleep',group:'refer',
+    on:c=>c.sleep,
+    text:()=>'Sleep problems persist after the behavioral plan and a melatonin trial.'},
+  {id:'tAdhd',group:'refer',
+    on:c=>c.adhdRx,
+    text:()=>'ADHD symptoms remain impairing despite treatment.'},
+
+  // Loss of skills goes to neurology, not back here (attending decision 2026-11-12; the
+  // guideline sources name neurology as the destination too).
+  {id:'tRegress',group:'other',
+    on:()=>!!S.diagStatus,
+    text:c=>(S.developmentalRegression?'Further language, social, or motor skills are lost: ':'Language, social, or motor skills the '+c.who+' already had are lost: ')
+      +(referralIncluded('neurology')?'tell pediatric neurology promptly.':'refer to pediatric neurology.')},
+  {id:'tCatatonia',group:'other',
+    on:()=>S.comorbid.has('catatonia_history'),
+    text:()=>'New slowing, freezing, posturing, or loss of speech appears (possible catatonia): contact psychiatry the same day.'},
+  // This clinic brings psychiatry in only for these (attending, 2026-11-12); a poor
+  // response to treatment comes back to DBP first (tAdhd, tNewConcern).
+  {id:'tPsych',group:'other',
+    on:c=>c.psychRx,
+    text:()=>'Mania, psychosis, or substance use that complicates treatment appears: refer to child psychiatry.'},
+  {id:'tSuicide',group:'other',
+    on:c=>c.inPlan('depression'),
+    text:()=>'Suicidal thoughts or behavior appear: use emergency or crisis care (call or text 988).'},
+];
+// The follow-up lines are the rows that cannot be left out: the list must always say
+// whether this clinic expects to see the child again, and how to come back. It is a mix on purpose. The standing
+// wording ("No routine DBP follow-up is needed") is what the clinician chose, and any
+// selection that leaves work with this clinic (c.open) or a typed return interval overrides
+// it with exactly what the return is for, so the standing line can never hide open work.
+function pcpFollowUpLines(c,hasRefer){
+  const rtc=(S.rtcInterval||'').trim(), planned=rtcVisitPlanned();
+  const what=c.open.length?' to '+andList(c.open):'';
+  // How to come back once routine visits stop. The two-year rule is this clinic's
+  // scheduling policy (attending, 2026-11-12); the phone number is a fill-in stop because
+  // the tool holds no clinic contact details.
+  const route='To come back: within 2 years of the last visit here, please call our clinic directly at {clinic phone number}; no new referral is needed. After 2 years, or if the '+c.who+' has been discharged from our clinic, please send a new referral.';
+  if(S.dbpFollowUp==='pcp'){
+    if(!pcpReturnExpected(c)) return ['No routine DBP follow-up is needed. Thank you for continuing this '+c.who+'\'s care. Primary care follows from here'+(hasRefer?', and we are always glad to see the family again for any of the changes listed below.':', and we are always glad to hear from you.'),route];
+    return ['DBP follow-up is limited to one return visit'+(planned?' in '+rtc:'')+(what||' {purpose of the return visit}')+'. No routine DBP follow-up is needed after that visit, and we are always glad to see the family again if the need arises.',route];
+  }
+  if(S.dbpFollowUp==='dbp')
+    return ['DBP follow-up continues, with a return visit '+(planned?'in '+rtc:rtc||'{interval}')+what+'. Thank you for sharing this '+c.who+'\'s care; primary care manages the items in this list between DBP visits.'];
+  return ['{DBP follow-up plan: no routine DBP follow-up, or a return visit and its purpose}'];
+}
+// One per typed line, as typed; a pasted bullet mark is dropped so it does not print twice.
+function pcpExtraLines(){
+  return String(S.pcpExtra||'').split(/\r?\n/).map(l=>l.trim().replace(/^[•*·-](\s+|$)/,'')).filter(Boolean);
+}
+// PURE (reads S only). Every row the selections produce, with the clinician's edits applied:
+// rows moved up come first within their group in the order they were clicked, the rest keep
+// table order, and left-out rows stay in the list (flagged) so the workspace can show them.
+function pcpBuild(){
+  const c=pcpCtx(), first=[...S.pcpFirst];
+  const rank=id=>{const i=first.indexOf(id);return i<0?first.length:i;};
+  const groups={};
+  PCP_GROUPS.forEach(([key,label])=>{
+    const rows=PCP_DEFS.filter(d=>d.group===key&&d.on(c)).map((d,i)=>({id:d.id,i,
+      omitted:S.pcpOmit.has(d.id),first:S.pcpFirst.has(d.id),
+      text:(d.owner?d.owner+(d.when?' ('+(typeof d.when==='function'?d.when(c):d.when)+')':'')+': ':'')+d.text(c)}));
+    rows.sort((a,b)=>(rank(a.id)-rank(b.id))||(a.i-b.i));
+    groups[key]={label:label(c),rows};
+  });
+  pcpExtraLines().forEach(t=>groups.act.rows.push({typed:true,text:t}));
+  const kept=k=>groups[k].rows.filter(r=>!r.omitted);
+  const any=PCP_GROUPS.some(([k])=>groups[k].rows.length>0);
+  return {c,groups,kept,empty:!any&&!S.dbpFollowUp,followUp:pcpFollowUpLines(c,kept('refer').length+kept('other').length>0)};
+}
+// What every copy and the note carry: kept rows only, in print order.
+function pcpSections(){
+  const b=pcpBuild(), out=[];
+  const add=(label,items)=>{if(items.length)out.push({label,items});};
+  add(b.groups.act.label,b.kept('act').map(r=>r.text));
+  add(b.groups.manage.label,b.kept('manage').map(r=>r.text));
+  add('DBP follow-up:',b.followUp);
+  add(b.groups.refer.label,b.kept('refer').map(r=>r.text));
+  add(b.groups.other.label,b.kept('other').map(r=>r.text));
+  return out;
+}
+function pcpSectionLines(){
+  const L=[];
+  pcpSections().forEach(s=>{L.push('');L.push(s.label);s.items.forEach(t=>L.push('  • '+t));});
+  return L;
+}
+// The list is part of the note once a follow-up plan is chosen (and the clinician has not
+// switched it off). Until then the note is unchanged and the list lives on its own tab.
+function pcpInNoteActive(){ return !!S.dbpFollowUp&&S.pcpInNote; }
+// Plain text of the standalone list: what "Copy for Epic" pastes from the PCP Recs tab.
+function generatePCPPlain(){
+  if(pcpBuild().empty) return '';
+  return ['RECOMMENDATIONS FOR PRIMARY CARE',...pcpSectionLines()].join('\n');
+}
+// isPreview=true: the workspace (every row, with its leave-out and move-up controls).
+// isPreview=false: clipboard HTML for Word (kept rows only, inline styles, no controls).
+function generatePCPHTML(isPreview){
+  const b=pcpBuild(), e=escapeHtml;
+  if(!isPreview){
+    if(b.empty) return '';
+    return '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.6;color:#1f2937;max-width:820px">'
+      +'<p style="font-weight:bold;font-size:12pt;margin:0 0 6px">Recommendations for Primary Care</p>'
+      +pcpSections().map(s=>'<p style="font-weight:bold;margin:10px 0 3px">'+e(s.label)+'</p><ul style="margin:3px 0 3px 18px;padding:0">'
+        +s.items.map(t=>'<li style="margin-bottom:3px">'+e(t)+'</li>').join('')+'</ul>').join('')
+      +'</div>';
+  }
+  if(b.empty) return '<div class="note-empty">Nothing selected so far produces a recommendation for primary care.<br><br><small>Choose a DBP follow-up plan in section 10, or keep filling in the form.</small></div>';
+  const ph=t=>phSpan(e(t),'aba-ph');
+  const row=r=>{
+    if(r.typed) return '<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="You typed this line in section 10. Edit it there.">typed</span></span><span class="pcp-text">'+ph(r.text)+'</span></li>';
+    return '<li class="pcp-row'+(r.omitted?' is-omitted':'')+'"><span class="pcp-ctl">'
+      +'<button type="button" class="pcp-btn'+(r.omitted?'':' is-on')+'" data-pcp="omit:'+r.id+'" aria-pressed="'+!r.omitted+'" aria-label="Include this line" aria-describedby="pcpt-'+r.id+'" title="'+(r.omitted?'Left out. Click to put it back.':'Included. Click to leave it out.')+'" onclick="togglePcpOmit(\''+r.id+'\')">'+(r.omitted?'+':'✓')+'</button>'
+      +'<button type="button" class="pcp-btn'+(r.first?' is-on':'')+'" data-pcp="first:'+r.id+'" aria-pressed="'+r.first+'" aria-label="Move this line to the top of its group" aria-describedby="pcpt-'+r.id+'" title="'+(r.first?'Moved to the top. Click to return it to its usual place.':'Move to the top of this group.')+'" onclick="togglePcpFirst(\''+r.id+'\')"'+(r.omitted?' disabled':'')+'>↑</button>'
+      +'</span><span class="pcp-text" id="pcpt-'+r.id+'">'+ph(r.text)+'</span></li>';
+  };
+  const group=(label,rows)=>rows.length?'<p class="pcp-group">'+e(label)+'</p><ul class="pcp-list">'+rows.join('')+'</ul>':'';
+  let h='<div class="note-doc pcp-doc">';
+  if(!S.dbpFollowUp) h+='<div class="note-err pcp-status"><strong>Follow-up plan not chosen.</strong> Pick one in section 10 (Follow-up &amp; Primary Care). Until you do, this list is not added to the A&amp;P note, and a copy carries a {placeholder} where the follow-up line goes.</div>';
+  else if(S.pcpInNote) h+='<div class="note-ok pcp-status"><strong>In the A&amp;P note</strong>, just above Return to Clinic. It updates as you edit here.</div>';
+  else h+='<div class="pcp-status pcp-off">Not in the A&amp;P note (switched off in section 10). Copy it from this tab.</div>';
+  h+='<p class="pcp-title">Recommendations for Primary Care</p>';
+  h+=group(b.groups.act.label,b.groups.act.rows.map(row));
+  h+=group(b.groups.manage.label,b.groups.manage.rows.map(row));
+  h+=group('DBP follow-up:',b.followUp.map(t=>'<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="This line always prints. It follows the follow-up plan, the return interval, and anything in the form that this clinic still has to finish.">always</span></span><span class="pcp-text">'+ph(t)+'</span></li>'));
+  h+=group(b.groups.refer.label,b.groups.refer.rows.map(row));
+  h+=group(b.groups.other.label,b.groups.other.rows.map(row));
+  h+='<p class="pcp-hint">✓ keeps or leaves out a line. ↑ moves it to the top of its group; click several in the order you want them. These choices are saved with your selections. Lines marked "always" cannot be left out, and lines marked "typed" are edited in section 10. Wording changes are made in Epic after pasting, so they are never lost when the list rebuilds.</p>';
+  return h+'</div>';
+}
+async function copyPCP(format){
+  const btn=document.getElementById(format==='rich'?'copyPCPBtn':'copyPCPEpicBtn');
+  const plain=generatePCPPlain();
+  if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
+  if(format==='rich'&&await writeClipboardRich(()=>generatePCPHTML(false),plain)){flashBtn('✓ Rich text copied!',btn);return;}
+  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+}
+// The workspace is redrawn on every render, which would drop keyboard focus from the
+// button just pressed; put it back on the same control.
+function pcpRerender(key){ render(); document.querySelector('[data-pcp="'+key+'"]')?.focus(); }
+function togglePcpOmit(id){
+  if(S.pcpOmit.has(id)) S.pcpOmit.delete(id); else{S.pcpOmit.add(id);S.pcpFirst.delete(id);}
+  pcpRerender('omit:'+id);
+}
+function togglePcpFirst(id){
+  if(S.pcpFirst.has(id)) S.pcpFirst.delete(id); else S.pcpFirst.add(id);
+  pcpRerender('first:'+id);
+}
+function resetPcpEdits(){ S.pcpOmit.clear();S.pcpFirst.clear();render(); }
+// Touches S only. An edit belongs to a row; when a changed selection removes the row, the
+// edit goes with it, so nothing sits hidden in S to ride along in the next export and
+// reappear later (the same rule the form's sub-options follow). A row with a `keep` test is
+// judged by it (see PCP_DEFS). Runs at the top of render() and from selPruneOrphans(), so a
+// restored string is held to it too.
+function pcpPruneEdits(){
+  const c=pcpCtx(), live=new Set(PCP_DEFS.filter(d=>(d.keep||d.on)(c)).map(d=>d.id));
+  [S.pcpOmit,S.pcpFirst].forEach(set=>[...set].forEach(id=>{if(!live.has(id))set.delete(id);}));
+  [...S.pcpFirst].forEach(id=>{if(S.pcpOmit.has(id))S.pcpFirst.delete(id);});
 }
 
 // ─── ABA LETTER OF MEDICAL NECESSITY ─────────────────────────────────────────
@@ -5942,12 +6316,13 @@ async function copyIEPLetter(format){
 
 function setPreviewMode(mode){
   S.previewMode=mode;
-  [['tabNote','note'],['tabABA','aba'],['tabIEP','iep']].forEach(([id,m])=>{
+  [['tabNote','note'],['tabABA','aba'],['tabIEP','iep'],['tabPCP','pcp']].forEach(([id,m])=>{
     const t=document.getElementById(id);t.classList.toggle('is-on',mode===m);t.setAttribute('aria-pressed',String(mode===m));
   });
   document.getElementById('noteStickyBar').style.display=mode==='note'?'':'none';
   document.getElementById('abaStickyBar').style.display=mode==='aba'?'':'none';
   document.getElementById('iepStickyBar').style.display=mode==='iep'?'':'none';
+  document.getElementById('pcpStickyBar').style.display=mode==='pcp'?'':'none';
   render();
 }
 
@@ -6146,6 +6521,7 @@ function render(){
   // toggles the .inactive class on each row based on current activity.
   syncTherapyStatusFromActivity();
   updateTherapyStatusEnablement();
+  pcpPruneEdits();
   updatePriorTestOutcomeRequired();
   updateEvChips();
   updateGaitExamVisibility();
@@ -6180,6 +6556,13 @@ function render(){
   // IEP letter preview
   if(S.previewMode==='iep'){
     pre.innerHTML=generateIEPLetterHTML();
+    updateSectionHeaders();
+    return;
+  }
+
+  // Primary care list: the workspace view (leave-out and move-up controls on each line)
+  if(S.previewMode==='pcp'){
+    pre.innerHTML=generatePCPHTML(true);
     updateSectionHeaders();
     return;
   }
@@ -6858,6 +7241,7 @@ function clearAll(opts){
   document.getElementById('levelGroup').style.display='none';
   document.getElementById('showDSMTable').checked=true;
   document.getElementById('showDSMLines').checked=false;
+  document.getElementById('pcpInNoteCb').checked=true;
   document.getElementById('levelJustificationSCField').value='';
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
@@ -6921,19 +7305,20 @@ const SEL_FIELDS={
   strangerDanger:'flag', safety:'many', ag:'many', showDSMTable:'flag', showDSMLines:'flag',
   insuranceType:'one', abaHours:'one', abaSetting:'many', abaTargets:'many',
   overrides:'map',
+  dbpFollowUp:'one', pcpInNote:'flag', pcpOmit:'many', pcpFirst:'many',
 };
 // Typed by the clinician, so PHI-capable: never exported, and restore cannot write them
 // because decodeSelections only ever emits SEL_FIELDS keys. priorTestingDate is a typed
 // year, left out on purpose (it narrows re-identification when joined to the categories).
 const SEL_TYPED=['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval',
-  'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments'];
+  'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments','pcpExtra'];
 const SEL_VIEW=['previewMode']; // which output tab is showing; not part of the case
 // 'one' fields set by a menu instead of a radio group: field -> select id.
 const SEL_MENUS={paeQuantity:'paeDrinksSel',paeFrequency:'paeFrequencySel',paeTiming:'paeTimingSel',
   evalProfileStatus:'evalProfileStatusSel',evalDxStatus:'evalDxStatusSel',evalDxOutcome:'evalDxOutcomeSel',ados2Module:'ados2ModuleSel'};
 // Flags whose checkbox is wired by id (the rest are data-key="single" / criteriaC-E).
 const SEL_ID_FLAGS={unevenCog:'unevenCogCb',adaptiveStandardized:'adaptiveStandardizedCb',
-  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines'};
+  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines',pcpInNote:'pcpInNoteCb'};
 // Sub-rows a parent checkbox reveals from its change handler. Restore fires no handlers,
 // so paintFormFromState recomputes them from S. A new reveal-on-check row needs an entry
 // here (invariants lane checks every hidden-by-default "...Row" id is accounted for).
@@ -6970,7 +7355,7 @@ const SEL_TEMPLATE=new Set(['visitType','ageGroup','langLevel','langModifiers',
   'needsComm','needsAdaptive','needsBehavior','needsSocial','needsSensory','needsMotor',
   'emotionalReg','academic','strangerDanger','teacherMaterials',
   'safety','ag','showDSMTable','showDSMLines',
-  'insuranceType','abaHours','abaSetting','overrides']);
+  'insuranceType','abaHours','abaSetting','overrides','pcpInNote']);
 const SEL_SCOPE_TEMPLATE='scope=template';
 // Categories that are sensitive beyond ordinary clinical detail; a Full string holding
 // any of them gets a named notice in the panel. label -> the fields that carry it.
@@ -7019,6 +7404,7 @@ function selPruneOrphans(){
   if(!st.hasProfile) S.evalProfileStatus='';
   if(!st.hasDx||(S.evalDxStatus==='today'&&!st.dxTodayAllowed)) S.evalDxStatus='';
   if(!S.evalDxStatus) S.evalDxOutcome='';
+  pcpPruneEdits();
 }
 
 // PURE (reads S only). level is 'template' or 'full'. Only values that differ from a
@@ -7063,6 +7449,7 @@ function selAllowed(){
   a.specifiersManuallySet=COG_SPEC_EXCL.slice();
   a.schoolSvcManualOff=a.schoolSvc;
   a.comorbidInPlan=[...document.querySelectorAll('.plan-pill[data-cv]')].map(p=>p.dataset.cv);
+  a.pcpOmit=a.pcpFirst=PCP_DEFS.map(d=>d.id); // rows of the primary care list; its controls are drawn by render()
   a.therapyStatus={};
   Object.keys(S.therapyStatus).forEach(k=>{a.therapyStatus[k]=vals('input[type=radio][name="therapyStatus_'+k+'"]');});
   a.priorTestingOutcome={};
@@ -7239,7 +7626,7 @@ function setSelLevel(level){
   const hint=document.getElementById('selLevelHint');
   const sens=level==='full'?selSensitiveIn(str):[];
   hint.textContent=level==='template'
-    ?'Template: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, DSM table display, insurance category, ABA hours and settings, and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
+    ?'Template: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, DSM table display, insurance category, ABA hours and settings, referral overrides, and whether the primary care list is added to the note. Leaves out the diagnosis, the follow-up plan, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
     :'Full: every selection in the form.';
   if(sens.length){
     // The category names carry the emphasis; red stays reserved for the standing caution
@@ -7452,6 +7839,7 @@ function updateSectionHeaders(){
   const sf=S.safety.size;setSH('sh-safety',sig.safety.content,sf>0?sf+' item'+(sf>1?'s':''):'');
   // 9 AG
   const ag=S.ag.size;setSH('sh-ag',ag>0,ag>0?ag+' item'+(ag>1?'s':''):'');
+  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()),S.dbpFollowUp==='pcp'?'No routine DBP follow-up':S.dbpFollowUp==='dbp'?'DBP follow-up continues':'');
   autoOpenSections();
 }
 
@@ -7817,7 +8205,7 @@ function updateAgeBasedVisibility(){
   // renumber is display-only. Iterating the canonical id list (not a DOM query) keeps the
   // unnumbered utility sections (ABA parameters, Adjust Referrals) out of the count.
   let folioN=1;
-  ['sh-profile','sh-dxWorkup','sh-dsm5','sh-needs','sh-medflags','sh-comorbid','sh-school','sh-safety','sh-ag'].forEach(id=>{
+  ['sh-profile','sh-dxWorkup','sh-dsm5','sh-needs','sh-medflags','sh-comorbid','sh-school','sh-safety','sh-ag','sh-followup'].forEach(id=>{
     const h=document.getElementById(id);if(!h)return;
     const w=h.closest('.section');
     const f=h.querySelector('.sec-folio');
@@ -8576,6 +8964,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('labsOrderedField').addEventListener('input',function(){S.labsOrdered=this.value;render();});
   document.getElementById('showDSMTable').addEventListener('change',function(){S.showDSMTable=this.checked;render();});
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
+  document.getElementById('pcpInNoteCb').addEventListener('change',function(){S.pcpInNote=this.checked;render();});
+  document.getElementById('pcpExtraField').addEventListener('input',function(){S.pcpExtra=this.value;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{
     pill.addEventListener('click',()=>toggleComorbidPlan(pill.dataset.cv));
     // The pill's own text ("Include plan" / "Note only") never names the condition, so its

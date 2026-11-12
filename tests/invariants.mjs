@@ -580,12 +580,17 @@ const outcomeMenus = Object.fromEntries(
   [...html.matchAll(/<select\b[^>]*data-outcome-key="(\w+)"[^>]*>([\s\S]*?)<\/select>/g)]
     .map(m => [m[1], [...m[2].matchAll(/<option\b[^>]*\bvalue="([^"]+)"/g)].map(o => o[1])]));
 const valuesOf = k => [...(controlValues.get(k) || [])].filter(v => v !== '');
+const pcpRowIds = [...balancedAfter('const PCP_DEFS=').matchAll(/\{id:'(\w+)',group:'(\w+)'/g)].map(m => m[1]);
 // 'many' fields with no checkbox group of their own: where their members come from.
 const SEL_MANY_SOURCES = {
   langModifiers: () => modIds,
   specifiersManuallySet: () => cogSpecExcl,
   schoolSvcManualOff: () => valuesOf('schoolSvc'),
   comorbidInPlan: () => planPillKeys,
+  // Rows of the primary care list. Their leave-out / move-up buttons are drawn by
+  // render(), so the saved values come from the row table, not from markup.
+  pcpOmit: () => pcpRowIds,
+  pcpFirst: () => pcpRowIds,
 };
 const vocabulary = {}; // field -> {type, values}; what a version-N string may contain
 for (const [k, t] of Object.entries(selFields)) {

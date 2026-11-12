@@ -9,7 +9,8 @@
 // and every output to come back identical: each control's checked/disabled/highlight
 // state, each menu, the visibility of every element with an id, the modifier chips,
 // plan pills and referral pills, the on-screen note, and the text of generateNote(),
-// the ABA letter and the IEP letter (plain and preview).
+// the ABA letter and the IEP letter (plain and preview), and the primary care list
+// (plain, Word copy and workspace view, with its left-out and moved-up lines).
 //
 // The clicks come from a fixed seed, so a failure reproduces. Typed text is blanked
 // before each export on purpose: a selections string never carries it. A restore that
@@ -65,6 +66,9 @@ function snapshot() {
   gen('gen:abaPreview', () => generateABALetter(true));
   gen('gen:iepPlain', () => generateIEPLetterPlain());
   gen('gen:iepPreview', () => generateIEPLetterHTML());
+  gen('gen:pcpPlain', () => generatePCPPlain());
+  gen('gen:pcpRich', () => generatePCPHTML(false));
+  gen('gen:pcpView', () => generatePCPHTML(true));
   o['eligible:aba'] = String(abaLetterEligible());
   o['eligible:iep'] = String(iepLetterEligible());
   return o;
@@ -72,7 +76,7 @@ function snapshot() {
 
 byId('secToggleAllBtn').click(); // open every section so its controls can be clicked
 const failures = [];
-const stats = { runs: RUNS, abaLetters: 0, iepLetters: 0, announced: 0, generatorErrors: 0 };
+const stats = { runs: RUNS, abaLetters: 0, iepLetters: 0, pcpEdits: 0, announced: 0, generatorErrors: 0 };
 for (let run = 0; run < RUNS; run++) {
   clearForm();
   const clicks = 10 + Math.floor(rnd() * 70);
@@ -80,6 +84,18 @@ for (let run = 0; run < RUNS; run++) {
     const el = pick([...$('input[type=radio]'), ...$('input[type=checkbox]'), ...$('.mod-chip'), ...$('.plan-pill'), ...$('.ov-pill'), ...$('select')].filter(usable));
     if (el.tagName === 'SELECT') { el.value = pick([...el.options].filter(x => !x.disabled)).value; fire(el, 'change'); }
     else el.click();
+  }
+  // The primary care list's leave-out and move-up buttons exist only on its own tab, so
+  // the random clicks above never reach them: open the tab on about half the forms, press
+  // a few, and return to the note. Every press redraws the list, so re-query each time.
+  if (rnd() < 0.5) {
+    byId('tabPCP').click();
+    for (let i = Math.floor(rnd() * 5); i > 0; i--) {
+      const btns = $('.pcp-btn').filter(b => !b.disabled);
+      if (!btns.length) break;
+      pick(btns).click();
+    }
+    byId('tabNote').click();
   }
   $('textarea,input[type=text],input[type=number]').filter(e => !e.closest('dialog')).forEach(e => { if (e.value) { e.value = ''; fire(e, 'input'); } });
   const exported = exportFull(), before = snapshot();
@@ -96,6 +112,7 @@ for (let run = 0; run < RUNS; run++) {
   if (exported !== reExported) diffs.unshift('re-exported string differs');
   if (before['eligible:aba'] === 'true') stats.abaLetters++;
   if (before['eligible:iep'] === 'true') stats.iepLetters++;
+  if (/;pcp(Omit|First)=/.test(exported)) stats.pcpEdits++;
   if (Object.keys(before).some(k => k.startsWith('gen:') && before[k].startsWith('THREW'))) stats.generatorErrors++;
   if (announced) { stats.announced++; if (!diffs.length) failures.push({ run, note: 'panel announced a drop but nothing differed' }); }
   else if (diffs.length) failures.push({ run, clicks, diffs: diffs.slice(0, 12), exported });

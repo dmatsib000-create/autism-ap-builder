@@ -73,6 +73,24 @@ The DSM-5 Criteria section shows a live badge: ✓ All criteria met when complet
 
 The **ABA Letter** and **IEP Letter** tabs activate as their inputs are populated. The ABA Letter tab appears when the ABA referral fires (see the [technical reference](docs/branching-logic.md) §7 for the full trigger list — it's needs-driven, not gated on diagnosis status alone) or is manually included via the Adjust Referrals override pills. The IEP Letter tab appears when school documentation status is set and the patient is not a toddler. Both tabs use the same one-form-three-outputs model — you don't enter anything separately, the letters auto-generate from the same checkboxes that drove the A&P note.
 
+### Hand the child back to primary care (PCP Recs)
+
+The **PCP Recs** tab builds a short list for the child's primary care clinician from what you already selected: who does what and when, what primary care can manage without this clinic, whether you expect the child back, and what should prompt a referral. Its purpose is to make routine follow-up here unnecessary where it is not needed, so those visits go to new children.
+
+1. Open section 10, **Follow-up & Primary Care**, and choose a **DBP follow-up plan**: *No routine DBP follow-up* or *DBP follow-up continues*. Until you choose, the list stays on its tab and the note is unchanged.
+2. Open the **PCP Recs** tab to review it. On each line, **✓** leaves the line out or puts it back, and **↑** moves it to the top of its group (click several in the order you want them). Lines you type under "Your own lines for primary care" print after the generated actions.
+3. Copy it from the tab, or let it ride in the A&P note, where it prints just above Return to Clinic. Untick "Add the list to the A&P note" in section 10 if you only want it on its own.
+
+Things to know:
+
+- **Nothing is invented.** Every line comes from a selection, and no line restates a diagnosis. With an empty form the tab is empty.
+- **"No routine DBP follow-up" gives way to open work.** If the form still holds something only this clinic can finish (an evaluation in progress, rating forms not yet returned, a suspected ADHD or feeding evaluation, cognitive testing to review) or you typed a return interval, the line names that one return visit instead.
+- **The line that says whether you expect the child back always prints.** It also states how to come back: within 2 years a direct call to the clinic, after that a new referral. The clinic phone number is a `{placeholder}` to fill in Epic.
+- **Your edits survive changes to the form.** Left-out and moved lines are remembered per line, so the list can rebuild as you keep selecting. To change a line's wording, edit it in Epic after pasting.
+- **The plan and your edits are saved at the Full level** of Export / Restore. Typed lines are not saved.
+
+The rules behind every line, and which statements are the note's own wording, your clinic's decisions, or new, are in the [technical reference](docs/branching-logic.md) §13.
+
 ### Save your selections and reuse them (Export / Restore)
 
 The **Export / Restore** button in the top bar turns everything you clicked into one line of text, and rebuilds the form from a line you saved earlier. Nothing is stored in the browser, so this is how a set of selections survives closing the tab.
@@ -87,7 +105,7 @@ APB1;scope=template;ageGroup=schoolAge;langLevel=phrase;needsComm=expressive,rec
 
 1. Click **Export / Restore**.
 2. Choose how much to save:
-   - **Template** (already selected) keeps the reusable outline: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, the two DSM table display choices, insurance category, ABA hours and settings, and referral overrides. Use it for a personal starting point you will reuse across visits.
+   - **Template** (already selected) keeps the reusable outline: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, the two DSM table display choices, insurance category, ABA hours and settings, referral overrides, and whether the primary care list is added to the note. Use it for a personal starting point you will reuse across visits.
    - **Full** keeps every selection, including the diagnosis, cognitive and adaptive profile, medical and exposure history, comorbid conditions, and test results. The panel names any sensitive categories the line contains.
 3. Click **Copy** and paste the line wherever you keep it.
 
@@ -114,12 +132,13 @@ If the form already holds anything, the panel first warns that restoring replace
 
 ## What you get
 
-One form on the left produces three coordinated outputs on the right. You don't enter anything separately for the ABA Letter or IEP Letter — they're derived from the same state that drives the A&P note.
+One form on the left produces four coordinated outputs on the right. You don't enter anything separately for the ABA Letter, the IEP Letter, or the primary care list — they're derived from the same state that drives the A&P note.
 
 | Output tab | What it contains | When the tab appears |
 |---|---|---|
 | **A&P Note** | Clinical summary (auto-generated narrative covering age, visit type, language, cognitive profile, DSM-5 status, severity levels, prior testing, specifiers); DSM-5 criteria table with evidence text; problem-based plan including therapy referrals with clinical rationale, medical referrals (genetics with AMA-cited guideline framing, neurology, audiology, GI, etc.), safety counseling, anticipatory guidance, and return-to-clinic interval | Always visible |
 | **ABA Letter** | Pre-filled medical-necessity intro paragraph; diagnosis statement with DSM-5 specifiers and severity level (uses max of Social Communication and RRB so highest support need drives authorization); requested weekly hours; recommended setting(s); treatment targets each with a one-sentence clinical rationale; authorization period and therapist signature block | When the ABA referral fires (needs-driven, not gated on diagnosis status alone; see the [technical reference](docs/branching-logic.md) §7) or is manually included via the Adjust Referrals override pills |
+| **PCP Recs** | Owner-tagged actions with a timeframe where one applies; what primary care can monitor and manage; whether DBP follow-up is needed and how to come back; changes that should prompt re-referral to DBP or direct referral elsewhere. Built only from selections | Always visible; it is added to the A&P note once a follow-up plan is chosen |
 | **IEP Letter** | IDEA-branch-appropriate opening (initial evaluation request / amendment / 504 upgrade / rule-out evaluation support); diagnosis statement with DSM-5 specifiers and severity; educational impact bullets; one rationale paragraph per requested school service; accommodation list; statutory citations (IDEA §300.301 / §300.302 / §300.324) | When school documentation status is set AND age group is not toddler (toddlers route through Early Steps, not K-12 IDEA) |
 
 > *To see concrete output, open the [live tool](https://dmatsib000-create.github.io/autism-ap-builder/autism-ap-builder.html) and work the quick-start example above — it's faster and always current than any sample pasted here.*

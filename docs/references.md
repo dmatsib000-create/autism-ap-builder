@@ -25,6 +25,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§8 Fetal alcohol spectrum disorders](#8-fetal-alcohol-spectrum-disorders)
 - [§9 Education law — IDEA and Florida ESE rules](#9-education-law--idea-and-florida-ese-rules)
 - [§10 Toe walking & gait](#10-toe-walking--gait)
+- [§11 Primary care hand-back](#11-primary-care-hand-back)
 
 ---
 
@@ -387,6 +388,92 @@ Was listed as: Mehler MF, Mehler MF. "Classification of mild and minor developme
 
 - **Why retired:** a PubMed search on 2026-10-31 found no such paper: nothing by any Mehler on developmental delay, and no 2016 *JAMA Pediatrics* article with "developmental delay" in the title. The only Mark F. Mehler in PubMed researches Huntington's disease and neural stem cells, and the doubled author line suggests the reference was generated rather than copied from a source.
 - **What changed:** the only inline consumer, the comment above `gddSevWord()` in autism-ap-builder.html, now states the severity adjective is a maintainer clinical-judgment call. No note or letter output ever showed this citation, and output is unchanged. The design choice stands; if a real source is found later, add it as a new entry.
+
+---
+
+## 11. Primary care hand-back
+
+Sources behind the Recommendations for Primary Care list (`PCP_DEFS` in `autism-ap-builder.html`; `docs/branching-logic.md` §13). None of these is printed in the note, the list, or either letter: they are cited from code comments and from §13.6. Every entry below was checked against its PubMed record in a Claude session on 2026-11-12. Guideline full texts could not be opened in that session (publisher sites were blocked), so each `Supports the claim` line says whether the claim rests on the abstract or on full text. `[hyman-2020]` (§1), `[noritz-2013]`, `[gelfer-2024]` (§10), `[idea-34cfr300]` (§9) and `[apa-dsm-5-tr-2022]` (§6) are reused by §13 and keep their own entries.
+
+### `[lipkin-2020]` — AAP clinical report on developmental surveillance and screening
+
+Lipkin PH, Macias MM; Council on Children With Disabilities, Section on Developmental and Behavioral Pediatrics. **Promoting optimal development: identifying infants and young children with developmental disorders through developmental surveillance and screening.** *Pediatrics.* 2020;145(1):e20193449. doi:10.1542/peds.2019-3449 (PMID 31843861)
+
+- **Used for:** docs/branching-logic.md §13.6; the `sibling` row of `PCP_DEFS` (autism screening at the 18- and 24-month visits).
+- **Supports the claim:** Abstract states that children with a diagnosed developmental disorder are identified as having special health care needs "with initiation of chronic condition management in the pediatric medical home", and gives general developmental screening at 9, 18 and 30 months with autism screening at 18 and 24 months. This is the basis for placing ongoing care with primary care. It does not say that subspecialty follow-up is unnecessary; no guideline found does.
+- **Verified:** bibliographic details and the quoted abstract wording confirmed against PubMed PMID 31843861 on 2026-11-12 (Claude session). The corporate-author string was not returned by PubMed and should be checked on the article page. Maintainer initials pending.
+
+### `[wolraich-2019]` — AAP clinical practice guideline for ADHD
+
+Wolraich ML, Hagan JF Jr, Allan C, et al; Subcommittee on Children and Adolescents With Attention-Deficit/Hyperactive Disorder. **Clinical practice guideline for the diagnosis, evaluation, and treatment of attention-deficit/hyperactivity disorder in children and adolescents.** *Pediatrics.* 2019;144(4):e20192528. doi:10.1542/peds.2019-2528 (PMID 31570648; PMC7067282)
+
+- **Used for:** docs/branching-logic.md §13.6; the `adhd` row of `PCP_DEFS` (primary care continues ADHD medication once the dose is stable and checks heart rate and blood pressure).
+- **Supports the claim:** Full text read (PMC). The guideline is written for the primary care clinician, treats ADHD as a chronic condition managed in the medical home, and encourages monitoring of heart rate and blood pressure; it gives no visit interval in the guideline text itself. Read with `[barbaresi-2020]`, which points the other way for a child who also has autism.
+- **Verified:** bibliographic details confirmed against PubMed PMID 31570648 on 2026-11-12 (Claude session); the points above were read in the PMC full text in that session. Maintainer initials pending.
+
+### `[barbaresi-2020]` — SDBP clinical practice guideline for complex ADHD
+
+Barbaresi WJ, Campbell L, Diekroger EA, et al. **Society for Developmental and Behavioral Pediatrics clinical practice guideline for the assessment and treatment of children and adolescents with complex attention-deficit/hyperactivity disorder.** *J Dev Behav Pediatr.* 2020;41 Suppl 2S:S35-S57. doi:10.1097/DBP.0000000000000770 (PMID 31996577)
+
+- **Used for:** docs/branching-logic.md §13.6; the `tAdhd` row of `PCP_DEFS` (re-refer when ADHD symptoms remain impairing despite treatment).
+- **Supports the claim:** Abstract defines ADHD with a coexisting condition (autism included) as complex ADHD that warrants specialist assessment, and names an inadequate response to treatment as a reason for that assessment. This is why the list sends treatment failure back to DBP. The guideline states no number of failed trials; "two failed medication trials" was searched for and is in no source.
+- **Verified:** bibliographic details confirmed against PubMed PMID 31996577 on 2026-11-12 (Claude session). Abstract only; the key action statement wording was not read. Maintainer initials pending.
+
+### `[williams-buckley-2020]` — AAN practice guideline on insomnia in autism
+
+Williams Buckley A, Hirtz D, Oskoui M, et al. **Practice guideline: Treatment for insomnia and disrupted sleep behavior in children and adolescents with autism spectrum disorder: report of the Guideline Development, Dissemination, and Implementation Subcommittee of the American Academy of Neurology.** *Neurology.* 2020;94(9):392-404. doi:10.1212/WNL.0000000000009033 (PMID 32051244; PMC7238942)
+
+- **Used for:** docs/branching-logic.md §13.6; the `sleep` and `tSleep` rows of `PCP_DEFS` (behavioral sleep plan first, melatonin alongside it, come back if both fail).
+- **Supports the claim:** Abstract: behavioral strategies first; if they are not enough, melatonin "starting with a low dose". The list prints no milligram dose on purpose: the dose table was not read, and the AAN and AAP figures seen secondhand differ. The 4 to 6 week reassessment in the `sleep` row is the note's own interval (this clinic's practice), not a guideline number.
+- **Verified:** bibliographic details confirmed against PubMed PMID 32051244 on 2026-11-12 (Claude session). Abstract only. Maintainer initials pending.
+
+### `[aguinaldo-2021]` — ASQ validated in primary care and outpatient specialty clinics
+
+Aguinaldo LD, Sullivant S, Lanzillo EC, et al. **Validation of the ask suicide-screening questions (ASQ) with youth in outpatient specialty and primary care clinics.** *Gen Hosp Psychiatry.* 2021;68:52-58. doi:10.1016/j.genhosppsych.2020.11.006 (PMID 33310014; PMC7855604)
+
+- **Used for:** autism-ap-builder.html, comment on the `mood` row of `PCP_DEFS`; docs/branching-logic.md §13.6.
+- **Supports the claim:** In 515 youth aged 10 to 21, the ASQ had 100% sensitivity in both the outpatient specialty and the primary care samples (specificity 91.2% and 87.9%). Supports naming the ASQ as the suicide-risk screen a PCP can use at the mood and safety recheck. The sample was not an autism sample and did not include children under 10.
+- **Verified:** bibliographic details and figures confirmed against PubMed PMID 33310014 on 2026-11-12 (Claude session). PubMed lists the electronic publication date as November 2020; the volume year is 2021 and should be checked on the article page. Maintainer initials pending.
+
+### `[horowitz-2012]` — Original ASQ development study
+
+Horowitz LM, Bridge JA, Teach SJ, et al. **Ask Suicide-Screening Questions (ASQ): a brief instrument for the pediatric emergency department.** *Arch Pediatr Adolesc Med.* 2012;166(12):1170-1176. doi:10.1001/archpediatrics.2012.1276 (PMID 23027429; PMC6889955)
+
+- **Used for:** autism-ap-builder.html, comment on the `mood` row of `PCP_DEFS`; docs/branching-logic.md §13.6.
+- **Supports the claim:** Derivation of the four-question ASQ in 524 emergency department patients aged 10 to 21 (sensitivity 96.9%, specificity 87.6%). Cited as the origin of the instrument; `[aguinaldo-2021]` is the evidence for use outside the emergency department.
+- **Verified:** bibliographic details and figures confirmed against PubMed PMID 23027429 on 2026-11-12 (Claude session). Maintainer initials pending.
+
+### `[forrest-2000]` — What referring pediatricians value in a specialist's letter
+
+Forrest CB, Glade GB, Baker AE, Bocian A, von Schrader S, Starfield B. **Coordination of specialty referrals and physician satisfaction with referral care.** *Arch Pediatr Adolesc Med.* 2000;154(5):499-506. doi:10.1001/archpedi.154.5.499 (PMID 10807303)
+
+- **Used for:** docs/branching-logic.md §13.6 (why each action row names an owner and why the follow-up lines always print).
+- **Supports the claim:** Across 963 referrals from 122 pediatricians, a stated plan for co-managing the patient was the only letter element significantly related to the referring physician's overall satisfaction. Supports the list's shape. It measured physician satisfaction, not child outcomes.
+- **Verified:** bibliographic details confirmed against PubMed PMID 10807303 on 2026-11-12 (Claude session). Abstract only. Maintainer initials pending.
+
+### `[baum-2024]` — DBP workforce supply, 2020 to 2040
+
+Baum RA, Berman BD, Fussell JJ, et al. **Child health needs and the developmental-behavioral pediatrics workforce supply: 2020-2040.** *Pediatrics.* 2024;153(Suppl 2). doi:10.1542/peds.2023-063678H (PMID 38300001)
+
+- **Used for:** docs/branching-logic.md §13.6 (why the feature exists).
+- **Supports the claim:** About 1.0 DBP subspecialist per 100,000 US children in 2023, projected to stay at 0.8 to 1.0 through 2040. Supports the premise that follow-up visits compete with new evaluations for a fixed supply. No study was found that tests whether handing stable patients back to primary care improves access or is safe; §13.6 says so.
+- **Verified:** bibliographic details confirmed against PubMed PMID 38300001 on 2026-11-12 (Claude session). PubMed returned no page or e-locator; **needs verification** on the article page before quoting outside this repo. Maintainer initials pending.
+
+### `[aap-mh-toolkit-2e]` — AAP Mental Health Toolkit, 2nd edition (needs verification)
+
+American Academy of Pediatrics. **Addressing Mental Health Concerns in Pediatrics: A Practical Resource Toolkit for Clinicians, 2nd edition.**
+
+- **Used for:** docs/branching-logic.md §13.6. Named by the maintainer on 2026-11-12 as the source primary care can draw on for the mood and safety recheck, together with the NIMH ASQ toolkit.
+- **Supports the claim:** Not yet established. The maintainer's copy could not be read in the session that built the list (the folder was reachable but its files were not returned), so no wording in the `mood` row comes from it. The title above is from memory.
+- **Verified:** **needs verification**. Title, edition, year and publisher detail are unconfirmed; do not quote from this entry.
+
+### `[nimh-asq-toolkit]` — NIMH Ask Suicide-Screening Questions toolkit (needs verification)
+
+National Institute of Mental Health. **Ask Suicide-Screening Questions (ASQ) Toolkit.** nimh.nih.gov.
+
+- **Used for:** autism-ap-builder.html, the `mood` row of `PCP_DEFS` names the toolkit and its brief suicide safety assessment; docs/branching-logic.md §13.6.
+- **Supports the claim:** The toolkit pairs the ASQ screen with a brief suicide safety assessment for a positive screen. That pairing is stated in the row from general knowledge of the toolkit; the toolkit pages were not opened in the session that wrote it.
+- **Verified:** **needs verification**. Confirm the brief suicide safety assessment wording and the toolkit's current age guidance on the NIMH page.
 
 ---
 

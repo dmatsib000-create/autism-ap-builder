@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `44e8734`
+> **Last verified against commit:** `5820be4`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -93,6 +93,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `pronouns` | string | `'he' \| 'she' \| 'they' \| ''` | §8 (pronoun resolution) |
 | `visitType` | string | varies | Note framing, RTC interval |
 | `rtcInterval` | string | varies | Plan section |
+| `dbpFollowUp` | string | [§13.3](#133-follow-up-lines-a-standing-line-that-selections-override) |
 | `diagStatus` | string | `'confirmed' \| 'suspected' \| 'ruleOut'` | §4, §5 (tab gates), §9 (ABA gate) |
 | `insuranceType` | string | varies | ABA letter framing |
 
@@ -190,11 +191,21 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 |---|---|
 | `overrides` | object, one key per rule; values `'auto' \| 'yes' \| 'no'`. See §7 |
 
+**Primary care list (§13):**
+
+| Property | Drives |
+|---|---|
+| `dbpFollowUp` | `'' \| 'pcp' \| 'dbp'` — the follow-up plan. `''` = not chosen (the list stays on its tab and is not in the note); `'pcp'` = no routine DBP follow-up; `'dbp'` = DBP follow-up continues. Also switches the Return to Clinic line, the gait recheck owner, and the depression plan's recheck line (§13.5) |
+| `pcpInNote` | boolean, default `true` — whether the list is inserted into the A&P note once a plan is chosen |
+| `pcpOmit` | Set of `PCP_DEFS` row ids the clinician left out |
+| `pcpFirst` | Set of `PCP_DEFS` row ids moved to the top of their group, in click order |
+| `pcpExtra` | string, typed — the clinician's own lines, one per row, printed after the generated actions |
+
 **UI / preview:**
 
 | Property | Drives |
 |---|---|
-| `previewMode` | `'note' \| 'aba' \| 'iep'` — which tab is active |
+| `previewMode` | `'note' \| 'aba' \| 'iep' \| 'pcp'` — which tab is active |
 | `traumaIncludeInIEP` | boolean — opt-in gate for disclosing trauma in the IEP letter (default `false` to protect educational record) |
 
 The full property list is intentionally exhaustive — it doubles as a checklist when adding a new branch ("is the field I'm adding really new, or is there already a Set I should reuse?").
@@ -276,6 +287,10 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `paeEvidence` | Set | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `paeFrequency` / `paeQuantity` / `paeTiming` | string | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
 | `prenatalAlcohol` | boolean | [§7.9](#79-fasd-flags--prenatal-alcohol-exposure--fasd-features) |
+| `pcpExtra` | string (typed) | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
+| `pcpFirst` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
+| `pcpInNote` | boolean | [§13.1](#131-placement-a-tab-that-also-feeds-the-note) |
+| `pcpOmit` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `previewMode` | string | [§5.4](#54-fallback-behavior) |
 | `priorTesting` | Set | [§1.2](#12-the-s-object--property-reference) |
 | `pronouns` | string | [§8](#8-pronoun--verb-agreement) |
@@ -329,9 +344,9 @@ The header button **Export / Restore** opens a panel (`#selDialog`) with two hal
 
 **Format.** `APB<version>;key=value;key=a,b;key=k:v,k:v`, values URI-encoded (the only value that needs it today is the ADOS-2 module, `Module%203`). Keys are `S` property names. Only values that differ from `initialState()` are written, so an empty form exports as `APB1`. Sets keep their click order, because some generators list items in that order.
 
-**What is saved is declared in one table.** `SEL_FIELDS` maps each saved `S` property to a type: `one` (single choice), `flag` (boolean), `many` (Set), `map` (object of single choices: `therapyStatus`, `priorTestingOutcome`, `overrides`). `SEL_TYPED` lists the typed fields, which are never exported: `unevenCogDesc`, `strengths`, both level justifications, `rtcInterval`, `ev.*`, `behavFreq.*`, `labsOrdered`, `paeDetail`, `teacherMaterialOther`, `iepInstruments`, and `priorTestingDate` (a typed year, left out by decision 2026-11-12). `SEL_VIEW` holds `previewMode`. Text that a chip writes into a typed field (strength chips, evidence chips, the echolalia auto-fill of B1 evidence) is typed text for this purpose and is not exported. The unit lane fails if an `initialState()` key is in none of the three lists, so a new `S` property cannot ship unclassified.
+**What is saved is declared in one table.** `SEL_FIELDS` maps each saved `S` property to a type: `one` (single choice), `flag` (boolean), `many` (Set), `map` (object of single choices: `therapyStatus`, `priorTestingOutcome`, `overrides`). `SEL_TYPED` lists the typed fields, which are never exported: `unevenCogDesc`, `strengths`, both level justifications, `rtcInterval`, `pcpExtra`, `ev.*`, `behavFreq.*`, `labsOrdered`, `paeDetail`, `teacherMaterialOther`, `iepInstruments`, and `priorTestingDate` (a typed year, left out by decision 2026-11-12). `SEL_VIEW` holds `previewMode`. Text that a chip writes into a typed field (strength chips, evidence chips, the echolalia auto-fill of B1 evidence) is typed text for this purpose and is not exported. The unit lane fails if an `initialState()` key is in none of the three lists, so a new `S` property cannot ship unclassified.
 
-**Two export levels.** `SEL_TEMPLATE` lists the fields exported at the default **Template** level: visit type, age band, language level and modifiers, the six needs Sets plus `emotionalReg` / `academic` / `strangerDanger`, requested teacher materials, safety and anticipatory-guidance topics, the two DSM display toggles, insurance category, ABA hours and settings, and referral overrides. Everything else is exported only at **Full**: the diagnostic determination (status, levels, criteria), pronouns, cognitive and adaptive profile, specifiers, medical flags, exposure history, comorbid conditions and their sub-options, prior testing and work-up results, therapy status, social work, school placement and documentation. A field absent from `SEL_TEMPLATE` is Full-only, so a new field defaults to the narrower export. Template drops the derived `rigidity` need, since it depends on criterion B2, which Template omits. For the same reason `schoolSvc`, `schoolSvcManualOff` and `abaTargets` are Full-only: the add-only syncs fill them from omitted fields as well (`sped` from an ID profile, `counseling` from a comorbid diagnosis, `transitions` from B2), so exporting them would disclose what Template leaves out. A Template string carries the marker `scope=template`, and restoring one runs `syncABATargetsFromNeeds()` and `syncSchoolSvcFromNeeds()` to rebuild both from the restored needs; services or targets that were hand-picked beyond what the needs imply are not carried by a Template. The panel always reopens at Template.
+**Two export levels.** `SEL_TEMPLATE` lists the fields exported at the default **Template** level: visit type, age band, language level and modifiers, the six needs Sets plus `emotionalReg` / `academic` / `strangerDanger`, requested teacher materials, safety and anticipatory-guidance topics, the two DSM display toggles, insurance category, ABA hours and settings, referral overrides, and `pcpInNote` (whether the primary care list is added to the note, a display preference like the DSM toggles). Everything else is exported only at **Full**: the follow-up plan and the primary care list edits (`dbpFollowUp`, `pcpOmit`, `pcpFirst`: a disposition and edits made for one child, and an edit's row id shows which condition produced the row), the diagnostic determination (status, levels, criteria), pronouns, cognitive and adaptive profile, specifiers, medical flags, exposure history, comorbid conditions and their sub-options, prior testing and work-up results, therapy status, social work, school placement and documentation. A field absent from `SEL_TEMPLATE` is Full-only, so a new field defaults to the narrower export. Template drops the derived `rigidity` need, since it depends on criterion B2, which Template omits. For the same reason `schoolSvc`, `schoolSvcManualOff` and `abaTargets` are Full-only: the add-only syncs fill them from omitted fields as well (`sped` from an ID profile, `counseling` from a comorbid diagnosis, `transitions` from B2), so exporting them would disclose what Template leaves out. A Template string carries the marker `scope=template`, and restoring one runs `syncABATargetsFromNeeds()` and `syncSchoolSvcFromNeeds()` to rebuild both from the restored needs; services or targets that were hand-picked beyond what the needs imply are not carried by a Template. The panel always reopens at Template.
 
 **Restore.** `decodeSelections(str, allowed)` is pure. `allowed` comes from `selAllowed()`, which reads the values the page's own controls can produce (radio and checkbox `value`s, menu options, modifier chip ids, plan pills, override keys). A key not in `SEL_FIELDS`, or a value no control offers, is dropped; a typed-field key is dropped the same way because it is not in `SEL_FIELDS`. This whitelist is what prevents a hand-edited string from carrying text into the form. `applySelectionState()` then runs `clearAll({confirmed:true})`, assigns the decoded fields, and calls `paintFormFromState()`, which sets every control and reveal-on-check row from `S` (`SEL_SUBROWS` holds the row predicates; the invariants lane checks every hidden-by-default `...Row` id is covered). For a Full string the add-only syncs are not re-run, so the restored form equals the exported one, with one exception: the visibility helpers `paintFormFromState()` calls (`updateAgeBasedVisibility()`, `toggleBifSpecifierGate()`) and `render()` still enforce their rules, so a state they forbid is corrected and reported, not reproduced. The form itself is not known to produce such a state any more: the one known route, "Unspecified delays" (`cogProfile='gdd'`) surviving a preschool to school-age switch, was closed when the age cleanup began reading `GDD_COG_PROFILES` (all four GDD values). A string exported before that fix, or a hand-edited one, can still carry `cogProfile=gdd` with a school-age band; restore then clears the profile and its GDD specifier and reports both. Restore replaces the whole form, typed text included; the output tab being viewed is kept: `clearAll()` returns to the note tab, so `applySelectionState()` saves `S.previewMode` first and ends with `setPreviewMode(mode)` (the §5.4 fallback still applies if the restored case does not offer that letter). `clearAll()` hides its reveal-on-check rows from the same `SEL_SUBROWS` table, so Clear All and Restore cannot disagree about which rows exist.
 
@@ -649,6 +664,7 @@ Three output tabs sit at the top of the right-hand panel. Their visibility is re
 | A&P Note | `tabNote` | always visible | — |
 | ABA Letter | `tabABA` | `abaLetterEligible()` = `S.diagStatus === 'confirmed' && referralIncluded('aba')` | next to `resolveOv()` |
 | IEP Letter | `tabIEP` | `iepLetterEligible()` = `S.schoolDoc !== '' && isPartBAge()` | next to `resolveOv()` |
+| PCP Recs | `tabPCP` | always visible; shows an empty-state message until a selection produces a row (§13) | — |
 
 Each predicate is the **single** gate for its letter: `render()` (tab visibility and the fallback below), both generators (`generateABALetter` / `generateABALetterPlain`, `generateIEPLetterHTML` / `generateIEPLetterPlain`) and the copy handler all call it. They used to spell the condition out separately, and the copies drifted — the ABA generators checked only `diagStatus`, so an ABA referral overridden to `'no'` hid the tab but still produced a full letter. The `referralIncluded('aba')` inside `abaLetterEligible()` is the same resolution layer described in [§7](#7-therapy-recommendations--override-system); the ABA parameters section in the form still keys off that inclusion alone (it is form input, not letter output).
 
@@ -1907,6 +1923,149 @@ The six-plus-one membership is council-ratified, grounded in national autism epi
 
 ---
 
+## 13. Recommendations for Primary Care
+
+A fourth output, written for a fourth reader: the child's primary care clinician. It is a short owner-tagged list of what to do, what primary care can manage without this clinic, whether this clinic expects the child back, and what should bring the child back. The purpose is to make routine DBP follow-up unnecessary where it is not needed, so those visits go to new children. Like the note, the ABA letter and the IEP letter, its wording is its own: do not share prose with the other three surfaces (CLAUDE.md, audience rule).
+
+Code: the block headed `RECOMMENDATIONS FOR PRIMARY CARE` in `autism-ap-builder.html` (`PCP_DEFS`, `pcpCtx()`, `pcpBuild()`, `pcpSections()`, `pcpFollowUpLines()`, `generatePCPPlain()`, `generatePCPHTML()`, `pcpPruneEdits()`). Tests: unit cases named `pcp: ...`, fixtures `tests/fixtures/pcp-*.mjs` with `.pcp.txt` goldens, and the browser round trip.
+
+### 13.1 Placement: a tab that also feeds the note
+
+| Piece | Where | What it is for |
+|---|---|---|
+| Inputs | Form section 10, "Follow-up & Primary Care" | The follow-up plan radios (`dbpFollowUp`), the Return to Clinic interval (moved here from section 9, same field and id), the clinician's own lines (`pcpExtra`), and the "Add the list to the A&P note" box (`pcpInNote`) |
+| Workspace | Output tab "PCP Recs" (`tabPCP`, always visible) | Every row the selections produce, each with a leave-out and a move-up button; its own copy bar (rich for Word, plain for Epic, "Undo my edits") |
+| Note section | `── Recommendations for Primary Care ──`, after the last problem block and directly above `RETURN TO CLINIC` | The finished list, live. Present only when `pcpInNoteActive()`: a plan is chosen and `pcpInNote` is on |
+
+Why a hybrid. The list is used last, when the plan is settled and the question is follow-up, so it has to be read with the note (it lands in the note, and the tab says so). It also needs room the note preview cannot give: per-row controls and left-out rows that stay visible so they can be put back. A note-only section would have had nowhere to put those; a tab-only list would have left the note's Return to Clinic line free to contradict it.
+
+Why above Return to Clinic and not at the top of the Plan. The follow-up lines and the return visit are one statement and are read together; consult notes conventionally end with recommendations and follow-up; and the top of the Plan is where a payer reads ABA medical necessity. A clinician who wants the list first pastes it from the tab.
+
+Why the note changes only after a plan is chosen. "No routine DBP follow-up" is a disposition. Printing it, or anything that implies it, without the clinician choosing it would put a clinical decision in the chart that nobody made. With no plan chosen the note is byte-identical to the note before this feature (every pre-existing golden is unchanged), and the tab shows the draft with a brace stop where the follow-up line goes.
+
+### 13.2 Generation rules
+
+A row prints only while its `on(c)` test holds, and every test reads a selection. An empty form produces no row. No row restates a diagnosis (unit lane). Typed text is never echoed into a generated row: the `labs` row prints because the labs box is not empty, and does not repeat what is in it.
+
+Each action row is `Owner (timeframe): action.` The owner is always present for an action. A timeframe is printed only when the note already states one or a guideline gives one; otherwise the row names the visit ("next visit") and no number (§13.6).
+
+| Row id | Group | Prints when | Owner, timeframe |
+|---|---|---|---|
+| `therapyStart` | act | any of ABA, SLP, OT, PT, PCIT, psychotherapy, social skills is included (`referralIncluded`) and is not already under way (`therapyStatus` unset). ABA is listed only with a confirmed diagnosis; preschool social skills is skipped (the note says "refer at a future visit") | PCP, next visit |
+| `referrals` | act | any of genetics, audiology, neurology, psychiatry, GI, sleep study is included, or both FASD flags are set (ophthalmology). Adds "genetics orders the testing" with genetics, and an urgency sentence with ongoing regression | PCP, next visit |
+| `earlySteps` | act | `referralIncluded('earlySteps')` | PCP and family, now |
+| `fdlrs` | act | `referralIncluded('fdlrs')` | Family, now |
+| `schoolEval` | act | Part B age and `schoolDoc` is `iep_needed`, or `neither` outside a private placement. The 60-day clause prints only for `iep_needed`, where the note already prints it | Family, now |
+| `gaitRecheck` | act | `gaitFindings().observeOnly`, plan is not `dbp`, and no return visit typed (`rtcVisitPlanned()` false). With a typed interval the note times the recheck to the DBP return, and while DBP follow-up continues the note leaves the owner as a fill-in, so in both cases the row does not print | PCP, next well visit, no later than 12 months |
+| `eeg` | act | `referralIncluded('eeg')` | DBP |
+| `labs` | act | the labs box holds text | DBP |
+| `sibling` | act | `ag` has `sibling` | PCP, well visits |
+| `transition` | act | `ag` has `transition` | PCP, now (teen and older) or starting in early adolescence |
+| `safety` | act | `safety` has `elopement_counsel` or `water_counsel` | PCP, well visits |
+| `sleep` | manage | `S.sleep` or the sleep-disorder comorbid. The 4 to 6 week reassessment and the sleep-study clause print only when the sleep disorder is in the plan, where the note prints them | primary care |
+| `gi` | manage | GI disorder in the plan | primary care |
+| `growth` | manage | a feeding disorder or ARFID in the plan, confirmed or suspected (two wordings) | primary care |
+| `adhd` | manage | a confirmed ADHD presentation in the plan | primary care |
+| `mood` | manage | depression in the plan, unless DBP follow-up continues (then the recheck stays with this clinic, as the note's depression plan says) | primary care, 4 to 6 weeks |
+| `tNewConcern`, `tBehavior`, `tDocs` | refer | `diagStatus` is `confirmed` | — |
+| `tGdd` | refer | a GDD specifier (confirmed or suspected) | — |
+| `tSleep` | refer | same test as `sleep` | — |
+| `tAdhd` | refer | same test as `adhd` | — |
+| `tRegress` | other | any `diagStatus` | neurology |
+| `tCatatonia` | other | `comorbid` has `catatonia_history` | psychiatry, same day |
+| `tPsych` | other | confirmed ADHD, anxiety, depression or OCD in the plan | child psychiatry |
+| `tSuicide` | other | depression in the plan | emergency or crisis care |
+
+Groups print in this order, each under its own heading, and a group with no kept row prints nothing: **Actions**; **Primary care can monitor and manage (no routine DBP follow-up needed for these)**; **DBP follow-up** (§13.3); **Re-refer to DBP if** (reads "Contact DBP before the return visit if" while a return is still expected, `pcpReturnExpected()`); **Refer directly to another service if**.
+
+The `other` group exists because the best-supported triggers do not belong to DBP. Loss of skills goes to neurology and possible catatonia to psychiatry in every source found, and the attending confirmed that routing on 2026-11-12. Sending them back to this clinic first would only add a delay.
+
+### 13.3 Follow-up lines: a standing line that selections override
+
+The **DBP follow-up** lines always print and cannot be left out: the list must say whether this clinic expects the child back. The design is a mix on purpose.
+
+- **Standing.** With plan `pcp`, no typed return interval, and nothing left with this clinic, the line is "No routine DBP follow-up is needed", followed by how to come back.
+- **Overridden per selection.** `pcpCtx().open` lists what the form says only this clinic can finish. Any entry, or a typed return interval, replaces the standing line with "DBP follow-up is limited to one return visit [in the typed interval] to [the open items]. No routine DBP follow-up is needed after that visit." With an interval but no open item the purpose is a `{purpose of the return visit}` stop.
+- **Per condition.** What needs no DBP follow-up is said once per condition, by the `manage` rows under their heading, not by repeating the standing line for each diagnosis.
+
+A purely per-condition line was rejected because it fails silently: a condition the table does not know gets no statement either way. A purely standing line was rejected because it fails dangerously: it would print "no routine follow-up" for a child whose evaluation is unfinished. The mix makes the standing line the default the clinician chose, and makes every selection that leaves work here an explicit exception to it.
+
+What counts as open work (each is something the note itself leaves with DBP):
+
+| `open` entry | Selection |
+|---|---|
+| complete the autism diagnostic evaluation | `diagStatus` is `suspected` or `ruleOut` |
+| complete the standardized autism testing already scheduled | confirmed, `dxEvalPath` is `certainYoung` / `certainOlder`, and `evalPathSteps().pendingTesting` |
+| review the rating forms requested from school | a requested teacher material not yet marked returned |
+| complete the ADHD evaluation | suspected ADHD in the plan |
+| review the cognitive and adaptive testing once it is completed | `cogEvalReferralPending()` (a suspected ID/GDD specifier without prior external testing, or `bifIdRisk()`) |
+| review the feeding evaluation | suspected PFD or ARFID in the plan |
+| recheck mood and safety | depression in the plan, only while plan is `dbp` |
+
+Deliberately **not** open work (attending decisions, 2026-11-12): the sleep recheck, constipation, growth checks, ADHD medication at a stable dose, and, under a hand-back, the mood and safety recheck. They are `manage` rows.
+
+With plan `dbp` the line is "DBP follow-up continues, with a return visit [interval]" plus the open items. With no plan it is a brace stop, and that state never reaches the note.
+
+**Route back.** Whenever routine visits stop, a second line states this clinic's rule (attending, 2026-11-12): within 2 years of the last visit the family or PCP calls the clinic directly and no new referral is needed; after 2 years, or if the child was discharged from the clinic, a new referral is required. The phone number is a `{clinic phone number}` stop because the tool holds no clinic contact details. If the number is added to the source, remove the stop there and in the goldens.
+
+**Typed interval.** `rtcVisitPlanned()` is true when the Return to Clinic box holds anything other than blank, "as needed" or "prn". It is the same test the gait recheck already used, now shared. A typed value changes the wording of the output but is never saved, so a restored string comes back without it (the standing line then prints if nothing else is open).
+
+### 13.4 Editing, and how edits survive a rebuild
+
+The clinician can leave a generated row out and can move rows up. There is deliberately no in-tool text editing of a generated row.
+
+- **Leave out** (`pcpOmit`): the row is removed from every copy and from the note, and stays visible, struck through, on the tab so it can be put back.
+- **Move up** (`pcpFirst`): the row goes to the top of its own group. Rows moved up keep the order they were clicked in, so any order can be reached by clicking rows in the order wanted. Rows never change group.
+- **Own lines** (`pcpExtra`): typed in section 10, one per line, printed after the generated actions exactly as typed.
+- **Wording changes** are made in Epic after pasting.
+
+Edits are stored as row ids, not as text. That is what lets the list rebuild on every render without losing them: when a selection changes, each surviving row still carries its own leave-out and move-up state, new rows appear in their standard place, and nothing the clinician decided is overwritten. Free reordering by drag, and editable row text, were rejected for the same reason. Edited text has no stable identity, so a rebuild would have to either discard it or freeze a list that no longer matches the selections; and typed text can carry PHI, which a selections string may never hold.
+
+**An edit goes when its row goes.** `pcpPruneEdits()` runs at the top of `render()` and from `selPruneOrphans()`. It drops an id from `pcpOmit` / `pcpFirst` when the row is no longer produced, the same rule the form's sub-options follow, so nothing sits hidden in `S` to ride along in the next export. A left-out row cannot also be moved up. Exception: two rows depend on typed text, which a restore never brings back, so pruning them by their full test would report the edit as "not kept" after every restore. Each carries a `keep` test, the part of its `on` test that reads no typed text, and is pruned by that instead: `labs` is always kept (its only trigger is the labs box), and `gaitRecheck` is kept while the watch-only gait selection holds and DBP follow-up is not continuing.
+
+**Selections string.** `dbpFollowUp`, `pcpOmit` and `pcpFirst` are saved at Full; `pcpInNote` is also in a Template; `pcpExtra` is typed and never saved. Restore accepts only ids that are in `PCP_DEFS` (`selAllowed()`), so a hand-edited string cannot inject text. The tab's buttons are drawn by `render()`, so `paintFormFromState()` needs no step for them.
+
+### 13.5 What the plan changes elsewhere in the note
+
+Three existing lines read `dbpFollowUp`, so the note cannot contradict the list. All three are unchanged when no plan is chosen.
+
+| Line | With plan `pcp` |
+|---|---|
+| `RETURN TO CLINIC` | If no return is expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop, as before |
+| Gait recheck (§7.10) | "at the next well visit with primary care" in place of the `{primary care or this clinic}` stop |
+| Depression plan | "Mood and safety recheck in 4–6 weeks with primary care." in place of "Shortened return-to-clinic interval: 4–6 weeks." |
+
+Known and left alone: several problem blocks say "reassess at next follow-up" without naming an owner (GI, PFD, ARFID), and the confirmed-ADHD and anxiety blocks say "Psychiatry co-management for medication management". The attending's stated practice (2026-11-12) is that psychiatry is involved only for mania, psychosis, treatment failure or complicating substance use, so that note wording and the `rulePsychiatry` auto-referral for any confirmed ADHD or anxiety are candidates for a separate change. Until then the list can print a psychiatry referral to confirm alongside "primary care continues ADHD medication"; the clinician resolves it with the psychiatry override tile.
+
+### 13.6 Clinical content ledger
+
+Per the clinic's working rule, each clinical statement is marked **reworded** (the note already says it), **attending** (decided by the maintainer on 2026-11-12), or **added** (new in this feature; review before relying on it). Sources are in `docs/references.md` §11. Guideline full texts could not be opened when this was written, so "abstract" means the PubMed abstract was read and nothing more.
+
+| Row | Status | Basis |
+|---|---|---|
+| `therapyStart` | added: PCP confirms at the next visit. Reworded: case manager, keep calling waitlists | No guideline gives an interval for confirming services started; "next visit" is a visit, not a number |
+| `referrals` | added: PCP confirms. Reworded: genetics owns its own testing | Note's Medical Referrals text |
+| `earlySteps`, `schoolEval` | reworded (third-birthday deadline, 60 days) | Note; `[idea-34cfr300]` |
+| `fdlrs` | reworded, with "Family" as owner added | Note |
+| `gaitRecheck` | reworded | Note §7.10; `[gelfer-2024]` |
+| `eeg`, `labs` | added: the ordering clinic reviews its own results | Ordinary practice; no source needed |
+| `sibling` | reworded (sibling risk), added: screening at 18 and 24 months | `[lipkin-2020]`, abstract |
+| `transition` | reworded; "early adolescence" in place of the note's ages | AAP transition reports, abstract (not yet in references.md because no number from them is printed) |
+| `safety` | added: PCP revisits at well visits | `[hyman-2020]` abstract names wandering; water safety is this clinic's counseling topic |
+| `sleep`, `tSleep` | reworded (4 to 6 weeks, sleep-study signs); behavioral plan then melatonin | Note; `[williams-buckley-2020]`, abstract. No dose printed |
+| `gi` | reworded | Note ("per GI or PCP guidance") |
+| `growth` | reworded, including the BMI threshold | Note |
+| `adhd`, `tAdhd`, `tPsych` | attending | `[wolraich-2019]` supports PCP management; `[barbaresi-2020]` classes ADHD with autism as complex ADHD needing specialist assessment. The two disagree and the attending chose: PCP continues once stable, treatment failure returns to DBP, psychiatry only for mania, psychosis or complicating substance use |
+| `mood`, `tSuicide` | attending (PCP owns the recheck, using the NIMH ASQ); added: the sentence about the brief suicide safety assessment | `[aguinaldo-2021]`, `[horowitz-2012]`; `[nimh-asq-toolkit]` and `[aap-mh-toolkit-2e]` need verification |
+| `tNewConcern`, `tBehavior`, `tDocs` | attending (chosen as the standing set) | No guideline publishes return-to-DBP criteria; this is clinic policy |
+| `tRegress` | attending (neurology, not DBP) | Consistent with every source found |
+| `tGdd` | added | DSM-5-TR requires reassessment of a GDD diagnosis `[apa-dsm-5-tr-2022]`; read secondhand |
+| `tCatatonia` | reworded | Note's catatonia-history block |
+| Route back (2 years, direct call) | attending | Clinic scheduling policy |
+| Standing line | attending chooses it per child | No guideline says routine DBP follow-up is unnecessary, and none sets an interval. `[lipkin-2020]` places chronic condition management in the medical home; `[forrest-2000]` is why owners and the follow-up arrangement are always stated; `[baum-2024]` is why the visits matter. No study has tested hand-back to primary care for access or safety |
+
+---
+
 ## 12. Maintenance protocol
 
 ### 12.1 When to update
@@ -1923,6 +2082,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
 - `SEC_TABLE` (adding/removing a collapsed-by-default section, or changing a `content`/`relevant` predicate), `secAutoOpenKeys()`, `setSecOpen()` — the form-section defaults and auto-open rules (§1.5). The markup classes on the section's head and body must change in the same commit (the invariants lane enforces it).
 - `SEL_FIELDS` / `SEL_TYPED` / `SEL_TEMPLATE` / `SEL_SENSITIVE` / `SEL_SUBROWS` / `SEL_ROW_FIELDS` / `SEL_SUBSETS` / `SEL_MENUS` / `SEL_ID_FLAGS`, `encodeSelections()`, `decodeSelections()`, `selPruneOrphans()`, `paintFormFromState()` — export / restore selections (§1.6). The lanes enforce each step: a new `S` property must be classified (unit); a saved field must have a control restore can repaint (invariants K); a new reveal-on-check sub-row needs a `SEL_SUBROWS` predicate and a `SEL_ROW_FIELDS` entry naming the fields inside it (invariants I); any added, removed or renamed field or option must be reconciled with `tests/selections-vocabulary.json` (invariants L), and a removal or rename needs a `SEL_VERSION` bump and a migration first. Then run the browser round trip (`.claude/skills/verify/scripts/roundtrip.js`). **`SEL_TEMPLATE` and `SEL_TYPED` are also restated in plain words for clinicians in three places: the panel hint in `setSelLevel()`, README.md "Save your selections and reuse them", and `docs/branching-logic-for-clinicians.html` "Saving your selections for later".** That list is what a clinician relies on when deciding what is safe to keep, so a field added to or removed from either table must be reflected in all three in the same commit; no lane can read the prose. Example strings in the docs are checked (invariants M).
+- `PCP_DEFS` / `PCP_GROUPS`, `pcpCtx()`, `pcpBuild()`, `pcpFollowUpLines()`, `pcpPruneEdits()`, `rtcVisitPlanned()`, `pcpReturnExpected()` — the primary care list (§13). A row id is a saved value (`pcpOmit`, `pcpFirst`): adding one needs `npm run test:update-selections`; renaming or removing one needs a `SEL_VERSION` bump and a `SEL_MIGRATIONS` entry, exactly like a control value. A change to which selections leave work with this clinic (`pcpCtx().open`) changes when the standing "no routine DBP follow-up" line may print, so update §13.3 and the unit cases with it. New clinical wording in a row goes in the §13.6 ledger as added, reworded or the attending's.
 - `PRESETS` / `MODIFIERS` / `applyPreset()` / `formHasInput()` — the archetype-preset engine (§11.17). Adding, removing, or retuning a preset, or changing how `applyPreset` drives controls, requires re-confirming the cross-preset invariant and updating §11.17.
 
 If you're not sure whether your change qualifies, check [§1.2](#12-the-s-object--property-reference) — if your change touches anything listed there, update this doc.

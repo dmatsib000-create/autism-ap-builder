@@ -913,6 +913,79 @@
      "no"
     ]
    }
+  },
+  "dbpFollowUp": {
+   "type": "one",
+   "values": [
+    "pcp",
+    "dbp"
+   ]
+  },
+  "pcpInNote": {
+   "type": "flag",
+   "values": []
+  },
+  "pcpOmit": {
+   "type": "many",
+   "values": [
+    "therapyStart",
+    "referrals",
+    "earlySteps",
+    "fdlrs",
+    "schoolEval",
+    "gaitRecheck",
+    "eeg",
+    "labs",
+    "sibling",
+    "transition",
+    "safety",
+    "sleep",
+    "gi",
+    "growth",
+    "adhd",
+    "mood",
+    "tNewConcern",
+    "tBehavior",
+    "tDocs",
+    "tGdd",
+    "tSleep",
+    "tAdhd",
+    "tRegress",
+    "tCatatonia",
+    "tPsych",
+    "tSuicide"
+   ]
+  },
+  "pcpFirst": {
+   "type": "many",
+   "values": [
+    "therapyStart",
+    "referrals",
+    "earlySteps",
+    "fdlrs",
+    "schoolEval",
+    "gaitRecheck",
+    "eeg",
+    "labs",
+    "sibling",
+    "transition",
+    "safety",
+    "sleep",
+    "gi",
+    "growth",
+    "adhd",
+    "mood",
+    "tNewConcern",
+    "tBehavior",
+    "tDocs",
+    "tGdd",
+    "tSleep",
+    "tAdhd",
+    "tRegress",
+    "tCatatonia",
+    "tPsych",
+    "tSuicide"
+   ]
   }
  }
 }

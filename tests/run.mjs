@@ -30,6 +30,7 @@ const GENERATORS = {
   note: app => app.generateNote().main,
   aba: app => app.generateABALetterPlain(),
   iep: app => app.generateIEPLetterPlain(),
+  pcp: app => app.generatePCPPlain(),
 };
 
 // Normalize line endings before comparing. The generators always emit \n, so a

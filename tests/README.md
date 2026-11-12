@@ -224,7 +224,7 @@ Create `tests/fixtures/<name>.mjs`:
 export default {
   name: 'my-scenario',                 // golden files: golden/my-scenario.<output>.txt
   describe: 'one-line clinical scenario',
-  outputs: ['note', 'aba', 'iep'],     // any of: note | aba | iep
+  outputs: ['note', 'aba', 'iep'],     // any of: note | aba | iep | pcp (the primary care list)
   apply(S) {
     S.ageGroup = 'schoolAge';
     S.diagStatus = 'confirmed';
