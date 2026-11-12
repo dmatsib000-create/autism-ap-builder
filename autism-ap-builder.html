@@ -6819,10 +6819,6 @@ function clearAll(opts){
   document.querySelectorAll('label[data-tm-returned]').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
   document.getElementById('levelGroup').style.display='none';
-  // Hide the conditional regression-timing sub-row that the developmentalRegression
-  // checkbox toggles. clearAll bypasses the change handler that normally controls
-  // its visibility, so without this the sub-row would remain orphaned after Clear All.
-  const rtRow=document.getElementById('regressionTimingRow');if(rtRow)rtRow.style.display='none';
   document.getElementById('showDSMTable').checked=true;
   document.getElementById('showDSMLines').checked=false;
   document.getElementById('levelJustificationSCField').value='';
@@ -6831,8 +6827,12 @@ function clearAll(opts){
   // Hide the behavior-frequency input rows
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
-  // Hide sub-option rows and reset their inputs
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow','gaitExamRow'].forEach(id=>{
+  // Hide every reveal-on-check sub-row. clearAll bypasses the change handlers that
+  // normally control them, so a row left out here stays open under an unchecked parent.
+  // SEL_SUBROWS is the one list of those rows (the invariants lane keeps it complete);
+  // menstrualCareRow and gaitExamRow are not in it because updateAgeBasedVisibility()
+  // below and render() recompute them from S.
+  Object.keys(SEL_SUBROWS).forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -6840,7 +6840,9 @@ function clearAll(opts){
   toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
   resetSections();
-  render();
+  // A blank form offers neither letter, and S.previewMode is already back to 'note';
+  // setPreviewMode moves the tab buttons and copy bars to match, then renders.
+  setPreviewMode('note');
 }
 
 // ─── EXPORT / RESTORE SELECTIONS ─────────────────────────────────────────────
@@ -7093,9 +7095,9 @@ function paintFormFromState(){
 // ABA targets, so rederive runs the syncs to rebuild them from the restored needs.
 function applySelectionState(state,rederive){
   const wasSuspended=renderSuspended;
-  // clearAll resets previewMode in S without moving the tab UI; the output tab the
-  // clinician is on is not part of the case, so keep it (render falls back to the note
-  // if the restored state no longer offers that letter).
+  // clearAll returns to the note tab; the output tab the clinician is on is not part of
+  // the case, so put it back afterwards (render falls back to the note if the restored
+  // state no longer offers that letter).
   const mode=S.previewMode;
   renderSuspended=true;
   try{
@@ -7105,9 +7107,8 @@ function applySelectionState(state,rederive){
     });
     paintFormFromState();
     if(rederive){syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();}
-    S.previewMode=mode;
   }finally{renderSuspended=wasSuspended;}
-  render();
+  setPreviewMode(mode);
 }
 
 // ── dialog wiring ──
@@ -7575,6 +7576,7 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=ritaTRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+      ritaTRow.classList.remove('is-on');
       // Route through the shared handler so step statuses reset and headers refresh
       // (this branch previously skipped the header refresh the certainYoung twin had).
       onDxEvalPathChange();
@@ -7588,6 +7590,7 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=certainYoungRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+      certainYoungRow.classList.remove('is-on');
       onDxEvalPathChange();
     }
   }
