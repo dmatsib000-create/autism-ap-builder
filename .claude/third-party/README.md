@@ -10,20 +10,25 @@ checkout (see below) so each command appears only once.
 | `.claude/commands/feature-dev.md` | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) `plugins/feature-dev/commands/feature-dev.md` | Apache-2.0 |
 | `.claude/agents/code-architect.md`, `code-explorer.md`, `code-reviewer.md` | same, `plugins/feature-dev/agents/` | Apache-2.0 |
 | `.claude/skills/engineering-code-review/SKILL.md`, `CONNECTORS.md` | [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) `engineering/skills/code-review/` and `engineering/CONNECTORS.md` | Apache-2.0 |
+| `.claude/skills/compliance-check/SKILL.md`, `CONNECTORS.md` | same, `legal/skills/compliance-check/` and `legal/CONNECTORS.md` | Apache-2.0 |
+| `.claude/skills/legal-risk-assessment/SKILL.md` | same, `legal/skills/legal-risk-assessment/` | Apache-2.0 |
 
-Copied 2026-09-26. Full license text: [LICENSE-Apache-2.0.txt](LICENSE-Apache-2.0.txt).
+Feature-dev and engineering files copied 2026-09-26; legal files copied 2026-11-12. Full license
+text: [LICENSE-Apache-2.0.txt](LICENSE-Apache-2.0.txt).
 
 **Changes from the originals:** the code-review skill is renamed `engineering-code-review`
 (frontmatter `name`, heading, and usage line) so it does not collide with the built-in
-`/code-review`, and its CONNECTORS.md link points at the copy beside it. All other files
-are unmodified.
+`/code-review`. In both it and `compliance-check`, the CONNECTORS.md link points at the copy
+beside it. The legal skills keep their original names (in the cloud they run as
+`/compliance-check` and `/legal-risk-assessment`, without the `legal:` prefix). All other
+files are unmodified.
 
 ## Hiding the copies on a desktop that has the plugins
 
 Run once per clone, from the repo root, in Git Bash:
 
 ```bash
-MSYS_NO_PATHCONV=1 git sparse-checkout set --no-cone '/*' '!/.claude/commands/feature-dev.md' '!/.claude/agents/code-architect.md' '!/.claude/agents/code-explorer.md' '!/.claude/agents/code-reviewer.md' '!/.claude/skills/engineering-code-review/'
+MSYS_NO_PATHCONV=1 git sparse-checkout set --no-cone '/*' '!/.claude/commands/feature-dev.md' '!/.claude/agents/code-architect.md' '!/.claude/agents/code-explorer.md' '!/.claude/agents/code-reviewer.md' '!/.claude/skills/engineering-code-review/' '!/.claude/skills/compliance-check/' '!/.claude/skills/legal-risk-assessment/'
 ```
 
 The files stay in git and on GitHub; they are only left off this machine's disk.
