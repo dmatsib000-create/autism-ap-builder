@@ -6915,17 +6915,22 @@ const SEL_SUBROWS={
 
 // Two export levels. A string is PHI-free field by field, but enough categories together
 // can single a child out, so the default export (Template) carries only what describes a
-// reusable starting point: age band, language level, functional needs, services, ABA
-// parameters, counseling topics, referral overrides, display toggles. Everything that is
+// reusable starting point: age band, language level, functional needs, ABA hours and
+// settings, counseling topics, referral overrides, display toggles. Everything that is
 // a finding about one child (the diagnostic determination, cognitive and adaptive
 // profile, specifiers, medical and exposure history, comorbid diagnoses, testing and
 // work-up results, family circumstances, school placement) is exported only at Full.
 // A field not listed here is Full-only, so a new field defaults to the safer level.
+// schoolSvc and abaTargets are deliberately NOT here: the add-only syncs fill them from
+// omitted fields too (sped from an ID profile, counseling from a comorbid diagnosis,
+// transitions from criterion B2), so exporting them would leak what Template leaves out.
+// A Template string says so (SEL_SCOPE_TEMPLATE) and restore re-derives both from the needs.
 const SEL_TEMPLATE=new Set(['visitType','ageGroup','langLevel','langModifiers',
   'needsComm','needsAdaptive','needsBehavior','needsSocial','needsSensory','needsMotor',
   'emotionalReg','academic','strangerDanger','teacherMaterials',
-  'schoolSvc','schoolSvcManualOff','safety','ag','showDSMTable','showDSMLines',
-  'insuranceType','abaHours','abaSetting','abaTargets','overrides']);
+  'safety','ag','showDSMTable','showDSMLines',
+  'insuranceType','abaHours','abaSetting','overrides']);
+const SEL_SCOPE_TEMPLATE='scope=template';
 // Categories that are sensitive beyond ordinary clinical detail; a Full string holding
 // any of them gets a named notice in the panel. label -> the fields that carry it.
 const SEL_SENSITIVE={
@@ -6941,6 +6946,7 @@ const SEL_SENSITIVE={
 function encodeSelections(level){
   const init=initialState(), enc=encodeURIComponent, out=[SEL_PREFIX+SEL_VERSION];
   const template=level==='template';
+  if(template) out.push(SEL_SCOPE_TEMPLATE);
   Object.entries(SEL_FIELDS).forEach(([k,t])=>{
     if(template&&!SEL_TEMPLATE.has(k)) return;
     let v=S[k];
@@ -6987,7 +6993,8 @@ function selAllowed(){
 
 // PURE. Parses a selections string against an allowed-values table (selAllowed()).
 // Returns {error} when the text is not a selections string at all, else
-// {version, state, applied, ignored}: state holds only SEL_FIELDS keys with allowed
+// {version, template, state, applied, ignored}: template is true for a Template-level
+// string (the caller then re-derives services and ABA targets); state holds only SEL_FIELDS keys with allowed
 // values; ignored holds one entry per dropped item, the key only (never the value, which
 // could be pasted text). version is the string's
 // version after any migrations, so the caller compares it with SEL_VERSION.
@@ -6996,7 +7003,8 @@ function decodeSelections(str,allowed){
   const head=new RegExp('^'+SEL_PREFIX+'(\\d+)$').exec(parts.shift()||'');
   if(!head) return {error:'not-a-selections-string'};
   let version=+head[1];
-  let pairs=parts.map(p=>{const i=p.indexOf('=');return i<0?[p,'']:[p.slice(0,i),p.slice(i+1)];});
+  const template=parts.includes(SEL_SCOPE_TEMPLATE);
+  let pairs=parts.filter(p=>p!==SEL_SCOPE_TEMPLATE).map(p=>{const i=p.indexOf('=');return i<0?[p,'']:[p.slice(0,i),p.slice(i+1)];});
   while(SEL_MIGRATIONS[version]){pairs=SEL_MIGRATIONS[version](pairs);version++;}
   const dec=s=>{try{return decodeURIComponent(s);}catch(e){return s;}};
   const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
@@ -7027,7 +7035,7 @@ function decodeSelections(str,allowed){
       if(own(ok,mk)&&ok[mk].includes(mv)){state[k][mk]=mv;applied++;} else ignored.push(k);
     });
   });
-  return {version,state,applied,ignored};
+  return {version,template,state,applied,ignored};
 }
 
 // PURE: true when the form holds any selection or any typed text.
@@ -7079,11 +7087,16 @@ function paintFormFromState(){
   toggleBifAdaptiveCrossCheck();
 }
 
-// Replace the whole form with a decoded state. The add-only syncs are deliberately NOT
-// re-run: the string already holds their results as of export, and re-running them here
-// would add back anything the clinician had turned off.
-function applySelectionState(state){
+// Replace the whole form with a decoded state. For a Full string the add-only syncs are
+// deliberately NOT re-run: the string already holds their results as of export, and the
+// restored form must equal the exported one. A Template string carries no services or
+// ABA targets, so rederive runs the syncs to rebuild them from the restored needs.
+function applySelectionState(state,rederive){
   const wasSuspended=renderSuspended;
+  // clearAll resets previewMode in S without moving the tab UI; the output tab the
+  // clinician is on is not part of the case, so keep it (render falls back to the note
+  // if the restored state no longer offers that letter).
+  const mode=S.previewMode;
   renderSuspended=true;
   try{
     clearAll({confirmed:true});
@@ -7091,6 +7104,8 @@ function applySelectionState(state){
       if(SEL_FIELDS[k]==='map') Object.assign(S[k],state[k]); else S[k]=state[k];
     });
     paintFormFromState();
+    if(rederive){syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();}
+    S.previewMode=mode;
   }finally{renderSuspended=wasSuspended;}
   render();
 }
@@ -7119,7 +7134,7 @@ function setSelLevel(level){
   const sens=level==='full'?selSensitiveIn(str):[];
   hint.classList.toggle('is-warn',sens.length>0);
   hint.textContent=level==='template'
-    ?'Template: age band, language, needs, services, ABA settings and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results.'
+    ?'Template: age band, language, needs, ABA hours and settings, counseling topics and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
     :'Full: every selection in the form.'+(sens.length?' This string includes sensitive categories: '+sens.join('; ')+'. Treat it as you would the note itself.':'');
 }
 function openSelDialog(){
@@ -7151,7 +7166,7 @@ function restoreSelections(){
       return;
     }
   }
-  applySelectionState(r.state);
+  applySelectionState(r.state,r.template);
   selDisarm();
   field.value=''; // the pasted text has done its job; do not leave it on screen
   setSelLevel(selLevel);

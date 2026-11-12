@@ -490,7 +490,7 @@ const CASES = [
   { name: 'selections: an empty form exports the bare version prefix at both levels',
     setup(){},
     check(a){ assert.equal(a.encodeSelections('full'), 'APB1');
-              assert.equal(a.encodeSelections('template'), 'APB1');
+              assert.equal(a.encodeSelections('template'), 'APB1;scope=template');
               assert.equal(a.formHasAnything(), false); } },
   { name: 'selections: typed text is never exported',
     setup(S){ const init=S; for(const k of ['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval','labsOrdered','paeDetail','teacherMaterialOther','iepInstruments']) init[k]='ZZTYPED';
@@ -506,9 +506,14 @@ const CASES = [
   { name: 'selections: Template leaves out every child-specific and sensitive field',
     setup(S){ S.ageGroup='preschool'; S.diagStatus='confirmed'; S.cogProfile='gdd_mild'; S.criteriaB.add('b2');
               S.needsBehavior.add('tantrums'); S.needsBehavior.add('rigidity'); S.comorbid.add('trauma');
-              S.prenatalAlcohol=true; S.socialWork=true; S.abaTargets.add('transitions'); S.overrides.pt='no'; },
+              S.prenatalAlcohol=true; S.socialWork=true; S.abaTargets.add('transitions'); S.schoolSvc.add('counseling'); S.overrides.pt='no'; },
     check(a){ assert.equal(a.encodeSelections('template'),
-                'APB1;ageGroup=preschool;needsBehavior=tantrums;abaTargets=transitions;overrides=pt:no');
+                'APB1;scope=template;ageGroup=preschool;needsBehavior=tantrums;overrides=pt:no');
+              // Derived fields are filled by the syncs from omitted findings, so they stay out too.
+              for(const k of ['schoolSvc','schoolSvcManualOff','abaTargets']) assert.ok(!a.SEL_TEMPLATE.has(k), k);
+              const t=a.decodeSelections(a.encodeSelections('template'), {ageGroup:['preschool'],needsBehavior:['tantrums'],overrides:{pt:['yes','no']}});
+              assert.equal(t.template, true); assert.deepEqual(t.ignored, []);
+              assert.equal(a.decodeSelections(a.encodeSelections('full'), {}).template, false);
               for(const keys of Object.values(a.SEL_SENSITIVE)) for(const k of keys){
                 assert.ok(k in a.SEL_FIELDS, k+' is not a saved field');
                 assert.ok(!a.SEL_TEMPLATE.has(k), k+' is sensitive but exported at Template level'); }
