@@ -2036,6 +2036,12 @@ const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' ||
 // can never disagree. The original D4 concern (surprise specifier flip from far-away
 // control) is neutralized because the pill renders the resulting state in the same render
 // frame, making the change visible at the clinician's focus rather than hidden 200px below.
+// Every cogProfile value in the GDD tier, including the ungraded 'gdd' ("Unspecified
+// delays"). One list on purpose: the age-change teardown once tested only the three
+// graded values, so an ungraded GDD profile survived a move to school-age and the
+// note printed a GDD diagnosis the age rule forbids. tests/invariants.mjs fails on
+// any inline copy of this list.
+const GDD_COG_PROFILES=['gdd','gdd_mild','gdd_moderate','gdd_severe'];
 function currentClinicalPathway(){
   const cog = S.cogProfile;
   if(!cog) return null;
@@ -2047,7 +2053,7 @@ function currentClinicalPathway(){
       ? {specKey:'withID',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
       : {specKey:'withSuspectedID', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
   }
-  if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cog)){
+  if(GDD_COG_PROFILES.includes(cog)){
     const sev = cog==='gdd_mild'?'mild':cog==='gdd_moderate'?'moderate':cog==='gdd_severe'?'severe':'';
     const label = sev ? `${sev.charAt(0).toUpperCase()+sev.slice(1)} Global Developmental Delay` : 'Global Developmental Delay (unspecified severity)';
     const confirmed = cogSourceSupportsConfirmation();
@@ -6451,7 +6457,7 @@ function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
   if(!g) return;
   const isId  = hasID();
-  const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  const isGdd = GDD_COG_PROFILES.includes(S.cogProfile);
   // Borderline is exposed to cogDataSource so the clinician can record which
   // instrument grounded the BIF call. BIF is an IQ-defined construct, so it
   // inherits the ID-tier IQ-instrument labels. The no-auto-bridge rule for
@@ -6958,8 +6964,8 @@ const COG_SPEC_EXCL = ['withID','withSuspectedID','withGDD','withSuspectedGDD','
 const COG_PROFILE_COMPAT = {
   withID:           ['id_mild','id_moderate','id_severe','unknown'],
   withSuspectedID:  ['id_mild','id_moderate','id_severe','unknown'],
-  withGDD:          ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
-  withSuspectedGDD: ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
+  withGDD:          [...GDD_COG_PROFILES,'unknown'],
+  withSuspectedGDD: [...GDD_COG_PROFILES,'unknown'],
   withBIF:          ['borderline','unknown'],
   withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
   withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
@@ -7267,7 +7273,7 @@ function updateAgeBasedVisibility(){
   if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
     gddCogGroup.style.display=hideGddCog?'none':'';
-    if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
+    if(hideGddCog&&GDD_COG_PROFILES.includes(S.cogProfile)){
       S.cogProfile='';
       gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
@@ -7651,7 +7657,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         // GDD-tier 'comprehensive' = Bayley-4 silently relabelled as 'comprehensive'
         // = WISC-V after switching to borderline).
         const tierOf = v => ['id_mild','id_moderate','id_severe','borderline'].includes(v) ? 'iq'
-          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(v) ? 'dev' : '';
+          : GDD_COG_PROFILES.includes(v) ? 'dev' : '';
         const prevTier = tierOf(S.cogProfile);
         const newTier  = tierOf(inp.value);
         if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){

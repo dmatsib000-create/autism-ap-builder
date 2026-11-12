@@ -77,6 +77,11 @@ const EXPORTS = [
   'SEC_TABLE',
   'sectionRelevance',
   'secAutoOpenKeys',
+  // Age-radio change handler: updateAgeBasedVisibility() teardown, then the specifier
+  // bridge re-fire. DOM-driven, but its S mutations run under the stub DOM (every
+  // element step is best-effort), so the unit lane can drive a real age change and
+  // assert that an age-invalid cognitive profile does not survive it.
+  'onAgeGroupChange',
 ];
 
 function extractScript(html) {
