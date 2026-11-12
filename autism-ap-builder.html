@@ -687,18 +687,33 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 .sel-dialog::backdrop{background:rgba(17,17,24,.45)}
 .sel-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);margin-bottom:6px}
 .sel-head h2{font-size:var(--text-15);font-weight:700;margin:0}
-.sel-lede{font-size:var(--text-12);color:var(--gray-600);line-height:1.5;margin:0 0 12px}
+.sel-lede{font-size:var(--text-12);color:var(--gray-600);line-height:1.5;margin:0 0 10px}
 .sel-row{display:flex;gap:var(--space-2);align-items:flex-start;margin-bottom:12px}
 .sel-row textarea{flex:1;min-width:0;padding:6px 8px;border-radius:var(--radius);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:var(--text-11);line-height:1.45;word-break:break-all;resize:vertical}
+/* Read-only output is tinted so it does not read as a second place to type. */
+.sel-row textarea[readonly]{background:var(--surface);resize:none}
+/* One width for both buttons: the label swap to "Restore anyway" must not resize the paste box. */
+.sel-row .btn{min-width:124px;white-space:nowrap}
+.sel-dialog .btn.is-danger{background:#b91c1c;color:white}
+@media (hover:hover){.sel-dialog .btn.is-danger:hover{background:#991b1b}}
 .sel-caution{font-size:var(--text-12);line-height:1.5;color:#7f1d1d;background:rgba(127,29,29,.06);border-left:3px solid #7f1d1d;padding:6px 10px;margin:0 0 12px}
-.sel-levels{display:inline-flex;gap:var(--space-1);margin-bottom:6px}
-.sel-level-btn{padding:4px 12px;border:1px solid var(--border-control);border-radius:var(--radius);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);font-weight:600;cursor:pointer}
-.sel-level-btn.is-on{background:var(--accent);border-color:var(--accent);color:white}
+/* Template / Full is one either-or control: the two halves share an edge. */
+.sel-levels{display:inline-flex;margin-bottom:6px}
+.sel-level-btn{padding:5px 14px;border:1px solid var(--border-control);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);font-weight:600;cursor:pointer}
+.sel-level-btn:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+.sel-level-btn:last-child{border-radius:0 var(--radius) var(--radius) 0;margin-left:-1px}
+.sel-level-btn.is-on{background:var(--accent);border-color:var(--accent);color:white;position:relative}
+/* Warm's accent is too light for white text (3.97:1); same darker fill .btn-blue uses there. */
+[data-theme="warm"] .sel-level-btn.is-on{background:var(--blue-dark);border-color:var(--blue-dark)}
 .sel-level-hint{font-size:var(--text-11-5);line-height:1.45;color:var(--gray-600);margin-bottom:6px}
-.sel-level-hint.is-warn{color:#7f1d1d;font-weight:600}
-.sel-status{font-size:var(--text-12);line-height:1.5;color:var(--gray-700)}
+.sel-level-hint strong{color:var(--gray-800)}
+.sel-status{font-size:var(--text-12);line-height:1.5;color:var(--gray-700);margin:-4px 0 10px}
 .sel-status:empty{display:none}
 .sel-status.is-warn{color:#7f1d1d;font-weight:600}
+@media (max-width:480px){
+  .sel-row{flex-direction:column;align-items:stretch}
+  .sel-dialog .btn,.sel-level-btn{min-height:36px}
+}
 .confirm-inline{display:inline-flex;align-items:center;gap:var(--space-2)}
 .confirm-inline .confirm-prompt{font-size:var(--text-11);color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
 .confirm-inline .btn{padding:4px 10px;font-size:var(--text-11)}
@@ -809,16 +824,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
     <div class="header-sep"></div>
     <button class="btn btn-outline" type="button" onclick="openSelDialog()" title="Copy your selections as a short string, or rebuild the form from one">Export / Restore</button>
+    <div class="header-sep"></div>
     <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
   </div>
 </header>
 
 <dialog id="selDialog" class="sel-dialog" aria-labelledby="selTitle">
   <div class="sel-head">
-    <h2 id="selTitle">Export / restore selections</h2>
-    <button type="button" class="btn btn-gray btn-sm" onclick="document.getElementById('selDialog').close()">Close</button>
+    <h2 id="selTitle">Export / Restore Selections</h2>
+    <button type="button" class="btn btn-gray" onclick="document.getElementById('selDialog').close()">Close</button>
   </div>
-  <p class="sel-lede">The string holds options you clicked (checkboxes, choices, menus, toggles) and never the text you typed. Paste it back here to rebuild the form.</p>
+  <p class="sel-lede">A selections string holds the options you clicked and never the text you typed. Paste one back to rebuild the form.</p>
   <p class="sel-caution"><strong>Do not save this string next to a name, MRN, date, or in a patient-named file.</strong> On its own it identifies no one; stored beside an identifier it becomes part of that patient's record.</p>
   <label class="field-label" for="selExportField">Current selections</label>
   <div class="sel-levels" role="group" aria-label="How much to export">
@@ -827,16 +843,17 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
   </div>
   <div id="selLevelHint" class="sel-level-hint" aria-live="polite"></div>
   <div class="sel-row">
-    <textarea id="selExportField" rows="3" readonly spellcheck="false"></textarea>
+    <textarea id="selExportField" rows="2" readonly spellcheck="false"></textarea>
     <button type="button" class="btn btn-blue" onclick="copySelections(this)">Copy</button>
   </div>
   <label class="field-label" for="selImportField">Restore from string</label>
   <div class="sel-row">
-    <textarea id="selImportField" rows="3" spellcheck="false" placeholder="Paste a selections string here" oninput="selDisarm()"></textarea>
+    <textarea id="selImportField" rows="3" spellcheck="false" placeholder="Paste a selections string here" aria-describedby="selStatus" oninput="selDisarm()"></textarea>
     <button type="button" class="btn btn-blue" id="selRestoreBtn" onclick="restoreSelections()">Restore</button>
   </div>
-  <span class="phi-hint">Paste only a string copied from this tool. The box is emptied after a restore, and typed text is never restored.</span>
   <div id="selStatus" class="sel-status" role="status" aria-live="polite"></div>
+  <span class="phi-hint">Paste only a string copied from this tool. The box is emptied after a restore, and typed text is never restored.</span>
+  <div id="selAnnounce" class="sr-only" role="status" aria-live="polite"></div>
 </dialog>
 
 <div id="mobile-nav" role="group" aria-label="Panel shown">
@@ -7142,7 +7159,9 @@ function selSetStatus(lines,warn){
 }
 function selDisarm(){
   selArmedFor=null;
-  const b=document.getElementById('selRestoreBtn');if(b)b.textContent='Restore';
+  const b=document.getElementById('selRestoreBtn');
+  if(b){b.textContent='Restore';b.classList.remove('is-danger');}
+  document.getElementById('selImportField')?.removeAttribute('aria-invalid');
 }
 function setSelLevel(level){
   selLevel=level;
@@ -7151,31 +7170,47 @@ function setSelLevel(level){
     b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));
   });
   const str=encodeSelections(level);
-  document.getElementById('selExportField').value=str;
+  const ta=document.getElementById('selExportField');
+  ta.value=str;
+  // Grow to show the whole string (a Full string runs to several lines), up to a cap.
+  ta.style.height='auto';
+  if(ta.scrollHeight) ta.style.height=Math.min(ta.scrollHeight+2,168)+'px';
   const hint=document.getElementById('selLevelHint');
   const sens=level==='full'?selSensitiveIn(str):[];
-  hint.classList.toggle('is-warn',sens.length>0);
   hint.textContent=level==='template'
     ?'Template: age band, language, needs, ABA hours and settings, counseling topics and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
-    :'Full: every selection in the form.'+(sens.length?' This string includes sensitive categories: '+sens.join('; ')+'. Treat it as you would the note itself.':'');
+    :'Full: every selection in the form.';
+  if(sens.length){
+    // The category names carry the emphasis; red stays reserved for the standing caution
+    // and the live status. Labels are SEL_SENSITIVE keys, never pasted text.
+    hint.append(' Includes sensitive categories: ');
+    sens.forEach((l,i)=>{const b=document.createElement('strong');b.textContent=l;hint.append(i?'; ':'',b);});
+    hint.append('. Treat this string as you would the note itself.');
+  }
 }
 function openSelDialog(){
   const d=document.getElementById('selDialog');if(!d)return;
   document.getElementById('selImportField').value='';
   selSetStatus([]);selDisarm();
-  setSelLevel('template'); // always reopens at the safer level
   d.showModal();
+  setSelLevel('template'); // always reopens at the safer level; after showModal so the box can be measured
+  // Not the Close button (first in the markup): Enter straight after opening would shut the panel.
+  d.querySelector('.sel-level-btn.is-on').focus();
 }
 async function copySelections(btn){
   await writeClipboardText(document.getElementById('selExportField').value);
   flashBtn('✓ Copied!',btn);
+  // flashBtn speaks through #srAnnounce, which is outside this modal and therefore inert
+  // while it is open; repeat the message in a live region inside the dialog.
+  const a=document.getElementById('selAnnounce');
+  if(a){a.textContent='';setTimeout(()=>{a.textContent='Copied';},50);}
 }
 function restoreSelections(){
   const field=document.getElementById('selImportField');
   const text=field.value.trim();
-  if(!text){selSetStatus(['Paste a selections string first.'],true);return;}
+  if(!text){field.setAttribute('aria-invalid','true');selSetStatus(['Paste a selections string first.'],true);return;}
   const r=decodeSelections(text,selAllowed());
-  if(r.error){selSetStatus(['That is not a selections string from this tool (it should start with "'+SEL_PREFIX+SEL_VERSION+';"). Nothing was changed.'],true);return;}
+  if(r.error){field.setAttribute('aria-invalid','true');selSetStatus(['That is not a selections string from this tool (it should start with "'+SEL_PREFIX+SEL_VERSION+';"). Nothing was changed.'],true);return;}
   const mismatch=r.version!==SEL_VERSION;
   if(selArmedFor!==text){
     const warn=[];
@@ -7183,8 +7218,9 @@ function restoreSelections(){
     if(formHasAnything()) warn.push('Restoring replaces the current form, including everything typed in it.');
     if(warn.length){
       selArmedFor=text;
-      document.getElementById('selRestoreBtn').textContent='Restore anyway';
-      selSetStatus(warn.concat('Nothing has changed yet.'),true);
+      const btn=document.getElementById('selRestoreBtn');
+      btn.textContent='Restore anyway';btn.classList.add('is-danger');
+      selSetStatus(warn.concat('Nothing has changed yet. Press Restore anyway to continue.'),true);
       return;
     }
   }
