@@ -529,6 +529,18 @@ for (const k of secTableKeys) {
     check('Collapsed sections', `#sh-${k}: body must be <div class="sec-body hidden" inert> to match its collapsed head (found class="${head[1]}"${head[2]})`);
 }
 
+// ── I. Export / restore: every reveal-on-check row is repainted on restore ───
+// Restore writes S wholesale and fires no change handler, so paintFormFromState()
+// recomputes sub-row visibility from SEL_SUBROWS. A row that a checkbox handler
+// reveals but that table does not know stays hidden after a restore, with its
+// restored sub-options invisible. Rows recomputed elsewhere on every render or by a
+// named helper that restore also calls are exempt.
+const SUBROW_RECOMPUTED = ['ritaTRow', 'evalStatusRow', 'withBifRow', 'menstrualCareRow', 'gaitExamRow'];
+const hiddenRowIds = [...html.matchAll(/<[a-z]+\b[^>]*\bid="(\w+Row)"[^>]*display:none[^>]*>/g)].map(m => m[1]);
+const subrowKeys = [...balancedAfter('const SEL_SUBROWS=').matchAll(/^\s*(\w+):\(\)=>/gm)].map(m => m[1]);
+check('Restore sub-rows (hidden-by-default "...Row" ids vs SEL_SUBROWS + recomputed list)',
+  diff('markup', hiddenRowIds, 'SEL_SUBROWS + exempt', [...subrowKeys, ...SUBROW_RECOMPUTED]));
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
@@ -542,7 +554,8 @@ console.log(
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces; ` +
-  `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls`
+  `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls; ` +
+  `restore sub-rows ${subrowKeys.length} table rows + ${SUBROW_RECOMPUTED.length} recomputed = ${hiddenRowIds.length} hidden rows`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');

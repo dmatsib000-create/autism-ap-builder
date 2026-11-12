@@ -77,6 +77,20 @@ const EXPORTS = [
   'SEC_TABLE',
   'sectionRelevance',
   'secAutoOpenKeys',
+  // Export / restore selections: the field registry, the pure encoder (reads S only),
+  // and the pure decoder (takes the allowed-values table the app builds from the DOM,
+  // so the unit lane hands it one). The DOM applier (paintFormFromState) is browser-only.
+  'initialState',
+  'SEL_VERSION',
+  'SEL_FIELDS',
+  'SEL_TYPED',
+  'SEL_VIEW',
+  'SEL_TEMPLATE',
+  'SEL_SENSITIVE',
+  'encodeSelections',
+  'decodeSelections',
+  'selSensitiveIn',
+  'formHasAnything',
 ];
 
 function extractScript(html) {
