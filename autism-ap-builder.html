@@ -7103,12 +7103,27 @@ function applySelectionState(state,rederive){
   try{
     clearAll({confirmed:true});
     Object.keys(state).forEach(k=>{
-      if(SEL_FIELDS[k]==='map') Object.assign(S[k],state[k]); else S[k]=state[k];
+      // Sets are copied so the decoded state stays as parsed for selDropped() to compare.
+      if(SEL_FIELDS[k]==='map') Object.assign(S[k],state[k]); else S[k]=state[k] instanceof Set?new Set(state[k]):state[k];
     });
     paintFormFromState();
     if(rederive){syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();}
   }finally{renderSuspended=wasSuspended;}
   setPreviewMode(mode);
+}
+
+// PURE (reads S only): fields where the form ended up without something the decoded state
+// asked for. The form's own rules still apply after a restore (age gates strip a GDD
+// specifier from a school-age child, the BIF gate needs a data source, a therapy status
+// needs its referral), so a string that breaks one cannot be applied whole; the caller
+// reports these instead of letting the difference pass silently.
+function selDropped(state){
+  return Object.keys(state).filter(k=>{
+    const want=state[k],got=S[k],t=SEL_FIELDS[k];
+    if(t==='many') return [...want].some(v=>!got.has(v));
+    if(t==='map') return Object.keys(want).some(m=>got[m]!==want[m]);
+    return got!==want;
+  });
 }
 
 // ── dialog wiring ──
@@ -7171,8 +7186,9 @@ function restoreSelections(){
   selDisarm();
   field.value=''; // the pasted text has done its job; do not leave it on screen
   setSelLevel(selLevel);
+  const dropped=selDropped(r.state);
   const done='Restored '+r.applied+' selection'+(r.applied===1?'':'s')+'.';
-  if(!r.ignored.length&&!mismatch){
+  if(!r.ignored.length&&!mismatch&&!dropped.length){
     document.getElementById('selDialog').close();
     toast(done+' Typed text is not part of a selections string; re-enter it as needed.','ok');
     return;
@@ -7182,6 +7198,7 @@ function restoreSelections(){
   const named=[...new Set(r.ignored.filter(k=>/^[A-Za-z][A-Za-z0-9_]{0,31}$/.test(k)))].slice(0,5);
   const lines=[done];
   if(r.ignored.length) lines.push('Ignored '+r.ignored.length+' item'+(r.ignored.length===1?'':'s')+' this version does not recognise'+(named.length?' (fields: '+named.join(', ')+')':'')+'.');
+  if(dropped.length) lines.push('Some selections were not kept because the form does not allow them together, for example a choice that does not fit the age group (fields: '+dropped.join(', ')+'). The note may differ from the one this string came from.');
   if(mismatch) lines.push('The string was version '+r.version+'; this tool reads version '+SEL_VERSION+'. Check the form before using the note.');
   selSetStatus(lines,true);
 }

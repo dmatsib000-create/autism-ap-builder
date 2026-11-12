@@ -91,6 +91,7 @@ const EXPORTS = [
   'decodeSelections',
   'selSensitiveIn',
   'formHasAnything',
+  'selDropped',
 ];
 
 function extractScript(html) {

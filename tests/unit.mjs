@@ -558,6 +558,11 @@ const CASES = [
               assert.equal(a.decodeSelections('APB2;ageGroup=schoolAge', {ageGroup:['schoolAge']}).version, 2);
               for(const junk of ['', 'hello', 'APB;x=1', 'APBx1;ageGroup=schoolAge', 'The child is 7 years old; lives with mother'])
                 assert.deepEqual(a.decodeSelections(junk, {}), {error:'not-a-selections-string'}); } },
+  { name: 'selections: selDropped names fields the form did not keep',
+    setup(S){ S.ageGroup='schoolAge'; S.specifiers.add('withoutID'); S.therapyStatus.slp=''; S.showDSMTable=true; },
+    check(a){ assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID']),therapyStatus:{},showDSMTable:true}), []);
+              assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID','withSuspectedGDD']),therapyStatus:{slp:'continue'},showDSMTable:false}),
+                ['specifiers','therapyStatus','showDSMTable']); } },
   // Compatibility pin. This literal is what a clinician may already have saved. If this
   // case fails, a key or value was renamed: bump SEL_VERSION and add a SEL_MIGRATIONS
   // entry rather than editing the expected values here.
