@@ -2067,6 +2067,12 @@ const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaire
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
+// Every cogProfile value in the GDD tier, including the ungraded 'gdd' ("Unspecified
+// delays"). One list on purpose: the age-change teardown once tested only the three
+// graded values, so an ungraded GDD profile survived a move to school-age and the
+// note printed a GDD diagnosis the age rule forbids. tests/invariants.mjs fails on
+// any inline copy of this list.
+const GDD_COG_PROFILES=['gdd','gdd_mild','gdd_moderate','gdd_severe'];
 // Cluster pathway summary — SINGLE SOURCE OF TRUTH for both the pathway pill (#pathwayPill)
 // AND the bridgeCogProfileToSpecifier() auto-bridge decision. Each return carries:
 //   - specKey: the specifier checkbox key the bridge should auto-check (null = no auto-bridge,
@@ -2079,12 +2085,6 @@ const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' ||
 // can never disagree. The original D4 concern (surprise specifier flip from far-away
 // control) is neutralized because the pill renders the resulting state in the same render
 // frame, making the change visible at the clinician's focus rather than hidden 200px below.
-// Every cogProfile value in the GDD tier, including the ungraded 'gdd' ("Unspecified
-// delays"). One list on purpose: the age-change teardown once tested only the three
-// graded values, so an ungraded GDD profile survived a move to school-age and the
-// note printed a GDD diagnosis the age rule forbids. tests/invariants.mjs fails on
-// any inline copy of this list.
-const GDD_COG_PROFILES=['gdd','gdd_mild','gdd_moderate','gdd_severe'];
 function currentClinicalPathway(){
   const cog = S.cogProfile;
   if(!cog) return null;
