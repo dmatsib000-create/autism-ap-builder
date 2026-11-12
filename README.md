@@ -77,7 +77,7 @@ The **ABA Letter** and **IEP Letter** tabs activate as their inputs are populate
 
 The **Export / Restore** button in the top bar turns everything you clicked into one line of text, and rebuilds the form from a line you saved earlier. Nothing is stored in the browser, so this is how a set of selections survives closing the tab.
 
-**What a line holds.** Only what you clicked: checkboxes, choices, menus, language-feature chips, "Include plan" pills, and referral overrides. Text you typed is never in it: evidence, strengths, level justifications, labs, behavior frequencies, the return-to-clinic interval, and test years. A line looks like this:
+**What a line holds.** Only what you clicked: checkboxes, choices, menus, language-feature chips, "Include plan" pills, and referral overrides. Text you typed is never in it: evidence, strengths, level justifications, the uneven-profile description, labs, behavior frequencies, alcohol-exposure details, an "other" teacher material, IEP instruments, the return-to-clinic interval, and test years. A line looks like this:
 
 ```
 APB1;scope=template;ageGroup=schoolAge;langLevel=phrase;needsComm=expressive,receptive
@@ -87,7 +87,7 @@ APB1;scope=template;ageGroup=schoolAge;langLevel=phrase;needsComm=expressive,rec
 
 1. Click **Export / Restore**.
 2. Choose how much to save:
-   - **Template** (already selected) keeps the reusable outline: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, insurance category, ABA hours and settings, and referral overrides. Use it for a personal starting point you will reuse across visits.
+   - **Template** (already selected) keeps the reusable outline: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, the two DSM table display choices, insurance category, ABA hours and settings, and referral overrides. Use it for a personal starting point you will reuse across visits.
    - **Full** keeps every selection, including the diagnosis, cognitive and adaptive profile, medical and exposure history, comorbid conditions, and test results. The panel names any sensitive categories the line contains.
 3. Click **Copy** and paste the line wherever you keep it.
 
@@ -110,7 +110,7 @@ If the form already holds anything, the panel first warns that restoring replace
 
 - **Do not save a line next to a name, MRN, date, or in a file named for a patient.** On its own a line identifies no one. Kept beside an identifier, it is part of that patient's record.
 - **Prefer Template for anything you keep.** A Full line describes one child; enough details together can point to that child in a small community. If you make one to carry a visit between sessions, delete it when the note is signed.
-- **If Copy cannot reach the clipboard**, the panel says so and leaves the line selected: press Ctrl+C.
+- **If Copy cannot reach the clipboard**, the panel says so and leaves the line selected: press Ctrl+C (Cmd+C on a Mac).
 
 ## What you get
 
@@ -136,7 +136,7 @@ A few boundaries to know before you rely on the output. Read this section before
 
 - **Doesn't auto-update cited guidelines.** Citations (e.g., AAP 2025 genetics evaluation guidance, Srivastava 2019 consensus statement) are accurate as of the date the tool was authored. Always verify currency before letters go out — guidelines change, and the tool will not warn you.
 
-- **Doesn't save your inputs between sessions.** The form is stateless by design (no PHI is stored or transmitted). Closing the browser tab discards everything. Copy your outputs into Epic *before* closing the tab.
+- **Doesn't save your inputs between sessions.** The form is stateless by design (no PHI is stored or transmitted). Closing the browser tab discards everything. Copy your outputs into Epic *before* closing the tab. To carry your clicked selections (never typed text) to another session, see [Export / Restore](#save-your-selections-and-reuse-them-export--restore).
 
 - **Doesn't integrate with Epic or any other EMR.** Copy-paste is manual. The Copy for Epic (plain) button produces text whose `{placeholder}` fields act as F2 cursor stops in Epic, but the paste itself is a manual step.
 
@@ -279,7 +279,7 @@ These two are the single source of truth for the tool's behavior; this README in
 ## Technical notes
 
 - **Single file, no build system, no dependencies, no network requests.** Open `autism-ap-builder.html` directly in any modern browser. All CSS is in `<style>`, all JavaScript is in `<script>` at script scope (no module system). File is ~4,900 lines.
-- **No PHI is transmitted or stored.** Everything runs locally in the browser. State lives in a single object `S` declared near the top of the `<script>` block; closing the browser tab discards everything.
+- **No PHI is transmitted or stored.** Everything runs locally in the browser. State lives in a single object `S` declared near the top of the `<script>` block; closing the browser tab discards everything (a selections string from Export / Restore, below, is the only thing that outlives it, and it lives wherever the clinician pastes it).
 - **Mobile responsive.** At viewport widths ≤768px, a sticky Input Form / View Note toggle nav appears at the top of the screen, section headers become sticky at `top:44px` (just below the nav) so the current section title stays visible while scrolling long forms, section collapse is animated via `max-height` transition with `inert` applied to collapsed bodies (keeps tab-nav clean), and touch targets are enlarged. Designed desktop-first but fully usable on tablet or phone.
 - **State resets completely** via the **Clear All** button (with inline confirmation prompt).
 - **Export / Restore** (header button) saves the form's clicked selections as a one-line string (`APB1;...`) and rebuilds the form from one; see [Save your selections and reuse them](#save-your-selections-and-reuse-them-export--restore). The string carries a version prefix, restore accepts only values a control on the page can produce, and `tests/selections-vocabulary.json` records everything a saved string may contain, so removing or renaming an option fails the tests until old strings are handled ([technical reference](docs/branching-logic.md) §1.6).

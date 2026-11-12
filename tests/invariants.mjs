@@ -652,6 +652,41 @@ else {
     `Decide whether each new field belongs in SEL_TEMPLATE, then run npm run test:update-selections`);
 }
 
+// ── M. Export / restore: example strings in the docs are real ────────────────
+// The README shows clinicians a literal selections string. Nothing else ties it to the
+// page, so a SEL_VERSION bump, a renamed key, or a field moved out of SEL_TEMPLATE would
+// leave a documented example that no longer restores as shown. Every "APB<n>;key=..."
+// in the tracked docs must be the current version and use only vocabulary entries; an
+// example marked scope=template may hold only SEL_TEMPLATE fields.
+const selTemplate = new Set([...balancedAfter('const SEL_TEMPLATE=').matchAll(/'(\w+)'/g)].map(m => m[1]));
+const ROOT = join(HERE, '..');
+const DOC_FILES = ['README.md', 'CLAUDE.md', 'tests/README.md',
+  ...readdirSync(join(ROOT, 'docs')).filter(f => /\.(md|html)$/.test(f)).map(f => 'docs/' + f)];
+let docExamples = 0;
+for (const f of DOC_FILES) {
+  const text = readFileSync(join(ROOT, f), 'utf8');
+  for (const m of text.matchAll(/APB(\d+);[\w=;,:%-]+/g)) {
+    docExamples++;
+    const bad = [], parts = m[0].replace(/;+$/, '').split(';').slice(1);
+    const template = parts.includes('scope=template');
+    if (Number(m[1]) !== selVersion) bad.push(`is version ${m[1]}, SEL_VERSION is ${selVersion}`);
+    for (const p of parts) {
+      if (p === 'scope=template') continue;
+      const eq = p.indexOf('='), k = p.slice(0, eq), raw = p.slice(eq + 1), v = vocabulary[k];
+      if (eq < 1 || !v) { bad.push(`"${p}" is not a saved field`); continue; }
+      if (template && !selTemplate.has(k)) bad.push(`"${k}" is not exported at Template level`);
+      const items = raw.split(',').map(decodeURIComponent);
+      const wrong = v.type === 'flag' ? items.filter(x => x !== '0' && x !== '1')
+        : v.type === 'map' ? items.filter(x => { const [mk, mv] = x.split(':'); return !(v.values[mk] || []).includes(mv); })
+        : v.type === 'one' && items.length !== 1 ? items
+        : items.filter(x => !v.values.includes(x));
+      if (wrong.length) bad.push(`${k} cannot hold ${wrong.join(', ')}`);
+    }
+    if (bad.length) check('Doc example strings', `${f}: "${m[0]}" ${bad.join('; ')}. Correct the example to what the tool exports now.`);
+  }
+}
+if (!docExamples) check('Doc example strings', 'no "APB<n>;..." example found in the docs; if the README example was removed on purpose, drop section M');
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
@@ -667,7 +702,8 @@ console.log(
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces; ` +
   `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls; ` +
   `restore sub-rows ${subrowKeys.length} table rows + ${SUBROW_RECOMPUTED.length} recomputed = ${hiddenRowIds.length} hidden rows; ` +
-  `selections vocabulary v${selVersion}: ${Object.keys(selFields).length} fields, ${nowFlat.length} entries`
+  `selections vocabulary v${selVersion}: ${Object.keys(selFields).length} fields, ${nowFlat.length} entries; ` +
+  `doc example strings ${docExamples} checked`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');

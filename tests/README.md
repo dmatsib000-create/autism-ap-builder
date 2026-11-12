@@ -116,6 +116,10 @@ for headings and emphasis. Presence may not.
   renamed fails with a "saved strings would lose this" message, and the refresh
   refuses to write until `SEL_VERSION` has been bumped. Treat that file like a
   golden: review its diff, never hand-edit it to make the lane pass.
+  Section M checks **example strings in the docs**: every literal
+  `APB<n>;key=...` in README.md, CLAUDE.md, this file and `docs/` must be the
+  current version and use only vocabulary entries, and a `scope=template`
+  example may hold only `SEL_TEMPLATE` fields.
   Section G checks the **fixtures themselves**: every value a fixture writes
   into `S` (`S.langLevel = 'phrase'`, `S.abaTargets.add('play')`, or the
   `[...].forEach(k => S.x.add(k))` form) must be one the page's own controls can

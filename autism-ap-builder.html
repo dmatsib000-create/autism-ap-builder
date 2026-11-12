@@ -6643,7 +6643,7 @@ async function writeClipboardText(text){
     return ok;
   }
 }
-const COPY_FAILED='Copy did not work in this browser. Select the text and press Ctrl+C.';
+const COPY_FAILED='Copy did not work in this browser. Select the text and press Ctrl+C (Cmd+C on a Mac).';
 // Button feedback for a plain-text copy: the flash on success, a warning toast on failure.
 function flashCopied(ok,msg,btn){
   if(ok) flashBtn(msg,btn); else toast(COPY_FAILED,'warn');
@@ -6964,6 +6964,8 @@ const SEL_SUBROWS={
 // omitted fields too (sped from an ID profile, counseling from a comorbid diagnosis,
 // transitions from criterion B2), so exporting them would leak what Template leaves out.
 // A Template string says so (SEL_SCOPE_TEMPLATE) and restore re-derives both from the needs.
+// The list is restated for clinicians in the panel hint (setSelLevel), README.md and
+// docs/branching-logic-for-clinicians.html; change all three with it (branching-logic.md §12.1).
 const SEL_TEMPLATE=new Set(['visitType','ageGroup','langLevel','langModifiers',
   'needsComm','needsAdaptive','needsBehavior','needsSocial','needsSensory','needsMotor',
   'emotionalReg','academic','strangerDanger','teacherMaterials',
@@ -7237,7 +7239,7 @@ function setSelLevel(level){
   const hint=document.getElementById('selLevelHint');
   const sens=level==='full'?selSensitiveIn(str):[];
   hint.textContent=level==='template'
-    ?'Template: age band, language, needs, ABA hours and settings, counseling topics and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
+    ?'Template: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, DSM table display, insurance category, ABA hours and settings, and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
     :'Full: every selection in the form.';
   if(sens.length){
     // The category names carry the emphasis; red stays reserved for the standing caution
