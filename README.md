@@ -73,6 +73,45 @@ The DSM-5 Criteria section shows a live badge: ✓ All criteria met when complet
 
 The **ABA Letter** and **IEP Letter** tabs activate as their inputs are populated. The ABA Letter tab appears when the ABA referral fires (see the [technical reference](docs/branching-logic.md) §7 for the full trigger list — it's needs-driven, not gated on diagnosis status alone) or is manually included via the Adjust Referrals override pills. The IEP Letter tab appears when school documentation status is set and the patient is not a toddler. Both tabs use the same one-form-three-outputs model — you don't enter anything separately, the letters auto-generate from the same checkboxes that drove the A&P note.
 
+### Save your selections and reuse them (Export / Restore)
+
+The **Export / Restore** button in the top bar turns everything you clicked into one line of text, and rebuilds the form from a line you saved earlier. Nothing is stored in the browser, so this is how a set of selections survives closing the tab.
+
+**What a line holds.** Only what you clicked: checkboxes, choices, menus, language-feature chips, "Include plan" pills, and referral overrides. Text you typed is never in it: evidence, strengths, level justifications, labs, behavior frequencies, the return-to-clinic interval, and test years. A line looks like this:
+
+```
+APB1;scope=template;ageGroup=schoolAge;langLevel=phrase;needsComm=expressive,receptive
+```
+
+**To save**
+
+1. Click **Export / Restore**.
+2. Choose how much to save:
+   - **Template** (already selected) keeps the reusable outline: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, insurance category, ABA hours and settings, and referral overrides. Use it for a personal starting point you will reuse across visits.
+   - **Full** keeps every selection, including the diagnosis, cognitive and adaptive profile, medical and exposure history, comorbid conditions, and test results. The panel names any sensitive categories the line contains.
+3. Click **Copy** and paste the line wherever you keep it.
+
+**To restore**
+
+1. Click **Export / Restore**.
+2. Paste the line into **Restore from string**.
+3. Click **Restore**. On an empty form that is all: the panel closes and a message confirms how many selections came back.
+
+If the form already holds anything, the panel first warns that restoring replaces the whole form, including typed text, and the button changes to **Restore anyway**. Click it to go ahead.
+
+**After restoring**
+
+- **Retype your text.** Typed fields come back empty. A few of them shape the note (for example, the return-to-clinic interval sets the timing of a toe-walking recheck), so the note matches the original only once they are filled in again.
+- **A Template works out school services and ABA targets again** from the needs. Any you had added by hand beyond those are not kept; a Full line keeps them.
+- **Read any notice the panel shows.** If it stays open, it is telling you something was left out: items this version of the tool does not recognise, or selections the form does not allow together (a choice that does not fit the age group, or a detail whose parent box is not ticked). The rest is applied.
+- **Lines from a different version** warn before applying. The same choices can produce different wording if the tool's rules have changed since the line was saved, so read the note before using it.
+
+**Keeping lines safely**
+
+- **Do not save a line next to a name, MRN, date, or in a file named for a patient.** On its own a line identifies no one. Kept beside an identifier, it is part of that patient's record.
+- **Prefer Template for anything you keep.** A Full line describes one child; enough details together can point to that child in a small community. If you make one to carry a visit between sessions, delete it when the note is signed.
+- **If Copy cannot reach the clipboard**, the panel says so and leaves the line selected: press Ctrl+C.
+
 ## What you get
 
 One form on the left produces three coordinated outputs on the right. You don't enter anything separately for the ABA Letter or IEP Letter — they're derived from the same state that drives the A&P note.
@@ -243,7 +282,7 @@ These two are the single source of truth for the tool's behavior; this README in
 - **No PHI is transmitted or stored.** Everything runs locally in the browser. State lives in a single object `S` declared near the top of the `<script>` block; closing the browser tab discards everything.
 - **Mobile responsive.** At viewport widths ≤768px, a sticky Input Form / View Note toggle nav appears at the top of the screen, section headers become sticky at `top:44px` (just below the nav) so the current section title stays visible while scrolling long forms, section collapse is animated via `max-height` transition with `inert` applied to collapsed bodies (keeps tab-nav clean), and touch targets are enlarged. Designed desktop-first but fully usable on tablet or phone.
 - **State resets completely** via the **Clear All** button (with inline confirmation prompt).
-- **Export / Restore** (header button) turns the form's clicked selections into a one-line string (`APB1;ageGroup=schoolAge;needsComm=expressive,...`) and rebuilds the form from one: one paste, one click. Typed text is never included and cannot be restored. **Template** (default) exports the reusable scaffold (age band, language, needs, ABA hours and settings; school services and ABA targets are rebuilt from the needs on restore); **Full** adds the diagnosis, profile, history, comorbid conditions and test results. Unknown items in a pasted string are skipped with a notice, and a string from a different version warns before applying. Do not store a string next to a name, MRN, date, or in a patient-named file.
+- **Export / Restore** (header button) saves the form's clicked selections as a one-line string (`APB1;...`) and rebuilds the form from one; see [Save your selections and reuse them](#save-your-selections-and-reuse-them-export--restore). The string carries a version prefix, restore accepts only values a control on the page can produce, and `tests/selections-vocabulary.json` records everything a saved string may contain, so removing or renaming an option fails the tests until old strings are handled ([technical reference](docs/branching-logic.md) §1.6).
 - **Offline use:** save the page (`Ctrl+S` → "Webpage, Complete") and open the saved file. No functionality is lost.
 - **Smart/curly quotes (U+2018 `'`, U+2019 `'`) must never appear in JS string literals.** They cause "Invalid or unexpected token" syntax errors and silently break the entire script with no console output. If a copy-paste introduces one, the PowerShell fix is in `CLAUDE.md`.
 - **Box-drawing characters** (`─` U+2500, `═` U+2550) in JS string literals are intentional section dividers in note output — do not replace them with ASCII.
