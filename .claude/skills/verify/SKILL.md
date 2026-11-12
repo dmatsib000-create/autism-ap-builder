@@ -68,6 +68,22 @@ Button ids: `copyIEPBtn` = **rich/Word**, `copyIEPEpicBtn` = **plain text, `{pla
 There is no separate plain button — intercepting `writeText` on `copyIEPBtn` catches
 only its *fallback* path, which is misleading.
 
+## Export / Restore round trip
+
+`paintFormFromState()` (the repaint behind Restore) has no coverage in `npm test`; it
+needs a real page. `scripts/roundtrip.js` is that coverage: 300 seeded random forms,
+each exported, cleared and restored, with every control, sub-row, pill, the note and both
+letters required to match.
+
+```bash
+node .claude/skills/verify/scripts/drive.mjs .claude/skills/verify/scripts/roundtrip.js --timeout 580
+```
+
+Prints `round trip OK: {...}` and exits 0, or exits 1 naming the first forms that did not
+survive (with the exported string, so the case can be pasted back). Run it after changing
+a form control or its change handler, `clearAll()`, `updateAgeBasedVisibility()`, or any
+`SEL_*` table. It takes about a minute.
+
 ## Gotchas
 
 - `.aba-sec` headings are uppercased by CSS, so `innerText.includes('Assessment Results')`

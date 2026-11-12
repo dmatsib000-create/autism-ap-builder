@@ -4995,10 +4995,9 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
-  await writeClipboardText(plain);
-  flashBtn('✓ Copied!',document.getElementById('copyABABtn'));
+  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABABtn'));
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
@@ -5840,7 +5839,7 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>{
     // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
       const c=_iepLetterContent();
@@ -5938,8 +5937,7 @@ async function copyIEPLetter(format){
       h+=`</div>`;
       return h;
   },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
-  await writeClipboardText(plain);
-  flashBtn('✓ Copied!',document.getElementById('copyIEPBtn'));
+  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPBtn'));
 }
 
 function setPreviewMode(mode){
@@ -6629,10 +6627,27 @@ function addStrength(text){
 // already treats every {placeholder} as an F2 cursor stop and blocks signing while one
 // remains, so no *** rewrite is needed (see CLAUDE.md). Square brackets get no such stop.
 // Plain-text copy with the execCommand fallback for contexts where the async Clipboard
-// API is unavailable (non-secure origins, older WebViews).
+// API is unavailable (non-secure origins, older WebViews). Resolves true only when the
+// text reached the clipboard, so callers never flash "Copied!" over a failed copy.
+// The temporary box goes inside an open <dialog> when there is one: a modal makes the
+// rest of the page inert, and a selection in inert content cannot be copied.
 async function writeClipboardText(text){
-  try{await navigator.clipboard.writeText(text);}
-  catch(e){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  try{await navigator.clipboard.writeText(text);return true;}
+  catch(e){
+    const host=document.querySelector('dialog[open]')||document.body;
+    const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+    host.appendChild(ta);ta.select();
+    let ok=false;
+    try{ok=document.execCommand('copy');}catch(e2){}
+    host.removeChild(ta);
+    return ok;
+  }
+}
+const COPY_FAILED='Copy did not work in this browser. Select the text and press Ctrl+C.';
+// Button feedback for a plain-text copy: the flash on success, a warning toast on failure.
+function flashCopied(ok,msg,btn){
+  if(ok) flashBtn(msg,btn); else toast(COPY_FAILED,'warn');
+  return ok;
 }
 // Rich copy (HTML + plain alternates). `build` returns the HTML; if it throws or returns
 // nothing, or the browser refuses ClipboardItem, the result is false and the caller falls
@@ -6648,8 +6663,7 @@ async function copyNote(format,part,btn){
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
   if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Rich text copied!',btn);return;}
-  await writeClipboardText(plain);
-  flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
 // Speak a short status to screen readers. Needed for flashBtn: it only swaps the button's
 // text, which assistive tech doesn't reliably read out. Cleared first so the same message
@@ -6965,6 +6979,46 @@ const SEL_SENSITIVE={
   'genetic and neurological findings':['dysmorphism','congenitalAnomalies','developmentalRegression','regressionTiming','seizureConcern','focalNeuroFindings'],
 };
 
+// The fields whose controls sit inside each reveal-on-check row. Such a field may hold a
+// value only while its row is revealed: the form's handlers clear it when the parent is
+// unticked ("so nothing orphans in S"), and selPruneOrphans() holds a restored string to
+// the same rule. Every SEL_SUBROWS row is listed (invariants lane), parents before the
+// rows nested inside them, because clearing a parent can close a nested row.
+const SEL_ROW_FIELDS={
+  socialWorkReasonsRow:['socialWorkReasons'],
+  regressionTimingRow:['regressionTiming'],
+  paeEvidenceRow:['paeEvidence'],
+  paeQuantityRow:['paeQuantity','paeFrequency','paeTiming'],
+  fasdDomainsRow:['fasdDomains'],
+  smearWorkupRow:['smearWorkup'],
+  strangerDangerRow:['strangerDanger'],
+  traumaIepGateRow:['traumaIncludeInIEP'],
+  sleepFactorsRow:['sleepFactors'],
+  depressionSafetyRow:['depressionSafety'],
+  pfdDomainsRow:['pfdDomains'],
+  arfidDetailsRow:['arfidMechanism','arfidImpact'],
+};
+// Sets whose members only make sense while the same key is in a parent Set.
+const SEL_SUBSETS={comorbidInPlan:'comorbid',teacherMaterialsReturned:'teacherMaterials'};
+// Touches S only (no DOM). Resets any sub-option whose parent is off, the way the change
+// handlers would have. Only a hand-edited or cross-version string can need this; the
+// tool's own exports are already consistent. Without it the value would sit hidden in S,
+// ride along in the next export, and appear pre-selected when the parent is ticked later.
+function selPruneOrphans(){
+  const init=initialState();
+  Object.entries(SEL_ROW_FIELDS).forEach(([row,fields])=>{
+    if(!SEL_SUBROWS[row]()) fields.forEach(f=>{S[f]=init[f];});
+  });
+  Object.entries(SEL_SUBSETS).forEach(([child,parent])=>{
+    [...S[child]].forEach(v=>{if(!S[parent].has(v)) S[child].delete(v);});
+  });
+  // Work-up statuses belong to the evaluation path (onDxEvalPathChange resets them).
+  const st=evalPathSteps();
+  if(!st.hasProfile) S.evalProfileStatus='';
+  if(!st.hasDx||(S.evalDxStatus==='today'&&!st.dxTodayAllowed)) S.evalDxStatus='';
+  if(!S.evalDxStatus) S.evalDxOutcome='';
+}
+
 // PURE (reads S only). level is 'template' or 'full'. Only values that differ from a
 // fresh form are written, and Sets keep their click order: the generators list some of
 // them in that order, so sorting here would reorder the restored note.
@@ -7034,32 +7088,36 @@ function decodeSelections(str,allowed){
   const dec=s=>{try{return decodeURIComponent(s);}catch(e){return s;}};
   const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
   const state={},ignored=[];
-  let applied=0;
   pairs.forEach(([k,raw])=>{
     if(!own(SEL_FIELDS,k)){ignored.push(k);return;}
     const t=SEL_FIELDS[k],ok=allowed[k];
     if(t==='flag'){
-      if(raw==='1'||raw==='0'){state[k]=raw==='1';applied++;} else ignored.push(k);
+      if(raw==='1'||raw==='0'){state[k]=raw==='1';} else ignored.push(k);
       return;
     }
     if(!ok){ignored.push(k);return;}
     if(t==='one'){
       const v=dec(raw);
-      if(ok.includes(v)){state[k]=v;applied++;} else ignored.push(k);
+      if(ok.includes(v)){state[k]=v;} else ignored.push(k);
       return;
     }
     const items=raw.split(',').filter(Boolean);
     if(t==='many'){
       state[k]=new Set();
-      items.forEach(i=>{const v=dec(i);if(ok.includes(v)){state[k].add(v);applied++;} else ignored.push(k);});
+      items.forEach(i=>{const v=dec(i);if(ok.includes(v)){state[k].add(v);} else ignored.push(k);});
       return;
     }
     state[k]={};
     items.forEach(i=>{
       const j=i.indexOf(':'),mk=dec(j<0?i:i.slice(0,j)),mv=dec(j<0?'':i.slice(j+1));
-      if(own(ok,mk)&&ok[mk].includes(mv)){state[k][mk]=mv;applied++;} else ignored.push(k);
+      if(own(ok,mk)&&ok[mk].includes(mv)){state[k][mk]=mv;} else ignored.push(k);
     });
   });
+  // Counted from the final state, so a key that appears twice is not counted twice.
+  const applied=Object.keys(state).reduce((n,k)=>{
+    const t=SEL_FIELDS[k],v=state[k];
+    return n+(t==='many'?v.size:t==='map'?Object.keys(v).length:1);
+  },0);
   return {version,template,state,applied,ignored};
 }
 
@@ -7129,6 +7187,7 @@ function applySelectionState(state,rederive){
       // Sets are copied so the decoded state stays as parsed for selDropped() to compare.
       if(SEL_FIELDS[k]==='map') Object.assign(S[k],state[k]); else S[k]=state[k] instanceof Set?new Set(state[k]):state[k];
     });
+    selPruneOrphans();
     paintFormFromState();
     if(rederive){syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();}
   }finally{renderSuspended=wasSuspended;}
@@ -7138,7 +7197,7 @@ function applySelectionState(state,rederive){
 // PURE (reads S only): fields where the form ended up without something the decoded state
 // asked for. The form's own rules still apply after a restore (age gates strip a GDD
 // specifier from a school-age child, the BIF gate needs a data source, a therapy status
-// needs its referral), so a string that breaks one cannot be applied whole; the caller
+// needs its referral, a sub-option needs its parent), so a string that breaks one cannot be applied whole; the caller
 // reports these instead of letting the difference pass silently.
 function selDropped(state){
   return Object.keys(state).filter(k=>{
@@ -7198,7 +7257,14 @@ function openSelDialog(){
   d.querySelector('.sel-level-btn.is-on').focus();
 }
 async function copySelections(btn){
-  await writeClipboardText(document.getElementById('selExportField').value);
+  const field=document.getElementById('selExportField');
+  if(!await writeClipboardText(field.value)){
+    // A toast would sit behind the modal, unseen and unannounced; say it here and leave
+    // the string selected so Ctrl+C finishes the job.
+    selSetStatus([COPY_FAILED],true);
+    field.focus();field.select();
+    return;
+  }
   flashBtn('✓ Copied!',btn);
   // flashBtn speaks through #srAnnounce, which is outside this modal and therefore inert
   // while it is open; repeat the message in a live region inside the dialog.
@@ -7235,12 +7301,14 @@ function restoreSelections(){
     toast(done+' Typed text is not part of a selections string; re-enter it as needed.','ok');
     return;
   }
-  // Report a count, and name only tokens shaped like a field key. Anything else in the
-  // pasted text could be a name or a date, so it is counted and never echoed.
-  const named=[...new Set(r.ignored.filter(k=>/^[A-Za-z][A-Za-z0-9_]{0,31}$/.test(k)))].slice(0,5);
+  // Report a count, and name an item only when it is one of this tool's own field names.
+  // Anything else in the pasted text could be a name or a date (a surname is as
+  // "key-shaped" as a field name), so it is counted and never echoed.
+  const known=k=>Object.prototype.hasOwnProperty.call(SEL_FIELDS,k)||SEL_TYPED.includes(k);
+  const named=[...new Set(r.ignored.filter(known))].slice(0,5);
   const lines=[done];
   if(r.ignored.length) lines.push('Ignored '+r.ignored.length+' item'+(r.ignored.length===1?'':'s')+' this version does not recognise'+(named.length?' (fields: '+named.join(', ')+')':'')+'.');
-  if(dropped.length) lines.push('Some selections were not kept because the form does not allow them together, for example a choice that does not fit the age group (fields: '+dropped.join(', ')+'). The note may differ from the one this string came from.');
+  if(dropped.length) lines.push('Some selections were not kept because the form does not allow them together, for example a choice that does not fit the age group or a detail whose parent box is not ticked (fields: '+dropped.join(', ')+'). The note may differ from the one this string came from.');
   if(mismatch) lines.push('The string was version '+r.version+'; this tool reads version '+SEL_VERSION+'. Check the form before using the note.');
   selSetStatus(lines,true);
 }

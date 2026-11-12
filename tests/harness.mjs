@@ -92,6 +92,9 @@ const EXPORTS = [
   'selSensitiveIn',
   'formHasAnything',
   'selDropped',
+  'selPruneOrphans',
+  'SEL_ROW_FIELDS',
+  'SEL_SUBROWS',
   // Age-radio change handler: updateAgeBasedVisibility() teardown, then the specifier
   // bridge re-fire. DOM-driven, but its S mutations run under the stub DOM (every
   // element step is best-effort), so the unit lane can drive a real age change and

@@ -12,6 +12,7 @@
     "test:unit": "node tests/unit.mjs",
     "test:wiring": "node tests/wiring.mjs",
     "test:invariants": "node tests/invariants.mjs",
-    "test:update": "node tests/run.mjs --update"
+    "test:update": "node tests/run.mjs --update",
+    "test:update-selections": "node tests/invariants.mjs --update-selections"
   }
 }

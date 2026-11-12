@@ -589,6 +589,35 @@ const CASES = [
     check(a){ assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID']),therapyStatus:{},showDSMTable:true}), []);
               assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID','withSuspectedGDD']),therapyStatus:{slp:'continue'},showDSMTable:false}),
                 ['specifiers','therapyStatus','showDSMTable']); } },
+  { name: 'selections: a sub-option without its parent is reset, and reported as not kept',
+    setup(S){ S.depressionSafety='positive';                       // no depression in comorbid
+              S.comorbidInPlan.add('anxiety');                     // not in comorbid
+              S.comorbid.add('trauma'); S.comorbidInPlan.add('trauma'); S.traumaIncludeInIEP=true;   // consistent: must survive
+              S.paeEvidence.add('quantityFrequency'); S.paeQuantity='1_2';   // prenatalAlcohol off: both go, parent row first
+              S.teacherMaterials.add('srs2'); S.teacherMaterialsReturned.add('srs2'); S.teacherMaterialsReturned.add('gars3');
+              S.evalDxStatus='done'; S.evalDxOutcome='consistent';  // no evaluation path chosen
+              S.socialWork=true; S.socialWorkReasons.add('financial'); },   // consistent
+    check(a){ a.selPruneOrphans(); const S=a.S;
+              assert.equal(S.depressionSafety, ''); assert.deepEqual([...S.comorbidInPlan], ['trauma']);
+              assert.equal(S.traumaIncludeInIEP, true);
+              assert.equal(S.paeEvidence.size, 0); assert.equal(S.paeQuantity, '');
+              assert.deepEqual([...S.teacherMaterialsReturned], ['srs2']);
+              assert.equal(S.evalDxStatus, ''); assert.equal(S.evalDxOutcome, '');
+              assert.deepEqual([...S.socialWorkReasons], ['financial']);
+              assert.deepEqual(a.selDropped({depressionSafety:'positive',comorbidInPlan:new Set(['anxiety','trauma']),socialWorkReasons:new Set(['financial'])}),
+                ['depressionSafety','comorbidInPlan']);
+              // every reveal row declares the fields inside it, and they are saved fields
+              assert.deepEqual(Object.keys(a.SEL_ROW_FIELDS).sort(), Object.keys(a.SEL_SUBROWS).sort());
+              for(const f of Object.values(a.SEL_ROW_FIELDS).flat()) assert.ok(f in a.SEL_FIELDS, f); } },
+  { name: 'selections: pruning leaves a consistent form untouched',
+    setup(S){ S.dxEvalPath='certainOlder'; S.evalProfileStatus='done'; S.evalDxStatus='today'; S.evalDxOutcome='consistent';
+              S.comorbid.add('depression'); S.depressionSafety='positive'; S.needsAdaptive.add('commSafety'); S.strangerDanger=true;
+              S.prenatalAlcohol=true; S.paeEvidence.add('quantityFrequency'); S.paeTiming='first'; },
+    check(a){ const before=a.encodeSelections('full'); a.selPruneOrphans(); assert.equal(a.encodeSelections('full'), before); } },
+  { name: 'selections: a repeated key is counted once, last one wins',
+    setup(){},
+    check(a){ const r=a.decodeSelections('APB1;ageGroup=toddler;ageGroup=schoolAge;needsComm=expressive;needsComm=receptive', {ageGroup:['toddler','schoolAge'],needsComm:['expressive','receptive']});
+              assert.equal(r.state.ageGroup, 'schoolAge'); assert.deepEqual([...r.state.needsComm], ['receptive']); assert.equal(r.applied, 2); } },
   // Compatibility pin. This literal is what a clinician may already have saved. If this
   // case fails, a key or value was renamed: bump SEL_VERSION and add a SEL_MIGRATIONS
   // entry rather than editing the expected values here.

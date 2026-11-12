@@ -1,0 +1,918 @@
+{
+ "version": 1,
+ "fields": {
+  "visitType": {
+   "type": "one",
+   "values": [
+    "initial",
+    "reeval",
+    "followup"
+   ]
+  },
+  "ageGroup": {
+   "type": "one",
+   "values": [
+    "toddler",
+    "preschool",
+    "schoolAge",
+    "adolescent",
+    "youngAdult"
+   ]
+  },
+  "pronouns": {
+   "type": "one",
+   "values": [
+    "he",
+    "she",
+    "they"
+   ]
+  },
+  "langLevel": {
+   "type": "one",
+   "values": [
+    "nonverbal",
+    "singleWord",
+    "phrase",
+    "simpleSentence",
+    "conversational",
+    "ageAppropriate",
+    "unclearSLP"
+   ]
+  },
+  "langModifiers": {
+   "type": "many",
+   "values": [
+    "langAgeAppropriate",
+    "pragmatic",
+    "echolalic",
+    "morphosyntactic",
+    "semantic",
+    "speechSound",
+    "reducedIntell",
+    "pedanticSpeech",
+    "advVocab"
+   ]
+  },
+  "cogProfile": {
+   "type": "one",
+   "values": [
+    "id_severe",
+    "id_moderate",
+    "id_mild",
+    "gdd",
+    "gdd_mild",
+    "gdd_moderate",
+    "gdd_severe",
+    "borderline",
+    "lowAverage",
+    "average",
+    "aboveAverage",
+    "superior",
+    "verySuperior",
+    "unknown"
+   ]
+  },
+  "unevenCog": {
+   "type": "flag",
+   "values": []
+  },
+  "cogDataSource": {
+   "type": "one",
+   "values": [
+    "comprehensive",
+    "screener",
+    "clinical",
+    "priorExternal"
+   ]
+  },
+  "adaptProfile": {
+   "type": "one",
+   "values": [
+    "severelyImpaired",
+    "moderatelyImpaired",
+    "mildlyImpaired",
+    "belowPotential",
+    "commensurate",
+    "ageAppropriate"
+   ]
+  },
+  "adaptiveStandardized": {
+   "type": "flag",
+   "values": []
+  },
+  "diagStatus": {
+   "type": "one",
+   "values": [
+    "confirmed",
+    "suspected",
+    "ruleOut"
+   ]
+  },
+  "asdLevelSC": {
+   "type": "one",
+   "values": [
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  "asdLevelRRB": {
+   "type": "one",
+   "values": [
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  "specifiers": {
+   "type": "many",
+   "values": [
+    "withID",
+    "withSuspectedID",
+    "withGDD",
+    "withSuspectedGDD",
+    "withoutGDD",
+    "withBIF",
+    "withoutID",
+    "withLangImpairment",
+    "withSuspectedLang",
+    "withoutLangImpairment",
+    "withGenetic",
+    "withNDD",
+    "withCatatonia"
+   ]
+  },
+  "specifiersManuallySet": {
+   "type": "many",
+   "values": [
+    "withID",
+    "withSuspectedID",
+    "withGDD",
+    "withSuspectedGDD",
+    "withBIF",
+    "withoutID",
+    "withoutGDD"
+   ]
+  },
+  "criteriaA": {
+   "type": "many",
+   "values": [
+    "a1",
+    "a2",
+    "a3"
+   ]
+  },
+  "criteriaB": {
+   "type": "many",
+   "values": [
+    "b1",
+    "b2",
+    "b3",
+    "b4"
+   ]
+  },
+  "criteriaC": {
+   "type": "flag",
+   "values": []
+  },
+  "criteriaD": {
+   "type": "flag",
+   "values": []
+  },
+  "criteriaE": {
+   "type": "flag",
+   "values": []
+  },
+  "needsComm": {
+   "type": "many",
+   "values": [
+    "expressive",
+    "receptive",
+    "functional_aac",
+    "oral_motor"
+   ]
+  },
+  "needsAdaptive": {
+   "type": "many",
+   "values": [
+    "toileting",
+    "dressing",
+    "feeding_adl",
+    "hygiene",
+    "menstrualCare",
+    "commSafety",
+    "commIndependence"
+   ]
+  },
+  "needsBehavior": {
+   "type": "many",
+   "values": [
+    "aggression",
+    "sib",
+    "property",
+    "tantrums",
+    "elopement",
+    "noncompliance",
+    "vocalDisruption",
+    "pica",
+    "smearing",
+    "boundaryViol",
+    "rigidity"
+   ]
+  },
+  "needsSocial": {
+   "type": "many",
+   "values": [
+    "peer",
+    "play",
+    "reciprocity",
+    "emotion",
+    "perspective",
+    "conversation"
+   ]
+  },
+  "needsSensory": {
+   "type": "many",
+   "values": [
+    "hypersensitivity",
+    "hyposensitivity",
+    "seeking",
+    "avoidance"
+   ]
+  },
+  "needsMotor": {
+   "type": "many",
+   "values": [
+    "gross",
+    "hypotonia",
+    "fine",
+    "coordination",
+    "handwriting",
+    "toeWalk",
+    "gait"
+   ]
+  },
+  "emotionalReg": {
+   "type": "flag",
+   "values": []
+  },
+  "academic": {
+   "type": "flag",
+   "values": []
+  },
+  "sleep": {
+   "type": "flag",
+   "values": []
+  },
+  "feeding": {
+   "type": "flag",
+   "values": []
+  },
+  "hearingScreenFail": {
+   "type": "flag",
+   "values": []
+  },
+  "seizureConcern": {
+   "type": "flag",
+   "values": []
+  },
+  "neurologyNowForSeizure": {
+   "type": "flag",
+   "values": []
+  },
+  "focalNeuroFindings": {
+   "type": "flag",
+   "values": []
+  },
+  "highlyMotivated": {
+   "type": "flag",
+   "values": []
+  },
+  "sleepStudy": {
+   "type": "flag",
+   "values": []
+  },
+  "socialWork": {
+   "type": "flag",
+   "values": []
+  },
+  "socialWorkReasons": {
+   "type": "many",
+   "values": [
+    "apd_waiver",
+    "financial",
+    "caregiver_support",
+    "community_nav",
+    "family_support",
+    "family_safety",
+    "fasd_support"
+   ]
+  },
+  "dysmorphism": {
+   "type": "one",
+   "values": [
+    "suspected",
+    "confirmed"
+   ]
+  },
+  "congenitalAnomalies": {
+   "type": "flag",
+   "values": []
+  },
+  "developmentalRegression": {
+   "type": "flag",
+   "values": []
+  },
+  "regressionTiming": {
+   "type": "one",
+   "values": [
+    "ongoing",
+    "distant",
+    "unsure"
+   ]
+  },
+  "gaitExam": {
+   "type": "many",
+   "values": [
+    "contracture",
+    "impact",
+    "asymmetric",
+    "umn",
+    "lmn",
+    "lateOnset",
+    "history",
+    "notAssessed",
+    "heelsFlat",
+    "familyPT"
+   ]
+  },
+  "prenatalAlcohol": {
+   "type": "flag",
+   "values": []
+  },
+  "fasdFeatures": {
+   "type": "flag",
+   "values": []
+  },
+  "paeEvidence": {
+   "type": "many",
+   "values": [
+    "quantityFrequency",
+    "socialLegal",
+    "intoxicationTesting",
+    "biomarkers",
+    "screenPositive"
+   ]
+  },
+  "fasdDomains": {
+   "type": "many",
+   "values": [
+    "facial",
+    "growth",
+    "brain",
+    "neurobehavioral"
+   ]
+  },
+  "paeQuantity": {
+   "type": "one",
+   "values": [
+    "1_2",
+    "3_5",
+    "6plus",
+    "notQuantified"
+   ]
+  },
+  "paeFrequency": {
+   "type": "one",
+   "values": [
+    "daily",
+    "weeklyPlus",
+    "lessWeekly",
+    "binge",
+    "notDocumented"
+   ]
+  },
+  "paeTiming": {
+   "type": "one",
+   "values": [
+    "first",
+    "second",
+    "third",
+    "throughout",
+    "preRecognition",
+    "notDocumented"
+   ]
+  },
+  "therapyStatus": {
+   "type": "map",
+   "values": {
+    "slp": [
+     "continue",
+     "revise",
+     "increase"
+    ],
+    "ot": [
+     "continue",
+     "revise",
+     "increase"
+    ],
+    "aba": [
+     "continue",
+     "revise",
+     "increase"
+    ],
+    "pt": [
+     "continue",
+     "revise",
+     "increase"
+    ]
+   }
+  },
+  "teacherMaterials": {
+   "type": "many",
+   "values": [
+    "uf_classroom",
+    "vanderbilt_teacher",
+    "dp4_teacher",
+    "srs2",
+    "scq_current",
+    "gars3",
+    "assq",
+    "other_teacher"
+   ]
+  },
+  "teacherMaterialsReturned": {
+   "type": "many",
+   "values": [
+    "uf_classroom",
+    "vanderbilt_teacher",
+    "dp4_teacher",
+    "srs2",
+    "scq_current",
+    "gars3",
+    "assq",
+    "other_teacher"
+   ]
+  },
+  "dxEvalPath": {
+   "type": "one",
+   "values": [
+    "devOnly",
+    "certainYoung",
+    "certainOlder",
+    "uncertainComp",
+    "uncertainADOS",
+    "ritaT"
+   ]
+  },
+  "evalProfileStatus": {
+   "type": "one",
+   "values": [
+    "done"
+   ]
+  },
+  "evalDxStatus": {
+   "type": "one",
+   "values": [
+    "today",
+    "done"
+   ]
+  },
+  "evalDxOutcome": {
+   "type": "one",
+   "values": [
+    "consistent",
+    "equivocal",
+    "notConsistent"
+   ]
+  },
+  "priorTesting": {
+   "type": "many",
+   "values": [
+    "cars2st",
+    "cars2hf",
+    "ados2",
+    "adir",
+    "asdpeds",
+    "midgas",
+    "srs2",
+    "gars3",
+    "vineland3",
+    "basc3",
+    "conners4"
+   ]
+  },
+  "priorTestingOutcome": {
+   "type": "map",
+   "values": {
+    "cars2st": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "cars2hf": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "ados2": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "adir": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "asdpeds": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "midgas": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "srs2": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "gars3": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "vineland3": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "basc3": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ],
+    "conners4": [
+     "consistent",
+     "equivocal",
+     "notConsistent"
+    ]
+   }
+  },
+  "ados2Module": {
+   "type": "one",
+   "values": [
+    "Module T",
+    "Module 1",
+    "Module 2",
+    "Module 3",
+    "Module 4"
+   ]
+  },
+  "comorbid": {
+   "type": "many",
+   "values": [
+    "adhd_combined",
+    "adhd_inattentive",
+    "adhd_hyperactive",
+    "adhd_suspected",
+    "anxiety",
+    "depression",
+    "ocd",
+    "trauma",
+    "catatonia",
+    "catatonia_history",
+    "language_disorder",
+    "ld_reading",
+    "ld_math",
+    "ld_written",
+    "ld_suspected",
+    "dcd",
+    "epilepsy",
+    "sleep_disorder",
+    "gi",
+    "pfd_chronic",
+    "pfd_acute",
+    "pfd_suspected",
+    "arfid",
+    "arfid_suspected"
+   ]
+  },
+  "comorbidInPlan": {
+   "type": "many",
+   "values": [
+    "adhd_combined",
+    "adhd_inattentive",
+    "adhd_hyperactive",
+    "adhd_suspected",
+    "anxiety",
+    "depression",
+    "ocd",
+    "trauma",
+    "catatonia",
+    "catatonia_history",
+    "language_disorder",
+    "ld_reading",
+    "ld_math",
+    "ld_written",
+    "ld_suspected",
+    "dcd",
+    "epilepsy",
+    "sleep_disorder",
+    "gi",
+    "pfd_chronic",
+    "pfd_acute",
+    "pfd_suspected",
+    "arfid",
+    "arfid_suspected"
+   ]
+  },
+  "traumaIncludeInIEP": {
+   "type": "flag",
+   "values": []
+  },
+  "sleepFactors": {
+   "type": "many",
+   "values": [
+    "melatonin",
+    "sensory",
+    "anxiety",
+    "stimulant"
+   ]
+  },
+  "depressionSafety": {
+   "type": "one",
+   "values": [
+    "negative",
+    "positive"
+   ]
+  },
+  "smearWorkup": {
+   "type": "one",
+   "values": [
+    "suspected",
+    "ruled_out",
+    "unclear"
+   ]
+  },
+  "pfdDomains": {
+   "type": "many",
+   "values": [
+    "medical",
+    "nutritional",
+    "skill",
+    "psychosocial"
+   ]
+  },
+  "arfidMechanism": {
+   "type": "many",
+   "values": [
+    "sensory",
+    "fear",
+    "low_interest"
+   ]
+  },
+  "arfidImpact": {
+   "type": "many",
+   "values": [
+    "nutritional",
+    "weight_loss",
+    "supplement_dep",
+    "psychosocial"
+   ]
+  },
+  "schoolPlacement": {
+   "type": "one",
+   "values": [
+    "notYet",
+    "daycare",
+    "genEd",
+    "genEdSupport",
+    "selfContained",
+    "therapDay",
+    "privateNoIEP",
+    "privateWithIEP",
+    "home"
+   ]
+  },
+  "schoolDoc": {
+   "type": "one",
+   "values": [
+    "iep",
+    "iep_needed",
+    "504",
+    "neither"
+   ]
+  },
+  "schoolSvc": {
+   "type": "many",
+   "values": [
+    "sped",
+    "slp_school",
+    "ot_school",
+    "pt_school",
+    "counseling",
+    "esy",
+    "aide",
+    "lowRatio",
+    "sensory",
+    "visual",
+    "social_skills_school",
+    "fba",
+    "psychoed"
+   ]
+  },
+  "schoolSvcManualOff": {
+   "type": "many",
+   "values": [
+    "sped",
+    "slp_school",
+    "ot_school",
+    "pt_school",
+    "counseling",
+    "esy",
+    "aide",
+    "lowRatio",
+    "sensory",
+    "visual",
+    "social_skills_school",
+    "fba",
+    "psychoed"
+   ]
+  },
+  "strangerDanger": {
+   "type": "flag",
+   "values": []
+  },
+  "safety": {
+   "type": "many",
+   "values": [
+    "elopement_counsel",
+    "water_counsel",
+    "road_counsel",
+    "medID",
+    "sib_safety_counsel",
+    "bullying",
+    "internet",
+    "fire_counsel"
+   ]
+  },
+  "ag": {
+   "type": "many",
+   "values": [
+    "caregiver_support",
+    "sibling",
+    "sleep_hygiene",
+    "nutrition",
+    "advocacy",
+    "transition",
+    "puberty",
+    "driving",
+    "self_advocacy",
+    "screen_time"
+   ]
+  },
+  "showDSMTable": {
+   "type": "flag",
+   "values": []
+  },
+  "showDSMLines": {
+   "type": "flag",
+   "values": []
+  },
+  "insuranceType": {
+   "type": "one",
+   "values": [
+    "commercial",
+    "medicaid",
+    "tricare",
+    "champva",
+    "selfpay"
+   ]
+  },
+  "abaHours": {
+   "type": "one",
+   "values": [
+    "10",
+    "15",
+    "20",
+    "25",
+    "30plus"
+   ]
+  },
+  "abaSetting": {
+   "type": "many",
+   "values": [
+    "home",
+    "clinic",
+    "school",
+    "community",
+    "telehealth"
+   ]
+  },
+  "abaTargets": {
+   "type": "many",
+   "values": [
+    "functional_comm",
+    "joint_attention",
+    "imitation",
+    "self_help",
+    "menstrual_care",
+    "safety_skills",
+    "play",
+    "reduce_sib",
+    "reduce_aggression",
+    "reduce_elopement",
+    "reduce_tantrum",
+    "reduce_stereotypy",
+    "reduce_pica",
+    "reduce_smearing",
+    "self_reg",
+    "instructional_control",
+    "transitions",
+    "academics",
+    "boundary_skills"
+   ]
+  },
+  "overrides": {
+   "type": "map",
+   "values": {
+    "aba": [
+     "yes",
+     "no"
+    ],
+    "pcit": [
+     "yes",
+     "no"
+    ],
+    "psychotherapy": [
+     "yes",
+     "no"
+    ],
+    "socialSkills": [
+     "yes",
+     "no"
+    ],
+    "slp": [
+     "yes",
+     "no"
+    ],
+    "ot": [
+     "yes",
+     "no"
+    ],
+    "pt": [
+     "yes",
+     "no"
+    ],
+    "genetics": [
+     "yes",
+     "no"
+    ],
+    "neurology": [
+     "yes",
+     "no"
+    ],
+    "psychiatry": [
+     "yes",
+     "no"
+    ],
+    "gi": [
+     "yes",
+     "no"
+    ],
+    "sleep_ref": [
+     "yes",
+     "no"
+    ],
+    "audiology": [
+     "yes",
+     "no"
+    ],
+    "qbtest": [
+     "yes",
+     "no"
+    ],
+    "earlySteps": [
+     "yes",
+     "no"
+    ],
+    "fdlrs": [
+     "yes",
+     "no"
+    ],
+    "eeg": [
+     "yes",
+     "no"
+    ],
+    "card": [
+     "yes",
+     "no"
+    ]
+   }
+  }
+ }
+}
