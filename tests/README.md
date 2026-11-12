@@ -47,6 +47,15 @@ for headings and emphasis. Presence may not.
   DSM-5 evidence chip's text onto a criterion's evidence (so a source heading or
   a typed sentence never ends up as "Parent report:; …" or "….; …"). These lanes
   share `makeApp()` and the real, unmodified shipped script.
+  The unit lane also covers **export / restore selections** (`encodeSelections`,
+  `decodeSelections`, both pure): every `initialState()` key must be classified as
+  saved (`SEL_FIELDS`), typed (`SEL_TYPED`) or view (`SEL_VIEW`); typed text never
+  appears in an export; Template omits every sensitive field; unknown keys, values
+  no control offers, and typed-field keys are dropped and reported by key only; and
+  one literal version-1 string is pinned so a renamed key or value fails here
+  instead of silently breaking strings clinicians already saved (the fix is a
+  `SEL_VERSION` bump plus a `SEL_MIGRATIONS` entry, not editing the pin). Painting
+  the form from a restored state is browser-only and is checked with /verify.
 - **Wiring lane** (`tests/wiring.mjs`, `npm run test:wiring`) — a source-text lint
   (no script eval) that checks the chip/state class contract: every state class
   JS toggles has a CSS rule, and every chip-family CSS rule is actually applied or
@@ -85,6 +94,10 @@ for headings and emphasis. Presence may not.
   `:where(textarea,select,input…)` rule is what gives every field its edge. It
   sees token pairs only, not arbitrary rules, so it doesn't replace a contrast
   audit of the rendered page.
+  Section I checks **restore sub-rows**: every hidden-by-default `...Row` element
+  must be a `SEL_SUBROWS` key or on the short list of rows recomputed on every
+  render. Restore fires no change handlers, so a reveal-on-check row missing from
+  that table would stay hidden with its restored sub-options invisible.
   Section G checks the **fixtures themselves**: every value a fixture writes
   into `S` (`S.langLevel = 'phrase'`, `S.abaTargets.add('play')`, or the
   `[...].forEach(k => S.x.add(k))` form) must be one the page's own controls can

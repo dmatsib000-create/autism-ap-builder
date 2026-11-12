@@ -2,7 +2,7 @@
 
 > **Living spec.** This document describes every output-shaping decision in `autism-ap-builder.html`. It is intended as a working reference for the maintainer (David) and future Claude Code sessions making changes to the app.
 >
-> **Last verified against commit:** `f615e5e`
+> **Last verified against commit:** `44e8734`
 > **Source file:** [`autism-ap-builder.html`](../autism-ap-builder.html) (~4,938 lines)
 > **Plain-English clinician companion:** a non-technical version of this content (same 12-section structure, vignettes instead of mechanism, no code or line refs) is planned at `docs/branching-logic-for-clinicians.html`. A working draft lives at `scratch/branching-logic-for-clinicians.html` in the interim. When changes here affect user-visible behavior, the clinician doc should be updated too — see its `§12 How this document is maintained` once migrated.
 
@@ -316,11 +316,39 @@ The markup carries the same state (`class="sec-head collapsed"` on the head, `cl
 
 **Auto-open is edge-triggered and one-way.** `updateSectionHeaders()` ends with `autoOpenSections()`, which runs on every `render()` path (including the ABA/IEP preview early returns). `sectionRelevance()` reads the table into `{key:{content,relevant}}`; `secAutoOpenKeys(prev,cur)` returns the keys whose `content` or `relevant` rose false→true since the previous pass; each opens once via `setSecOpen()`. A steady true never re-opens (so the per-keystroke renders from the text boxes cannot fight a clinician who folded a section), and nothing is ever auto-closed. Presets go through the same path: they click real controls with render suspended, so the one final `render()` opens whatever they populated (P5 and the ADHD modifier tick comorbidities). `setSecOpen(head, open)` is the only writer of the three attributes that must move together (`hidden` + `inert` on the body, `collapsed` on the head, `aria-expanded` on the button); `toggleSec()`, init, auto-open, Clear All, and the toolbar all route through it.
 
-**Clear All** calls `resetSections()` before its final `render()`: the edge memory is emptied and the four defaults re-collapse; since `S` is already blank, that render sees no rising edge. Sections outside the table keep whatever state the clinician left them in.
+**Clear All** calls `resetSections()` before its final render (`setPreviewMode('note')`, see §5.4): the edge memory is emptied and the four defaults re-collapse; since `S` is already blank, that render sees no rising edge. Sections outside the table keep whatever state the clinician left them in.
 
 **Toolbar.** The "Expand all" / "Collapse all" button (`#secToggleAllBtn`, `toggleAllSections()`) acts on every on-screen section head; a display-gated section (the ABA parameters block) is skipped so it cannot make the label read "Expand all" while everything visible is open. The label is re-synced by `syncSecToggleAll()` after any open/close.
 
 Adding a fifth collapsed section is one `SEC_TABLE` row plus the two markup classes on its head and body; adding a relevance trigger is one more clause in that row's `relevant`. Both are unit-tested in `tests/unit.mjs` ("sections:" and "secAutoOpenKeys:" cases).
+
+
+### 1.6 Export / restore selections
+
+The header button **Export / Restore** opens a panel (`#selDialog`) with two halves: the current form as a one-line **selections string** with a Copy button, and a paste box with a Restore button. The string holds clicked choices only, so the form can be carried between sessions or kept as a personal starting point without storing anything in the browser.
+
+**Format.** `APB<version>;key=value;key=a,b;key=k:v,k:v`, values URI-encoded (the only value that needs it today is the ADOS-2 module, `Module%203`). Keys are `S` property names. Only values that differ from `initialState()` are written, so an empty form exports as `APB1`. Sets keep their click order, because some generators list items in that order.
+
+**What is saved is declared in one table.** `SEL_FIELDS` maps each saved `S` property to a type: `one` (single choice), `flag` (boolean), `many` (Set), `map` (object of single choices: `therapyStatus`, `priorTestingOutcome`, `overrides`). `SEL_TYPED` lists the typed fields, which are never exported: `unevenCogDesc`, `strengths`, both level justifications, `rtcInterval`, `ev.*`, `behavFreq.*`, `labsOrdered`, `paeDetail`, `teacherMaterialOther`, `iepInstruments`, and `priorTestingDate` (a typed year, left out by decision 2026-11-12). `SEL_VIEW` holds `previewMode`. Text that a chip writes into a typed field (strength chips, evidence chips, the echolalia auto-fill of B1 evidence) is typed text for this purpose and is not exported. The unit lane fails if an `initialState()` key is in none of the three lists, so a new `S` property cannot ship unclassified.
+
+**Two export levels.** `SEL_TEMPLATE` lists the fields exported at the default **Template** level: visit type, age band, language level and modifiers, the six needs Sets plus `emotionalReg` / `academic` / `strangerDanger`, requested teacher materials, safety and anticipatory-guidance topics, the two DSM display toggles, insurance category, ABA hours and settings, and referral overrides. Everything else is exported only at **Full**: the diagnostic determination (status, levels, criteria), pronouns, cognitive and adaptive profile, specifiers, medical flags, exposure history, comorbid conditions and their sub-options, prior testing and work-up results, therapy status, social work, school placement and documentation. A field absent from `SEL_TEMPLATE` is Full-only, so a new field defaults to the narrower export. Template drops the derived `rigidity` need, since it depends on criterion B2, which Template omits. For the same reason `schoolSvc`, `schoolSvcManualOff` and `abaTargets` are Full-only: the add-only syncs fill them from omitted fields as well (`sped` from an ID profile, `counseling` from a comorbid diagnosis, `transitions` from B2), so exporting them would disclose what Template leaves out. A Template string carries the marker `scope=template`, and restoring one runs `syncABATargetsFromNeeds()` and `syncSchoolSvcFromNeeds()` to rebuild both from the restored needs; services or targets that were hand-picked beyond what the needs imply are not carried by a Template. The panel always reopens at Template.
+
+**Restore.** `decodeSelections(str, allowed)` is pure. `allowed` comes from `selAllowed()`, which reads the values the page's own controls can produce (radio and checkbox `value`s, menu options, modifier chip ids, plan pills, override keys). A key not in `SEL_FIELDS`, or a value no control offers, is dropped; a typed-field key is dropped the same way because it is not in `SEL_FIELDS`. This whitelist is what prevents a hand-edited string from carrying text into the form. `applySelectionState()` then runs `clearAll({confirmed:true})`, assigns the decoded fields, and calls `paintFormFromState()`, which sets every control and reveal-on-check row from `S` (`SEL_SUBROWS` holds the row predicates; the invariants lane checks every hidden-by-default `...Row` id is covered). For a Full string the add-only syncs are not re-run, so the restored form equals the exported one, with one exception: the visibility helpers `paintFormFromState()` calls (`updateAgeBasedVisibility()`, `toggleBifSpecifierGate()`) and `render()` still enforce their rules, so a state they forbid is corrected and reported, not reproduced. The form itself is not known to produce such a state any more: the one known route, "Unspecified delays" (`cogProfile='gdd'`) surviving a preschool to school-age switch, was closed when the age cleanup began reading `GDD_COG_PROFILES` (all four GDD values). A string exported before that fix, or a hand-edited one, can still carry `cogProfile=gdd` with a school-age band; restore then clears the profile and its GDD specifier and reports both. Restore replaces the whole form, typed text included; the output tab being viewed is kept: `clearAll()` returns to the note tab, so `applySelectionState()` saves `S.previewMode` first and ends with `setPreviewMode(mode)` (the §5.4 fallback still applies if the restored case does not offer that letter). `clearAll()` hides its reveal-on-check rows from the same `SEL_SUBROWS` table, so Clear All and Restore cannot disagree about which rows exist.
+
+| Situation | Behavior |
+|---|---|
+| Form empty, version matches, nothing dropped | One click: form restored, panel closes, toast reports the count |
+| Form holds selections or typed text | First click warns that the form will be replaced; the button reads "Restore anyway"; second click proceeds. Editing the paste box cancels the pending confirmation |
+| String version differs from `SEL_VERSION` (after any `SEL_MIGRATIONS`) | Same two-step warning; recognised keys are applied on the second click and the panel stays open with a check-the-form notice |
+| Unknown keys or values | Applied without them; the panel stays open and reports a count, naming only tokens shaped like a field key (never a value, never free text from the paste) |
+| The form's own rules reject part of the state (`selDropped()`): an age gate, the BIF gate, a therapy status whose referral is inactive | The rest is applied; the panel stays open and names the affected fields, and says the note may differ from the source |
+| Text that does not start with `APB<digits>` | Rejected; nothing changes |
+
+The paste box is emptied after every restore.
+
+**Versioning.** The key names and control values are a compatibility contract with strings clinicians have already saved. Renaming an `S` property in `SEL_FIELDS`, or a control `value`, requires bumping `SEL_VERSION` and adding `SEL_MIGRATIONS[oldVersion]` (a function from the old `[key, rawValue]` pairs to the new ones). The unit lane pins one literal version-1 string to catch an unintended rename.
+
+**PHI residual.** No single exported field is PHI, and typed text cannot enter or leave through a string. The residual is the one already carried by the form itself: enough categorical fields together can single out a child in a small population, and a Full string is exactly that combination in portable form. Mitigations in the panel: Template is the default and omits the child-specific fields; a Full string that carries a category in `SEL_SENSITIVE` (mental-health and other diagnoses, prenatal alcohol exposure, family and social circumstances, genetic and neurological findings) shows a named notice; a standing warning tells the clinician not to store a string beside a name, MRN, date, or in a patient-named file; the panel is excluded from print. What the tool cannot control is where a copied string is kept. A string stored next to an identifier is part of that patient's record and should be handled as PHI.
 
 ---
 
@@ -639,6 +667,8 @@ if (!abaLetterEligible() && S.previewMode === 'aba') {
 ```
 
 This prevents a confusing state where the user is "on" a tab that no longer exists.
+
+**Clear All** does not go through this fallback: it resets `S.previewMode` to `'note'` with the rest of `S`, so the checks above never fire. `clearAll()` therefore ends with `setPreviewMode('note')` itself, which moves the tab buttons and sticky copy bars to the note and renders. Without it the ABA/IEP tab button and copy bar stayed active over a note preview.
 
 ---
 
@@ -1884,6 +1914,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - Adding/removing any HTML control that mutates a `Set` on `S`
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
 - `SEC_TABLE` (adding/removing a collapsed-by-default section, or changing a `content`/`relevant` predicate), `secAutoOpenKeys()`, `setSecOpen()` — the form-section defaults and auto-open rules (§1.5). The markup classes on the section's head and body must change in the same commit (the invariants lane enforces it).
+- `SEL_FIELDS` / `SEL_TYPED` / `SEL_TEMPLATE` / `SEL_SENSITIVE` / `SEL_SUBROWS`, `encodeSelections()`, `decodeSelections()`, `paintFormFromState()` — export / restore selections (§1.6). A new `S` property must be classified (the unit lane enforces it); a new reveal-on-check sub-row needs a `SEL_SUBROWS` entry (the invariants lane enforces it); renaming a saved key or control value needs a `SEL_VERSION` bump and a migration.
 - `PRESETS` / `MODIFIERS` / `applyPreset()` / `formHasInput()` — the archetype-preset engine (§11.17). Adding, removing, or retuning a preset, or changing how `applyPreset` drives controls, requires re-confirming the cross-preset invariant and updating §11.17.
 
 If you're not sure whether your change qualifies, check [§1.2](#12-the-s-object--property-reference) — if your change touches anything listed there, update this doc.
