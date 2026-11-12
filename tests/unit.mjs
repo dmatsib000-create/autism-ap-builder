@@ -109,6 +109,32 @@ const CASES = [
     setup(S){ S.cogProfile='gdd'; S.cogDataSource='screener'; },
     check(a){ assert.equal(a.currentClinicalPathway().specKey, 'withSuspectedGDD'); } },
 
+  // ── Age change tears down a GDD-tier profile (GDD is not diagnosable after ~age 5) ──
+  // Drives the real age-radio handler. The ungraded 'gdd' ("Unspecified delays") value
+  // was once missing from the teardown list: the profile survived the move to
+  // school-age, the bridge re-asserted the specifier, and the note printed a GDD
+  // diagnosis. All four values are looped so a tier cannot be skipped again.
+  ...['gdd','gdd_mild','gdd_moderate','gdd_severe'].map(tier => ({
+    name: `Age preschool -> school-age clears cogProfile '${tier}', its specifier, and GDD note wording`,
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='preschool'; S.cogProfile=tier;
+              S.cogDataSource='screener'; S.specifiers.add('withSuspectedGDD'); },
+    check(a){ assert.match(a.generateNote().main, /Autism Spectrum Disorder \(ASD\), with[^\n]*Global Developmental Delay/, 'precondition: confirmed preschool note names GDD on the ASD line');
+              a.S.ageGroup='schoolAge'; a.onAgeGroupChange();
+              assert.equal(a.S.cogProfile, '', 'cogProfile cleared');
+              assert.equal(a.S.cogDataSource, '', 'evidence flags cleared');
+              assert.deepEqual([...a.S.specifiers].filter(k => /GDD/.test(k)), [], 'no GDD specifier');
+              const n=a.generateNote();
+              // Case-sensitive on purpose: the capitalized diagnosis name, not the lowercase
+              // DSM-5 exclusion sentence ("not better explained by intellectual disability or
+              // global developmental delay alone") or the genetics citation title, both of
+              // which belong in a school-age note.
+              assert.doesNotMatch(n.main+n.assessment+n.plan, /Global Developmental Delay|\bGDD\b|F88|developmental delays are present/, 'note free of a GDD diagnosis'); } })),
+  { name: 'Age preschool -> toddler keeps a GDD profile (still age-valid)',
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='preschool'; S.cogProfile='gdd'; S.cogDataSource='screener'; S.specifiers.add('withSuspectedGDD'); },
+    check(a){ a.S.ageGroup='toddler'; a.onAgeGroupChange();
+              assert.equal(a.S.cogProfile, 'gdd');
+              assert.equal(a.S.specifiers.has('withSuspectedGDD'), true); } },
+
   // Normal range: withoutID for older, withoutGDD for under-5 (DSM-5 ID age rule).
   { name: 'Normal range, school-age -> withoutID',
     setup(S){ S.cogProfile='average'; S.ageGroup='schoolAge'; },

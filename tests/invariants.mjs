@@ -541,6 +541,19 @@ const subrowKeys = [...balancedAfter('const SEL_SUBROWS=').matchAll(/^\s*(\w+):\
 check('Restore sub-rows (hidden-by-default "...Row" ids vs SEL_SUBROWS + recomputed list)',
   diff('markup', hiddenRowIds, 'SEL_SUBROWS + exempt', [...subrowKeys, ...SUBROW_RECOMPUTED]));
 
+// ── J. GDD cognitive-profile tier: one list, no inline copies ────────────────
+// GDD_COG_PROFILES must hold exactly the gdd* cogProfile radios, and no other array
+// literal may restate the tier. An inline copy that omitted the ungraded 'gdd' is how
+// a GDD diagnosis once survived an age change to school-age.
+const gddRadioVals = [...html.matchAll(/name="cogProfile" value="(gdd[^"]*)"/g)].map(m => m[1]);
+const gddConst = html.match(/const GDD_COG_PROFILES=\[([^\]]*)\]/);
+if (!gddConst) check('GDD tier list', 'const GDD_COG_PROFILES=[...] not found; update section J if it was renamed');
+else check('GDD tier list (cogProfile gdd* radios vs GDD_COG_PROFILES)',
+  diff('radios', gddRadioVals, 'GDD_COG_PROFILES', [...gddConst[1].matchAll(/'([^']+)'/g)].map(m => m[1])));
+const inlineGddLists = (html.match(/\[[^\[\]\n]*'gdd_mild'[^\[\]\n]*\]/g) || []).length;
+if (inlineGddLists > 1) check('GDD tier list',
+  `${inlineGddLists - 1} inline array(s) restate the GDD tier; use GDD_COG_PROFILES instead`);
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
