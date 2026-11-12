@@ -683,6 +683,37 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 .toast-msg{flex:1;min-width:0}
 
 /* ── Inline confirm (replaces confirm() for Clear All) ────────────────── */
+.sel-dialog{margin:auto;width:min(640px,calc(100vw - 24px));padding:16px 18px;border:1px solid var(--gray-300);border-radius:var(--radius);background:var(--bg-card);color:var(--gray-800);box-shadow:var(--shadow-lg)}
+.sel-dialog::backdrop{background:rgba(17,17,24,.45)}
+.sel-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);margin-bottom:6px}
+.sel-head h2{font-size:var(--text-15);font-weight:700;margin:0}
+.sel-lede{font-size:var(--text-12);color:var(--gray-600);line-height:1.5;margin:0 0 10px}
+.sel-row{display:flex;gap:var(--space-2);align-items:flex-start;margin-bottom:12px}
+.sel-row textarea{flex:1;min-width:0;padding:6px 8px;border-radius:var(--radius);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:var(--text-11);line-height:1.45;word-break:break-all;resize:vertical}
+/* Read-only output is tinted so it does not read as a second place to type. */
+.sel-row textarea[readonly]{background:var(--surface);resize:none}
+/* One width for both buttons: the label swap to "Restore anyway" must not resize the paste box. */
+.sel-row .btn{min-width:124px;white-space:nowrap}
+.sel-dialog .btn.is-danger{background:#b91c1c;color:white}
+@media (hover:hover){.sel-dialog .btn.is-danger:hover{background:#991b1b}}
+.sel-caution{font-size:var(--text-12);line-height:1.5;color:#7f1d1d;background:rgba(127,29,29,.06);border-left:3px solid #7f1d1d;padding:6px 10px;margin:0 0 12px}
+/* Template / Full is one either-or control: the two halves share an edge. */
+.sel-levels{display:inline-flex;margin-bottom:6px}
+.sel-level-btn{padding:5px 14px;border:1px solid var(--border-control);background:var(--bg-card);color:var(--gray-700);font-size:var(--text-12);font-weight:600;cursor:pointer}
+.sel-level-btn:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+.sel-level-btn:last-child{border-radius:0 var(--radius) var(--radius) 0;margin-left:-1px}
+.sel-level-btn.is-on{background:var(--accent);border-color:var(--accent);color:white;position:relative}
+/* Warm's accent is too light for white text (3.97:1); same darker fill .btn-blue uses there. */
+[data-theme="warm"] .sel-level-btn.is-on{background:var(--blue-dark);border-color:var(--blue-dark)}
+.sel-level-hint{font-size:var(--text-11-5);line-height:1.45;color:var(--gray-600);margin-bottom:6px}
+.sel-level-hint strong{color:var(--gray-800)}
+.sel-status{font-size:var(--text-12);line-height:1.5;color:var(--gray-700);margin:-4px 0 10px}
+.sel-status:empty{display:none}
+.sel-status.is-warn{color:#7f1d1d;font-weight:600}
+@media (max-width:480px){
+  .sel-row{flex-direction:column;align-items:stretch}
+  .sel-dialog .btn,.sel-level-btn{min-height:36px}
+}
 .confirm-inline{display:inline-flex;align-items:center;gap:var(--space-2)}
 .confirm-inline .confirm-prompt{font-size:var(--text-11);color:#fecaca;font-weight:500;margin-right:2px;white-space:nowrap}
 .confirm-inline .btn{padding:4px 10px;font-size:var(--text-11)}
@@ -744,7 +775,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
 /* ── Print — clean printable note ──────────────────────────────────── */
 @media print{
   body{overflow:visible;height:auto;background:white;color:black}
-  .app-header,.left-panel,.rp-header,#mobile-nav,.note-sticky-bar,.toast-container{display:none!important}
+  .app-header,.left-panel,.rp-header,#mobile-nav,.note-sticky-bar,.toast-container,.sel-dialog{display:none!important}
   .main{display:block}.right-panel{overflow:visible;background:white}
   .note-preview{padding:0;overflow:visible}
   .note-doc,.aba-doc{border:none;box-shadow:none;padding:0;min-height:auto;color:black;max-width:100%;font-family:var(--font-serif)}
@@ -792,9 +823,38 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-outline" onclick="copyNote('plain','all',this)">Copy Plain</button>
     <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
     <div class="header-sep"></div>
+    <button class="btn btn-outline" type="button" onclick="openSelDialog()" title="Copy your selections as a short string, or rebuild the form from one">Export / Restore</button>
+    <div class="header-sep"></div>
     <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
   </div>
 </header>
+
+<dialog id="selDialog" class="sel-dialog" aria-labelledby="selTitle">
+  <div class="sel-head">
+    <h2 id="selTitle">Export / Restore Selections</h2>
+    <button type="button" class="btn btn-gray" onclick="document.getElementById('selDialog').close()">Close</button>
+  </div>
+  <p class="sel-lede">A selections string holds the options you clicked and never the text you typed. Paste one back to rebuild the form.</p>
+  <p class="sel-caution"><strong>Do not save this string next to a name, MRN, date, or in a patient-named file.</strong> On its own it identifies no one; stored beside an identifier it becomes part of that patient's record.</p>
+  <label class="field-label" for="selExportField">Current selections</label>
+  <div class="sel-levels" role="group" aria-label="How much to export">
+    <button type="button" class="sel-level-btn is-on" data-level="template" aria-pressed="true" onclick="setSelLevel('template')">Template</button>
+    <button type="button" class="sel-level-btn" data-level="full" aria-pressed="false" onclick="setSelLevel('full')">Full</button>
+  </div>
+  <div id="selLevelHint" class="sel-level-hint" aria-live="polite"></div>
+  <div class="sel-row">
+    <textarea id="selExportField" rows="2" readonly spellcheck="false"></textarea>
+    <button type="button" class="btn btn-blue" onclick="copySelections(this)">Copy</button>
+  </div>
+  <label class="field-label" for="selImportField">Restore from string</label>
+  <div class="sel-row">
+    <textarea id="selImportField" rows="3" spellcheck="false" placeholder="Paste a selections string here" aria-describedby="selStatus" oninput="selDisarm()"></textarea>
+    <button type="button" class="btn btn-blue" id="selRestoreBtn" onclick="restoreSelections()">Restore</button>
+  </div>
+  <div id="selStatus" class="sel-status" role="status" aria-live="polite"></div>
+  <span class="phi-hint">Paste only a string copied from this tool. The box is emptied after a restore, and typed text is never restored.</span>
+  <div id="selAnnounce" class="sr-only" role="status" aria-live="polite"></div>
+</dialog>
 
 <div id="mobile-nav" role="group" aria-label="Panel shown">
   <button class="mnav-btn is-on" id="mnav-input" onclick="showMobilePanel('input')" aria-pressed="true">&#9998; Input Form</button>
@@ -2024,6 +2084,12 @@ const hasFormallyImpairedAdaptive = () => ['severelyImpaired','moderatelyImpaire
 const hasFormalAdaptiveConsistent = () => [...S.priorTesting].some(k => ['vineland3','basc3'].includes(k) && S.priorTestingOutcome[k]==='consistent');
 const adaptiveEvidenceConfirmed = () => hasFormalAdaptiveConsistent() || S.adaptiveStandardized;
 const cogSourceSupportsConfirmation = () => S.cogDataSource==='comprehensive' || S.cogDataSource==='priorExternal';
+// Every cogProfile value in the GDD tier, including the ungraded 'gdd' ("Unspecified
+// delays"). One list on purpose: the age-change teardown once tested only the three
+// graded values, so an ungraded GDD profile survived a move to school-age and the
+// note printed a GDD diagnosis the age rule forbids. tests/invariants.mjs fails on
+// any inline copy of this list.
+const GDD_COG_PROFILES=['gdd','gdd_mild','gdd_moderate','gdd_severe'];
 // Cluster pathway summary — SINGLE SOURCE OF TRUTH for both the pathway pill (#pathwayPill)
 // AND the bridgeCogProfileToSpecifier() auto-bridge decision. Each return carries:
 //   - specKey: the specifier checkbox key the bridge should auto-check (null = no auto-bridge,
@@ -2047,7 +2113,7 @@ function currentClinicalPathway(){
       ? {specKey:'withID',          variant:'pp-confirmed', prefix:'Pathway', text:`Confirmed ${sev} Intellectual Disability`}
       : {specKey:'withSuspectedID', variant:'pp-suspected', prefix:'Pathway', text:`Suspected ${sev} ID — awaiting comprehensive battery + standardized adaptive evidence`};
   }
-  if(['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(cog)){
+  if(GDD_COG_PROFILES.includes(cog)){
     const sev = cog==='gdd_mild'?'mild':cog==='gdd_moderate'?'moderate':cog==='gdd_severe'?'severe':'';
     const label = sev ? `${sev.charAt(0).toUpperCase()+sev.slice(1)} Global Developmental Delay` : 'Global Developmental Delay (unspecified severity)';
     const confirmed = cogSourceSupportsConfirmation();
@@ -4929,10 +4995,9 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
-  await writeClipboardText(plain);
-  flashBtn('✓ Copied!',document.getElementById('copyABABtn'));
+  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABABtn'));
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
@@ -5774,7 +5839,7 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){await writeClipboardText(plain);flashBtn('✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>{
     // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
       const c=_iepLetterContent();
@@ -5872,8 +5937,7 @@ async function copyIEPLetter(format){
       h+=`</div>`;
       return h;
   },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
-  await writeClipboardText(plain);
-  flashBtn('✓ Copied!',document.getElementById('copyIEPBtn'));
+  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPBtn'));
 }
 
 function setPreviewMode(mode){
@@ -6451,7 +6515,7 @@ function toggleCogDataSourceVisibility(){
   const g=document.getElementById('cogDataSourceGroup');
   if(!g) return;
   const isId  = hasID();
-  const isGdd = ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile);
+  const isGdd = GDD_COG_PROFILES.includes(S.cogProfile);
   // Borderline is exposed to cogDataSource so the clinician can record which
   // instrument grounded the BIF call. BIF is an IQ-defined construct, so it
   // inherits the ID-tier IQ-instrument labels. The no-auto-bridge rule for
@@ -6563,10 +6627,27 @@ function addStrength(text){
 // already treats every {placeholder} as an F2 cursor stop and blocks signing while one
 // remains, so no *** rewrite is needed (see CLAUDE.md). Square brackets get no such stop.
 // Plain-text copy with the execCommand fallback for contexts where the async Clipboard
-// API is unavailable (non-secure origins, older WebViews).
+// API is unavailable (non-secure origins, older WebViews). Resolves true only when the
+// text reached the clipboard, so callers never flash "Copied!" over a failed copy.
+// The temporary box goes inside an open <dialog> when there is one: a modal makes the
+// rest of the page inert, and a selection in inert content cannot be copied.
 async function writeClipboardText(text){
-  try{await navigator.clipboard.writeText(text);}
-  catch(e){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  try{await navigator.clipboard.writeText(text);return true;}
+  catch(e){
+    const host=document.querySelector('dialog[open]')||document.body;
+    const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+    host.appendChild(ta);ta.select();
+    let ok=false;
+    try{ok=document.execCommand('copy');}catch(e2){}
+    host.removeChild(ta);
+    return ok;
+  }
+}
+const COPY_FAILED='Copy did not work in this browser. Select the text and press Ctrl+C.';
+// Button feedback for a plain-text copy: the flash on success, a warning toast on failure.
+function flashCopied(ok,msg,btn){
+  if(ok) flashBtn(msg,btn); else toast(COPY_FAILED,'warn');
+  return ok;
 }
 // Rich copy (HTML + plain alternates). `build` returns the HTML; if it throws or returns
 // nothing, or the browser refuses ClipboardItem, the result is false and the caller falls
@@ -6582,8 +6663,7 @@ async function copyNote(format,part,btn){
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
   if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Rich text copied!',btn);return;}
-  await writeClipboardText(plain);
-  flashBtn(format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
 }
 // Speak a short status to screen readers. Needed for flashBtn: it only swaps the button's
 // text, which assistive tech doesn't reliably read out. Cleared first so the same message
@@ -6776,10 +6856,6 @@ function clearAll(opts){
   document.querySelectorAll('label[data-tm-returned]').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.plan-pill').forEach(p=>{p.className='plan-pill';});
   document.getElementById('levelGroup').style.display='none';
-  // Hide the conditional regression-timing sub-row that the developmentalRegression
-  // checkbox toggles. clearAll bypasses the change handler that normally controls
-  // its visibility, so without this the sub-row would remain orphaned after Clear All.
-  const rtRow=document.getElementById('regressionTimingRow');if(rtRow)rtRow.style.display='none';
   document.getElementById('showDSMTable').checked=true;
   document.getElementById('showDSMLines').checked=false;
   document.getElementById('levelJustificationSCField').value='';
@@ -6788,8 +6864,12 @@ function clearAll(opts){
   // Hide the behavior-frequency input rows
   document.querySelectorAll('.beh-freq-row').forEach(r=>{r.style.display='none';});
   document.querySelectorAll('.beh-freq-inp').forEach(i=>{i.value='';});
-  // Hide sub-option rows and reset their inputs
-  ['socialWorkReasonsRow','sleepFactorsRow','depressionSafetyRow','smearWorkupRow','pfdDomainsRow','arfidDetailsRow','strangerDangerRow','menstrualCareRow','paeEvidenceRow','paeQuantityRow','fasdDomainsRow','gaitExamRow'].forEach(id=>{
+  // Hide every reveal-on-check sub-row. clearAll bypasses the change handlers that
+  // normally control them, so a row left out here stays open under an unchecked parent.
+  // SEL_SUBROWS is the one list of those rows (the invariants lane keeps it complete);
+  // menstrualCareRow and gaitExamRow are not in it because updateAgeBasedVisibility()
+  // below and render() recompute them from S.
+  Object.keys(SEL_SUBROWS).forEach(id=>{
     const r=document.getElementById(id);if(r)r.style.display='none';
   });
   document.querySelectorAll('input[name="depressionSafety"]').forEach(r=>{r.checked=false;r.closest('.r-opt').classList.remove('is-on');});
@@ -6797,7 +6877,440 @@ function clearAll(opts){
   toggleCogDataSourceVisibility();
   updateAgeBasedVisibility();
   resetSections();
-  render();
+  // A blank form offers neither letter, and S.previewMode is already back to 'note';
+  // setPreviewMode moves the tab buttons and copy bars to match, then renders.
+  setPreviewMode('note');
+}
+
+// ─── EXPORT / RESTORE SELECTIONS ─────────────────────────────────────────────
+// keep docs/branching-logic.md §1.6 in sync
+// A selections string carries every clicked choice (radios, checkboxes, menus, chips,
+// referral pills) and nothing that was typed, so it holds no PHI and can be kept
+// outside the chart. Shape, values URI-encoded:
+//   APB<version>;key=value;key=a,b;key=k:v,k:v
+// The keys are S property names and are a compatibility contract: renaming one needs a
+// SEL_VERSION bump plus a SEL_MIGRATIONS entry, or old strings silently lose that field.
+const SEL_PREFIX='APB', SEL_VERSION=1;
+// SEL_MIGRATIONS[n] rewrites the [key,rawValue] pairs of a version-n string into n+1.
+const SEL_MIGRATIONS={};
+// Every initialState() key is listed here, in SEL_TYPED, or in SEL_VIEW (unit lane enforces
+// it, so a new field cannot be added without deciding whether it is saved).
+// one = single choice, flag = boolean, many = Set, map = object of single choices.
+const SEL_FIELDS={
+  visitType:'one', ageGroup:'one', pronouns:'one', langLevel:'one', langModifiers:'many',
+  cogProfile:'one', unevenCog:'flag', cogDataSource:'one', adaptProfile:'one', adaptiveStandardized:'flag',
+  diagStatus:'one', asdLevelSC:'one', asdLevelRRB:'one',
+  specifiers:'many', specifiersManuallySet:'many',
+  criteriaA:'many', criteriaB:'many', criteriaC:'flag', criteriaD:'flag', criteriaE:'flag',
+  needsComm:'many', needsAdaptive:'many', needsBehavior:'many', needsSocial:'many', needsSensory:'many', needsMotor:'many',
+  emotionalReg:'flag', academic:'flag', sleep:'flag', feeding:'flag', hearingScreenFail:'flag',
+  seizureConcern:'flag', neurologyNowForSeizure:'flag', focalNeuroFindings:'flag', highlyMotivated:'flag', sleepStudy:'flag',
+  socialWork:'flag', socialWorkReasons:'many',
+  dysmorphism:'one', congenitalAnomalies:'flag', developmentalRegression:'flag', regressionTiming:'one',
+  gaitExam:'many',
+  prenatalAlcohol:'flag', fasdFeatures:'flag', paeEvidence:'many', fasdDomains:'many',
+  paeQuantity:'one', paeFrequency:'one', paeTiming:'one',
+  therapyStatus:'map',
+  teacherMaterials:'many', teacherMaterialsReturned:'many',
+  dxEvalPath:'one', evalProfileStatus:'one', evalDxStatus:'one', evalDxOutcome:'one',
+  priorTesting:'many', priorTestingOutcome:'map', ados2Module:'one',
+  comorbid:'many', comorbidInPlan:'many', traumaIncludeInIEP:'flag',
+  sleepFactors:'many', depressionSafety:'one', smearWorkup:'one',
+  pfdDomains:'many', arfidMechanism:'many', arfidImpact:'many',
+  schoolPlacement:'one', schoolDoc:'one', schoolSvc:'many', schoolSvcManualOff:'many',
+  strangerDanger:'flag', safety:'many', ag:'many', showDSMTable:'flag', showDSMLines:'flag',
+  insuranceType:'one', abaHours:'one', abaSetting:'many', abaTargets:'many',
+  overrides:'map',
+};
+// Typed by the clinician, so PHI-capable: never exported, and restore cannot write them
+// because decodeSelections only ever emits SEL_FIELDS keys. priorTestingDate is a typed
+// year, left out on purpose (it narrows re-identification when joined to the categories).
+const SEL_TYPED=['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval',
+  'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments'];
+const SEL_VIEW=['previewMode']; // which output tab is showing; not part of the case
+// 'one' fields set by a menu instead of a radio group: field -> select id.
+const SEL_MENUS={paeQuantity:'paeDrinksSel',paeFrequency:'paeFrequencySel',paeTiming:'paeTimingSel',
+  evalProfileStatus:'evalProfileStatusSel',evalDxStatus:'evalDxStatusSel',evalDxOutcome:'evalDxOutcomeSel',ados2Module:'ados2ModuleSel'};
+// Flags whose checkbox is wired by id (the rest are data-key="single" / criteriaC-E).
+const SEL_ID_FLAGS={unevenCog:'unevenCogCb',adaptiveStandardized:'adaptiveStandardizedCb',
+  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines'};
+// Sub-rows a parent checkbox reveals from its change handler. Restore fires no handlers,
+// so paintFormFromState recomputes them from S. A new reveal-on-check row needs an entry
+// here (invariants lane checks every hidden-by-default "...Row" id is accounted for).
+const SEL_SUBROWS={
+  socialWorkReasonsRow:()=>S.socialWork,
+  regressionTimingRow:()=>S.developmentalRegression,
+  paeEvidenceRow:()=>S.prenatalAlcohol,
+  paeQuantityRow:()=>S.paeEvidence.has('quantityFrequency'),
+  fasdDomainsRow:()=>S.fasdFeatures,
+  smearWorkupRow:()=>S.needsBehavior.has('smearing'),
+  strangerDangerRow:()=>S.needsAdaptive.has('commSafety'),
+  traumaIepGateRow:()=>S.comorbid.has('trauma'),
+  sleepFactorsRow:()=>S.comorbid.has('sleep_disorder'),
+  depressionSafetyRow:()=>S.comorbid.has('depression'),
+  pfdDomainsRow:()=>S.comorbid.has('pfd_chronic')||S.comorbid.has('pfd_acute'),
+  arfidDetailsRow:()=>S.comorbid.has('arfid')||S.comorbid.has('arfid_suspected'),
+};
+
+// Two export levels. A string is PHI-free field by field, but enough categories together
+// can single a child out, so the default export (Template) carries only what describes a
+// reusable starting point: age band, language level, functional needs, ABA hours and
+// settings, counseling topics, referral overrides, display toggles. Everything that is
+// a finding about one child (the diagnostic determination, cognitive and adaptive
+// profile, specifiers, medical and exposure history, comorbid diagnoses, testing and
+// work-up results, family circumstances, school placement) is exported only at Full.
+// A field not listed here is Full-only, so a new field defaults to the safer level.
+// schoolSvc and abaTargets are deliberately NOT here: the add-only syncs fill them from
+// omitted fields too (sped from an ID profile, counseling from a comorbid diagnosis,
+// transitions from criterion B2), so exporting them would leak what Template leaves out.
+// A Template string says so (SEL_SCOPE_TEMPLATE) and restore re-derives both from the needs.
+const SEL_TEMPLATE=new Set(['visitType','ageGroup','langLevel','langModifiers',
+  'needsComm','needsAdaptive','needsBehavior','needsSocial','needsSensory','needsMotor',
+  'emotionalReg','academic','strangerDanger','teacherMaterials',
+  'safety','ag','showDSMTable','showDSMLines',
+  'insuranceType','abaHours','abaSetting','overrides']);
+const SEL_SCOPE_TEMPLATE='scope=template';
+// Categories that are sensitive beyond ordinary clinical detail; a Full string holding
+// any of them gets a named notice in the panel. label -> the fields that carry it.
+const SEL_SENSITIVE={
+  'mental-health and other diagnoses':['comorbid','comorbidInPlan','depressionSafety','traumaIncludeInIEP','specifiers'],
+  'prenatal alcohol exposure':['prenatalAlcohol','fasdFeatures','paeEvidence','fasdDomains','paeQuantity','paeFrequency','paeTiming'],
+  'family and social circumstances':['socialWork','socialWorkReasons'],
+  'genetic and neurological findings':['dysmorphism','congenitalAnomalies','developmentalRegression','regressionTiming','seizureConcern','focalNeuroFindings'],
+};
+
+// The fields whose controls sit inside each reveal-on-check row. Such a field may hold a
+// value only while its row is revealed: the form's handlers clear it when the parent is
+// unticked ("so nothing orphans in S"), and selPruneOrphans() holds a restored string to
+// the same rule. Every SEL_SUBROWS row is listed (invariants lane), parents before the
+// rows nested inside them, because clearing a parent can close a nested row.
+const SEL_ROW_FIELDS={
+  socialWorkReasonsRow:['socialWorkReasons'],
+  regressionTimingRow:['regressionTiming'],
+  paeEvidenceRow:['paeEvidence'],
+  paeQuantityRow:['paeQuantity','paeFrequency','paeTiming'],
+  fasdDomainsRow:['fasdDomains'],
+  smearWorkupRow:['smearWorkup'],
+  strangerDangerRow:['strangerDanger'],
+  traumaIepGateRow:['traumaIncludeInIEP'],
+  sleepFactorsRow:['sleepFactors'],
+  depressionSafetyRow:['depressionSafety'],
+  pfdDomainsRow:['pfdDomains'],
+  arfidDetailsRow:['arfidMechanism','arfidImpact'],
+};
+// Sets whose members only make sense while the same key is in a parent Set.
+const SEL_SUBSETS={comorbidInPlan:'comorbid',teacherMaterialsReturned:'teacherMaterials'};
+// Touches S only (no DOM). Resets any sub-option whose parent is off, the way the change
+// handlers would have. Only a hand-edited or cross-version string can need this; the
+// tool's own exports are already consistent. Without it the value would sit hidden in S,
+// ride along in the next export, and appear pre-selected when the parent is ticked later.
+function selPruneOrphans(){
+  const init=initialState();
+  Object.entries(SEL_ROW_FIELDS).forEach(([row,fields])=>{
+    if(!SEL_SUBROWS[row]()) fields.forEach(f=>{S[f]=init[f];});
+  });
+  Object.entries(SEL_SUBSETS).forEach(([child,parent])=>{
+    [...S[child]].forEach(v=>{if(!S[parent].has(v)) S[child].delete(v);});
+  });
+  // Work-up statuses belong to the evaluation path (onDxEvalPathChange resets them).
+  const st=evalPathSteps();
+  if(!st.hasProfile) S.evalProfileStatus='';
+  if(!st.hasDx||(S.evalDxStatus==='today'&&!st.dxTodayAllowed)) S.evalDxStatus='';
+  if(!S.evalDxStatus) S.evalDxOutcome='';
+}
+
+// PURE (reads S only). level is 'template' or 'full'. Only values that differ from a
+// fresh form are written, and Sets keep their click order: the generators list some of
+// them in that order, so sorting here would reorder the restored note.
+function encodeSelections(level){
+  const init=initialState(), enc=encodeURIComponent, out=[SEL_PREFIX+SEL_VERSION];
+  const template=level==='template';
+  if(template) out.push(SEL_SCOPE_TEMPLATE);
+  Object.entries(SEL_FIELDS).forEach(([k,t])=>{
+    if(template&&!SEL_TEMPLATE.has(k)) return;
+    let v=S[k];
+    // rigidity is derived from criterion B2, which a Template leaves out; exporting it
+    // alone would restore a need the next sync pass deletes.
+    if(template&&k==='needsBehavior') v=[...v].filter(x=>x!=='rigidity');
+    let s='';
+    if(t==='one') s=enc(v||'');
+    else if(t==='flag'){ if(!!v!==!!init[k]) s=v?'1':'0'; }
+    else if(t==='many') s=[...v].map(enc).join(',');
+    else s=Object.keys(v).filter(m=>v[m]&&v[m]!==init[k][m]).map(m=>enc(m)+':'+enc(v[m])).join(',');
+    if(s) out.push(k+'='+s);
+  });
+  return out.join(';');
+}
+// PURE: labels of the sensitive categories a selections string carries.
+function selSensitiveIn(str){
+  const keys=new Set(String(str).split(';').map(p=>p.split('=')[0]));
+  return Object.keys(SEL_SENSITIVE).filter(l=>SEL_SENSITIVE[l].some(k=>keys.has(k)));
+}
+
+// What the page's own controls can produce, per field. Restore accepts nothing else,
+// which is what stops a hand-edited string from carrying text into the form.
+function selAllowed(){
+  const vals=q=>[...document.querySelectorAll(q)].map(e=>e.value).filter(Boolean);
+  const a={};
+  Object.entries(SEL_FIELDS).forEach(([k,t])=>{
+    if(t==='one') a[k]=SEL_MENUS[k]?vals('#'+SEL_MENUS[k]+' option'):vals('input[type=radio][name="'+k+'"]');
+    else if(t==='many') a[k]=vals('input[type=checkbox][data-key="'+k+'"]');
+  });
+  a.langModifiers=[...document.querySelectorAll('[id^="mod_"]')].map(e=>e.id.slice(4));
+  a.needsBehavior.push('rigidity'); // derived from criterion B2; has no checkbox
+  a.specifiersManuallySet=COG_SPEC_EXCL.slice();
+  a.schoolSvcManualOff=a.schoolSvc;
+  a.comorbidInPlan=[...document.querySelectorAll('.plan-pill[data-cv]')].map(p=>p.dataset.cv);
+  a.therapyStatus={};
+  Object.keys(S.therapyStatus).forEach(k=>{a.therapyStatus[k]=vals('input[type=radio][name="therapyStatus_'+k+'"]');});
+  a.priorTestingOutcome={};
+  document.querySelectorAll('select[data-outcome-key]').forEach(s=>{a.priorTestingOutcome[s.dataset.outcomeKey]=[...s.options].map(o=>o.value).filter(Boolean);});
+  a.overrides={};
+  Object.keys(S.overrides).forEach(k=>{a.overrides[k]=['yes','no'];});
+  return a;
+}
+
+// PURE. Parses a selections string against an allowed-values table (selAllowed()).
+// Returns {error} when the text is not a selections string at all, else
+// {version, template, state, applied, ignored}: template is true for a Template-level
+// string (the caller then re-derives services and ABA targets); state holds only SEL_FIELDS keys with allowed
+// values; ignored holds one entry per dropped item, the key only (never the value, which
+// could be pasted text). version is the string's
+// version after any migrations, so the caller compares it with SEL_VERSION.
+function decodeSelections(str,allowed){
+  const parts=String(str).replace(/\s+/g,'').split(';').filter(Boolean);
+  const head=new RegExp('^'+SEL_PREFIX+'(\\d+)$').exec(parts.shift()||'');
+  if(!head) return {error:'not-a-selections-string'};
+  let version=+head[1];
+  const template=parts.includes(SEL_SCOPE_TEMPLATE);
+  let pairs=parts.filter(p=>p!==SEL_SCOPE_TEMPLATE).map(p=>{const i=p.indexOf('=');return i<0?[p,'']:[p.slice(0,i),p.slice(i+1)];});
+  while(SEL_MIGRATIONS[version]){pairs=SEL_MIGRATIONS[version](pairs);version++;}
+  const dec=s=>{try{return decodeURIComponent(s);}catch(e){return s;}};
+  const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+  const state={},ignored=[];
+  pairs.forEach(([k,raw])=>{
+    if(!own(SEL_FIELDS,k)){ignored.push(k);return;}
+    const t=SEL_FIELDS[k],ok=allowed[k];
+    if(t==='flag'){
+      if(raw==='1'||raw==='0'){state[k]=raw==='1';} else ignored.push(k);
+      return;
+    }
+    if(!ok){ignored.push(k);return;}
+    if(t==='one'){
+      const v=dec(raw);
+      if(ok.includes(v)){state[k]=v;} else ignored.push(k);
+      return;
+    }
+    const items=raw.split(',').filter(Boolean);
+    if(t==='many'){
+      state[k]=new Set();
+      items.forEach(i=>{const v=dec(i);if(ok.includes(v)){state[k].add(v);} else ignored.push(k);});
+      return;
+    }
+    state[k]={};
+    items.forEach(i=>{
+      const j=i.indexOf(':'),mk=dec(j<0?i:i.slice(0,j)),mv=dec(j<0?'':i.slice(j+1));
+      if(own(ok,mk)&&ok[mk].includes(mv)){state[k][mk]=mv;} else ignored.push(k);
+    });
+  });
+  // Counted from the final state, so a key that appears twice is not counted twice.
+  const applied=Object.keys(state).reduce((n,k)=>{
+    const t=SEL_FIELDS[k],v=state[k];
+    return n+(t==='many'?v.size:t==='map'?Object.keys(v).length:1);
+  },0);
+  return {version,template,state,applied,ignored};
+}
+
+// PURE: true when the form holds any selection or any typed text.
+function formHasAnything(){
+  return encodeSelections('full')!==SEL_PREFIX+SEL_VERSION
+    || SEL_TYPED.some(k=>{const v=S[k];return typeof v==='string'?!!v.trim():Object.values(v).some(Boolean);});
+}
+
+// Writes every control and reveal-on-check row from S. The change handlers normally keep
+// the form in step one click at a time; restore replaces S wholesale, so none has fired.
+// Call on a form clearAll() has just reset (typed fields empty, auto badges gone).
+function paintFormFromState(){
+  const byId=id=>document.getElementById(id);
+  const show=(el,on)=>{if(el)el.style.display=on?'':'none';};
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    // A blank-valued radio ("not specified") is indistinguishable in S from no choice at
+    // all, so it stays however clearAll left it; checking a sibling unchecks it natively.
+    if(r.value==='') return;
+    const cur=(r.dataset.bind||r.name).split('.').reduce((o,p)=>o&&o[p],S)||'';
+    r.checked=cur===r.value;
+    r.closest('.r-opt')?.classList.toggle('is-on',r.checked);
+  });
+  document.querySelectorAll('input[type=checkbox][data-key]').forEach(c=>{
+    const k=c.dataset.key;
+    c.checked=k==='single'?!!S[c.value]:S[k] instanceof Set?S[k].has(c.value):!!S[k];
+  });
+  Object.entries(SEL_ID_FLAGS).forEach(([k,id])=>{const c=byId(id);if(c)c.checked=!!S[k];});
+  document.querySelectorAll('[id^="mod_"]').forEach(el=>{
+    const on=S.langModifiers.has(el.id.slice(4));
+    if(el.type==='checkbox') el.checked=on;
+    else{el.classList.toggle('is-on',on);el.setAttribute('aria-pressed',String(on));}
+  });
+  Object.entries(SEL_MENUS).forEach(([k,id])=>{const s=byId(id);if(s)s.value=S[k]||'';});
+  document.querySelectorAll('select[data-outcome-key]').forEach(s=>{s.value=S.priorTestingOutcome[s.dataset.outcomeKey]||'';});
+  document.querySelectorAll('.plan-pill[data-cv]').forEach(p=>{
+    const cv=p.dataset.cv,inPlan=S.comorbidInPlan.has(cv);
+    if(!S.comorbid.has(cv)){p.className='plan-pill';return;}
+    p.className=inPlan?'plan-pill is-on':'plan-pill pill-off';
+    p.textContent=inPlan?'Include plan':'Note only';
+  });
+  Object.entries(SEL_SUBROWS).forEach(([id,on])=>show(byId(id),on()));
+  document.querySelectorAll('.beh-freq-row').forEach(r=>show(r,r.dataset.for==='emotionalReg'?S.emotionalReg:S.needsBehavior.has(r.dataset.for)));
+  document.querySelectorAll('label[data-tm-returned]').forEach(r=>show(r,S.teacherMaterials.has(r.dataset.tmReturned)));
+  onDiagStatusChange();
+  toggleUnevenCog();
+  toggleCogDataSourceVisibility();
+  updateAgeBasedVisibility();
+  toggleBifSpecifierGate();
+  toggleBifAdaptiveCrossCheck();
+}
+
+// Replace the whole form with a decoded state. For a Full string the add-only syncs are
+// deliberately NOT re-run: the string already holds their results as of export, and the
+// restored form must equal the exported one. A Template string carries no services or
+// ABA targets, so rederive runs the syncs to rebuild them from the restored needs.
+function applySelectionState(state,rederive){
+  const wasSuspended=renderSuspended;
+  // clearAll returns to the note tab; the output tab the clinician is on is not part of
+  // the case, so put it back afterwards (render falls back to the note if the restored
+  // state no longer offers that letter).
+  const mode=S.previewMode;
+  renderSuspended=true;
+  try{
+    clearAll({confirmed:true});
+    Object.keys(state).forEach(k=>{
+      // Sets are copied so the decoded state stays as parsed for selDropped() to compare.
+      if(SEL_FIELDS[k]==='map') Object.assign(S[k],state[k]); else S[k]=state[k] instanceof Set?new Set(state[k]):state[k];
+    });
+    selPruneOrphans();
+    paintFormFromState();
+    if(rederive){syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();}
+  }finally{renderSuspended=wasSuspended;}
+  setPreviewMode(mode);
+}
+
+// PURE (reads S only): fields where the form ended up without something the decoded state
+// asked for. The form's own rules still apply after a restore (age gates strip a GDD
+// specifier from a school-age child, the BIF gate needs a data source, a therapy status
+// needs its referral, a sub-option needs its parent), so a string that breaks one cannot be applied whole; the caller
+// reports these instead of letting the difference pass silently.
+function selDropped(state){
+  return Object.keys(state).filter(k=>{
+    const want=state[k],got=S[k],t=SEL_FIELDS[k];
+    if(t==='many') return [...want].some(v=>!got.has(v));
+    if(t==='map') return Object.keys(want).some(m=>got[m]!==want[m]);
+    return got!==want;
+  });
+}
+
+// ── dialog wiring ──
+let selArmedFor=null; // the pasted text whose warnings were shown; a second click on the same text proceeds
+let selLevel='template';
+function selSetStatus(lines,warn){
+  const el=document.getElementById('selStatus');if(!el)return;
+  el.classList.toggle('is-warn',!!warn);
+  el.textContent=lines.join(' ');
+}
+function selDisarm(){
+  selArmedFor=null;
+  const b=document.getElementById('selRestoreBtn');
+  if(b){b.textContent='Restore';b.classList.remove('is-danger');}
+  document.getElementById('selImportField')?.removeAttribute('aria-invalid');
+}
+function setSelLevel(level){
+  selLevel=level;
+  document.querySelectorAll('.sel-level-btn').forEach(b=>{
+    const on=b.dataset.level===level;
+    b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));
+  });
+  const str=encodeSelections(level);
+  const ta=document.getElementById('selExportField');
+  ta.value=str;
+  // Grow to show the whole string (a Full string runs to several lines), up to a cap.
+  ta.style.height='auto';
+  if(ta.scrollHeight) ta.style.height=Math.min(ta.scrollHeight+2,168)+'px';
+  const hint=document.getElementById('selLevelHint');
+  const sens=level==='full'?selSensitiveIn(str):[];
+  hint.textContent=level==='template'
+    ?'Template: age band, language, needs, ABA hours and settings, counseling topics and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
+    :'Full: every selection in the form.';
+  if(sens.length){
+    // The category names carry the emphasis; red stays reserved for the standing caution
+    // and the live status. Labels are SEL_SENSITIVE keys, never pasted text.
+    hint.append(' Includes sensitive categories: ');
+    sens.forEach((l,i)=>{const b=document.createElement('strong');b.textContent=l;hint.append(i?'; ':'',b);});
+    hint.append('. Treat this string as you would the note itself.');
+  }
+}
+function openSelDialog(){
+  const d=document.getElementById('selDialog');if(!d)return;
+  document.getElementById('selImportField').value='';
+  selSetStatus([]);selDisarm();
+  d.showModal();
+  setSelLevel('template'); // always reopens at the safer level; after showModal so the box can be measured
+  // Not the Close button (first in the markup): Enter straight after opening would shut the panel.
+  d.querySelector('.sel-level-btn.is-on').focus();
+}
+async function copySelections(btn){
+  const field=document.getElementById('selExportField');
+  if(!await writeClipboardText(field.value)){
+    // A toast would sit behind the modal, unseen and unannounced; say it here and leave
+    // the string selected so Ctrl+C finishes the job.
+    selSetStatus([COPY_FAILED],true);
+    field.focus();field.select();
+    return;
+  }
+  flashBtn('✓ Copied!',btn);
+  // flashBtn speaks through #srAnnounce, which is outside this modal and therefore inert
+  // while it is open; repeat the message in a live region inside the dialog.
+  const a=document.getElementById('selAnnounce');
+  if(a){a.textContent='';setTimeout(()=>{a.textContent='Copied';},50);}
+}
+function restoreSelections(){
+  const field=document.getElementById('selImportField');
+  const text=field.value.trim();
+  if(!text){field.setAttribute('aria-invalid','true');selSetStatus(['Paste a selections string first.'],true);return;}
+  const r=decodeSelections(text,selAllowed());
+  if(r.error){field.setAttribute('aria-invalid','true');selSetStatus(['That is not a selections string from this tool (it should start with "'+SEL_PREFIX+SEL_VERSION+';"). Nothing was changed.'],true);return;}
+  const mismatch=r.version!==SEL_VERSION;
+  if(selArmedFor!==text){
+    const warn=[];
+    if(mismatch) warn.push('This string is version '+r.version+'; this copy of the tool reads version '+SEL_VERSION+'. Some selections may be missing or may no longer exist.');
+    if(formHasAnything()) warn.push('Restoring replaces the current form, including everything typed in it.');
+    if(warn.length){
+      selArmedFor=text;
+      const btn=document.getElementById('selRestoreBtn');
+      btn.textContent='Restore anyway';btn.classList.add('is-danger');
+      selSetStatus(warn.concat('Nothing has changed yet. Press Restore anyway to continue.'),true);
+      return;
+    }
+  }
+  applySelectionState(r.state,r.template);
+  selDisarm();
+  field.value=''; // the pasted text has done its job; do not leave it on screen
+  setSelLevel(selLevel);
+  const dropped=selDropped(r.state);
+  const done='Restored '+r.applied+' selection'+(r.applied===1?'':'s')+'.';
+  if(!r.ignored.length&&!mismatch&&!dropped.length){
+    document.getElementById('selDialog').close();
+    toast(done+' Typed text is not part of a selections string; re-enter it as needed.','ok');
+    return;
+  }
+  // Report a count, and name an item only when it is one of this tool's own field names.
+  // Anything else in the pasted text could be a name or a date (a surname is as
+  // "key-shaped" as a field name), so it is counted and never echoed.
+  const known=k=>Object.prototype.hasOwnProperty.call(SEL_FIELDS,k)||SEL_TYPED.includes(k);
+  const named=[...new Set(r.ignored.filter(known))].slice(0,5);
+  const lines=[done];
+  if(r.ignored.length) lines.push('Ignored '+r.ignored.length+' item'+(r.ignored.length===1?'':'s')+' this version does not recognise'+(named.length?' (fields: '+named.join(', ')+')':'')+'.');
+  if(dropped.length) lines.push('Some selections were not kept because the form does not allow them together, for example a choice that does not fit the age group or a detail whose parent box is not ticked (fields: '+dropped.join(', ')+'). The note may differ from the one this string came from.');
+  if(mismatch) lines.push('The string was version '+r.version+'; this tool reads version '+SEL_VERSION+'. Check the form before using the note.');
+  selSetStatus(lines,true);
 }
 
 // ─── SECTION HEADER SUMMARIES ────────────────────────────────────────────────
@@ -6958,8 +7471,8 @@ const COG_SPEC_EXCL = ['withID','withSuspectedID','withGDD','withSuspectedGDD','
 const COG_PROFILE_COMPAT = {
   withID:           ['id_mild','id_moderate','id_severe','unknown'],
   withSuspectedID:  ['id_mild','id_moderate','id_severe','unknown'],
-  withGDD:          ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
-  withSuspectedGDD: ['gdd','gdd_mild','gdd_moderate','gdd_severe','unknown'],
+  withGDD:          [...GDD_COG_PROFILES,'unknown'],
+  withSuspectedGDD: [...GDD_COG_PROFILES,'unknown'],
   withBIF:          ['borderline','unknown'],
   withoutID:        ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
   withoutGDD:       ['lowAverage','average','aboveAverage','superior','verySuperior','unknown'],
@@ -7190,6 +7703,7 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=ritaTRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+      ritaTRow.classList.remove('is-on');
       // Route through the shared handler so step statuses reset and headers refresh
       // (this branch previously skipped the header refresh the certainYoung twin had).
       onDxEvalPathChange();
@@ -7203,6 +7717,7 @@ function updateAgeBasedVisibility(){
       S.dxEvalPath='';
       const r=certainYoungRow.querySelector('input[type=radio]');
       if(r) r.checked=false;
+      certainYoungRow.classList.remove('is-on');
       onDxEvalPathChange();
     }
   }
@@ -7267,7 +7782,7 @@ function updateAgeBasedVisibility(){
   if(gddCogGroup){
     const hideGddCog=older&&S.ageGroup!=='';
     gddCogGroup.style.display=hideGddCog?'none':'';
-    if(hideGddCog&&['gdd_mild','gdd_moderate','gdd_severe'].includes(S.cogProfile)){
+    if(hideGddCog&&GDD_COG_PROFILES.includes(S.cogProfile)){
       S.cogProfile='';
       gddCogGroup.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=false;r.closest('.r-opt')?.classList.remove('is-on');});
       bridgeCogProfileToSpecifier('');
@@ -7651,7 +8166,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         // GDD-tier 'comprehensive' = Bayley-4 silently relabelled as 'comprehensive'
         // = WISC-V after switching to borderline).
         const tierOf = v => ['id_mild','id_moderate','id_severe','borderline'].includes(v) ? 'iq'
-          : ['gdd','gdd_mild','gdd_moderate','gdd_severe'].includes(v) ? 'dev' : '';
+          : GDD_COG_PROFILES.includes(v) ? 'dev' : '';
         const prevTier = tierOf(S.cogProfile);
         const newTier  = tierOf(inp.value);
         if(prevTier && newTier && prevTier!==newTier && S.cogDataSource){

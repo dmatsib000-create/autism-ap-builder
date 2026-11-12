@@ -77,6 +77,29 @@ const EXPORTS = [
   'SEC_TABLE',
   'sectionRelevance',
   'secAutoOpenKeys',
+  // Export / restore selections: the field registry, the pure encoder (reads S only),
+  // and the pure decoder (takes the allowed-values table the app builds from the DOM,
+  // so the unit lane hands it one). The DOM applier (paintFormFromState) is browser-only.
+  'initialState',
+  'SEL_VERSION',
+  'SEL_FIELDS',
+  'SEL_TYPED',
+  'SEL_VIEW',
+  'SEL_TEMPLATE',
+  'SEL_SENSITIVE',
+  'encodeSelections',
+  'decodeSelections',
+  'selSensitiveIn',
+  'formHasAnything',
+  'selDropped',
+  'selPruneOrphans',
+  'SEL_ROW_FIELDS',
+  'SEL_SUBROWS',
+  // Age-radio change handler: updateAgeBasedVisibility() teardown, then the specifier
+  // bridge re-fire. DOM-driven, but its S mutations run under the stub DOM (every
+  // element step is best-effort), so the unit lane can drive a real age change and
+  // assert that an age-invalid cognitive profile does not survive it.
+  'onAgeGroupChange',
 ];
 
 function extractScript(html) {

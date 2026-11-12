@@ -15,7 +15,7 @@
 //
 // When this fails, the message names the table and the exact keys that differ.
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -529,6 +529,129 @@ for (const k of secTableKeys) {
     check('Collapsed sections', `#sh-${k}: body must be <div class="sec-body hidden" inert> to match its collapsed head (found class="${head[1]}"${head[2]})`);
 }
 
+// ── I. Export / restore: every reveal-on-check row is repainted on restore ───
+// Restore writes S wholesale and fires no change handler, so paintFormFromState()
+// recomputes sub-row visibility from SEL_SUBROWS. A row that a checkbox handler
+// reveals but that table does not know stays hidden after a restore, with its
+// restored sub-options invisible. Rows recomputed elsewhere on every render or by a
+// named helper that restore also calls are exempt.
+const SUBROW_RECOMPUTED = ['ritaTRow', 'evalStatusRow', 'withBifRow', 'menstrualCareRow', 'gaitExamRow'];
+const hiddenRowIds = [...html.matchAll(/<[a-z]+\b[^>]*\bid="(\w+Row)"[^>]*display:none[^>]*>/g)].map(m => m[1]);
+const subrowKeys = [...balancedAfter('const SEL_SUBROWS=').matchAll(/^\s*(\w+):\(\)=>/gm)].map(m => m[1]);
+check('Restore sub-rows (hidden-by-default "...Row" ids vs SEL_SUBROWS + recomputed list)',
+  diff('markup', hiddenRowIds, 'SEL_SUBROWS + exempt', [...subrowKeys, ...SUBROW_RECOMPUTED]));
+
+// ── J. GDD cognitive-profile tier: one list, no inline copies ────────────────
+// GDD_COG_PROFILES must hold exactly the gdd* cogProfile radios, and no other array
+// literal may restate the tier. An inline copy that omitted the ungraded 'gdd' is how
+// a GDD diagnosis once survived an age change to school-age.
+const gddRadioVals = [...html.matchAll(/name="cogProfile" value="(gdd[^"]*)"/g)].map(m => m[1]);
+const gddConst = html.match(/const GDD_COG_PROFILES=\[([^\]]*)\]/);
+if (!gddConst) check('GDD tier list', 'const GDD_COG_PROFILES=[...] not found; update section J if it was renamed');
+else check('GDD tier list (cogProfile gdd* radios vs GDD_COG_PROFILES)',
+  diff('radios', gddRadioVals, 'GDD_COG_PROFILES', [...gddConst[1].matchAll(/'([^']+)'/g)].map(m => m[1])));
+const inlineGddLists = (html.match(/\[[^\[\]\n]*'gdd_mild'[^\[\]\n]*\]/g) || []).length;
+if (inlineGddLists > 1) check('GDD tier list',
+  `${inlineGddLists - 1} inline array(s) restate the GDD tier; use GDD_COG_PROFILES instead`);
+
+// Every reveal row must also say which fields live inside it (SEL_ROW_FIELDS), or a
+// restored string could switch one of those fields on under an unticked parent.
+const rowFieldKeys = [...balancedAfter('const SEL_ROW_FIELDS=').matchAll(/^\s*(\w+):\[/gm)].map(m => m[1]);
+check('Restore sub-rows (SEL_SUBROWS vs SEL_ROW_FIELDS)', diff('SEL_SUBROWS', subrowKeys, 'SEL_ROW_FIELDS', rowFieldKeys));
+
+// ── K. Export / restore: every saved field has a control restore can repaint ──
+// The unit lane makes sure a new S property is classified in SEL_FIELDS. This makes
+// sure the classified field is also reachable on the page: a 'flag' wired by id but
+// missing from SEL_ID_FLAGS, or a 'one' whose menu is missing from SEL_MENUS, would
+// export and decode fine and then never be shown after a restore.
+const selFields = Object.fromEntries(
+  [...balancedAfter('const SEL_FIELDS=').matchAll(/(\w+):'(one|flag|many|map)'/g)].map(m => [m[1], m[2]]));
+if (Object.keys(selFields).length < 60) throw new Error(
+  `invariants.mjs: only ${Object.keys(selFields).length} SEL_FIELDS entries parsed; the table's shape changed.`);
+const idMapOf = marker => Object.fromEntries(
+  [...balancedAfter(marker).matchAll(/(\w+):'(\w+)'/g)].map(m => [m[1], m[2]]));
+const selMenus = idMapOf('const SEL_MENUS='), selIdFlags = idMapOf('const SEL_ID_FLAGS=');
+const hasTag = re => re.test(html);
+const singleFlags = new Set([...html.matchAll(/<input\b[^>]*data-key="single"[^>]*value="(\w+)"/g)].map(m => m[1]));
+const modIds = [...html.matchAll(/\bid="mod_(\w+)"/g)].map(m => m[1]);
+const planPillKeys = [...html.matchAll(/class="plan-pill" data-cv="(\w+)"/g)].map(m => m[1]);
+const cogSpecExcl = [...balancedAfter('const COG_SPEC_EXCL').matchAll(/'(\w+)'/g)].map(m => m[1]);
+const outcomeMenus = Object.fromEntries(
+  [...html.matchAll(/<select\b[^>]*data-outcome-key="(\w+)"[^>]*>([\s\S]*?)<\/select>/g)]
+    .map(m => [m[1], [...m[2].matchAll(/<option\b[^>]*\bvalue="([^"]+)"/g)].map(o => o[1])]));
+const valuesOf = k => [...(controlValues.get(k) || [])].filter(v => v !== '');
+// 'many' fields with no checkbox group of their own: where their members come from.
+const SEL_MANY_SOURCES = {
+  langModifiers: () => modIds,
+  specifiersManuallySet: () => cogSpecExcl,
+  schoolSvcManualOff: () => valuesOf('schoolSvc'),
+  comorbidInPlan: () => planPillKeys,
+};
+const vocabulary = {}; // field -> {type, values}; what a version-N string may contain
+for (const [k, t] of Object.entries(selFields)) {
+  let values = [], problem = null;
+  if (t === 'flag') {
+    const id = selIdFlags[k];
+    if (id ? !hasTag(new RegExp(`<input\\b[^>]*type="checkbox"[^>]*\\bid="${id}"`))
+           : !(singleFlags.has(k) || hasTag(new RegExp(`<input\\b[^>]*data-key="${k}"`))))
+      problem = id ? `SEL_ID_FLAGS points at #${id}, which is not a checkbox on the page`
+                   : 'no data-key="single" checkbox, no data-key checkbox, and no SEL_ID_FLAGS entry';
+  } else if (t === 'one') {
+    values = valuesOf(k);
+    if (selMenus[k] && !hasTag(new RegExp(`<select\\b[^>]*\\bid="${selMenus[k]}"`))) problem = `SEL_MENUS points at #${selMenus[k]}, which is not a menu on the page`;
+    else if (!values.length) problem = 'no radio group named after it and no SEL_MENUS entry with options';
+  } else if (t === 'many') {
+    values = SEL_MANY_SOURCES[k] ? SEL_MANY_SOURCES[k]() : valuesOf(k);
+    if (k === 'needsBehavior') values = [...values, 'rigidity']; // derived from criterion B2
+    if (!values.length) problem = 'no checkbox group with this data-key and no SEL_MANY_SOURCES entry';
+  } else {
+    values = k === 'therapyStatus' ? Object.fromEntries([...controlValues.keys()].filter(c => c.startsWith('therapyStatus.')).map(c => [c.split('.')[1], valuesOf(c)]))
+           : k === 'priorTestingOutcome' ? outcomeMenus
+           : k === 'overrides' ? Object.fromEntries(ovInitKeys.map(o => [o, ['yes', 'no']]))
+           : {};
+    if (!Object.keys(values).length) problem = 'a map field this lane does not know how to read; teach section K where its controls are';
+  }
+  if (problem) check('Restore controls', `saved field "${k}" (${t}): ${problem}`);
+  vocabulary[k] = { type: t, values };
+}
+
+// ── L. Export / restore: the version-N vocabulary is a contract ──────────────
+// A selections string a clinician saved last month must still mean the same thing.
+// tests/selections-vocabulary.json records every field and every option a string of
+// the current SEL_VERSION may contain. Any difference from the page fails here:
+//   - something ADDED is safe for old strings; refresh the snapshot.
+//   - something REMOVED or RENAMED silently drops that selection from every saved
+//     string. Bump SEL_VERSION and add a SEL_MIGRATIONS entry first; the refresh
+//     refuses a removal while the version is unchanged.
+// Refresh with: npm run test:update-selections
+const VOCAB_PATH = join(dirname(fileURLToPath(import.meta.url)), 'selections-vocabulary.json');
+const selVersion = Number(html.match(/SEL_PREFIX='APB', SEL_VERSION=(\d+)/)?.[1]);
+const flatVocab = v => Object.entries(v).flatMap(([k, f]) => [
+  `${k} (${f.type})`,
+  ...(Array.isArray(f.values) ? f.values.map(x => `${k}=${x}`)
+    : Object.entries(f.values).flatMap(([m, xs]) => xs.map(x => `${k}=${m}:${x}`)))]);
+const saved = existsSync(VOCAB_PATH) ? JSON.parse(readFileSync(VOCAB_PATH, 'utf8')) : null;
+const nowFlat = flatVocab(vocabulary), savedFlat = saved ? flatVocab(saved.fields) : [];
+const vocabAdded = nowFlat.filter(x => !savedFlat.includes(x)), vocabRemoved = savedFlat.filter(x => !nowFlat.includes(x));
+if (process.argv.includes('--update-selections')) {
+  if (saved && vocabRemoved.length && selVersion === saved.version) {
+    console.log(`\nRefusing to refresh ${VOCAB_PATH}:\n  removed or renamed since version ${saved.version}: ${vocabRemoved.join(', ')}\n` +
+      `  Saved strings that use these would silently lose them. Bump SEL_VERSION and add a\n  SEL_MIGRATIONS[${saved.version}] entry in autism-ap-builder.html, then run this again.`);
+    process.exit(1);
+  }
+  writeFileSync(VOCAB_PATH, JSON.stringify({ version: selVersion, fields: vocabulary }, null, 1) + '\n');
+  console.log(`\nselections vocabulary written: version ${selVersion}, ${nowFlat.length} entries (+${vocabAdded.length} / -${vocabRemoved.length})`);
+  process.exit(0);
+}
+if (!saved) check('Selections vocabulary', `${VOCAB_PATH} is missing; run npm run test:update-selections`);
+else {
+  if (saved.version !== selVersion) check('Selections vocabulary', `snapshot is version ${saved.version} but SEL_VERSION is ${selVersion}; run npm run test:update-selections once the migration is in place`);
+  if (vocabRemoved.length) check('Selections vocabulary', `REMOVED or RENAMED since the version-${saved.version} snapshot: ${vocabRemoved.join(', ')}. ` +
+    `Strings clinicians already saved would silently lose these. Restore them, or bump SEL_VERSION and add SEL_MIGRATIONS[${saved.version}], then run npm run test:update-selections`);
+  if (vocabAdded.length) check('Selections vocabulary', `new since the snapshot (safe for old strings): ${vocabAdded.join(', ')}. ` +
+    `Decide whether each new field belongs in SEL_TEMPLATE, then run npm run test:update-selections`);
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 console.log('');
 console.log(
@@ -542,7 +665,9 @@ console.log(
   `boundary pins ${PIN_TOKENS.length} guarded theme-independent; ` +
   `contrast ${CONTRAST_PAIRS.length} token pairs x ${contrastThemes.length} themes; ` +
   `IEP fields ${IEP_SHARED_FIELDS.length} shared across 3 surfaces; ` +
-  `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls`
+  `fixture values ${fixtureWritesChecked} writes checked against ${controlValues.size} page controls; ` +
+  `restore sub-rows ${subrowKeys.length} table rows + ${SUBROW_RECOMPUTED.length} recomputed = ${hiddenRowIds.length} hidden rows; ` +
+  `selections vocabulary v${selVersion}: ${Object.keys(selFields).length} fields, ${nowFlat.length} entries`
 );
 for (const f of failures) console.log('✗ ' + f);
 console.log('');

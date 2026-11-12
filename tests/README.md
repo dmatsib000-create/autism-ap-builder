@@ -47,6 +47,19 @@ for headings and emphasis. Presence may not.
   DSM-5 evidence chip's text onto a criterion's evidence (so a source heading or
   a typed sentence never ends up as "Parent report:; …" or "….; …"). These lanes
   share `makeApp()` and the real, unmodified shipped script.
+  The unit lane also covers **export / restore selections** (`encodeSelections`,
+  `decodeSelections`, both pure): every `initialState()` key must be classified as
+  saved (`SEL_FIELDS`), typed (`SEL_TYPED`) or view (`SEL_VIEW`); typed text never
+  appears in an export; Template omits every sensitive field; unknown keys, values
+  no control offers, and typed-field keys are dropped and reported by key only; and
+  one literal version-1 string is pinned so a renamed key or value fails here
+  instead of silently breaking strings clinicians already saved (the fix is a
+  `SEL_VERSION` bump plus a `SEL_MIGRATIONS` entry, not editing the pin). It also
+  covers `selPruneOrphans` (a sub-option without its parent is reset and reported;
+  a consistent form is left untouched). Painting the form from a restored state is
+  browser-only: run `.claude/skills/verify/scripts/roundtrip.js` through the
+  headless driver (300 seeded random forms; exits 1 if any does not come back
+  identical, including the note and both letters).
 - **Wiring lane** (`tests/wiring.mjs`, `npm run test:wiring`) — a source-text lint
   (no script eval) that checks the chip/state class contract: every state class
   JS toggles has a CSS rule, and every chip-family CSS rule is actually applied or
@@ -85,6 +98,24 @@ for headings and emphasis. Presence may not.
   `:where(textarea,select,input…)` rule is what gives every field its edge. It
   sees token pairs only, not arbitrary rules, so it doesn't replace a contrast
   audit of the rendered page.
+  Section I checks **restore sub-rows**: every hidden-by-default `...Row` element
+  must be a `SEL_SUBROWS` key or on the short list of rows recomputed on every
+  render. Restore fires no change handlers, so a reveal-on-check row missing from
+  that table would stay hidden with its restored sub-options invisible.
+  It also requires `SEL_ROW_FIELDS` to list the same rows, naming the fields inside
+  each, so a restored string cannot switch one on under an unticked parent.
+  Section K checks **restore controls**: every field in `SEL_FIELDS` must resolve
+  to a control on the page (a radio group, a checkbox group, a `data-key="single"`
+  checkbox, or an entry in `SEL_MENUS` / `SEL_ID_FLAGS` that points at a real
+  element). A field that is classified but has no control would export and decode
+  and then never be shown after a restore.
+  Section L holds the **selections vocabulary** to a snapshot,
+  `tests/selections-vocabulary.json`: every field and option a string of the
+  current `SEL_VERSION` may contain. Anything added fails with a "refresh the
+  snapshot" message (`npm run test:update-selections`); anything removed or
+  renamed fails with a "saved strings would lose this" message, and the refresh
+  refuses to write until `SEL_VERSION` has been bumped. Treat that file like a
+  golden: review its diff, never hand-edit it to make the lane pass.
   Section G checks the **fixtures themselves**: every value a fixture writes
   into `S` (`S.langLevel = 'phrase'`, `S.abaTargets.add('play')`, or the
   `[...].forEach(k => S.x.add(k))` form) must be one the page's own controls can

@@ -109,6 +109,32 @@ const CASES = [
     setup(S){ S.cogProfile='gdd'; S.cogDataSource='screener'; },
     check(a){ assert.equal(a.currentClinicalPathway().specKey, 'withSuspectedGDD'); } },
 
+  // ── Age change tears down a GDD-tier profile (GDD is not diagnosable after ~age 5) ──
+  // Drives the real age-radio handler. The ungraded 'gdd' ("Unspecified delays") value
+  // was once missing from the teardown list: the profile survived the move to
+  // school-age, the bridge re-asserted the specifier, and the note printed a GDD
+  // diagnosis. All four values are looped so a tier cannot be skipped again.
+  ...['gdd','gdd_mild','gdd_moderate','gdd_severe'].map(tier => ({
+    name: `Age preschool -> school-age clears cogProfile '${tier}', its specifier, and GDD note wording`,
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='preschool'; S.cogProfile=tier;
+              S.cogDataSource='screener'; S.specifiers.add('withSuspectedGDD'); },
+    check(a){ assert.match(a.generateNote().main, /Autism Spectrum Disorder \(ASD\), with[^\n]*Global Developmental Delay/, 'precondition: confirmed preschool note names GDD on the ASD line');
+              a.S.ageGroup='schoolAge'; a.onAgeGroupChange();
+              assert.equal(a.S.cogProfile, '', 'cogProfile cleared');
+              assert.equal(a.S.cogDataSource, '', 'evidence flags cleared');
+              assert.deepEqual([...a.S.specifiers].filter(k => /GDD/.test(k)), [], 'no GDD specifier');
+              const n=a.generateNote();
+              // Case-sensitive on purpose: the capitalized diagnosis name, not the lowercase
+              // DSM-5 exclusion sentence ("not better explained by intellectual disability or
+              // global developmental delay alone") or the genetics citation title, both of
+              // which belong in a school-age note.
+              assert.doesNotMatch(n.main+n.assessment+n.plan, /Global Developmental Delay|\bGDD\b|F88|developmental delays are present/, 'note free of a GDD diagnosis'); } })),
+  { name: 'Age preschool -> toddler keeps a GDD profile (still age-valid)',
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='preschool'; S.cogProfile='gdd'; S.cogDataSource='screener'; S.specifiers.add('withSuspectedGDD'); },
+    check(a){ a.S.ageGroup='toddler'; a.onAgeGroupChange();
+              assert.equal(a.S.cogProfile, 'gdd');
+              assert.equal(a.S.specifiers.has('withSuspectedGDD'), true); } },
+
   // Normal range: withoutID for older, withoutGDD for under-5 (DSM-5 ID age rule).
   { name: 'Normal range, school-age -> withoutID',
     setup(S){ S.cogProfile='average'; S.ageGroup='schoolAge'; },
@@ -469,6 +495,141 @@ const CASES = [
               assert.deepEqual(a.secAutoOpenKeys({}, c1), ['safety']);
               a.S.strengths='loves trains';            // an unrelated keystroke
               assert.deepEqual(a.secAutoOpenKeys(c1, a.sectionRelevance()), []); } },
+
+  // ── Export / restore selections ──
+  // The string must carry clicked choices only. These cases lock the three promises the
+  // panel makes: typed text never leaves, nothing but a page-control value comes back
+  // in, and a version-1 string keeps meaning the same thing.
+  { name: 'selections: every state field is classified exactly once (saved, typed, or view)',
+    setup(){},
+    check(a){ const all=[...Object.keys(a.SEL_FIELDS),...a.SEL_TYPED,...a.SEL_VIEW];
+              assert.deepEqual([...all].sort(), Object.keys(a.initialState()).sort());
+              assert.equal(new Set(all).size, all.length); } },
+  { name: 'selections: field type matches the state shape',
+    setup(){},
+    check(a){ const init=a.initialState();
+              for(const [k,t] of Object.entries(a.SEL_FIELDS)){
+                const v=init[k];
+                const shape=v instanceof Set?'many':typeof v==='boolean'?'flag':typeof v==='string'?'one':'map';
+                assert.equal(t, shape, k);
+              } } },
+  { name: 'selections: an empty form exports the bare version prefix at both levels',
+    setup(){},
+    check(a){ assert.equal(a.encodeSelections('full'), 'APB1');
+              assert.equal(a.encodeSelections('template'), 'APB1;scope=template');
+              assert.equal(a.formHasAnything(), false); } },
+  { name: 'selections: typed text is never exported',
+    setup(S){ const init=S; for(const k of ['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval','labsOrdered','paeDetail','teacherMaterialOther','iepInstruments']) init[k]='ZZTYPED';
+              Object.keys(S.ev).forEach(k=>{S.ev[k]='ZZTYPED';});
+              Object.keys(S.behavFreq).forEach(k=>{S.behavFreq[k]='ZZTYPED';});
+              S.priorTestingDate.ados2='2019'; S.priorTesting.add('ados2'); S.ageGroup='schoolAge'; },
+    check(a){ for(const k of a.SEL_TYPED){ const v=a.S[k];
+                assert.ok(typeof v==='string'?v:Object.values(v).some(Boolean), k+' was not filled by this test'); }
+              const full=a.encodeSelections('full');
+              assert.ok(!full.includes('ZZTYPED')); assert.ok(!full.includes('2019'));
+              assert.equal(full, 'APB1;ageGroup=schoolAge;priorTesting=ados2');
+              assert.equal(a.formHasAnything(), true); } },
+  { name: 'selections: Template leaves out every child-specific and sensitive field',
+    setup(S){ S.ageGroup='preschool'; S.diagStatus='confirmed'; S.cogProfile='gdd_mild'; S.criteriaB.add('b2');
+              S.needsBehavior.add('tantrums'); S.needsBehavior.add('rigidity'); S.comorbid.add('trauma');
+              S.prenatalAlcohol=true; S.socialWork=true; S.abaTargets.add('transitions'); S.schoolSvc.add('counseling'); S.overrides.pt='no'; },
+    check(a){ assert.equal(a.encodeSelections('template'),
+                'APB1;scope=template;ageGroup=preschool;needsBehavior=tantrums;overrides=pt:no');
+              // Derived fields are filled by the syncs from omitted findings, so they stay out too.
+              for(const k of ['schoolSvc','schoolSvcManualOff','abaTargets']) assert.ok(!a.SEL_TEMPLATE.has(k), k);
+              const t=a.decodeSelections(a.encodeSelections('template'), {ageGroup:['preschool'],needsBehavior:['tantrums'],overrides:{pt:['yes','no']}});
+              assert.equal(t.template, true); assert.deepEqual(t.ignored, []);
+              assert.equal(a.decodeSelections(a.encodeSelections('full'), {}).template, false);
+              for(const keys of Object.values(a.SEL_SENSITIVE)) for(const k of keys){
+                assert.ok(k in a.SEL_FIELDS, k+' is not a saved field');
+                assert.ok(!a.SEL_TEMPLATE.has(k), k+' is sensitive but exported at Template level'); }
+              for(const k of a.SEL_TEMPLATE) assert.ok(k in a.SEL_FIELDS, k);
+              assert.deepEqual(a.selSensitiveIn(a.encodeSelections('template')), []);
+              assert.deepEqual(a.selSensitiveIn(a.encodeSelections('full')),
+                ['mental-health and other diagnoses','prenatal alcohol exposure','family and social circumstances']); } },
+  { name: 'selections: Full round-trips every field type, keeping Set click order',
+    setup(S){ S.ageGroup='schoolAge'; S.ados2Module='Module 3'; S.showDSMTable=false; S.criteriaC=true;
+              ['receptive','expressive'].forEach(v=>S.needsComm.add(v));
+              S.therapyStatus.slp='continue'; S.priorTestingOutcome.ados2='consistent'; S.overrides.aba='yes'; },
+    check(a){ const str=a.encodeSelections('full');
+              assert.equal(str, 'APB1;ageGroup=schoolAge;criteriaC=1;needsComm=receptive,expressive;therapyStatus=slp:continue;priorTestingOutcome=ados2:consistent;ados2Module=Module%203;showDSMTable=0;overrides=aba:yes');
+              const allowed={ageGroup:['schoolAge'],ados2Module:['Module 3'],needsComm:['expressive','receptive'],
+                therapyStatus:{slp:['continue']},priorTestingOutcome:{ados2:['consistent']},overrides:{aba:['yes','no']}};
+              const r=a.decodeSelections(str, allowed);
+              assert.equal(r.version, 1); assert.deepEqual(r.ignored, []); assert.equal(r.applied, 9);
+              assert.equal(r.state.ados2Module, 'Module 3'); assert.equal(r.state.showDSMTable, false);
+              assert.equal(r.state.criteriaC, true); assert.deepEqual([...r.state.needsComm], ['receptive','expressive']);
+              assert.deepEqual(r.state.therapyStatus, {slp:'continue'}); assert.deepEqual(r.state.overrides, {aba:'yes'}); } },
+  { name: 'selections: whitespace from a wrapped paste is tolerated',
+    setup(){},
+    check(a){ const r=a.decodeSelections('  APB1;ageGroup=school\nAge ;\r\n needsComm=expressive ', {ageGroup:['schoolAge'],needsComm:['expressive']});
+              assert.equal(r.state.ageGroup, 'schoolAge'); assert.equal(r.applied, 2); } },
+  { name: 'selections: unknown keys, unknown values and typed fields are dropped, reported by key only',
+    setup(){},
+    check(a){ const r=a.decodeSelections(
+                'APB1;ageGroup=Jane%20Doe;futureField=x;strengths=loves%20trains;needsComm=expressive,MRN12345;criteriaC=yes;overrides=aba:maybe,nope:yes;constructor=1;John Smith 3/4/2019',
+                {ageGroup:['schoolAge'],needsComm:['expressive'],overrides:{aba:['yes','no']}});
+              assert.deepEqual(Object.keys(r.state).sort(), ['needsComm','overrides']);
+              assert.deepEqual([...r.state.needsComm], ['expressive']); assert.deepEqual(r.state.overrides, {});
+              assert.equal(r.applied, 1);
+              assert.deepEqual(r.ignored, ['ageGroup','futureField','strengths','needsComm','criteriaC','overrides','overrides','constructor','JohnSmith3/4/2019']);
+              assert.ok(!JSON.stringify(r.state).match(/Jane|MRN|trains/)); } },
+  { name: 'selections: a field with no page control is dropped rather than trusted',
+    setup(){},
+    check(a){ const r=a.decodeSelections('APB1;cogProfile=average', {});
+              assert.deepEqual(r.state, {}); assert.deepEqual(r.ignored, ['cogProfile']); } },
+  { name: 'selections: version is reported, and non-strings are rejected outright',
+    setup(){},
+    check(a){ assert.equal(a.SEL_VERSION, 1);
+              assert.equal(a.decodeSelections('APB2;ageGroup=schoolAge', {ageGroup:['schoolAge']}).version, 2);
+              for(const junk of ['', 'hello', 'APB;x=1', 'APBx1;ageGroup=schoolAge', 'The child is 7 years old; lives with mother'])
+                assert.deepEqual(a.decodeSelections(junk, {}), {error:'not-a-selections-string'}); } },
+  { name: 'selections: selDropped names fields the form did not keep',
+    setup(S){ S.ageGroup='schoolAge'; S.specifiers.add('withoutID'); S.therapyStatus.slp=''; S.showDSMTable=true; },
+    check(a){ assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID']),therapyStatus:{},showDSMTable:true}), []);
+              assert.deepEqual(a.selDropped({ageGroup:'schoolAge',specifiers:new Set(['withoutID','withSuspectedGDD']),therapyStatus:{slp:'continue'},showDSMTable:false}),
+                ['specifiers','therapyStatus','showDSMTable']); } },
+  { name: 'selections: a sub-option without its parent is reset, and reported as not kept',
+    setup(S){ S.depressionSafety='positive';                       // no depression in comorbid
+              S.comorbidInPlan.add('anxiety');                     // not in comorbid
+              S.comorbid.add('trauma'); S.comorbidInPlan.add('trauma'); S.traumaIncludeInIEP=true;   // consistent: must survive
+              S.paeEvidence.add('quantityFrequency'); S.paeQuantity='1_2';   // prenatalAlcohol off: both go, parent row first
+              S.teacherMaterials.add('srs2'); S.teacherMaterialsReturned.add('srs2'); S.teacherMaterialsReturned.add('gars3');
+              S.evalDxStatus='done'; S.evalDxOutcome='consistent';  // no evaluation path chosen
+              S.socialWork=true; S.socialWorkReasons.add('financial'); },   // consistent
+    check(a){ a.selPruneOrphans(); const S=a.S;
+              assert.equal(S.depressionSafety, ''); assert.deepEqual([...S.comorbidInPlan], ['trauma']);
+              assert.equal(S.traumaIncludeInIEP, true);
+              assert.equal(S.paeEvidence.size, 0); assert.equal(S.paeQuantity, '');
+              assert.deepEqual([...S.teacherMaterialsReturned], ['srs2']);
+              assert.equal(S.evalDxStatus, ''); assert.equal(S.evalDxOutcome, '');
+              assert.deepEqual([...S.socialWorkReasons], ['financial']);
+              assert.deepEqual(a.selDropped({depressionSafety:'positive',comorbidInPlan:new Set(['anxiety','trauma']),socialWorkReasons:new Set(['financial'])}),
+                ['depressionSafety','comorbidInPlan']);
+              // every reveal row declares the fields inside it, and they are saved fields
+              assert.deepEqual(Object.keys(a.SEL_ROW_FIELDS).sort(), Object.keys(a.SEL_SUBROWS).sort());
+              for(const f of Object.values(a.SEL_ROW_FIELDS).flat()) assert.ok(f in a.SEL_FIELDS, f); } },
+  { name: 'selections: pruning leaves a consistent form untouched',
+    setup(S){ S.dxEvalPath='certainOlder'; S.evalProfileStatus='done'; S.evalDxStatus='today'; S.evalDxOutcome='consistent';
+              S.comorbid.add('depression'); S.depressionSafety='positive'; S.needsAdaptive.add('commSafety'); S.strangerDanger=true;
+              S.prenatalAlcohol=true; S.paeEvidence.add('quantityFrequency'); S.paeTiming='first'; },
+    check(a){ const before=a.encodeSelections('full'); a.selPruneOrphans(); assert.equal(a.encodeSelections('full'), before); } },
+  { name: 'selections: a repeated key is counted once, last one wins',
+    setup(){},
+    check(a){ const r=a.decodeSelections('APB1;ageGroup=toddler;ageGroup=schoolAge;needsComm=expressive;needsComm=receptive', {ageGroup:['toddler','schoolAge'],needsComm:['expressive','receptive']});
+              assert.equal(r.state.ageGroup, 'schoolAge'); assert.deepEqual([...r.state.needsComm], ['receptive']); assert.equal(r.applied, 2); } },
+  // Compatibility pin. This literal is what a clinician may already have saved. If this
+  // case fails, a key or value was renamed: bump SEL_VERSION and add a SEL_MIGRATIONS
+  // entry rather than editing the expected values here.
+  { name: 'selections: a saved version-1 string still decodes to the same fields',
+    setup(){},
+    check(a){ const r=a.decodeSelections(
+                'APB1;visitType=initial;ageGroup=preschool;langLevel=phrase;langModifiers=echolalic;needsComm=expressive,receptive;needsSocial=play,peer;schoolSvc=slp_school,social_skills_school;insuranceType=medicaid;abaTargets=functional_comm,joint_attention,imitation,play',
+                {visitType:['initial'],ageGroup:['preschool'],langLevel:['phrase'],langModifiers:['echolalic'],needsComm:['expressive','receptive'],
+                 needsSocial:['play','peer'],schoolSvc:['slp_school','social_skills_school'],insuranceType:['medicaid'],
+                 abaTargets:['functional_comm','joint_attention','imitation','play']});
+              assert.deepEqual(r.ignored, []); assert.equal(r.applied, 15);
+              assert.deepEqual(Object.keys(r.state), ['visitType','ageGroup','langLevel','langModifiers','needsComm','needsSocial','schoolSvc','insuranceType','abaTargets']); } },
 ];
 
 let pass = 0;
