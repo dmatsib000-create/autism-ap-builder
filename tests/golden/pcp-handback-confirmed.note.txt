@@ -120,7 +120,7 @@ Recommended IEP/504 accommodations based on current evaluation findings:
     • How to Know If You're Getting Good ABA
 
 9. ANTICIPATORY GUIDANCE
-  • Sibling Recurrence: Elevated ASD/developmental risk (~10–20%). All siblings should be monitored.
+  • Sibling Recurrence: About 1 in 5 younger siblings of an autistic child are later diagnosed with autism (Ozonoff 2011; Ozonoff 2024). All siblings should be monitored.
 
 ── Problem 2: Sleep Disorder: Insomnia / Circadian Rhythm Disruption (G47.9) ──
 
@@ -135,21 +135,18 @@ Plan:
     - Sleep environment: dark, cool, quiet; address sensory sensitivities (weighted blanket, white noise, etc.)
     - Screen-free period of at least 60 minutes before target bedtime
     - Stimulus control: bed used only for sleep, not play or screens
-  Pharmacotherapy for sleep in ASD (always adjunct to behavioral intervention):
-  • Melatonin (first-line pharmacological adjunct): start 1-3 mg approximately 30 minutes before target bedtime; increase every 5-7 days in 1-3 mg increments to maximum 10 mg. Timing is more important than dose. ASD children have lower endogenous melatonin secretion; >84% improvement rate across studies. Use third-party certified formulation (USP or NSF label); FDA does not regulate supplements. Chewable or liquid preferred for texture-sensitive children.
-  • Guanfacine ER (if co-occurring ADHD or anxiety): start 1 mg; titrate weekly to maximum 4 mg/day. Addresses sleep, hyperactivity, and anxiety simultaneously.
-  • Clonidine IR (if melatonin insufficient; more sedating): start 0.05 mg (half of 0.1 mg tablet) 30 minutes before bedtime; increase by 0.05 mg every 3–5 days; maximum 0.3 mg. ER: start 0.1 mg, titrate weekly to 0.3 mg/day.
-  • Trazodone (if above insufficient): start 25 mg at bedtime; increase weekly by 25 mg to 100-150 mg based on weight. No RCTs in ASD children but clinically used; rare risk of priapism; counsel families.
-  • Mirtazapine (if co-occurring anxiety or depression): start 3.75 mg at bedtime; titrate to maximum 45 mg/day. Benefits sleep onset and maintenance; weight gain common.
-  NOT recommended as sleep agents in ASD: benzodiazepines (paradoxical activation risk is elevated in ASD; chronic use contraindicated), zolpidem (no pediatric ASD evidence), amitriptyline/doxepin (anticholinergic burden, cardiac risk). Antipsychotics should not be initiated primarily for sleep without separate behavioral or psychiatric indications.
-  • Re-evaluate sleep in 4-6 weeks.
+  • Melatonin as an adjunct to the behavioral plan, not a replacement: low starting dose, 30 to 60 minutes before the target bedtime, adjusted to response. Dose advised today: {dose, or melatonin not started}. Pharmaceutical-grade product advised.
+  • No other sleep medication has been studied in autistic children (AAN 2020); further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • Not recommended as sleep aids (Florida Best Practice guideline): benzodiazepines, zolpidem, amitriptyline, doxepin, and antipsychotic medication.
+  • Re-evaluate sleep in 4 to 6 weeks with primary care.
   • If ADHD is co-occurring: review stimulant timing; afternoon dose may be delaying sleep onset.
   • Polysomnography referral if sleep-disordered breathing (snoring, witnessed apneas, restless sleep) is suspected.
 
 ── Problem 3: Functional GI Disorder (K59.00) ──
 
 Assessment:
-  GI disorder confirmed (constipation, GERD, and/or functional abdominal pain). GI symptoms occur 4-5x more frequently in ASD than in the general population. In non-verbal or minimally verbal individuals, GI pain frequently manifests as behavioral dysregulation, self-injurious behavior, or sleep disruption rather than verbal complaint; all providers should maintain a high index of suspicion for a GI pain etiology when behavior escalates.
+  GI disorder confirmed (constipation, GERD, and/or functional abdominal pain). Gastrointestinal symptoms, particularly constipation, diarrhea and abdominal pain, are more common in autistic children than in comparison children. In non-verbal or minimally verbal individuals, GI pain frequently manifests as behavioral dysregulation, self-injurious behavior, or sleep disruption rather than verbal complaint; all providers should maintain a high index of suspicion for a GI pain etiology when behavior escalates.
 
 Plan:
   • Pediatric GI referral placed; see Medical Referrals in ASD plan above.
@@ -157,24 +154,24 @@ Plan:
   • First-line for constipation: polyethylene glycol (MiraLAX); dosing per weight/age per GI or PCP guidance.
   • GERD: management per GI specialist recommendation.
   • All care providers (ABA team, school staff, teachers) alerted that behavioral escalations may have a GI-pain etiology and should trigger a medical evaluation rather than solely a behavioral intervention.
-  • Reassess at next follow-up.
+  • Primary care reassesses at the next visit.
 
 ── Recommendations for Primary Care ──
 
+DBP follow-up:
+  • No routine DBP follow-up is planned. The child has not been discharged and can return as needed. We are glad to see the child and family again for any reason listed under "Re-refer to DBP if". Thank you for continuing this child's care.
+  • To come back: within 2 years of the last visit here, the family or primary care can call our clinic directly at (352) 265-8250; no new referral is needed. After 2 years, or if the child has been dismissed from our clinic, please send a new referral.
+
 Actions:
-  • PCP (next visit): Confirm that ABA, speech-language therapy, PCIT, and a social skills group have started. If not, the family should ask the insurance case manager for in-network providers and keep calling the waitlists.
-  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and pediatric gastroenterology. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
+  • PCP (next visit): Confirm that ABA, speech-language therapy, parent-child interaction therapy (PCIT), and a social skills group have started. If not, ask where the family is on each waitlist and point them to the insurance case manager for in-network providers; waitlists often need repeated calls.
+  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and pediatric gastroenterology. Our clinic placed every referral; some insurance plans need one re-sent from primary care. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
   • Family (now): Send the school district a written request for a special education evaluation. The district must evaluate within 60 days of written consent.
+  • PCP (in 4 to 6 weeks): Recheck sleep. Continue the behavioral sleep plan, with melatonin at the dose stated in the plan. Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.
   • PCP (well visits): Watch the development of younger siblings closely, with autism screening at the 18- and 24-month visits and early referral for any concern. Autism is more likely in siblings.
   • PCP (well visits): Revisit wandering and water-safety precautions with the family.
 
-Primary care can monitor and manage (no routine DBP follow-up needed for these):
-  • Sleep: Continue the behavioral sleep plan, with melatonin as outlined in the plan, and reassess in 4 to 6 weeks. Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.
+Primary care manages:
   • GI symptoms: Treat constipation in primary care with polyethylene glycol dosed by weight. A change in behavior or sleep may be the only sign of abdominal pain.
-
-DBP follow-up:
-  • No routine DBP follow-up is needed. Thank you for continuing this child's care. Primary care follows from here, and we are always glad to see the family again for any of the changes listed below.
-  • To come back: within 2 years of the last visit here, please call our clinic directly at {clinic phone number}; no new referral is needed. After 2 years, or if the child has been discharged from our clinic, please send a new referral.
 
 Re-refer to DBP if:
   • A new developmental, learning, attention, or mood concern needs diagnostic evaluation.
@@ -182,7 +179,7 @@ Re-refer to DBP if:
   • Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.
   • Sleep problems persist after the behavioral plan and a melatonin trial.
 
-Refer directly to another service if:
+Urgent, or for another service:
   • Language, social, or motor skills the child already had are lost: refer to pediatric neurology.
 
 RETURN TO CLINIC

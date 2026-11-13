@@ -71,14 +71,11 @@ Plan:
     - Sleep environment: dark, cool, quiet; address sensory sensitivities (weighted blanket, white noise, etc.)
     - Screen-free period of at least 60 minutes before target bedtime
     - Stimulus control: bed used only for sleep, not play or screens
-  Pharmacotherapy for sleep in ASD (always adjunct to behavioral intervention):
-  • Melatonin (first-line pharmacological adjunct): start 1-3 mg approximately 30 minutes before target bedtime; increase every 5-7 days in 1-3 mg increments to maximum 10 mg. Timing is more important than dose. ASD children have lower endogenous melatonin secretion; >84% improvement rate across studies. Use third-party certified formulation (USP or NSF label); FDA does not regulate supplements. Chewable or liquid preferred for texture-sensitive children.
-  • Guanfacine ER (if co-occurring ADHD or anxiety): start 1 mg; titrate weekly to maximum 4 mg/day. Addresses sleep, hyperactivity, and anxiety simultaneously.
-  • Clonidine IR (if melatonin insufficient; more sedating): start 0.05 mg (half of 0.1 mg tablet) 30 minutes before bedtime; increase by 0.05 mg every 3–5 days; maximum 0.3 mg. ER: start 0.1 mg, titrate weekly to 0.3 mg/day.
-  • Trazodone (if above insufficient): start 25 mg at bedtime; increase weekly by 25 mg to 100-150 mg based on weight. No RCTs in ASD children but clinically used; rare risk of priapism; counsel families.
-  • Mirtazapine (if co-occurring anxiety or depression): start 3.75 mg at bedtime; titrate to maximum 45 mg/day. Benefits sleep onset and maintenance; weight gain common.
-  NOT recommended as sleep agents in ASD: benzodiazepines (paradoxical activation risk is elevated in ASD; chronic use contraindicated), zolpidem (no pediatric ASD evidence), amitriptyline/doxepin (anticholinergic burden, cardiac risk). Antipsychotics should not be initiated primarily for sleep without separate behavioral or psychiatric indications.
-  • Re-evaluate sleep in 4-6 weeks.
+  • Melatonin as an adjunct to the behavioral plan, not a replacement: low starting dose, 30 to 60 minutes before the target bedtime, adjusted to response. Dose advised today: {dose, or melatonin not started}. Pharmaceutical-grade product advised.
+  • No other sleep medication has been studied in autistic children (AAN 2020); further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • Not recommended as sleep aids (Florida Best Practice guideline): benzodiazepines, zolpidem, amitriptyline, doxepin, and antipsychotic medication.
+  • Re-evaluate sleep in 4 to 6 weeks.
   • If ADHD is co-occurring: review stimulant timing; afternoon dose may be delaying sleep onset.
   • Polysomnography referral if sleep-disordered breathing (snoring, witnessed apneas, restless sleep) is suspected.
 

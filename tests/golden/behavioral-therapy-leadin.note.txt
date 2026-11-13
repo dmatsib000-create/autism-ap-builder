@@ -47,10 +47,7 @@ Targets:
 4. SPEECH-LANGUAGE PATHOLOGY (SLP)
   • Service frequency: SLP services at a frequency to be determined following formal evaluation, typically 1-2 individual sessions per week. Group social communication therapy may supplement individual sessions where available. School-based and clinic-based SLP address different goals; concurrent services are appropriate when goals are documented as distinct.
 
-5. MEDICAL REFERRALS
-  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: anxiety. Behavioral strategies should be maximized prior to and concurrent with any medication.
-
-6. FAMILY RESOURCES & NEXT STEPS
+5. FAMILY RESOURCES & NEXT STEPS
 
   Finding Therapies / Navigating the System:
     1. Call your insurance company and ask to be assigned a case manager.

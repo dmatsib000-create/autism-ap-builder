@@ -197,6 +197,8 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 |---|---|
 | `dbpFollowUp` | `'' \| 'pcp' \| 'dbp'` — the follow-up plan. `''` = not chosen (the list stays on its tab and is not in the note); `'pcp'` = no routine DBP follow-up; `'dbp'` = DBP follow-up continues. Also switches the Return to Clinic line, the gait recheck owner, and the depression plan's recheck line (§13.5) |
 | `pcpInNote` | boolean, default `true` — whether the list is inserted into the A&P note once a plan is chosen |
+| `pcpNotDiscussed` | boolean, default `false` — the follow-up plan was not discussed with the family at the visit; adds one line with a fill-in to the list's follow-up lines under plan `pcp` (§13.3) |
+| `psychReasons` | Set — why psychiatry is involved: `mania_psychosis`, `treatment_failure`, `substance_use`, `safety`. Any entry turns the psychiatry referral on (§7.2 rule 10); labels in `PSYCH_REASON_LABELS` |
 | `pcpOmit` | Set of `PCP_DEFS` row ids the clinician left out |
 | `pcpFirst` | Set of `PCP_DEFS` row ids moved to the top of their group, in click order |
 | `pcpExtra` | string, typed — the clinician's own lines, one per row, printed after the generated actions |
@@ -230,7 +232,7 @@ This doc primarily describes how state on `S` shapes output. When you need to **
 2. Confirm the checkbox event handler writes to `S.comorbid` (the generic handler should cover this — verify by reading the listener registration)
 3. Add the key + ICD code to the per-comorbid mapping inside `_iepLetterContent()` (look for the comorbidity-phrase loop near line 3362)
 4. Add a row to the A&P note's co-occurring conditions builder
-5. If the comorbidity should fire a therapy rule, add the trigger condition inside the relevant `rule*()` (e.g., add `S.comorbid.has('newKey')` to `rulePsychiatry`'s OR-chain)
+5. If the comorbidity should fire a therapy rule, add the trigger condition inside the relevant `rule*()` (e.g., add `S.comorbid.has('newKey')` to `rulePsychotherapy`'s OR-chain). Psychiatry is by exception (§7.2 rule 10): a new diagnosis does not refer there on its own
 6. If it warrants IEP-letter accommodations, add an entry to the `accomBeh` table (§10.8) via the per-comorbid switch
 7. Update [§6.1 reference table](#61-comorbidity-reference-table) in this doc
 8. Bump the "Last verified against commit" SHA
@@ -290,6 +292,8 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `pcpExtra` | string (typed) | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `pcpFirst` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `pcpInNote` | boolean | [§13.1](#131-placement-a-tab-that-also-feeds-the-note) |
+| `pcpNotDiscussed` | boolean | [§13.3](#133-follow-up-lines-a-standing-line-that-selections-override) |
+| `psychReasons` | Set | [§7.2](#72-the-18-rules-at-a-glance) rule 10 |
 | `pcpOmit` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `previewMode` | string | [§5.4](#54-fallback-behavior) |
 | `priorTesting` | Set | [§1.2](#12-the-s-object--property-reference) |
@@ -706,12 +710,12 @@ A second Set, `S.comorbidInPlan`, filters which comorbidities appear in the Plan
 
 | Key | ICD-10 | A&P language | IEP language emphasis | Rules fired |
 |---|---|---|---|---|
-| `adhd_combined` | F90.2 | "ADHD, combined presentation" | Executive function / attention accommodations | `rulePsychiatry`, `ruleQBTest` |
-| `adhd_inattentive` | F90.0 | "ADHD, predominantly inattentive" | Same as above | `rulePsychiatry`, `ruleQBTest` |
-| `adhd_hyperactive` | F90.1 | "ADHD, predominantly hyperactive/impulsive" | Same as above | `rulePsychiatry`, `ruleQBTest` |
-| `adhd_suspected` | Z03.89 | "ADHD, suspected — under evaluation" | "Pending ADHD evaluation" | `ruleQBTest`, conditional `rulePsychiatry` |
-| `anxiety` | F41.x | "Anxiety disorder" | CBT recs, calm space, gradual exposure | `rulePsychiatry`, `rulePsychotherapy`, `rulePCIT` |
-| `depression` | F32.x | "Depressive disorder" + suicide-risk note if `depressionSafety` set | Behavioral activation, mood-support accoms | `rulePsychiatry`, `rulePsychotherapy` |
+| `adhd_combined` | F90.2 | "ADHD, combined presentation" | Executive function / attention accommodations | `ruleQBTest` |
+| `adhd_inattentive` | F90.0 | "ADHD, predominantly inattentive" | Same as above | `ruleQBTest` |
+| `adhd_hyperactive` | F90.1 | "ADHD, predominantly hyperactive/impulsive" | Same as above | `ruleQBTest` |
+| `adhd_suspected` | Z03.89 | "ADHD, suspected — under evaluation" | "Pending ADHD evaluation" | `ruleQBTest` |
+| `anxiety` | F41.x | "Anxiety disorder" | CBT recs, calm space, gradual exposure | `rulePsychotherapy`, `rulePCIT` |
+| `depression` | F32.x | "Depressive disorder" + suicide-risk note if `depressionSafety` set | Behavioral activation, mood-support accoms | `rulePsychotherapy` |
 | `ocd` | F42.x | "Obsessive-compulsive disorder" | ERP/CBT; ritual accommodation | `rulePsychiatry`, `rulePsychotherapy` |
 | `trauma` | (clinical narrative) | Trauma-informed approach noted in A&P | **Gated by `traumaIncludeInIEP`** — default omitted from IEP letter to protect educational record | (referral to trauma-informed therapy) |
 | `ld_reading` | F81.0 | "Specific learning disorder, reading (dyslexia)" | TTS, audiobooks, extended time | — |
@@ -755,7 +759,7 @@ The co-occurring conditions list now includes *"Attention-Deficit/Hyperactivity 
 
 **Step 3 — Therapy rules fire:**
 
-- `rulePsychiatry()` (§7.2, line 1410): trigger condition `confirmed ADHD` is now satisfied → returns `{include: true, reasons: [..., 'confirmed ADHD']}`.
+- `rulePsychiatry()` (§7.2): **not** triggered. Since 2026-11-13 a confirmed ADHD, anxiety or depression diagnosis does not refer to psychiatry on its own; this clinic prescribes for them. The referral needs a selected reason (`psychReasons`) or OCD.
 - `ruleQBTest()` (§7.2, line 1424): trigger condition `ADHD suspected/confirmed AND age ∈ {schoolAge, adolescent, youngAdult}` is now satisfied → returns `{include: true, ...}`.
 
 Both rules feed through `resolveOv()` (§7.4). Assuming overrides are on `'auto'`, both recommendations now appear in the form's recommendation section.
@@ -813,7 +817,7 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid OR `gaitFindings().ptIndicated` (§7.10) | `pt` |
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (regression OR confirmed dysmorphism OR congenital anomaly OR either FASD flag §7.9)) | `genetics` |
 | 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression OR a gait red flag (§7.10) | `neurology` |
-| 10 | `rulePsychiatry` | 1410 | Confirmed ADHD/anxiety/depression/OCD, OR (severe behavior AND age school+) | `psychiatry` |
+| 10 | `rulePsychiatry` | — | By exception: any `psychReasons` entry (section 5: concern for mania or psychosis, treatment has not worked, substance use complicating treatment, safety concern), OR OCD (psychiatry OCD clinic), OR (aggression or self-injury AND age school+). ADHD, anxiety and depression do not refer on their own (attending, 2026-11-12 and 2026-11-13). The note's referral bullet states the reason; a tile forced on with no reason prints a `{reason for referral}` stop | `psychiatry` |
 | 11 | `ruleGI` | 1415 | GI comorbid OR feeding OR PFD OR ARFID OR pica OR fecal smearing (only when its medical cause is **not** marked ruled-out via `S.smearWorkup`) | `gi` |
 | 12 | `ruleSleepRef` | 1416 | `S.sleepStudy === true` | `sleep_ref` |
 | 13 | `ruleAudiology` | 1417 | Hearing screen fail, OR (toddler/preschool AND speech concern), OR either FASD flag (§7.9 — rationale adapts; always a single bullet) | `audiology` |
@@ -930,7 +934,7 @@ Combined-level lookup picks Level 2 narrative (line 3091). Domain filter (line 3
 
 These are inconsistencies or vague thresholds surfaced during the source scan. They aren't bugs, but a future reader changing this code should know about them:
 
-1. **`rulePsychiatry` "severe behavior" is undefined in code** (line 1410). The condition reads roughly as `(confirmed ADHD/anxiety/depression/OCD) || (severeBehavior && ageSchoolPlus)` but "severe" isn't a state field — it's inferred from the size or specific contents of `needsBehavior` / `safety`. Worth a future audit pass to make the threshold explicit.
+1. **`rulePsychiatry` "severe behavior" is undefined in code** (line 1410). The condition reads `psychReasons.size || OCD || (severeBehavior && ageSchoolPlus)` but "severe" isn't a state field — it's inferred from the size or specific contents of `needsBehavior` / `safety`. Worth a future audit pass to make the threshold explicit.
 
 2. **Safety-flag asymmetry between `ruleABA` and `_abaContent`.** `ruleABA` checks `S.safety.size > 0` (line 1356), but the urgency-clause safety flags inside `_abaContent` (lines 3120–3125) are computed from a *different* set of conditions (`hasSIB`, `hasElope`, etc., which combine `needsBehavior` membership with specific `safety` keys). The two lists overlap but aren't identical. A patient could trip `ruleABA` for "safety needs" while the letter's urgency clause stays silent, or vice versa. Probably fine clinically (the letter still mentions safety in the domain list), but worth verifying with a council pass before any refactor.
 
@@ -1783,6 +1787,8 @@ Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). Add-o
 
 The condition includes "severe behavior + age school+" but "severe" is inferred from `needsBehavior` / `safety` rather than a flagged threshold. Future audit needed to make it explicit.
 
+**Open since 2026-11-13.** The rule became "psychiatry by exception" (§7.2 rule 10). The attending named four reasons for psychiatry (mania, psychosis, treatment failure, complicating substance use) and OCD; aggression or self-injury was not among them and was not ruled out either. The trigger is kept as it was and marked `WARY:` in the source. Ask the attending before removing or keeping it for good.
+
 ### 11.5 Reasons-array string contract (§7.7 open question 3)
 
 `rule*().reasons[]` strings are comma-joined into letter prose with no format contract — a contributor pushing a sentence-cased string with trailing punctuation will produce malformed letter output. No automated check.
@@ -1933,7 +1939,7 @@ Code: the block headed `RECOMMENDATIONS FOR PRIMARY CARE` in `autism-ap-builder.
 
 | Piece | Where | What it is for |
 |---|---|---|
-| Inputs | Form section 10, "Follow-up & Primary Care" | The follow-up plan radios (`dbpFollowUp`), the Return to Clinic interval (moved here from section 9, same field and id), the clinician's own lines (`pcpExtra`), and the "Add the list to the A&P note" box (`pcpInNote`) |
+| Inputs | Form section 10, "Follow-up & Primary Care" | The follow-up plan radios (`dbpFollowUp`), the Return to Clinic interval (moved here from section 9, same field and id), the clinician's own lines (`pcpExtra`), the "Plan not yet discussed with the family" box (`pcpNotDiscussed`), and the "Add the list to the A&P note" box (`pcpInNote`) |
 | Workspace | Output tab "PCP Recs" (`tabPCP`, always visible) | Every row the selections produce, each with a leave-out and a move-up button; its own copy bar (rich for Word, plain for Epic, "Undo my edits") |
 | Note section | `── Recommendations for Primary Care ──`, after the last problem block and directly above `RETURN TO CLINIC` | The finished list, live. Present only when `pcpInNoteActive()`: a plan is chosen and `pcpInNote` is on |
 
@@ -1962,21 +1968,29 @@ Each action row is `Owner (timeframe): action.` The owner is always present for 
 | `sibling` | act | `ag` has `sibling` | PCP, well visits |
 | `transition` | act | `ag` has `transition` | PCP, now (teen and older) or starting in early adolescence |
 | `safety` | act | `safety` has `elopement_counsel` or `water_counsel` | PCP, well visits |
-| `sleep` | manage | `S.sleep` or the sleep-disorder comorbid. The 4 to 6 week reassessment and the sleep-study clause print only when the sleep disorder is in the plan, where the note prints them | primary care |
+| `sleepRecheck` | act | the sleep disorder is a problem in the plan (the note's own plan carries the 4 to 6 week clock). The sleep-study clause is dropped when a sleep study is already referred | PCP, in 4 to 6 weeks |
+| `mood` | act | depression in the plan **and** plan is `pcp`. The row names the PCP as owner, so it does not exist until the hand-back is chosen; under `dbp` the recheck is open work with this clinic. Adds "even if the psychiatry visit has not yet happened" when a psychiatry referral is in the list | PCP, in 4 to 6 weeks, sooner if mood worsens |
+| `tGdd` | act | a GDD specifier. "Repeated" with `withGDD`, "completed" with `withSuspectedGDD` (a child with suspected delay may never have been tested). The id dates from when this was a re-referral trigger; ids are saved values, so it was not renamed | PCP, at school entry |
+| `sleep` | manage | a sleep concern or sleep-disorder comorbid that is **not** a problem in the plan (no clock) | primary care |
 | `gi` | manage | GI disorder in the plan | primary care |
 | `growth` | manage | a feeding disorder or ARFID in the plan, confirmed or suspected (two wordings) | primary care |
-| `adhd` | manage | a confirmed ADHD presentation in the plan | primary care |
-| `mood` | manage | depression in the plan, unless DBP follow-up continues (then the recheck stays with this clinic, as the note's depression plan says) | primary care, 4 to 6 weeks |
+| `adhd` | manage | a confirmed ADHD presentation in the plan. The start of primary care prescribing is a `{now, or the date DBP confirms a stable dose}` stop, because this clinic adjusts the dose until it is stable and the tool cannot know whether that has happened. The stimulant side-effect sentence prints only with confirmed autism | primary care |
 | `tNewConcern`, `tBehavior`, `tDocs` | refer | `diagStatus` is `confirmed` | — |
-| `tGdd` | refer | a GDD specifier (confirmed or suspected) | — |
-| `tSleep` | refer | same test as `sleep` | — |
+| `tSleep` | refer | `S.sleep` or the sleep-disorder comorbid | — |
 | `tAdhd` | refer | same test as `adhd` | — |
+| `tMood` | refer | depression or anxiety in the plan: "not improving with treatment, or is worsening" comes back to DBP, not to psychiatry | — |
+| `tSuicide` | other, printed first | confirmed ADHD, anxiety, depression or OCD in the plan (atomoxetine and every antidepressant carry the boxed warning). **Locked**: it cannot be left out while the `mood` row prints, because that row points to it | emergency evaluation; BSSA; local mental health options |
+| `tPsych` | other | same test as `tSuicide`. "Hold any stimulant" prints only with ADHD medication; the substance-use clause says "tell child psychiatry promptly" when a psychiatry referral is already in the list | same-day evaluation; child psychiatry |
 | `tRegress` | other | any `diagStatus` | neurology |
 | `tCatatonia` | other | `comorbid` has `catatonia_history` | psychiatry, same day |
-| `tPsych` | other | confirmed ADHD, anxiety, depression or OCD in the plan | child psychiatry |
-| `tSuicide` | other | depression in the plan | emergency or crisis care |
 
-Groups print in this order, each under its own heading, and a group with no kept row prints nothing: **Actions**; **Primary care can monitor and manage (no routine DBP follow-up needed for these)**; **DBP follow-up** (§13.3); **Re-refer to DBP if** (reads "Contact DBP before the return visit if" while a return is still expected, `pcpReturnExpected()`); **Refer directly to another service if**.
+Sections print in this order, each under its own heading, and a group with no kept row prints nothing: **DBP follow-up** (§13.3), first because whether this clinic is still following is what a PCP looks for first; **Actions**; **Primary care manages** (reads "Primary care manages between DBP visits" under plan `dbp`); **Re-refer to DBP if** (reads "Contact DBP before the return visit if" while a return is still expected, `pcpReturnExpected()`); **Urgent, or for another service**. The title is "RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)".
+
+This order and wording came from the council on the tool's text outputs (2026-11-13; five reviewers, three rounds, 70 to 76% agreement on the option adopted) and the attending's answers the same day. Nothing was dropped or merged: the reviewing general pediatrician's point was that a PCP acts on about five lines and reads the rest once, so order matters more than length. The two rechecks that carry a clock (`sleepRecheck`, `mood`) are actions for that reason.
+
+Both the therapy row and the referral row say that this clinic placed every referral and that some insurance plans need one re-sent from primary care (attending, 2026-11-13); the sentence prints once, on the referral row when there is one.
+
+The suicide triage is stated once, in `tSuicide`, and the `mood` row points to it by heading name, never by position ("below"), because the order of sections can change. `d.lock` on a row is the test for "cannot be left out"; `pcpBuild()` ignores a saved `pcpOmit` entry for a locked row and the tab disables its button.
 
 The `other` group exists because the best-supported triggers do not belong to DBP. Loss of skills goes to neurology and possible catatonia to psychiatry in every source found, and the attending confirmed that routing on 2026-11-12. Sending them back to this clinic first would only add a delay.
 
@@ -1984,9 +1998,11 @@ The `other` group exists because the best-supported triggers do not belong to DB
 
 The **DBP follow-up** lines always print and cannot be left out: the list must say whether this clinic expects the child back. The design is a mix on purpose.
 
-- **Standing.** With plan `pcp`, no typed return interval, and nothing left with this clinic, the line is "No routine DBP follow-up is needed", followed by how to come back.
-- **Overridden per selection.** `pcpCtx().open` lists what the form says only this clinic can finish. Any entry, or a typed return interval, replaces the standing line with "DBP follow-up is limited to one return visit [in the typed interval] to [the open items]. No routine DBP follow-up is needed after that visit." With an interval but no open item the purpose is a `{purpose of the return visit}` stop.
+- **Standing.** With plan `pcp`, no typed return interval, and nothing left with this clinic, the line is "No routine DBP follow-up is planned. The child has not been discharged and can return as needed.", followed by how to come back. "Planned" replaced "needed" because the council's parent reviewer read "needed" as "your child no longer needs us". "No routine follow-up" is not a discharge (attending, 2026-11-13), and the line says so.
+- **Overridden per selection.** `pcpCtx().open` lists what the form says only this clinic can finish. Any entry, or a typed return interval, replaces the standing line with "DBP follow-up is limited to one return visit [in the typed interval] to [the open items]. No routine DBP follow-up is planned after that visit." With an interval but no open item the purpose is a `{purpose of the return visit}` stop.
+- **Unfinished diagnostic evaluation.** While `diagStatus` is `suspected` or `ruleOut` (`pcpCtx().evalOpen`) the line is "DBP will see the child again in [interval] to complete the autism diagnostic evaluation. The follow-up plan after that visit will be stated in that visit's note." This clinic keeps the child until the evaluation is done (attending, 2026-11-13), so nothing is promised about follow-up before a diagnosis exists, and the route-back line is not printed.
 - **Per condition.** What needs no DBP follow-up is said once per condition, by the `manage` rows under their heading, not by repeating the standing line for each diagnosis.
+- **Not discussed with the family.** The plan is normally discussed at the visit. Only the exception is recorded (attending, 2026-11-13): with `pcpNotDiscussed` ticked, plan `pcp` adds "This follow-up plan was not discussed with the family at the visit: {how and when the family will be told}." Nothing prints by default, because a "discussed" sentence printed for every patient would be an attestation nobody made.
 
 A purely per-condition line was rejected because it fails silently: a condition the table does not know gets no statement either way. A purely standing line was rejected because it fails dangerously: it would print "no routine follow-up" for a child whose evaluation is unfinished. The mix makes the standing line the default the clinician chose, and makes every selection that leaves work here an explicit exception to it.
 
@@ -2001,12 +2017,13 @@ What counts as open work (each is something the note itself leaves with DBP):
 | review the cognitive and adaptive testing once it is completed | `cogEvalReferralPending()` (a suspected ID/GDD specifier without prior external testing, or `bifIdRisk()`) |
 | review the feeding evaluation | suspected PFD or ARFID in the plan |
 | recheck mood and safety | depression in the plan, only while plan is `dbp` |
+| review the QbTest result | QbTest referred without suspected ADHD in the plan (otherwise "complete the ADHD evaluation" covers it) |
 
-Deliberately **not** open work (attending decisions, 2026-11-12): the sleep recheck, constipation, growth checks, ADHD medication at a stable dose, and, under a hand-back, the mood and safety recheck. They are `manage` rows.
+Deliberately **not** open work (attending decisions, 2026-11-12): the sleep recheck, constipation, growth checks, ADHD medication at a stable dose, and, under a hand-back, the mood and safety recheck. They are `manage` rows or PCP-owned actions.
 
 With plan `dbp` the line is "DBP follow-up continues, with a return visit [interval]" plus the open items. With no plan it is a brace stop, and that state never reaches the note.
 
-**Route back.** Whenever routine visits stop, a second line states this clinic's rule (attending, 2026-11-12): within 2 years of the last visit the family or PCP calls the clinic directly and no new referral is needed; after 2 years, or if the child was discharged from the clinic, a new referral is required. The phone number is a `{clinic phone number}` stop because the tool holds no clinic contact details. If the number is added to the source, remove the stop there and in the goldens.
+**Route back.** Whenever routine visits stop, a second line states this clinic's rule (attending, 2026-11-12): within 2 years of the last visit the family or PCP calls the clinic directly and no new referral is needed; after 2 years, or if the child was dismissed from the clinic, a new referral is required. The clinic's number is printed (`PCP_CLINIC_PHONE`, supplied by the attending on 2026-11-13); a clinic number is not PHI. The wording is "dismissed", the attending's word, and is separate from "no routine follow-up", which is not a dismissal.
 
 **Typed interval.** `rtcVisitPlanned()` is true when the Return to Clinic box holds anything other than blank, "as needed" or "prn". It is the same test the gait recheck already used, now shared. A typed value changes the wording of the output but is never saved, so a restored string comes back without it (the standing line then prints if nothing else is open).
 
@@ -2023,28 +2040,39 @@ Edits are stored as row ids, not as text. That is what lets the list rebuild on 
 
 **An edit goes when its row goes.** `pcpPruneEdits()` runs at the top of `render()` and from `selPruneOrphans()`. It drops an id from `pcpOmit` / `pcpFirst` when the row is no longer produced, the same rule the form's sub-options follow, so nothing sits hidden in `S` to ride along in the next export. A left-out row cannot also be moved up. Exception: two rows depend on typed text, which a restore never brings back, so pruning them by their full test would report the edit as "not kept" after every restore. Each carries a `keep` test, the part of its `on` test that reads no typed text, and is pruned by that instead: `labs` is always kept (its only trigger is the labs box), and `gaitRecheck` is kept while the watch-only gait selection holds and DBP follow-up is not continuing.
 
-**Selections string.** `dbpFollowUp`, `pcpOmit` and `pcpFirst` are saved at Full; `pcpInNote` is also in a Template; `pcpExtra` is typed and never saved. Restore accepts only ids that are in `PCP_DEFS` (`selAllowed()`), so a hand-edited string cannot inject text. The tab's buttons are drawn by `render()`, so `paintFormFromState()` needs no step for them.
+**Selections string.** `dbpFollowUp`, `pcpNotDiscussed`, `pcpOmit` and `pcpFirst` are saved at Full (as is `psychReasons`, which is listed under the mental-health sensitive category); `pcpInNote` is also in a Template; `pcpExtra` is typed and never saved. Restore accepts only ids that are in `PCP_DEFS` (`selAllowed()`), so a hand-edited string cannot inject text. The tab's buttons are drawn by `render()`, so `paintFormFromState()` needs no step for them.
 
 ### 13.5 What the plan changes elsewhere in the note
 
-Three existing lines read `dbpFollowUp`, so the note cannot contradict the list. All three are unchanged when no plan is chosen.
+Existing lines read `dbpFollowUp`, so the note cannot contradict the list. All are unchanged when no plan is chosen.
 
-| Line | With plan `pcp` |
+| Line | With a plan chosen |
 |---|---|
-| `RETURN TO CLINIC` | If no return is expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop, as before |
-| Gait recheck (§7.10) | "at the next well visit with primary care" in place of the `{primary care or this clinic}` stop |
-| Depression plan | "Mood and safety recheck in 4–6 weeks with primary care." in place of "Shortened return-to-clinic interval: 4–6 weeks." |
+| `RETURN TO CLINIC` | Plan `pcp` and no return expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop. A typed "as needed" or "prn" prints "Return to clinic as needed." (it used to print "Return to clinic in as needed.") |
+| Gait recheck (§7.10) | Plan `pcp`: "at the next well visit with primary care" in place of the `{primary care or this clinic}` stop |
+| Depression plan | Plan `pcp`: "Mood and safety recheck in 4 to 6 weeks with primary care." in place of "Shortened return-to-clinic interval: 4 to 6 weeks." |
+| Work primary care carries under a hand-back: sleep re-evaluation, GI, confirmed PFD, confirmed ARFID (`fuPcpVisit()`) | Plan `pcp`: "Primary care reassesses at the next visit" (sleep: "in 4 to 6 weeks with primary care"). Plan `dbp`: unchanged, because a DBP visit is coming |
+| Work that stays with this clinic: suspected ADHD re-evaluation, the feeding and ARFID evaluations, teacher materials, QbTest results (`fuDbpVisit()`) | Either plan: "at the DBP return visit" |
 
-Known and left alone: several problem blocks say "reassess at next follow-up" without naming an owner (GI, PFD, ARFID), and the confirmed-ADHD and anxiety blocks say "Psychiatry co-management for medication management". The attending's stated practice (2026-11-12) is that psychiatry is involved only for mania, psychosis, treatment failure or complicating substance use, so that note wording and the `rulePsychiatry` auto-referral for any confirmed ADHD or anxiety are candidates for a separate change. Until then the list can print a psychiatry referral to confirm alongside "primary care continues ADHD medication"; the clinician resolves it with the psychiatry override tile.
+The two classes are the same split `pcpCtx().open` uses to decide what is still open with this clinic, so the list and these lines cannot name different owners (council, 2026-11-13, 90 to 94%).
+
+**Medication wording (§6 problem blocks).** Changed in the same pass, on the council's recommendation (64 to 66%) and the attending's answers of 2026-11-13:
+
+- The note records what was prescribed; it prints no drug menu and **no dose**. Each medication block prints the behavioral plan, one sentence of reasoning, the fill-ins `RX_FILL` (agent, dose and schedule; titration; planned maximum; tried before and stopped), the dose source `RX_DOSE_SOURCE` (the 2022-2023 Florida Best Practice guideline, confirmed with the attending), class-level safety lines worded so they never imply the child takes a drug, and who continues the medication. A unit case fails if any milligram figure prints in a problem block.
+- Reasoning sentences that describe this clinic's practice say "this clinic" and come from the attending: guanfacine ER or clonidine ER with emotional dysregulation beyond ADHD or a sleep problem; atomoxetine when anxiety co-occurs; sertraline or fluoxetine first for anxiety and depression, early move to duloxetine for depression that is not responding; mirtazapine only after an SSRI with an alpha-2 agonist has not been enough and medical causes are ruled out; sertraline for OCD with referral to the psychiatry OCD clinic and the psychology OCD therapy clinic.
+- Statements printed as done for every patient became fill-ins: `{Boxed warning discussed: yes / no}`, `{provided / not needed, screen negative}`.
+- One melatonin statement (`RX_MELATONIN`) in all three places it appears, with no milligrams: the guideline's ceiling differs for children and adolescents and the tool takes no age in years.
+- The four "Psychiatry co-management" lines and "Psychiatry referral: strongly recommended" are gone; psychiatry is by exception (§7.2 rule 10).
+- Statistics reworded to what their sources say: sibling recurrence ("about 1 in 5"), GI symptoms ("more common", the source is an odds ratio), feeding referral (no "20 foods"), growth ("falling across percentile lines", no fixed BMI percentile).
 
 ### 13.6 Clinical content ledger
 
-Per the clinic's working rule, each clinical statement is marked **reworded** (the note already says it), **attending** (decided by the maintainer on 2026-11-12), or **added** (new in this feature; review before relying on it). Sources are in `docs/references.md` §11. Guideline full texts could not be opened when this was written, so "abstract" means the PubMed abstract was read and nothing more.
+Per the clinic's working rule, each clinical statement is marked **reworded** (the note already says it), **attending** (decided by the maintainer on 2026-11-12 or 2026-11-13), or **added** (new in this feature; review before relying on it). Sources are in `docs/references.md` §11. Guideline full texts could not be opened when this was written, so "abstract" means the PubMed abstract was read and nothing more.
 
 | Row | Status | Basis |
 |---|---|---|
-| `therapyStart` | added: PCP confirms at the next visit. Reworded: case manager, keep calling waitlists | No guideline gives an interval for confirming services started; "next visit" is a visit, not a number |
-| `referrals` | added: PCP confirms. Reworded: genetics owns its own testing | Note's Medical Referrals text |
+| `therapyStart` | added: PCP confirms at the next visit. Reworded: case manager, repeated waitlist calls (the council general pediatrician's wording). Attending: this clinic placed every referral; some need re-sending for insurance | No guideline gives an interval for confirming services started; "next visit" is a visit, not a number |
+| `referrals` | added: PCP confirms. Reworded: genetics owns its own testing. Attending: re-sending | Note's Medical Referrals text |
 | `earlySteps`, `schoolEval` | reworded (third-birthday deadline, 60 days) | Note; `[idea-34cfr300]` |
 | `fdlrs` | reworded, with "Family" as owner added | Note |
 | `gaitRecheck` | reworded | Note §7.10; `[gelfer-2024]` |
@@ -2052,16 +2080,19 @@ Per the clinic's working rule, each clinical statement is marked **reworded** (t
 | `sibling` | reworded (sibling risk), added: screening at 18 and 24 months | `[lipkin-2020]`, abstract |
 | `transition` | reworded; "early adolescence" in place of the note's ages | AAP transition reports, abstract (not yet in references.md because no number from them is printed) |
 | `safety` | added: PCP revisits at well visits | `[hyman-2020]` abstract names wandering; water safety is this clinic's counseling topic |
-| `sleep`, `tSleep` | reworded (4 to 6 weeks, sleep-study signs); behavioral plan then melatonin | Note; `[williams-buckley-2020]`, abstract. No dose printed |
+| `sleepRecheck`, `sleep`, `tSleep` | reworded (4 to 6 weeks, sleep-study signs); behavioral plan then melatonin. "At the dose stated in the plan" relies on the PCP always receiving the full note (attending, 2026-11-13) | Note; `[williams-buckley-2020]`, abstract; `[fl-bhc-2022]` insomnia section. No dose printed |
 | `gi` | reworded | Note ("per GI or PCP guidance") |
-| `growth` | reworded, including the BMI threshold | Note |
-| `adhd`, `tAdhd`, `tPsych` | attending | `[wolraich-2019]` supports PCP management; `[barbaresi-2020]` classes ADHD with autism as complex ADHD needing specialist assessment. The two disagree and the attending chose: PCP continues once stable, treatment failure returns to DBP, psychiatry only for mania, psychosis or complicating substance use |
-| `mood`, `tSuicide` | attending (PCP owns the recheck, using the NIMH ASQ); added: the sentence about the brief suicide safety assessment | `[aguinaldo-2021]`, `[horowitz-2012]`; `[nimh-asq-toolkit]` and `[aap-mh-toolkit-2e]` need verification |
+| `growth` | reworded; the fixed BMI percentile was removed because it misses a fall across percentile lines | Note; council 2026-11-13 |
+| `adhd`, `tAdhd` | attending | `[wolraich-2019]` supports PCP management; `[barbaresi-2020]` classes ADHD with autism as complex ADHD needing specialist assessment. The two disagree and the attending chose: this clinic adjusts until stable, the PCP then prescribes and monitors, treatment failure returns to DBP. Mood or irritability in the monitoring list and the slower-titration sentence: `[rupp-2005]` (more adverse effects with autism) |
+| `mood` | attending (PCP owns the recheck, using the NIMH ASQ and the BSSA after a positive screen). Added, from the council psychiatrist and parent reviewers: the wording for a younger or non-speaking child, and "a negative screen does not override caregiver or clinician concern" | `[aguinaldo-2021]`, `[horowitz-2012]` (age 10); `[nimh-asq-toolkit]` outpatient pathway and BSSA worksheet, read 2026-11-13; `[aap-mh-toolkit-2e]`. No validated screen for a younger or minimally verbal child was found, which is why that sentence asks rather than names a tool |
+| `tSuicide` | attending (BSSA, the 72-hour local options, the CAT team number); reworded from the BSSA worksheet (emergency evaluation; safety plan; lethal means; 72 hours) | `[nimh-asq-toolkit]`. The local services are named as the attending gave them and were not independently checked: confirm names and the CAT number with the clinic before each release |
+| `tPsych` | attending (psychiatry only for mania, psychosis, treatment failure or complicating substance use). Changed 2026-11-13: new mania or psychosis is a same-day evaluation, not a routine referral, and a stimulant is held | AAP ADHD Toolkit ("immediate mental health specialty evaluation" for psychosis), read in the clinic's copy |
+| `tMood` | attending (2026-11-13): not improving comes back to DBP | Clinic policy |
+| `tGdd` | added; now a PCP action at school entry | DSM-5-TR requires reassessment of a GDD diagnosis `[apa-dsm-5-tr-2022]`; read secondhand |
 | `tNewConcern`, `tBehavior`, `tDocs` | attending (chosen as the standing set) | No guideline publishes return-to-DBP criteria; this is clinic policy |
 | `tRegress` | attending (neurology, not DBP) | Consistent with every source found |
-| `tGdd` | added | DSM-5-TR requires reassessment of a GDD diagnosis `[apa-dsm-5-tr-2022]`; read secondhand |
 | `tCatatonia` | reworded | Note's catatonia-history block |
-| Route back (2 years, direct call) | attending | Clinic scheduling policy |
+| Route back (2 years, direct call, the phone number, "not discharged") | attending | Clinic scheduling policy |
 | Standing line | attending chooses it per child | No guideline says routine DBP follow-up is unnecessary, and none sets an interval. `[lipkin-2020]` places chronic condition management in the medical home; `[forrest-2000]` is why owners and the follow-up arrangement are always stated; `[baum-2024]` is why the visits matter. No study has tested hand-back to primary care for access or safety |
 
 ---
@@ -2082,6 +2113,7 @@ Any change to the following files or constructs requires updating this doc **in 
 - `getPron()`, `V3_MAP`, `v3()`, `aOr()`
 - `SEC_TABLE` (adding/removing a collapsed-by-default section, or changing a `content`/`relevant` predicate), `secAutoOpenKeys()`, `setSecOpen()` — the form-section defaults and auto-open rules (§1.5). The markup classes on the section's head and body must change in the same commit (the invariants lane enforces it).
 - `SEL_FIELDS` / `SEL_TYPED` / `SEL_TEMPLATE` / `SEL_SENSITIVE` / `SEL_SUBROWS` / `SEL_ROW_FIELDS` / `SEL_SUBSETS` / `SEL_MENUS` / `SEL_ID_FLAGS`, `encodeSelections()`, `decodeSelections()`, `selPruneOrphans()`, `paintFormFromState()` — export / restore selections (§1.6). The lanes enforce each step: a new `S` property must be classified (unit); a saved field must have a control restore can repaint (invariants K); a new reveal-on-check sub-row needs a `SEL_SUBROWS` predicate and a `SEL_ROW_FIELDS` entry naming the fields inside it (invariants I); any added, removed or renamed field or option must be reconciled with `tests/selections-vocabulary.json` (invariants L), and a removal or rename needs a `SEL_VERSION` bump and a migration first. Then run the browser round trip (`.claude/skills/verify/scripts/roundtrip.js`). **`SEL_TEMPLATE` and `SEL_TYPED` are also restated in plain words for clinicians in three places: the panel hint in `setSelLevel()`, README.md "Save your selections and reuse them", and `docs/branching-logic-for-clinicians.html` "Saving your selections for later".** That list is what a clinician relies on when deciding what is safe to keep, so a field added to or removed from either table must be reflected in all three in the same commit; no lane can read the prose. Example strings in the docs are checked (invariants M).
+- `RX_FILL` / `RX_DOSE_SOURCE` / `RX_BOXED` / `RX_ACTIVATION` / `RX_MELATONIN`, `fuDbpVisit()`, `fuPcpVisit()` — the medication wording and plan-following follow-up lines in the note's problem blocks (§13.5). No dose may be printed: a unit case checks. `PSYCH_REASON_LABELS` / `rulePsychiatry()` — psychiatry by exception (§7.2 rule 10); the section 5 checkboxes and the label map must match (invariants lane).
 - `PCP_DEFS` / `PCP_GROUPS`, `pcpCtx()`, `pcpBuild()`, `pcpFollowUpLines()`, `pcpPruneEdits()`, `rtcVisitPlanned()`, `pcpReturnExpected()` — the primary care list (§13). A row id is a saved value (`pcpOmit`, `pcpFirst`): adding one needs `npm run test:update-selections`; renaming or removing one needs a `SEL_VERSION` bump and a `SEL_MIGRATIONS` entry, exactly like a control value. A change to which selections leave work with this clinic (`pcpCtx().open`) changes when the standing "no routine DBP follow-up" line may print, so update §13.3 and the unit cases with it. New clinical wording in a row goes in the §13.6 ledger as added, reworded or the attending's.
 - `PRESETS` / `MODIFIERS` / `applyPreset()` / `formHasInput()` — the archetype-preset engine (§11.17). Adding, removing, or retuning a preset, or changing how `applyPreset` drives controls, requires re-confirming the cross-preset invariant and updating §11.17.
 

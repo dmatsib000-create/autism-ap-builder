@@ -72,7 +72,6 @@ Recommended IEP/504 accommodations based on current evaluation findings:
       Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
       Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
       Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
-  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: ADHD, anxiety. Behavioral strategies should be maximized prior to and concurrent with any medication.
 
   References (genetics):
     1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
@@ -106,20 +105,14 @@ Assessment:
 
 Plan:
   Treatment is indicated based on the functional impairment documented in the Assessment above.
-  Medication approach in ASD+ADHD differs from standard ADHD care: only ~49% of ASD children respond to methylphenidate (vs. higher rates in non-autistic ADHD); adverse effect rates are higher. Non-stimulants, particularly guanfacine ER, have RCT support in ASD and may be preferred as first-line agents in many patients.
-  • Non-stimulants (consider first-line in ASD):
-    - Guanfacine ER: start 1 mg daily; increase by 1 mg/week to maximum 4 mg/day. Has RCT evidence in ASD (50% positive response; also benefits irritability, anxiety, sleep, tics). Additional benefit if sleep or anxiety co-occurring.
-    - Clonidine ER: start 0.1 mg at night; increase weekly by 0.1 mg to maximum 0.4 mg/day. More sedating than guanfacine; useful if sleep-onset is a target.
-    - Atomoxetine: start 0.5 mg/kg/day; titrate to 1.2–1.4 mg/kg/day (max 100 mg/day). Black box warning: suicidal ideation; monitor closely.
-  • Stimulants (if non-stimulant insufficient or not tolerated):
-    - Methylphenidate IR: start 2.5 mg AM; increase by 2.5 mg every 5–7 days. Maximum 35 mg/day (≤25 kg) or 60 mg/day (>25 kg).
-    - Amphetamine salts IR: start 2.5 mg; maximum 40 mg/day (or 60 mg/day if >50 kg). No RCTs in ASD; extrapolated from ADHD data.
-    - ER formulations preferred once effective IR dose established.
-  • Cardiac screening before initiation (history and exam; ECG if indicated).
-  • Monitor at each titration step: appetite, weight/growth, sleep onset, mood/irritability, and stereotypy. Note: ASD patients are less likely to self-report adverse effects; behavioral change is the signal.
-  • Vanderbilt or Conners Rating Scales (teacher and parent forms) at each titration visit to quantify response.
   • IEP/504 accommodations (extended time, preferential seating, chunked assignments) regardless of medication status.
-  • Psychiatry co-management for medication management; via existing referral or new referral if not already placed.
+  Medication reasoning: Stimulants remain the first choice for ADHD (AAP 2019). In autistic children the response to methylphenidate is lower (49% of 72 children in one trial) and side effects stop treatment more often. This clinic considers guanfacine ER or clonidine ER when emotional dysregulation goes beyond ADHD alone or sleep is a problem, and atomoxetine when anxiety co-occurs.
+  • Medication: {agent, dose and schedule started today, or reason deferred}. Titration: {step and interval}. Planned maximum: {dose}. Tried before and stopped: {none / agent and reason}.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • Before starting: cardiac history and examination; ECG if risk factors.
+  • At each visit: height, weight, pulse, blood pressure, appetite, sleep, and mood or irritability; parent and teacher rating scales (Vanderbilt or Conners) at each dose change. Autistic children are less likely to report side effects themselves; a change in behavior is the signal.
+  • If guanfacine or clonidine is used, it is tapered, never stopped abruptly. If atomoxetine is used, it carries a boxed warning for suicidal thinking.
+  • This clinic adjusts the dose until it is stable; primary care then continues the medication. Return to this clinic if symptoms remain impairing at the planned maximum, or if the medication is not tolerated.
 
 RETURN TO CLINIC
 Return to clinic in 6 months.

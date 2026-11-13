@@ -89,6 +89,13 @@ check('SW reasons (SW_REASON_LABELS vs note-prose swLbls)',
 check('SW reasons (SW_REASON_LABELS vs §8 HTML checkboxes)',
   diff('SW_REASON_LABELS', swLabelKeys, '§8 HTML', swHtmlKeys));
 
+// Psychiatry referral reasons: the section 5 checkboxes vs PSYCH_REASON_LABELS. A checkbox
+// with no label would turn the referral on and print no reason for it.
+const psychLabelKeys = flatObjectKeys(balancedAfter('const PSYCH_REASON_LABELS='));
+const psychHtmlKeys = [...html.matchAll(/data-key="psychReasons"\s+value="([^"]+)"/g)].map(m => m[1]);
+check('Psychiatry reasons (PSYCH_REASON_LABELS vs section 5 checkboxes)',
+  diff('PSYCH_REASON_LABELS', psychLabelKeys, 'section 5 HTML', psychHtmlKeys));
+
 // ── B. Override registry: OV_DEFS / OV_GROUPS / S.overrides agree ────────────
 // Accept either quote style on the key (key:'x' or key:"x"). A single-quote-only
 // match would make a future double-quoted entry invisible here — a false NEGATIVE

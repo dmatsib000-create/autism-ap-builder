@@ -1,19 +1,19 @@
-RECOMMENDATIONS FOR PRIMARY CARE
+RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)
+
+DBP follow-up:
+  • No routine DBP follow-up is planned. The child has not been discharged and can return as needed. We are glad to see the child and family again for any reason listed under "Re-refer to DBP if". Thank you for continuing this child's care.
+  • To come back: within 2 years of the last visit here, the family or primary care can call our clinic directly at (352) 265-8250; no new referral is needed. After 2 years, or if the child has been dismissed from our clinic, please send a new referral.
 
 Actions:
-  • PCP (next visit): Confirm that ABA, speech-language therapy, PCIT, and a social skills group have started. If not, the family should ask the insurance case manager for in-network providers and keep calling the waitlists.
-  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and pediatric gastroenterology. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
+  • PCP (next visit): Confirm that ABA, speech-language therapy, parent-child interaction therapy (PCIT), and a social skills group have started. If not, ask where the family is on each waitlist and point them to the insurance case manager for in-network providers; waitlists often need repeated calls.
+  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and pediatric gastroenterology. Our clinic placed every referral; some insurance plans need one re-sent from primary care. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
   • Family (now): Send the school district a written request for a special education evaluation. The district must evaluate within 60 days of written consent.
+  • PCP (in 4 to 6 weeks): Recheck sleep. Continue the behavioral sleep plan, with melatonin at the dose stated in the plan. Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.
   • PCP (well visits): Watch the development of younger siblings closely, with autism screening at the 18- and 24-month visits and early referral for any concern. Autism is more likely in siblings.
   • PCP (well visits): Revisit wandering and water-safety precautions with the family.
 
-Primary care can monitor and manage (no routine DBP follow-up needed for these):
-  • Sleep: Continue the behavioral sleep plan, with melatonin as outlined in the plan, and reassess in 4 to 6 weeks. Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.
+Primary care manages:
   • GI symptoms: Treat constipation in primary care with polyethylene glycol dosed by weight. A change in behavior or sleep may be the only sign of abdominal pain.
-
-DBP follow-up:
-  • No routine DBP follow-up is needed. Thank you for continuing this child's care. Primary care follows from here, and we are always glad to see the family again for any of the changes listed below.
-  • To come back: within 2 years of the last visit here, please call our clinic directly at {clinic phone number}; no new referral is needed. After 2 years, or if the child has been discharged from our clinic, please send a new referral.
 
 Re-refer to DBP if:
   • A new developmental, learning, attention, or mood concern needs diagnostic evaluation.
@@ -21,5 +21,5 @@ Re-refer to DBP if:
   • Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.
   • Sleep problems persist after the behavioral plan and a melatonin trial.
 
-Refer directly to another service if:
+Urgent, or for another service:
   • Language, social, or motor skills the child already had are lost: refer to pediatric neurology.

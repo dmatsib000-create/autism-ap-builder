@@ -925,6 +925,10 @@
    "type": "flag",
    "values": []
   },
+  "pcpNotDiscussed": {
+   "type": "flag",
+   "values": []
+  },
   "pcpOmit": {
    "type": "many",
    "values": [
@@ -933,6 +937,9 @@
     "earlySteps",
     "fdlrs",
     "schoolEval",
+    "sleepRecheck",
+    "mood",
+    "tGdd",
     "gaitRecheck",
     "eeg",
     "labs",
@@ -943,17 +950,16 @@
     "gi",
     "growth",
     "adhd",
-    "mood",
     "tNewConcern",
     "tBehavior",
     "tDocs",
-    "tGdd",
     "tSleep",
     "tAdhd",
-    "tRegress",
-    "tCatatonia",
+    "tMood",
+    "tSuicide",
     "tPsych",
-    "tSuicide"
+    "tRegress",
+    "tCatatonia"
    ]
   },
   "pcpFirst": {
@@ -964,6 +970,9 @@
     "earlySteps",
     "fdlrs",
     "schoolEval",
+    "sleepRecheck",
+    "mood",
+    "tGdd",
     "gaitRecheck",
     "eeg",
     "labs",
@@ -974,17 +983,25 @@
     "gi",
     "growth",
     "adhd",
-    "mood",
     "tNewConcern",
     "tBehavior",
     "tDocs",
-    "tGdd",
     "tSleep",
     "tAdhd",
-    "tRegress",
-    "tCatatonia",
+    "tMood",
+    "tSuicide",
     "tPsych",
-    "tSuicide"
+    "tRegress",
+    "tCatatonia"
+   ]
+  },
+  "psychReasons": {
+   "type": "many",
+   "values": [
+    "mania_psychosis",
+    "treatment_failure",
+    "substance_use",
+    "safety"
    ]
   }
  }
