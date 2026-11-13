@@ -2025,7 +2025,7 @@ With plan `dbp` the line is "DBP follow-up continues, with a return visit [inter
 
 **Route back.** Whenever routine visits stop, a second line states this clinic's rule (attending, 2026-11-12): within 2 years of the last visit the family or PCP calls the clinic directly and no new referral is needed; after 2 years, or if the child was dismissed from the clinic, a new referral is required. The clinic's number is printed (`PCP_CLINIC_PHONE`, supplied by the attending on 2026-11-13); a clinic number is not PHI. The wording is "dismissed", the attending's word, and is separate from "no routine follow-up", which is not a dismissal.
 
-**Typed interval.** `rtcVisitPlanned()` is true when the Return to Clinic box holds anything other than blank, "as needed" or "prn". It is the same test the gait recheck already used, now shared. A typed value changes the wording of the output but is never saved, so a restored string comes back without it (the standing line then prints if nothing else is open).
+**Typed interval.** `rtcVisitPlanned()` is true when the Return to Clinic box holds anything other than blank or *only* "as needed" / "PRN" (optionally "only", a period, or "p.r.n."). The match is anchored: "6 months, sooner PRN" names a 6-month visit and prints as typed. An unanchored match once rewrote such entries to "as needed" and dropped the visit from both the note and the list. The note, the list and the gait recheck share this one test. A typed value changes the wording of the output but is never saved, so a restored string comes back without it (the standing line then prints if nothing else is open).
 
 ### 13.4 Editing, and how edits survive a rebuild
 
@@ -2048,7 +2048,7 @@ Existing lines read `dbpFollowUp`, so the note cannot contradict the list. With 
 
 | Line | With a plan chosen |
 |---|---|
-| `RETURN TO CLINIC` | Plan `pcp` and no return expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop. A typed "as needed" or "prn" prints "Return to clinic as needed." (it used to print "Return to clinic in as needed.") |
+| `RETURN TO CLINIC` | Plan `pcp` and no return expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop. A typed "as needed" or "PRN" on its own prints "Return to clinic as needed." (it used to print "Return to clinic in as needed."); an interval followed by "as needed" or "PRN" prints as typed |
 | Gait recheck (§7.10) | Plan `pcp`: "at the next well visit with primary care" in place of the `{primary care or this clinic}` stop |
 | Depression plan | Plan `pcp`: "Mood and safety recheck in 4 to 6 weeks with primary care." in place of "Shortened return-to-clinic interval: 4 to 6 weeks." |
 | Who continues ADHD, anxiety and depression medication (`rxOwner()`) | Plan `pcp`: the hand-back sentence ("primary care then continues the medication" / "once the dose is stable, primary care can continue it", with when to return). Plan `dbp` **or no plan**: "This clinic prescribes and adjusts this medication." Handing medication to primary care is a disposition, so nothing about it prints unless the clinician chose the hand-back. The OCD and sleep blocks carry no such sentence. A unit case fails if any problem block mentions primary care when the plan is not `pcp` |

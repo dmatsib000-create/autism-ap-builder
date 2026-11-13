@@ -4701,7 +4701,7 @@ function generateNote() {
   // "No routine DBP follow-up" with nothing left open and no visit typed is a complete
   // answer, so say it instead of leaving an {interval} stop for the clinician to delete.
   if(S.dbpFollowUp==='pcp'&&!pcpReturnExpected(pcpCtx())) L.push('No routine return visit is scheduled'+(S.pcpInNote?' (see Recommendations for Primary Care for when and how to return)':'')+'.');
-  else L.push(!S.rtcInterval?'Return to clinic: {interval}':rtcVisitPlanned()?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic as needed.');
+  else L.push(!S.rtcInterval.trim()?'Return to clinic: {interval}':rtcVisitPlanned()?`Return to clinic in ${S.rtcInterval.trim()}.`:'Return to clinic as needed.');
   L.push('');
 
   L.push('────────────────────────────────────────────────────────');
@@ -4870,8 +4870,10 @@ function fuPcpVisit(dflt){ return S.dbpFollowUp==='pcp'?'Primary care reassesses
 // and was not verified: docs/branching-logic.md §13.6 and docs/references.md §11.
 const PCP_THERAPY_NAMES={aba:'ABA',slp:'speech-language therapy',ot:'occupational therapy',pt:'physical therapy',pcit:'parent-child interaction therapy (PCIT)',psychotherapy:'psychotherapy',socialSkills:'a social skills group'};
 const PCP_REFERRAL_NAMES={genetics:'clinical genetics',audiology:'audiology',neurology:'pediatric neurology',psychiatry:'child psychiatry',gi:'pediatric gastroenterology',sleep_ref:'a sleep study'};
-// The clinician's own Return to Clinic text names a visit unless it is blank or "as needed".
-function rtcVisitPlanned(){ const rtc=(S.rtcInterval||'').trim(); return !!rtc&&!/as needed|prn/i.test(rtc); }
+// The clinician's own Return to Clinic text names a visit unless it is blank or ONLY "as
+// needed" / "PRN". Anchored on purpose: "6 months, sooner PRN" names a 6-month visit, and an
+// unanchored match once rewrote it to "as needed" and dropped the visit from note and list.
+function rtcVisitPlanned(){ const rtc=(S.rtcInterval||'').trim(); return !!rtc&&!/^(?:as needed|p\.?r\.?n\.?)(?: only)?\.?$/i.test(rtc); }
 // PURE (reads S only). The facts the rows share, worked out once per build.
 function pcpCtx(){
   const inPlan=(...ks)=>ks.some(k=>S.comorbid.has(k)&&S.comorbidInPlan.has(k));

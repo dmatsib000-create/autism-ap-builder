@@ -109,6 +109,8 @@ const EXPORTS = [
   'pcpPruneEdits',
   'generatePCPPlain',
   'generatePCPHTML',
+  // Whether the typed Return to Clinic text names a visit; note, list and gait recheck share it.
+  'rtcVisitPlanned',
 ];
 
 function extractScript(html) {

@@ -691,6 +691,25 @@ const CASES = [
               a.S.diagStatus='confirmed'; a.S.comorbid.add('adhd_suspected'); a.S.comorbidInPlan.add('adhd_suspected');
               assert.ok(line().includes('one return visit to complete the ADHD evaluation'));
               a.S.rtcInterval='2 months'; assert.ok(line().includes('one return visit in 2 months to complete the ADHD evaluation')); } },
+  { name: 'return interval: "as needed" or "PRN" after a real interval keeps the interval',
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; },
+    check(a){ const rtc=()=>{const m=a.generateNote().main.split('\n');return m[m.indexOf('RETURN TO CLINIC')+1];};
+              // No plan chosen: the note prints the clinician's words, as it did before the list.
+              for(const t of ['6 months, sooner PRN','3 months or sooner as needed','1 year prn']){
+                a.S.rtcInterval=t; assert.equal(a.rtcVisitPlanned(), true, t);
+                assert.equal(rtc(), 'Return to clinic in '+t+'.'); }
+              for(const t of ['as needed','PRN','prn.','P.R.N.','As needed only']){
+                a.S.rtcInterval=t; assert.equal(a.rtcVisitPlanned(), false, t);
+                assert.equal(rtc(), 'Return to clinic as needed.'); }
+              a.S.rtcInterval='   '; assert.equal(rtc(), 'Return to clinic: {interval}');
+              // DBP follow-up continues: note and list name the same visit.
+              a.S.dbpFollowUp='dbp'; a.S.rtcInterval='3 months or sooner as needed';
+              assert.equal(rtc(), 'Return to clinic in 3 months or sooner as needed.');
+              assert.ok(a.pcpBuild().followUp[0].includes('with a return visit in 3 months or sooner as needed.'));
+              // Hand-back: a typed visit is kept, not replaced by "no routine return visit".
+              a.S.dbpFollowUp='pcp'; a.S.rtcInterval='6 months, sooner prn';
+              assert.equal(rtc(), 'Return to clinic in 6 months, sooner prn.');
+              assert.ok(a.pcpBuild().followUp[0].startsWith('DBP follow-up is limited to one return visit in 6 months, sooner prn')); } },
   { name: 'pcp: the wording follows the age band ("patient" from adolescence on)',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; },
     check(a){ const b=a.pcpBuild();
