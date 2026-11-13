@@ -4525,9 +4525,10 @@ function generateNote() {
     L.push('    -Screen-free period of at least 60 minutes before target bedtime');
     L.push('    -Stimulus control: bed used only for sleep, not play or screens');
     L.push('  • '+RX_MELATONIN);
-    // "No other sleep medication has been studied": [williams-buckley-2020]. Short-term use,
+    // Melatonin is the only medication the AAN autism sleep guideline makes a recommendation
+    // for [williams-buckley-2020] (clinician summary read 2026-11-13). Short-term use,
     // the taper, and the not-recommended list were read in the Florida guideline (insomnia).
-    if(S.diagStatus==='confirmed') L.push('  • No other sleep medication has been studied in autistic children (AAN 2020); further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.');
+    if(S.diagStatus==='confirmed') L.push('  • Melatonin is the only sleep medication the AAN autism sleep guideline (2020) recommends; further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.');
     else L.push('  • Further sleep medication is an attending decision, for short-term use alongside the behavioral plan (Florida Best Practice guideline, Level 3). Started today: {none / drug, dose, timing}. If clonidine is started, it is tapered, never stopped abruptly.');
     L.push('  • '+RX_DOSE_SOURCE);
     L.push('  • Not recommended as sleep aids (Florida Best Practice guideline): benzodiazepines, zolpidem, amitriptyline, doxepin, and antipsychotic medication.');
@@ -4826,7 +4827,9 @@ const RX_DOSE_SOURCE='Doses follow the 2022-2023 Florida Best Practice Psychothe
 const RX_BOXED='All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.';
 const RX_ACTIVATION='If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.';
 // Timing and pharmaceutical-grade advice were read in the Florida guideline (insomnia,
-// Level 2). No milligrams: its child and adolescent ceilings differ and the tool takes no age.
+// Level 2) and in the AAN summary. No milligrams: the Florida table caps children at 3 mg
+// and adolescents at 10 mg, the AAN caps autistic children at 10 mg, and the attending's
+// rule is that the dose comes from the Florida guideline, so the clinician types it.
 const RX_MELATONIN='Melatonin as an adjunct to the behavioral plan, not a replacement: low starting dose, 30 to 60 minutes before the target bedtime, adjusted to response. Dose advised today: {dose, or melatonin not started}. Pharmaceutical-grade product advised.';
 // Follow-up lines in the problem blocks follow the plan, in the same two classes the
 // primary care list uses (pcpCtx().open = work that stays with this clinic). With no plan

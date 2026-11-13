@@ -72,7 +72,7 @@ Plan:
     - Screen-free period of at least 60 minutes before target bedtime
     - Stimulus control: bed used only for sleep, not play or screens
   • Melatonin as an adjunct to the behavioral plan, not a replacement: low starting dose, 30 to 60 minutes before the target bedtime, adjusted to response. Dose advised today: {dose, or melatonin not started}. Pharmaceutical-grade product advised.
-  • No other sleep medication has been studied in autistic children (AAN 2020); further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.
+  • Melatonin is the only sleep medication the AAN autism sleep guideline (2020) recommends; further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.
   • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
   • Not recommended as sleep aids (Florida Best Practice guideline): benzodiazepines, zolpidem, amitriptyline, doxepin, and antipsychotic medication.
   • Re-evaluate sleep in 4 to 6 weeks.
