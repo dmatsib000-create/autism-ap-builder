@@ -653,7 +653,7 @@ const CASES = [
               assert.deepEqual(b.groups.act.rows, []); assert.deepEqual(b.groups.manage.rows, []);
               assert.deepEqual(b.groups.refer.rows.map(r=>r.id), ['tNewConcern','tBehavior','tDocs']);
               // Loss of skills is sent to neurology, not back to this clinic.
-              assert.deepEqual(b.groups.other.rows.map(r=>[r.id,r.text]), [['tRegress','Language, social, or motor skills the child already had are lost: refer to pediatric neurology.']]);
+              assert.deepEqual(b.groups.other.rows.map(r=>[r.id,r.text]), [['tRegress','The child loses language, social, or motor skills they already had: refer to pediatric neurology.']]);
               // No row may simply restate the diagnosis.
               for(const g of Object.values(b.groups)) for(const r of g.rows) assert.ok(!/autism spectrum disorder/i.test(r.text), r.id); } },
   { name: 'pcp: the list reaches the note only once a follow-up plan is chosen, and can be switched off',
@@ -672,25 +672,25 @@ const CASES = [
   { name: 'pcp: follow-up line is the standing line only when nothing is left with this clinic',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; S.dbpFollowUp='pcp'; },
     check(a){ const lines=()=>a.pcpBuild().followUp, line=()=>lines()[0];
-              const route='To come back: within 2 years of the last visit here, the family or primary care can call our clinic directly at (352) 265-8250; no new referral is needed. After 2 years, or if the child has been dismissed from our clinic, please send a new referral.';
-              assert.deepEqual(lines(), ['No routine DBP follow-up is planned. The child has not been discharged and can return as needed. We are glad to see the child and family again for any reason listed under "Re-refer to DBP if". Thank you for continuing this child\'s care.', route]);
+              const route='How to come back: within 2 years of the last visit, the family or your office can call us directly at (352) 265-8250. No new referral is needed. After 2 years, or if the child was dismissed from our clinic, please send a new referral.';
+              assert.deepEqual(lines(), ['No routine DBP visits are planned; you can follow the child with the plan below. This is not a discharge: the child remains in our care and can return as needed. We are glad to see the child and family again for any reason listed under "Re-refer to DBP if". Thank you for caring for this child.', route]);
               // A typed return interval is a visit, so the standing line gives way to it.
               a.S.rtcInterval='6 months';
-              assert.equal(line(), 'DBP follow-up is limited to one return visit in 6 months {purpose of the return visit}. No routine DBP follow-up is planned after that visit. The child has not been discharged and can return as needed.');
+              assert.equal(line(), 'We will see the child for one more visit in 6 months {purpose of the return visit}. After that visit, no routine DBP visits are planned. This is not a discharge: the child remains in our care and can return as needed.');
               assert.equal(lines()[1], route, 'the way back is stated whenever routine visits stop');
-              a.S.rtcInterval='as needed'; assert.ok(line().startsWith('No routine DBP follow-up is planned.'));
+              a.S.rtcInterval='as needed'; assert.ok(line().startsWith('No routine DBP visits are planned;'));
               // Open work in the form overrides it and names what the visit is for.
               a.S.rtcInterval=''; a.S.teacherMaterials.add('srs2');
-              assert.ok(line().startsWith('DBP follow-up is limited to one return visit to review the rating forms requested from school. No routine DBP follow-up is planned after that visit'));
+              assert.ok(line().startsWith('We will see the child for one more visit to review the rating forms requested from school. After that visit, no routine DBP visits are planned'));
               assert.ok(a.generateNote().main.includes('Return to clinic: {interval}'), 'a visit is owed, so the interval stop stays');
-              a.S.teacherMaterialsReturned.add('srs2'); assert.ok(line().startsWith('No routine DBP follow-up is planned.'));
+              a.S.teacherMaterialsReturned.add('srs2'); assert.ok(line().startsWith('No routine DBP visits are planned;'));
               // An unfinished diagnostic evaluation is never handed back, and nothing is promised
               // about follow-up after it (attending, 2026-11-13).
               a.S.diagStatus='suspected';
-              assert.deepEqual(lines(), ["DBP will see the child again in {interval} to complete the autism diagnostic evaluation. The follow-up plan after that visit will be stated in that visit's note."]);
+              assert.deepEqual(lines(), ["We will see the child again in {interval} to complete the autism diagnostic evaluation. We will send the follow-up plan in that visit's note."]);
               a.S.diagStatus='confirmed'; a.S.comorbid.add('adhd_suspected'); a.S.comorbidInPlan.add('adhd_suspected');
-              assert.ok(line().includes('one return visit to complete the ADHD evaluation'));
-              a.S.rtcInterval='2 months'; assert.ok(line().includes('one return visit in 2 months to complete the ADHD evaluation')); } },
+              assert.ok(line().includes('one more visit to complete the ADHD evaluation'));
+              a.S.rtcInterval='2 months'; assert.ok(line().includes('one more visit in 2 months to complete the ADHD evaluation')); } },
   { name: 'return interval: "as needed" or "PRN" after a real interval keeps the interval',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; },
     check(a){ const rtc=()=>{const m=a.generateNote().main.split('\n');return m[m.indexOf('RETURN TO CLINIC')+1];};
@@ -705,22 +705,22 @@ const CASES = [
               // DBP follow-up continues: note and list name the same visit.
               a.S.dbpFollowUp='dbp'; a.S.rtcInterval='3 months or sooner as needed';
               assert.equal(rtc(), 'Return to clinic in 3 months or sooner as needed.');
-              assert.ok(a.pcpBuild().followUp[0].includes('with a return visit in 3 months or sooner as needed.'));
+              assert.ok(a.pcpBuild().followUp[0].includes('next in 3 months or sooner as needed.'));
               // Hand-back: a typed visit is kept, not replaced by "no routine return visit".
               a.S.dbpFollowUp='pcp'; a.S.rtcInterval='6 months, sooner prn';
               assert.equal(rtc(), 'Return to clinic in 6 months, sooner prn.');
-              assert.ok(a.pcpBuild().followUp[0].startsWith('DBP follow-up is limited to one return visit in 6 months, sooner prn')); } },
+              assert.ok(a.pcpBuild().followUp[0].startsWith('We will see the child for one more visit in 6 months, sooner prn')); } },
   { name: 'pcp: the wording follows the age band ("patient" from adolescence on)',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; },
     check(a){ const b=a.pcpBuild();
-              assert.ok(b.followUp[0].includes("this patient's care")); assert.ok(b.followUp[1].includes('if the patient has been dismissed'));
-              assert.ok(b.groups.other.rows[0].text.includes('skills the patient already had')); } },
+              assert.ok(b.followUp[0].includes('Thank you for caring for this patient.')); assert.ok(b.followUp[1].includes('if the patient was dismissed'));
+              assert.ok(b.groups.other.rows[0].text.includes('The patient loses language, social, or motor skills they already had')); } },
   { name: 'pcp: a depression plan is handed to primary care with a suicide-risk screen, and does not force a DBP visit',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; S.comorbid.add('depression'); S.comorbidInPlan.add('depression'); },
     check(a){ const b=a.pcpBuild();
-              assert.ok(b.followUp[0].startsWith('No routine DBP follow-up is planned.'));
+              assert.ok(b.followUp[0].startsWith('No routine DBP visits are planned;'));
               const mood=b.groups.act.rows.find(r=>r.id==='mood').text;
-              assert.ok(mood.startsWith('PCP (in 4 to 6 weeks, sooner if mood worsens): Recheck mood and safety.')); assert.ok(mood.includes('NIMH ASQ'));
+              assert.ok(mood.startsWith('PCP (in 4 to 6 weeks, sooner if mood worsens): Recheck mood and safety with the ASQ')); assert.ok(mood.includes('NIMH ASQ toolkit'));
               assert.ok(mood.includes('Brief Suicide Safety Assessment (BSSA) before the patient leaves'));
               assert.deepEqual(b.groups.other.rows.map(r=>r.id), ['tSuicide','tPsych','tRegress'], 'the suicide line is read first');
               // The note's own depression plan must not promise a clinic return the plan denies.
@@ -734,9 +734,9 @@ const CASES = [
   { name: 'pcp: confirmed ADHD in the plan hands stable medication to primary care; suspected ADHD stays with DBP',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; S.dbpFollowUp='pcp'; S.comorbid.add('adhd_combined'); S.comorbidInPlan.add('adhd_combined'); },
     check(a){ const b=a.pcpBuild();
-              assert.ok(b.groups.manage.rows.find(r=>r.id==='adhd').text.startsWith('ADHD medication: Our clinic adjusts the dose until it is stable. Primary care prescribes and monitors from {now, or the date DBP confirms a stable dose}.'));
+              assert.ok(b.groups.manage.rows.find(r=>r.id==='adhd').text.startsWith('ADHD medication: We adjust the dose until it is stable. You take over prescribing from {now, or the date DBP confirms a stable dose}.'));
               assert.ok(b.groups.refer.rows.some(r=>r.id==='tAdhd')); assert.ok(b.groups.other.rows.some(r=>r.id==='tPsych'));
-              assert.ok(b.followUp[0].startsWith('No routine DBP follow-up is planned.'));
+              assert.ok(b.followUp[0].startsWith('No routine DBP visits are planned;'));
               a.S.comorbid.delete('adhd_combined'); a.S.comorbidInPlan.delete('adhd_combined');
               a.S.comorbid.add('adhd_suspected'); a.S.comorbidInPlan.add('adhd_suspected');
               const b2=a.pcpBuild();
@@ -745,9 +745,9 @@ const CASES = [
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; },
     check(a){ assert.deepEqual(a.pcpBuild().followUp, ['{DBP follow-up plan: no routine DBP follow-up, or a return visit and its purpose}']);
               a.S.dbpFollowUp='dbp';
-              assert.deepEqual(a.pcpBuild().followUp, ["DBP follow-up continues, with a return visit {interval}. Thank you for sharing this child's care; primary care manages the items in this list between DBP visits."]);
+              assert.deepEqual(a.pcpBuild().followUp, ["We will keep seeing the child, next {interval}. Between our visits, you manage the items in this list. Thank you for sharing this child's care."]);
               assert.equal(a.pcpBuild().groups.refer.label, 'Contact DBP before the return visit if:');
-              a.S.rtcInterval='6 months'; assert.ok(a.pcpBuild().followUp[0].includes('with a return visit in 6 months.'));
+              a.S.rtcInterval='6 months'; assert.ok(a.pcpBuild().followUp[0].includes('next in 6 months.'));
               a.S.dbpFollowUp='pcp'; a.S.rtcInterval=''; assert.equal(a.pcpBuild().groups.refer.label, 'Re-refer to DBP if:'); } },
   { name: 'pcp: rows follow the selections that drive them',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; S.needsComm.add('expressive'); },
@@ -797,7 +797,7 @@ const CASES = [
               const plain=a.generatePCPPlain(), rich=a.generatePCPHTML(false), view=a.generatePCPHTML(true);
               assert.ok(!plain.includes('Self-injury')); assert.ok(!rich.includes('Self-injury'));
               assert.ok(view.includes('Self-injury'), 'the workspace still shows a left-out line so it can be put back');
-              assert.ok(plain.indexOf('Sleep problems persist')<plain.indexOf('Updated diagnostic testing'));
+              assert.ok(plain.indexOf('Sleep problems continue')<plain.indexOf('School, insurance, disability services'));
               // Same lines on every surface (plain copy, Word copy, the note).
               for(const s of a.pcpSections()) for(const t of s.items){
                 assert.ok(plain.includes('  • '+t), 'plain: '+t); assert.ok(rich.includes(t.replace(/&/g,'&amp;')), 'rich: '+t);
@@ -807,8 +807,8 @@ const CASES = [
     check(a){ ['tRegress','tNewConcern','tBehavior','tDocs'].forEach(k=>a.S.pcpOmit.add(k));
               const secs=a.pcpSections();
               assert.deepEqual(secs.map(s=>s.label), ['DBP follow-up:']);
-              assert.equal(secs[0].items[0], "No routine DBP follow-up is planned. The child has not been discharged and can return as needed. We are glad to see the child and family again whenever the need arises. Thank you for continuing this child's care.");
-              assert.ok(secs[0].items[1].startsWith('To come back:')); } },
+              assert.equal(secs[0].items[0], "No routine DBP visits are planned; you can follow the child with the plan below. This is not a discharge: the child remains in our care and can return as needed. We are glad to see the child and family again whenever the need arises. Thank you for caring for this child.");
+              assert.ok(secs[0].items[1].startsWith('How to come back:')); } },
   { name: 'pcp: the suicide line prints for any medication-treated problem and cannot be left out while the mood recheck prints',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; S.comorbid.add('adhd_combined'); S.comorbidInPlan.add('adhd_combined'); },
     check(a){ const other=()=>a.pcpBuild().groups.other.rows, kept=()=>a.pcpBuild().kept('other').map(r=>r.id);
@@ -823,10 +823,10 @@ const CASES = [
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='preschool'; S.dbpFollowUp='pcp'; ['anxiety','sleep_disorder'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); S.specifiers.add('withGDD'); },
     check(a){ const g=()=>a.pcpBuild().groups, text=(k,id)=>g()[k].rows.find(r=>r.id===id).text;
               assert.equal(text('refer','tMood'), 'Anxiety is not improving with treatment, or is worsening.');
-              assert.ok(text('act','sleepRecheck').startsWith('PCP (in 4 to 6 weeks): Recheck sleep.'));
+              assert.ok(text('act','sleepRecheck').startsWith('PCP (in 4 to 6 weeks): Ask how sleep is going.'));
               assert.ok(!g().manage.rows.some(r=>r.id==='sleep'), 'the sleep line prints once, as the action');
-              assert.ok(text('act','tGdd').startsWith('PCP (at school entry): Confirm that cognitive and adaptive testing has been repeated through the school'));
-              a.S.specifiers.delete('withGDD'); a.S.specifiers.add('withSuspectedGDD'); assert.ok(text('act','tGdd').includes('has been completed through the school'));
+              assert.ok(text('act','tGdd').startsWith('PCP (at school entry): Global developmental delay is a provisional diagnosis, so it needs retesting. Check that the school has repeated cognitive and adaptive testing'));
+              a.S.specifiers.delete('withGDD'); a.S.specifiers.add('withSuspectedGDD'); assert.ok(text('act','tGdd').includes('the school has completed cognitive and adaptive testing'));
               a.S.comorbidInPlan.delete('sleep_disorder'); assert.ok(g().manage.rows.some(r=>r.id==='sleep')); assert.ok(!g().act.rows.some(r=>r.id==='sleepRecheck')); } },
   { name: 'pcp: only the exception is recorded when the plan was not discussed with the family',
     setup(S){ S.diagStatus='confirmed'; S.dbpFollowUp='pcp'; },
@@ -836,17 +836,17 @@ const CASES = [
   { name: 'pcp: a medication started or changed today keeps one DBP return visit',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; ['adhd_combined','depression'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); },
     check(a){ const line=()=>a.pcpBuild().followUp[0], rtc=()=>{const m=a.generateNote().main.split('\n');return m[m.indexOf('RETURN TO CLINIC')+1];};
-              assert.ok(line().startsWith('No routine DBP follow-up is planned.'), 'unticked: a stable dose is handed back');
+              assert.ok(line().startsWith('No routine DBP visits are planned;'), 'unticked: a stable dose is handed back');
               assert.equal(rtc(), 'No routine return visit is scheduled (see Recommendations for Primary Care for when and how to return).');
               a.S.rxStartedToday=true;
-              assert.equal(line(), 'DBP follow-up is limited to one return visit to adjust the medication started or changed today until the dose is stable. No routine DBP follow-up is planned after that visit. The patient has not been discharged and can return as needed.');
+              assert.equal(line(), 'We will see the patient for one more visit to adjust the medication started or changed today until the dose is stable. After that visit, no routine DBP visits are planned. This is not a discharge: the patient remains in our care and can return as needed.');
               assert.equal(rtc(), 'Return to clinic: {interval}', 'a titration visit is owed, so the interval stop stays');
-              a.S.rtcInterval='4 weeks'; assert.ok(line().startsWith('DBP follow-up is limited to one return visit in 4 weeks to adjust the medication'));
+              a.S.rtcInterval='4 weeks'; assert.ok(line().startsWith('We will see the patient for one more visit in 4 weeks to adjust the medication'));
               // Under DBP follow-up the visit names the titration as one of its purposes.
               a.S.dbpFollowUp='dbp'; assert.ok(line().includes('recheck mood and safety, and adjust the medication started or changed today until the dose is stable'), line());
               // With no medication block in the plan the box changes nothing.
               a.S.dbpFollowUp='pcp'; a.S.rtcInterval=''; a.S.comorbidInPlan.clear();
-              assert.ok(line().startsWith('No routine DBP follow-up is planned.')); } },
+              assert.ok(line().startsWith('No routine DBP visits are planned;')); } },
   { name: 'note: psychiatry is referred by exception, with the reason stated',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; ['adhd_combined','anxiety','depression'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); },
     check(a){ const m=()=>a.generateNote().main;

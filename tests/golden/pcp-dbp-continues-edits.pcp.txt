@@ -1,21 +1,25 @@
 RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)
 
 DBP follow-up:
-  • DBP follow-up continues, with a return visit in 3 months to recheck mood and safety. Thank you for sharing this patient's care; primary care manages the items in this list between DBP visits.
+  • We will keep seeing the patient, next in 3 months to recheck mood and safety. Between our visits, you manage the items in this list. Thank you for sharing this patient's care.
 
 Actions:
-  • PCP (next visit): Confirm that ABA, speech-language therapy, psychotherapy, and a social skills group have started. If not, ask where the family is on each waitlist and point them to the insurance case manager for in-network providers; waitlists often need repeated calls.
-  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and child psychiatry. Our clinic placed every referral; some insurance plans need one re-sent from primary care. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
-  • PCP (now): Start health care transition planning with the family: adult providers, decision-making supports, and benefits.
+  • PCP (next visit): Ask whether ABA, speech-language therapy, psychotherapy, and a social skills group have started. If not, ask where the family is on each waitlist. The insurance case manager can find in-network providers, and families often have to call a waitlist more than once.
+  • PCP (next visit): Check that these referrals are scheduled or done: clinical genetics and child psychiatry. We placed every referral. Some insurance plans want the referral to come from primary care; if so, please re-send it. You do not need to order genetic testing: clinical genetics orders it and follows up the results.
+  • PCP (now): Start planning the move to adult health care with the family: adult doctors, support for decision-making, and benefits.
   • PCP (next visit): Recheck weight after the medication change
   • Family: Bring the school progress report to the next visit
 
 Contact DBP before the return visit if:
-  • Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.
-  • A new developmental, learning, attention, or mood concern needs diagnostic evaluation.
+  • School, insurance, disability services, or the move to adult care needs updated diagnostic testing or documentation.
+  • A new developmental, learning, attention, or mood concern needs a diagnostic evaluation.
   • Depression or anxiety is not improving with treatment, or is worsening.
 
 Urgent, or for another service:
-  • Suicidal intent, a plan, or an attempt: emergency evaluation the same day. Suicidal thoughts without intent or a plan: complete the ASQ Brief Suicide Safety Assessment at that visit, make a written safety plan with the patient and family, and ask the family to lock up firearms and medications. When the assessment calls for mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a rapid intake, age 11 and older); or a Community Action Treatment (CAT) team for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt). The family can call or text 988 at any time.
-  • New mania or psychosis: mental health evaluation the same day (emergency department if none is available). Substance use that complicates treatment: tell child psychiatry promptly.
-  • Language, social, or motor skills the patient already had are lost: refer to pediatric neurology.
+  • If suicidal thoughts come up:
+      - Intent, a plan, or an attempt: arrange an emergency evaluation the same day.
+      - Thoughts without intent or a plan: do the BSSA at that visit. Make a written safety plan with the patient and family, and ask the family to lock up firearms and medications.
+      - If the BSSA calls for a mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a quick intake, age 11 and older); or a Community Action Treatment (CAT) team, for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt).
+      - Give every patient who screens positive the toolkit's patient resource list. The family can call or text 988 at any time.
+  • New mania or psychosis: arrange a mental health evaluation the same day (the emergency department if none is available). Substance use that complicates treatment: tell child psychiatry promptly.
+  • The patient loses language, social, or motor skills they already had: refer to pediatric neurology.

@@ -82,14 +82,14 @@ Evidence-based, parent-mediated intervention improving the parent-child relation
 ── Recommendations for Primary Care ──
 
 DBP follow-up:
-  • DBP will see the child again in 3 months to complete the autism diagnostic evaluation. The follow-up plan after that visit will be stated in that visit's note.
+  • We will see the child again in 3 months to complete the autism diagnostic evaluation. We will send the follow-up plan in that visit's note.
 
 Actions:
-  • PCP (next visit): Confirm that speech-language therapy and parent-child interaction therapy (PCIT) have started. If not, ask where the family is on each waitlist and point them to the insurance case manager for in-network providers; waitlists often need repeated calls. Our clinic placed every referral; some insurance plans need one re-sent from primary care.
-  • PCP and family (now): Confirm that the Florida Early Steps (Part C) referral has been submitted. Eligibility must be established before the third birthday.
+  • PCP (next visit): Ask whether speech-language therapy and parent-child interaction therapy (PCIT) have started. If not, ask where the family is on each waitlist. The insurance case manager can find in-network providers, and families often have to call a waitlist more than once. We placed every referral. Some insurance plans want the referral to come from primary care; if so, please re-send it.
+  • PCP and family (now): Check that the Florida Early Steps (Part C) referral was sent. Early Steps has to find the child eligible before the third birthday, so it cannot wait.
 
 Urgent, or for another service:
-  • Language, social, or motor skills the child already had are lost: refer to pediatric neurology.
+  • The child loses language, social, or motor skills they already had: refer to pediatric neurology.
 
 RETURN TO CLINIC
 Return to clinic in 3 months.

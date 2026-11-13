@@ -141,30 +141,39 @@ Plan:
 ── Recommendations for Primary Care ──
 
 DBP follow-up:
-  • No routine DBP follow-up is planned. The patient has not been discharged and can return as needed. We are glad to see the patient and family again for any reason listed under "Re-refer to DBP if". Thank you for continuing this patient's care.
-  • To come back: within 2 years of the last visit here, the family or primary care can call our clinic directly at (352) 265-8250; no new referral is needed. After 2 years, or if the patient has been dismissed from our clinic, please send a new referral.
+  • No routine DBP visits are planned; you can follow the patient with the plan below. This is not a discharge: the patient remains in our care and can return as needed. We are glad to see the patient and family again for any reason listed under "Re-refer to DBP if". Thank you for caring for this patient.
+  • How to come back: within 2 years of the last visit, the family or your office can call us directly at (352) 265-8250. No new referral is needed. After 2 years, or if the patient was dismissed from our clinic, please send a new referral.
   • This follow-up plan was not discussed with the family at the visit: {how and when the family will be told}.
 
 Actions:
-  • PCP (next visit): Confirm that ABA, speech-language therapy, psychotherapy, and a social skills group have started. If not, ask where the family is on each waitlist and point them to the insurance case manager for in-network providers; waitlists often need repeated calls.
-  • PCP (next visit): Confirm that these referrals are scheduled or completed: clinical genetics and child psychiatry. Our clinic placed every referral; some insurance plans need one re-sent from primary care. Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.
-  • PCP (in 4 to 6 weeks, sooner if mood worsens): Recheck mood and safety. Screen for suicide risk with the NIMH ASQ (Ask Suicide-Screening Questions, validated from age 10). For a younger child, or one who does not use speech to answer, ask the child in plain, concrete words in the way the child communicates, and ask the caregiver what has changed. A negative screen does not override caregiver or clinician concern. If the screen is positive, complete the ASQ Brief Suicide Safety Assessment (BSSA) before the patient leaves, following the NIMH pathway for outpatient primary care and specialty clinics, then follow the suicide line under "Urgent, or for another service". Primary care does this recheck even if the psychiatry visit has not yet happened.
-  • PCP (now): Start health care transition planning with the family: adult providers, decision-making supports, and benefits.
+  • PCP (next visit): Ask whether ABA, speech-language therapy, psychotherapy, and a social skills group have started. If not, ask where the family is on each waitlist. The insurance case manager can find in-network providers, and families often have to call a waitlist more than once.
+  • PCP (next visit): Check that these referrals are scheduled or done: clinical genetics and child psychiatry. We placed every referral. Some insurance plans want the referral to come from primary care; if so, please re-send it. You do not need to order genetic testing: clinical genetics orders it and follows up the results.
+  • PCP (in 4 to 6 weeks, sooner if mood worsens): Recheck mood and safety with the ASQ (Ask Suicide-Screening Questions). NIMH made this screen for medical clinics; the free NIMH ASQ toolkit (search "NIMH ASQ toolkit") has the questions, a script, and a worksheet for each step.
+      1. For a patient 10 or older, ask the 4 yes/no questions, ideally with the parent out of the room. It takes about 20 seconds.
+      2. If every answer is no, the screen is negative. Still act on your own concern or the caregiver's; a negative screen does not outweigh it.
+      3. If any answer is yes, do the Brief Suicide Safety Assessment (BSSA) before the patient leaves. It takes about 10 to 15 minutes, and the toolkit worksheet walks you through it. Then follow "If suicidal thoughts come up" under "Urgent, or for another service".
+      For a younger child, or one who does not use speech to answer, ask about safety in plain, concrete words, in the way the child communicates, and ask the caregiver what has changed.
+      Do this recheck even if the psychiatry visit has not happened yet.
+  • PCP (now): Start planning the move to adult health care with the family: adult doctors, support for decision-making, and benefits.
 
 Primary care manages:
-  • ADHD medication: Our clinic adjusts the dose until it is stable. Primary care prescribes and monitors from {now, or the date DBP confirms a stable dose}. Check height, weight, blood pressure, heart rate, sleep, appetite, and mood or irritability at each medication visit. Children with autism have more stimulant side effects than children with ADHD alone, so any later dose change is made slowly.
+  • ADHD medication: We adjust the dose until it is stable. You take over prescribing from {now, or the date DBP confirms a stable dose}. At each medication visit, check height, weight, blood pressure, heart rate, sleep, appetite, and mood or irritability. Children with autism get more stimulant side effects than children with ADHD alone, so make any later dose change slowly.
 
 Re-refer to DBP if:
-  • A new developmental, learning, attention, or mood concern needs diagnostic evaluation.
-  • Self-injury, aggression, or unsafe behavior persists despite the current supports, or medication for behavior is being considered.
-  • Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.
-  • ADHD symptoms remain impairing despite treatment.
+  • A new developmental, learning, attention, or mood concern needs a diagnostic evaluation.
+  • Self-injury, aggression, or unsafe behavior continues despite current supports, or you are considering medication for behavior.
+  • School, insurance, disability services, or the move to adult care needs updated diagnostic testing or documentation.
+  • ADHD symptoms still get in the way despite treatment.
   • Depression is not improving with treatment, or is worsening.
 
 Urgent, or for another service:
-  • Suicidal intent, a plan, or an attempt: emergency evaluation the same day. Suicidal thoughts without intent or a plan: complete the ASQ Brief Suicide Safety Assessment at that visit, make a written safety plan with the patient and family, and ask the family to lock up firearms and medications. When the assessment calls for mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a rapid intake, age 11 and older); or a Community Action Treatment (CAT) team for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt). The family can call or text 988 at any time.
-  • New mania or psychosis: mental health evaluation the same day (emergency department if none is available), and hold any stimulant until then. Substance use that complicates treatment: tell child psychiatry promptly.
-  • Language, social, or motor skills the patient already had are lost: refer to pediatric neurology.
+  • If suicidal thoughts come up:
+      - Intent, a plan, or an attempt: arrange an emergency evaluation the same day.
+      - Thoughts without intent or a plan: do the BSSA at that visit. Make a written safety plan with the patient and family, and ask the family to lock up firearms and medications.
+      - If the BSSA calls for a mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a quick intake, age 11 and older); or a Community Action Treatment (CAT) team, for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt).
+      - Give every patient who screens positive the toolkit's patient resource list. The family can call or text 988 at any time.
+  • New mania or psychosis: arrange a mental health evaluation the same day (the emergency department if none is available), and hold any stimulant until then. Substance use that complicates treatment: tell child psychiatry promptly.
+  • The patient loses language, social, or motor skills they already had: refer to pediatric neurology.
 
 RETURN TO CLINIC
 No routine return visit is scheduled (see Recommendations for Primary Care for when and how to return).

@@ -4936,99 +4936,103 @@ const PCP_GROUPS=[
 function pcpReturnExpected(c){ return S.dbpFollowUp==='dbp'||(S.dbpFollowUp==='pcp'&&(rtcVisitPlanned()||c.open.length>0)); }
 // This clinic places every referral itself; some plans still want it sent from the PCP
 // (attending, 2026-11-13).
-const PCP_RESEND=' Our clinic placed every referral; some insurance plans need one re-sent from primary care.';
+const PCP_RESEND=' We placed every referral. Some insurance plans want the referral to come from primary care; if so, please re-send it.';
 const PCP_DEFS=[
   {id:'therapyStart',group:'act',owner:'PCP',when:'next visit',
     on:c=>c.therapies.length>0,
-    text:c=>'Confirm that '+andList(c.therapies.map(k=>PCP_THERAPY_NAMES[k]))+' '+(c.therapies.length>1?'have':'has')+' started. If not, ask where the family is on '+(c.therapies.length>1?'each waitlist':'the waitlist')+' and point them to the insurance case manager for in-network providers; waitlists often need repeated calls.'+(c.referrals.length?'':PCP_RESEND)},
+    text:c=>'Ask whether '+andList(c.therapies.map(k=>PCP_THERAPY_NAMES[k]))+' '+(c.therapies.length>1?'have':'has')+' started. If not, ask where the family is on '+(c.therapies.length>1?'each waitlist':'the waitlist')+'. The insurance case manager can find in-network providers, and families often have to call a waitlist more than once.'+(c.referrals.length?'':PCP_RESEND)},
   {id:'referrals',group:'act',owner:'PCP',when:'next visit',
     on:c=>c.referrals.length>0,
-    text:c=>'Confirm that '+(c.referrals.length>1?'these referrals are':'this referral is')+' scheduled or completed: '+andList(c.referrals)+'.'+PCP_RESEND
-      +(c.genetics?' Clinical genetics orders and follows the genetic testing, so none needs to be ordered in primary care.':'')
+    text:c=>'Check that '+(c.referrals.length>1?'these referrals are':'this referral is')+' scheduled or done: '+andList(c.referrals)+'.'+PCP_RESEND
+      +(c.genetics?' You do not need to order genetic testing: clinical genetics orders it and follows up the results.':'')
       +(c.urgentNeuro?' The neurology referral is urgent because skills are being lost now.':'')},
   {id:'earlySteps',group:'act',owner:'PCP and family',when:'now',
     on:()=>referralIncluded('earlySteps'),
-    text:()=>'Confirm that the Florida Early Steps (Part C) referral has been submitted. Eligibility must be established before the third birthday.'},
+    text:()=>'Check that the Florida Early Steps (Part C) referral was sent. Early Steps has to find the child eligible before the third birthday, so it cannot wait.'},
   {id:'fdlrs',group:'act',owner:'Family',when:'now',
     on:()=>referralIncluded('fdlrs'),
-    text:()=>'Contact FDLRS Child Find for a preschool evaluation and IEP planning through the school district.'},
+    text:()=>'Call FDLRS Child Find to ask for a preschool evaluation and IEP planning through the school district.'},
   {id:'schoolEval',group:'act',owner:'Family',when:'now',
     on:()=>isPartBAge()&&(S.schoolDoc==='iep_needed'||(S.schoolDoc==='neither'&&!['privateNoIEP','privateWithIEP'].includes(S.schoolPlacement))),
-    text:()=>'Send the school district a written request for a special education evaluation.'+(S.schoolDoc==='iep_needed'?' The district must evaluate within 60 days of written consent.':'')},
+    text:()=>'Ask the school district in writing for a special education evaluation.'+(S.schoolDoc==='iep_needed'?' Once the family signs consent, the district has 60 days to evaluate.':'')},
   // The two rechecks that carry a clock are actions, so the PCP finds them where tasks are
   // looked for. The sleep clock comes from the note's own sleep-disorder plan, so a sleep
   // concern that is not a problem in the plan stays under "manage" with no clock.
   {id:'sleepRecheck',group:'act',owner:'PCP',when:'in 4 to 6 weeks',
     on:c=>c.sleepInPlan,
-    text:()=>'Recheck sleep. Continue the behavioral sleep plan, with melatonin at the dose stated in the plan.'+(referralIncluded('sleep_ref')?'':' Arrange a sleep study if snoring, pauses in breathing, or restless sleep appear.')},
+    text:()=>'Ask how sleep is going. Keep the behavioral sleep plan going, with melatonin at the dose in our plan.'+(referralIncluded('sleep_ref')?'':' If snoring, pauses in breathing, or restless sleep appear, order a sleep study.')},
   // The screen is the NIMH ASQ, validated in primary care and outpatient specialty clinics
   // from age 10 [aguinaldo-2021] [horowitz-2012]. What follows a positive screen is the NIMH
   // outpatient pathway [nimh-asq-toolkit]; the triage itself is stated once, in tSuicide.
   {id:'mood',group:'act',owner:'PCP',when:'in 4 to 6 weeks, sooner if mood worsens',
     on:c=>c.moodRow,
-    text:c=>'Recheck mood and safety. Screen for suicide risk with the NIMH ASQ (Ask Suicide-Screening Questions, validated from age 10). For a younger child, or one who does not use speech to answer, ask the child in plain, concrete words in the way the child communicates, and ask the caregiver what has changed. A negative screen does not override caregiver or clinician concern. If the screen is positive, complete the ASQ Brief Suicide Safety Assessment (BSSA) before the patient leaves, following the NIMH pathway for outpatient primary care and specialty clinics, then follow the suicide line under "Urgent, or for another service".'
-      +(c.psychRef?' Primary care does this recheck even if the psychiatry visit has not yet happened.':'')},
+    text:c=>'Recheck mood and safety with the ASQ (Ask Suicide-Screening Questions). NIMH made this screen for medical clinics; the free NIMH ASQ toolkit (search "NIMH ASQ toolkit") has the questions, a script, and a worksheet for each step.'
+      +'\n1. For a patient 10 or older, ask the 4 yes/no questions, ideally with the parent out of the room. It takes about 20 seconds.'
+      +'\n2. If every answer is no, the screen is negative. Still act on your own concern or the caregiver\'s; a negative screen does not outweigh it.'
+      +'\n3. If any answer is yes, do the Brief Suicide Safety Assessment (BSSA) before the patient leaves. It takes about 10 to 15 minutes, and the toolkit worksheet walks you through it. Then follow "If suicidal thoughts come up" under "Urgent, or for another service".'
+      +'\nFor a younger child, or one who does not use speech to answer, ask about safety in plain, concrete words, in the way the child communicates, and ask the caregiver what has changed.'
+      +(c.psychRef?'\nDo this recheck even if the psychiatry visit has not happened yet.':'')},
   // id kept from when this was a re-referral trigger (ids are saved values). "Repeated" for
   // a child already tested, "completed" where delay is only suspected and may never have been.
   {id:'tGdd',group:'act',owner:'PCP',when:'at school entry',
     on:()=>S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD'),
-    text:()=>'Confirm that cognitive and adaptive testing has been '+(S.specifiers.has('withGDD')?'repeated':'completed')+' through the school, and re-refer to DBP if it has not. Global developmental delay is a provisional diagnosis.'},
+    text:()=>'Global developmental delay is a provisional diagnosis, so it needs retesting. Check that the school has '+(S.specifiers.has('withGDD')?'repeated':'completed')+' cognitive and adaptive testing; if not, re-refer to DBP.'},
   // Printed only where the note itself sends the recheck to primary care: no return visit
   // typed, and DBP follow-up not continuing (the note then leaves the owner as a fill-in).
   {id:'gaitRecheck',group:'act',owner:'PCP',when:'next well visit, no later than 12 months',
     keep:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp',
     on:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp'&&!rtcVisitPlanned(),
-    text:()=>'Recheck ankle range (knee straight and bent) and gait. Refer to PT if the ankle no longer reaches neutral with the knee straight, or if pain, falls, or functional impact develops.'},
+    text:()=>'Check how far the ankle bends up, with the knee straight and with it bent, and watch the child walk. Refer to physical therapy if the ankle no longer reaches neutral with the knee straight, or if pain, falls, or trouble with daily activities develop.'},
   {id:'eeg',group:'act',owner:'DBP',
     on:()=>referralIncluded('eeg'),
-    text:()=>'Will review the EEG ordered at this visit and refer to pediatric neurology if it is abnormal.'},
+    text:()=>'We will review the EEG ordered at this visit and refer to pediatric neurology if it is abnormal. Nothing is needed from you.'},
   {id:'labs',group:'act',owner:'DBP',
     keep:()=>true,
     on:()=>!!S.labsOrdered.trim(),
-    text:()=>'Will review the results of the labs and studies ordered at this visit and act on them.'},
+    text:()=>'We will review the labs and studies ordered at this visit and act on the results. Nothing is needed from you.'},
   {id:'sibling',group:'act',owner:'PCP',when:'well visits',
     on:()=>S.ag.has('sibling'),
-    text:()=>'Watch the development of younger siblings closely, with autism screening at the 18- and 24-month visits and early referral for any concern. Autism is more likely in siblings.'},
+    text:()=>'Autism is more likely in younger siblings. Screen them for autism at the 18- and 24-month visits, and refer early for any concern.'},
   {id:'transition',group:'act',owner:'PCP',when:()=>isTeenPlus()?'now':'starting in early adolescence',
     on:()=>S.ag.has('transition'),
-    text:()=>'Start health care transition planning with the family: adult providers, decision-making supports, and benefits.'},
+    text:()=>'Start planning the move to adult health care with the family: adult doctors, support for decision-making, and benefits.'},
   {id:'safety',group:'act',owner:'PCP',when:'well visits',
     on:()=>S.safety.has('elopement_counsel')||S.safety.has('water_counsel'),
-    text:()=>'Revisit '+andList([S.safety.has('elopement_counsel')&&'wandering',S.safety.has('water_counsel')&&'water-safety'].filter(Boolean))+' precautions with the family.'},
+    text:()=>'Ask the family how their '+andList([S.safety.has('elopement_counsel')&&'wandering',S.safety.has('water_counsel')&&'water-safety'].filter(Boolean))+' precautions are working.'},
 
   {id:'sleep',group:'manage',
     on:c=>c.sleep&&!c.sleepInPlan,
-    text:()=>'Sleep: Continue the behavioral sleep plan. Low-dose melatonin can be used alongside it.'},
+    text:()=>'Sleep: Keep the behavioral sleep plan going. Low-dose melatonin can be added alongside it.'},
   {id:'gi',group:'manage',
     on:c=>c.inPlan('gi'),
-    text:()=>'GI symptoms: Treat constipation in primary care with polyethylene glycol dosed by weight. A change in behavior or sleep may be the only sign of abdominal pain.'},
+    text:()=>'GI symptoms: Treat constipation with polyethylene glycol dosed by weight. In this child, a change in behavior or sleep may be the only sign of abdominal pain.'},
   {id:'growth',group:'manage',
     on:c=>c.feedingDx||c.feedingSuspected,
     text:c=>c.feedingDx
-      ?'Feeding and growth: Check weight, height, and BMI at every visit. Escalate to the feeding team or GI for weight loss, or for weight or BMI falling across percentile lines.'
-      :'Feeding and growth: Check weight and height at the next visit while the feeding evaluation is pending, and escalate urgently if growth falters.'},
+      ?'Feeding and growth: Check weight, height, and BMI at every visit. Contact the feeding team or GI if weight drops, or if weight or BMI falls across percentile lines.'
+      :'Feeding and growth: While the feeding evaluation is pending, check weight and height at the next visit. If growth falters, escalate urgently.'},
   // This clinic adjusts the dose until it is stable (attending, 2026-11-13). The tool cannot
   // know whether that has happened, so the start of primary care prescribing is a fill-in.
   {id:'adhd',group:'manage',
     on:c=>c.adhdRx,
-    text:()=>'ADHD medication: Our clinic adjusts the dose until it is stable. Primary care prescribes and monitors from {now, or the date DBP confirms a stable dose}. Check height, weight, blood pressure, heart rate, sleep, appetite, and mood or irritability at each medication visit.'
-      +(S.diagStatus==='confirmed'?' Children with autism have more stimulant side effects than children with ADHD alone, so any later dose change is made slowly.':'')},
+    text:()=>'ADHD medication: We adjust the dose until it is stable. You take over prescribing from {now, or the date DBP confirms a stable dose}. At each medication visit, check height, weight, blood pressure, heart rate, sleep, appetite, and mood or irritability.'
+      +(S.diagStatus==='confirmed'?' Children with autism get more stimulant side effects than children with ADHD alone, so make any later dose change slowly.':'')},
 
   {id:'tNewConcern',group:'refer',
     on:()=>S.diagStatus==='confirmed',
-    text:()=>'A new developmental, learning, attention, or mood concern needs diagnostic evaluation.'},
+    text:()=>'A new developmental, learning, attention, or mood concern needs a diagnostic evaluation.'},
   {id:'tBehavior',group:'refer',
     on:()=>S.diagStatus==='confirmed',
-    text:()=>'Self-injury, aggression, or unsafe behavior persists despite the current supports, or medication for behavior is being considered.'},
+    text:()=>'Self-injury, aggression, or unsafe behavior continues despite current supports, or you are considering medication for behavior.'},
   {id:'tDocs',group:'refer',
     on:()=>S.diagStatus==='confirmed',
-    text:()=>'Updated diagnostic testing or documentation is required for school, insurance, disability services, or the move to adult care.'},
+    text:()=>'School, insurance, disability services, or the move to adult care needs updated diagnostic testing or documentation.'},
   {id:'tSleep',group:'refer',
     on:c=>c.sleep,
-    text:()=>'Sleep problems persist after the behavioral plan and a melatonin trial.'},
+    text:()=>'Sleep problems continue after the behavioral plan and a melatonin trial.'},
   {id:'tAdhd',group:'refer',
     on:c=>c.adhdRx,
-    text:()=>'ADHD symptoms remain impairing despite treatment.'},
+    text:()=>'ADHD symptoms still get in the way despite treatment.'},
   // Not improving in primary care comes back here, not to psychiatry (attending, 2026-11-13).
   {id:'tMood',group:'refer',
     on:c=>c.depression||c.anxiety,
@@ -5042,21 +5046,25 @@ const PCP_DEFS=[
   {id:'tSuicide',group:'other',
     lock:c=>c.moodRow&&!S.pcpOmit.has('mood'),
     on:c=>c.psychRx,
-    text:()=>'Suicidal intent, a plan, or an attempt: emergency evaluation the same day. Suicidal thoughts without intent or a plan: complete the ASQ Brief Suicide Safety Assessment at that visit, make a written safety plan with the patient and family, and ask the family to lock up firearms and medications. When the assessment calls for mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a rapid intake, age 11 and older); or a Community Action Treatment (CAT) team for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt). The family can call or text 988 at any time.'},
+    text:()=>'If suicidal thoughts come up:'
+      +'\n- Intent, a plan, or an attempt: arrange an emergency evaluation the same day.'
+      +'\n- Thoughts without intent or a plan: do the BSSA at that visit. Make a written safety plan with the patient and family, and ask the family to lock up firearms and medications.'
+      +'\n- If the BSSA calls for a mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a quick intake, age 11 and older); or a Community Action Treatment (CAT) team, for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt).'
+      +'\n- Give every patient who screens positive the toolkit\'s patient resource list. The family can call or text 988 at any time.'},
   // This clinic brings psychiatry in only for these (attending, 2026-11-12); a poor
   // response to treatment comes back to DBP first (tAdhd, tMood, tNewConcern).
   {id:'tPsych',group:'other',
     on:c=>c.psychRx,
-    text:c=>'New mania or psychosis: mental health evaluation the same day (emergency department if none is available)'+(c.adhdRx?', and hold any stimulant until then':'')+'. Substance use that complicates treatment: '+(c.psychRef?'tell child psychiatry promptly.':'refer to child psychiatry.')},
+    text:c=>'New mania or psychosis: arrange a mental health evaluation the same day (the emergency department if none is available)'+(c.adhdRx?', and hold any stimulant until then':'')+'. Substance use that complicates treatment: '+(c.psychRef?'tell child psychiatry promptly.':'refer to child psychiatry.')},
   // Loss of skills goes to neurology, not back here (attending decision 2026-11-12; the
   // guideline sources name neurology as the destination too).
   {id:'tRegress',group:'other',
     on:()=>!!S.diagStatus,
-    text:c=>(S.developmentalRegression?'Further language, social, or motor skills are lost: ':'Language, social, or motor skills the '+c.who+' already had are lost: ')
+    text:c=>(S.developmentalRegression?'More language, social, or motor skills are lost: ':'The '+c.who+' loses language, social, or motor skills they already had: ')
       +(referralIncluded('neurology')?'tell pediatric neurology promptly.':'refer to pediatric neurology.')},
   {id:'tCatatonia',group:'other',
     on:()=>S.comorbid.has('catatonia_history'),
-    text:()=>'New slowing, freezing, posturing, or loss of speech appears (possible catatonia): contact psychiatry the same day.'},
+    text:()=>'New slowing, freezing, posturing, or loss of speech (possible catatonia): contact psychiatry the same day.'},
 ];
 // The follow-up lines are the rows that cannot be left out: the list must always say
 // whether this clinic expects to see the child again, and how to come back. It is a mix on purpose. The standing
@@ -5071,20 +5079,20 @@ function pcpFollowUpLines(c,hasRefer){
   // How to come back once routine visits stop. The two-year rule is this clinic's
   // scheduling policy (attending, 2026-11-12). "No routine follow-up" is not a discharge:
   // the child stays a patient and returns as needed (attending, 2026-11-13).
-  const route='To come back: within 2 years of the last visit here, the family or primary care can call our clinic directly at '+PCP_CLINIC_PHONE+'; no new referral is needed. After 2 years, or if the '+c.who+' has been dismissed from our clinic, please send a new referral.';
+  const route='How to come back: within 2 years of the last visit, the family or your office can call us directly at '+PCP_CLINIC_PHONE+'. No new referral is needed. After 2 years, or if the '+c.who+' was dismissed from our clinic, please send a new referral.';
   // The plan is discussed with the family at the visit; only the exception is recorded
   // (attending, 2026-11-13), so no "discussed" attestation prints for every patient.
   const told=S.pcpNotDiscussed?['This follow-up plan was not discussed with the family at the visit: {how and when the family will be told}.']:[];
   if(S.dbpFollowUp==='pcp'){
-    const remains='The '+c.who+' has not been discharged and can return as needed.';
-    if(!pcpReturnExpected(c)) return ['No routine DBP follow-up is planned. '+remains+' We are glad to see '+fam+' again '+(hasRefer?'for any reason listed under "Re-refer to DBP if".':'whenever the need arises.')+' Thank you for continuing this '+c.who+'\'s care.',route,...told];
+    const remains='This is not a discharge: the '+c.who+' remains in our care and can return as needed.';
+    if(!pcpReturnExpected(c)) return ['No routine DBP visits are planned; you can follow the '+c.who+' with the plan below. '+remains+' We are glad to see '+fam+' again '+(hasRefer?'for any reason listed under "Re-refer to DBP if".':'whenever the need arises.')+' Thank you for caring for this '+c.who+'.',route,...told];
     // An unfinished diagnostic evaluation stays here, and the plan after it is not promised
     // before a diagnosis exists.
-    if(c.evalOpen) return ['DBP will see the '+c.who+' again '+(planned?'in '+rtc:'in {interval}')+what+'. The follow-up plan after that visit will be stated in that visit\'s note.',...told];
-    return ['DBP follow-up is limited to one return visit'+(planned?' in '+rtc:'')+(what||' {purpose of the return visit}')+'. No routine DBP follow-up is planned after that visit. '+remains,route,...told];
+    if(c.evalOpen) return ['We will see the '+c.who+' again '+(planned?'in '+rtc:'in {interval}')+what+'. We will send the follow-up plan in that visit\'s note.',...told];
+    return ['We will see the '+c.who+' for one more visit'+(planned?' in '+rtc:'')+(what||' {purpose of the return visit}')+'. After that visit, no routine DBP visits are planned. '+remains,route,...told];
   }
   if(S.dbpFollowUp==='dbp')
-    return ['DBP follow-up continues, with a return visit '+(planned?'in '+rtc:rtc||'{interval}')+what+'. Thank you for sharing this '+c.who+'\'s care; primary care manages the items in this list between DBP visits.'];
+    return ['We will keep seeing the '+c.who+', next '+(planned?'in '+rtc:rtc||'{interval}')+what+'. Between our visits, you manage the items in this list. Thank you for sharing this '+c.who+'\'s care.'];
   return ['{DBP follow-up plan: no routine DBP follow-up, or a return visit and its purpose}'];
 }
 // One per typed line, as typed; a pasted bullet mark is dropped so it does not print twice.
@@ -5124,7 +5132,9 @@ function pcpSections(){
 }
 function pcpSectionLines(){
   const L=[];
-  pcpSections().forEach(s=>{L.push('');L.push(s.label);s.items.forEach(t=>L.push('  • '+t));});
+  // A row's later lines (numbered steps, sub-points) print as 6-space continuations, which the
+  // rich note keeps inside the bullet; see generateRichHTML.
+  pcpSections().forEach(s=>{L.push('');L.push(s.label);s.items.forEach(t=>{const [h,...rest]=t.split('\n');L.push('  • '+h);rest.forEach(r=>L.push('      '+r));});});
   return L;
 }
 // The list is part of the note once a follow-up plan is chosen (and the clinician has not
@@ -5135,6 +5145,8 @@ function generatePCPPlain(){
   if(pcpBuild().empty) return '';
   return ['RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)',...pcpSectionLines()].join('\n');
 }
+// A row may carry steps on later lines (a newline in its text); each prints as its own indented line.
+function pcpLinesHtml(t,fmt){ const [h,...rest]=String(t).split('\n'); return fmt(h)+rest.map(r=>'<span style="display:block;padding-left:1.1em;margin-top:2px">'+fmt(r)+'</span>').join(''); }
 // isPreview=true: the workspace (every row, with its leave-out and move-up controls).
 // isPreview=false: clipboard HTML for Word (kept rows only, inline styles, no controls).
 function generatePCPHTML(isPreview){
@@ -5144,11 +5156,11 @@ function generatePCPHTML(isPreview){
     return '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.6;color:#1f2937;max-width:820px">'
       +'<p style="font-weight:bold;font-size:12pt;margin:0 0 6px">Recommendations for Primary Care from Developmental-Behavioral Pediatrics (DBP)</p>'
       +pcpSections().map(s=>'<p style="font-weight:bold;margin:10px 0 3px">'+e(s.label)+'</p><ul style="margin:3px 0 3px 18px;padding:0">'
-        +s.items.map(t=>'<li style="margin-bottom:3px">'+e(t)+'</li>').join('')+'</ul>').join('')
+        +s.items.map(t=>'<li style="margin-bottom:3px">'+pcpLinesHtml(t,e)+'</li>').join('')+'</ul>').join('')
       +'</div>';
   }
   if(b.empty) return '<div class="note-empty">Nothing selected so far produces a recommendation for primary care.<br><br><small>Choose a DBP follow-up plan in section 10, or keep filling in the form.</small></div>';
-  const ph=t=>phSpan(e(t),'aba-ph');
+  const ph=t=>pcpLinesHtml(t,x=>phSpan(e(x),'aba-ph'));
   const row=r=>{
     if(r.typed) return '<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="You typed this line in section 10. Edit it there.">typed</span></span><span class="pcp-text">'+ph(r.text)+'</span></li>';
     return '<li class="pcp-row'+(r.omitted?' is-omitted':'')+'"><span class="pcp-ctl">'
