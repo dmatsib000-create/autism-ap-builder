@@ -1714,6 +1714,8 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
           <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="dbp">DBP follow-up continues</label>
         </div>
         <div class="field-hint" style="margin:5px 0 0;font-size:var(--text-11);color:var(--gray-500)">Choosing a plan finishes the primary care list and adds it to the note. With "No routine DBP follow-up", anything in the form that still needs this clinic (testing to finish, forms to review) is named as the one reason to return.</div>
+        <label class="cb-row" style="margin:8px 0 0"><input type="checkbox" id="rxStartedTodayCb"> Medication started or dose changed today</label>
+        <div class="field-hint" style="margin:2px 0 0 22px;font-size:var(--text-11);color:var(--gray-500)">For ADHD, anxiety, depression or OCD medication in the plan. This clinic adjusts the dose until it is stable, so the list keeps one return visit for that instead of handing the child back now.</div>
       </div>
       <div class="field-group">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
@@ -1916,6 +1918,9 @@ function initialState(){ return {
   // chosen and pcpInNote is on. pcpOmit / pcpFirst hold PCP_DEFS row ids the clinician left
   // out or moved up (pcpFirst in click order). pcpExtra is typed, one line per row.
   dbpFollowUp:'', pcpInNote:true, pcpNotDiscussed:false, pcpOmit:new Set(), pcpFirst:new Set(), pcpExtra:'',
+  // A medication was started or its dose changed at this visit. The note's medication blocks
+  // say this clinic adjusts the dose until stable, so that titration is open work (pcpCtx).
+  rxStartedToday:false,
   // Why psychiatry is involved (see rulePsychiatry). Any entry turns the referral on.
   psychReasons:new Set(),
   specifiers:new Set(),
@@ -4897,6 +4902,12 @@ function pcpCtx(){
   // While DBP follow-up continues, the note's depression plan keeps its own shortened
   // return, so the recheck stays here; under a hand-back it is the PCP's ("mood" row).
   if(S.dbpFollowUp==='dbp'&&inPlan('depression')) open.push('recheck mood and safety');
+  // The medication blocks say this clinic adjusts the dose until it is stable (rxOwner), so a
+  // medication started or changed today keeps one return visit even under a hand-back
+  // (maintainer decision, 2026-11-12). Counted only while a medication block prints; a stable dose is
+  // still the PCP's (the "adhd" manage row).
+  const psychRx=hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')||inPlan('anxiety','depression','ocd');
+  if(S.rxStartedToday&&psychRx) open.push('adjust the medication started or changed today until the dose is stable');
   // Not in this list on purpose (attending decisions, 2026-11-12): the sleep recheck, the
   // mood and safety recheck after a depression plan, constipation, growth checks, and ADHD
   // medication at a stable dose are handed to primary care.
@@ -4907,7 +4918,7 @@ function pcpCtx(){
     depression,anxiety,psychRef:referralIncluded('psychiatry'),
     // The mood recheck names the PCP as owner, so it exists only once the hand-back is chosen.
     moodRow:depression&&S.dbpFollowUp==='pcp',
-    psychRx:hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')||inPlan('anxiety','depression','ocd'),
+    psychRx,
     genetics:referralIncluded('genetics'),
     urgentNeuro:referralIncluded('neurology')&&S.developmentalRegression&&S.regressionTiming==='ongoing',
     sleep:S.sleep||S.comorbid.has('sleep_disorder'),sleepInPlan:inPlan('sleep_disorder'),
@@ -7320,6 +7331,7 @@ function clearAll(opts){
   document.getElementById('showDSMLines').checked=false;
   document.getElementById('pcpInNoteCb').checked=true;
   document.getElementById('pcpNotDiscussedCb').checked=false;
+  document.getElementById('rxStartedTodayCb').checked=false;
   document.getElementById('levelJustificationSCField').value='';
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
@@ -7383,7 +7395,7 @@ const SEL_FIELDS={
   strangerDanger:'flag', safety:'many', ag:'many', showDSMTable:'flag', showDSMLines:'flag',
   insuranceType:'one', abaHours:'one', abaSetting:'many', abaTargets:'many',
   overrides:'map',
-  dbpFollowUp:'one', pcpInNote:'flag', pcpNotDiscussed:'flag', pcpOmit:'many', pcpFirst:'many',
+  dbpFollowUp:'one', pcpInNote:'flag', pcpNotDiscussed:'flag', rxStartedToday:'flag', pcpOmit:'many', pcpFirst:'many',
   psychReasons:'many',
 };
 // Typed by the clinician, so PHI-capable: never exported, and restore cannot write them
@@ -7397,7 +7409,7 @@ const SEL_MENUS={paeQuantity:'paeDrinksSel',paeFrequency:'paeFrequencySel',paeTi
   evalProfileStatus:'evalProfileStatusSel',evalDxStatus:'evalDxStatusSel',evalDxOutcome:'evalDxOutcomeSel',ados2Module:'ados2ModuleSel'};
 // Flags whose checkbox is wired by id (the rest are data-key="single" / criteriaC-E).
 const SEL_ID_FLAGS={unevenCog:'unevenCogCb',adaptiveStandardized:'adaptiveStandardizedCb',
-  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines',pcpInNote:'pcpInNoteCb',pcpNotDiscussed:'pcpNotDiscussedCb'};
+  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines',pcpInNote:'pcpInNoteCb',pcpNotDiscussed:'pcpNotDiscussedCb',rxStartedToday:'rxStartedTodayCb'};
 // Sub-rows a parent checkbox reveals from its change handler. Restore fires no handlers,
 // so paintFormFromState recomputes them from S. A new reveal-on-check row needs an entry
 // here (invariants lane checks every hidden-by-default "...Row" id is accounted for).
@@ -7439,7 +7451,7 @@ const SEL_SCOPE_TEMPLATE='scope=template';
 // Categories that are sensitive beyond ordinary clinical detail; a Full string holding
 // any of them gets a named notice in the panel. label -> the fields that carry it.
 const SEL_SENSITIVE={
-  'mental-health and other diagnoses':['comorbid','comorbidInPlan','depressionSafety','traumaIncludeInIEP','specifiers','psychReasons'],
+  'mental-health and other diagnoses':['comorbid','comorbidInPlan','depressionSafety','traumaIncludeInIEP','specifiers','psychReasons','rxStartedToday'],
   'prenatal alcohol exposure':['prenatalAlcohol','fasdFeatures','paeEvidence','fasdDomains','paeQuantity','paeFrequency','paeTiming'],
   'family and social circumstances':['socialWork','socialWorkReasons'],
   'genetic and neurological findings':['dysmorphism','congenitalAnomalies','developmentalRegression','regressionTiming','seizureConcern','focalNeuroFindings'],
@@ -7928,7 +7940,7 @@ function updateSectionHeaders(){
     if(out) fu.push(out+' line'+(out>1?'s':'')+' left out');
     if(up) fu.push(up+' moved up');
   }
-  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()||fu.length>1),fu.filter(Boolean).join(' · '));
+  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()||S.rxStartedToday||fu.length>1),fu.filter(Boolean).join(' · '));
   autoOpenSections();
 }
 
@@ -9055,6 +9067,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
   document.getElementById('pcpInNoteCb').addEventListener('change',function(){S.pcpInNote=this.checked;render();});
   document.getElementById('pcpNotDiscussedCb').addEventListener('change',function(){S.pcpNotDiscussed=this.checked;render();});
+  document.getElementById('rxStartedTodayCb').addEventListener('change',function(){S.rxStartedToday=this.checked;render();});
   document.getElementById('pcpExtraField').addEventListener('input',function(){S.pcpExtra=this.value;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{
     pill.addEventListener('click',()=>toggleComorbidPlan(pill.dataset.cv));

@@ -198,6 +198,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `dbpFollowUp` | `'' \| 'pcp' \| 'dbp'` — the follow-up plan. `''` = not chosen (the list stays on its tab and is not in the note); `'pcp'` = no routine DBP follow-up; `'dbp'` = DBP follow-up continues. Also switches the Return to Clinic line, the gait recheck owner, and the depression plan's recheck line (§13.5) |
 | `pcpInNote` | boolean, default `true` — whether the list is inserted into the A&P note once a plan is chosen |
 | `pcpNotDiscussed` | boolean, default `false` — the follow-up plan was not discussed with the family at the visit; adds one line with a fill-in to the list's follow-up lines under plan `pcp` (§13.3) |
+| `rxStartedToday` | boolean, default `false` — a medication was started or its dose changed at this visit; while a medication block prints it is open work, so a hand-back keeps one return visit (§13.3) |
 | `psychReasons` | Set — why psychiatry is involved: `mania_psychosis`, `treatment_failure`, `substance_use`, `safety`. Any entry turns the psychiatry referral on (§7.2 rule 10); labels in `PSYCH_REASON_LABELS` |
 | `pcpOmit` | Set of `PCP_DEFS` row ids the clinician left out |
 | `pcpFirst` | Set of `PCP_DEFS` row ids moved to the top of their group, in click order |
@@ -293,6 +294,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `pcpFirst` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `pcpInNote` | boolean | [§13.1](#131-placement-a-tab-that-also-feeds-the-note) |
 | `pcpNotDiscussed` | boolean | [§13.3](#133-follow-up-lines-a-standing-line-that-selections-override) |
+| `rxStartedToday` | boolean | [§13.3](#133-follow-up-lines-a-standing-line-that-selections-override) |
 | `psychReasons` | Set | [§7.2](#72-the-18-rules-at-a-glance) rule 10 |
 | `pcpOmit` | Set | [§13.4](#134-editing-and-how-edits-survive-a-rebuild) |
 | `previewMode` | string | [§5.4](#54-fallback-behavior) |
@@ -2017,9 +2019,10 @@ What counts as open work (each is something the note itself leaves with DBP):
 | review the cognitive and adaptive testing once it is completed | `cogEvalReferralPending()` (a suspected ID/GDD specifier without prior external testing, or `bifIdRisk()`) |
 | review the feeding evaluation | suspected PFD or ARFID in the plan |
 | recheck mood and safety | depression in the plan, only while plan is `dbp` |
+| adjust the medication started or changed today until the dose is stable | `rxStartedToday` ticked and a medication block prints (`psychRx`: confirmed ADHD, anxiety, depression or OCD in the plan). The blocks say this clinic adjusts the dose until stable (`rxOwner`), so under a hand-back that titration keeps one return visit (maintainer decision, 2026-11-12). The tool cannot tell a new prescription from a stable one, hence the box |
 | review the QbTest result | QbTest referred without suspected ADHD in the plan (otherwise "complete the ADHD evaluation" covers it) |
 
-Deliberately **not** open work (attending decisions, 2026-11-12): the sleep recheck, constipation, growth checks, ADHD medication at a stable dose, and, under a hand-back, the mood and safety recheck. They are `manage` rows or PCP-owned actions.
+Deliberately **not** open work (attending decisions, 2026-11-12): the sleep recheck, constipation, growth checks, ADHD medication at a stable dose (a dose started or changed today is open work, above), and, under a hand-back, the mood and safety recheck. They are `manage` rows or PCP-owned actions.
 
 With plan `dbp` the line is "DBP follow-up continues, with a return visit [interval]" plus the open items. With no plan it is a brace stop, and that state never reaches the note.
 
@@ -2040,7 +2043,7 @@ Edits are stored as row ids, not as text. That is what lets the list rebuild on 
 
 **An edit goes when its row goes.** `pcpPruneEdits()` runs at the top of `render()` and from `selPruneOrphans()`. It drops an id from `pcpOmit` / `pcpFirst` when the row is no longer produced, the same rule the form's sub-options follow, so nothing sits hidden in `S` to ride along in the next export. A left-out row cannot also be moved up. Exception: two rows depend on typed text, which a restore never brings back, so pruning them by their full test would report the edit as "not kept" after every restore. Each carries a `keep` test, the part of its `on` test that reads no typed text, and is pruned by that instead: `labs` is always kept (its only trigger is the labs box), and `gaitRecheck` is kept while the watch-only gait selection holds and DBP follow-up is not continuing.
 
-**Selections string.** `dbpFollowUp`, `pcpNotDiscussed`, `pcpOmit` and `pcpFirst` are saved at Full (as is `psychReasons`, which is listed under the mental-health sensitive category); `pcpInNote` is also in a Template; `pcpExtra` is typed and never saved. Restore accepts only ids that are in `PCP_DEFS` (`selAllowed()`), so a hand-edited string cannot inject text. The tab's buttons are drawn by `render()`, so `paintFormFromState()` needs no step for them.
+**Selections string.** `dbpFollowUp`, `pcpNotDiscussed`, `pcpOmit` and `pcpFirst` are saved at Full (as are `psychReasons` and `rxStartedToday`, which are listed under the mental-health sensitive category); `pcpInNote` is also in a Template; `pcpExtra` is typed and never saved. Restore accepts only ids that are in `PCP_DEFS` (`selAllowed()`), so a hand-edited string cannot inject text. The tab's buttons are drawn by `render()`, so `paintFormFromState()` needs no step for them.
 
 ### 13.5 What the plan changes elsewhere in the note
 

@@ -833,6 +833,20 @@ const CASES = [
     check(a){ assert.ok(!a.generatePCPPlain().includes('discussed with the family'));
               a.S.pcpNotDiscussed=true;
               assert.equal(a.pcpBuild().followUp[2], 'This follow-up plan was not discussed with the family at the visit: {how and when the family will be told}.'); } },
+  { name: 'pcp: a medication started or changed today keeps one DBP return visit',
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='adolescent'; S.dbpFollowUp='pcp'; ['adhd_combined','depression'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); },
+    check(a){ const line=()=>a.pcpBuild().followUp[0], rtc=()=>{const m=a.generateNote().main.split('\n');return m[m.indexOf('RETURN TO CLINIC')+1];};
+              assert.ok(line().startsWith('No routine DBP follow-up is planned.'), 'unticked: a stable dose is handed back');
+              assert.equal(rtc(), 'No routine return visit is scheduled (see Recommendations for Primary Care for when and how to return).');
+              a.S.rxStartedToday=true;
+              assert.equal(line(), 'DBP follow-up is limited to one return visit to adjust the medication started or changed today until the dose is stable. No routine DBP follow-up is planned after that visit. The patient has not been discharged and can return as needed.');
+              assert.equal(rtc(), 'Return to clinic: {interval}', 'a titration visit is owed, so the interval stop stays');
+              a.S.rtcInterval='4 weeks'; assert.ok(line().startsWith('DBP follow-up is limited to one return visit in 4 weeks to adjust the medication'));
+              // Under DBP follow-up the visit names the titration as one of its purposes.
+              a.S.dbpFollowUp='dbp'; assert.ok(line().includes('recheck mood and safety, and adjust the medication started or changed today until the dose is stable'), line());
+              // With no medication block in the plan the box changes nothing.
+              a.S.dbpFollowUp='pcp'; a.S.rtcInterval=''; a.S.comorbidInPlan.clear();
+              assert.ok(line().startsWith('No routine DBP follow-up is planned.')); } },
   { name: 'note: psychiatry is referred by exception, with the reason stated',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; ['adhd_combined','anxiety','depression'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); },
     check(a){ const m=()=>a.generateNote().main;
