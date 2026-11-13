@@ -4759,8 +4759,12 @@ function generateRichHTML(isPreview=false) {
   // Section color bars for plan numbered sections
   const sectionColors=['#2563eb','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#6b7280','#0f766e','#be185d'];
   let planSectionIdx=-1;
+  // The primary care list's group labels ("Actions:", "Re-refer to DBP if:") are its only
+  // structure, and the PCP reads the list in this pasted note; bold them as the tab does.
+  const pcpLabels=new Set(pcpInNoteActive()?pcpSections().map(s=>s.label):[]);
   lines.forEach(line=>{
-    if(line==='ASSESSMENT'||line==='PLAN'){
+    if(pcpLabels.has(line)){closeUL();html+=`<p style="font-weight:bold;margin:8px 0 3px">${e(line)}</p>`;}
+    else if(line==='ASSESSMENT'||line==='PLAN'){
       closeUL();
       const border='border-bottom:2px solid #374151';
       html+=`<p style="font-size:${isPreview?'13pt':'14pt'};font-weight:bold;${border};padding-bottom:3px;margin:18px 0 8px">${e(line)}</p>`;
@@ -5135,7 +5139,9 @@ function generatePCPHTML(isPreview){
   const row=r=>{
     if(r.typed) return '<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="You typed this line in section 10. Edit it there.">typed</span></span><span class="pcp-text">'+ph(r.text)+'</span></li>';
     return '<li class="pcp-row'+(r.omitted?' is-omitted':'')+'"><span class="pcp-ctl">'
-      +'<button type="button" class="pcp-btn'+(r.omitted?'':' is-on')+'" data-pcp="omit:'+r.id+'" aria-pressed="'+!r.omitted+'" aria-label="Include this line" aria-describedby="pcpt-'+r.id+'" title="'+(r.locked?'Stays in the list while the mood and safety recheck is in it.':r.omitted?'Left out. Click to put it back.':'Included. Click to leave it out.')+'" onclick="togglePcpOmit(\''+r.id+'\')"'+(r.locked?' disabled':'')+'>'+(r.omitted?'+':'✓')+'</button>'
+      // Lit only when left out: an included line is the default and stays quiet, so the
+      // eye goes to the clinician's edits (same rule as the move-up button and the form's chips).
+      +'<button type="button" class="pcp-btn'+(r.omitted?' is-on':'')+'" data-pcp="omit:'+r.id+'" aria-pressed="'+r.omitted+'" aria-label="Leave this line out" aria-describedby="pcpt-'+r.id+'" title="'+(r.locked?'Stays in the list while the mood and safety recheck is in it.':r.omitted?'Left out. Click to put it back.':'Included. Click to leave it out.')+'" onclick="togglePcpOmit(\''+r.id+'\')"'+(r.locked?' disabled':'')+'>'+(r.omitted?'+':'✓')+'</button>'
       +'<button type="button" class="pcp-btn'+(r.first?' is-on':'')+'" data-pcp="first:'+r.id+'" aria-pressed="'+r.first+'" aria-label="Move this line to the top of its group" aria-describedby="pcpt-'+r.id+'" title="'+(r.first?'Moved to the top. Click to return it to its usual place.':'Move to the top of this group.')+'" onclick="togglePcpFirst(\''+r.id+'\')"'+(r.omitted?' disabled':'')+'>↑</button>'
       +'</span><span class="pcp-text" id="pcpt-'+r.id+'">'+ph(r.text)+'</span></li>';
   };
@@ -6380,6 +6386,10 @@ async function copyIEPLetter(format){
 }
 
 function setPreviewMode(mode){
+  // A different document opens at its top; the scroll position of the one just left means
+  // nothing in this one, and each tab's first lines (status strip, letter heading) matter most.
+  const pv=document.getElementById('notePreview');
+  if(pv&&mode!==S.previewMode) pv.scrollTop=0;
   S.previewMode=mode;
   [['tabNote','note'],['tabABA','aba'],['tabIEP','iep'],['tabPCP','pcp']].forEach(([id,m])=>{
     const t=document.getElementById(id);t.classList.toggle('is-on',mode===m);t.setAttribute('aria-pressed',String(mode===m));
@@ -7906,7 +7916,17 @@ function updateSectionHeaders(){
   const sf=S.safety.size;setSH('sh-safety',sig.safety.content,sf>0?sf+' item'+(sf>1?'s':''):'');
   // 9 AG
   const ag=S.ag.size;setSH('sh-ag',ag>0,ag>0?ag+' item'+(ag>1?'s':''):'');
-  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()),S.dbpFollowUp==='pcp'?'No routine DBP follow-up':S.dbpFollowUp==='dbp'?'DBP follow-up continues':'');
+  // Edits made on the PCP Recs tab also change the note, so the heading counts them where
+  // the Note tab's reader can see them. Built rows, not the saved sets: a locked row ignores
+  // its saved leave-out.
+  const fu=[S.dbpFollowUp==='pcp'?'No routine DBP follow-up':S.dbpFollowUp==='dbp'?'DBP follow-up continues':''];
+  if(S.pcpOmit.size||S.pcpFirst.size){
+    const rows=Object.values(pcpBuild().groups).flatMap(g=>g.rows);
+    const out=rows.filter(r=>r.omitted).length, up=rows.filter(r=>r.first&&!r.omitted).length;
+    if(out) fu.push(out+' line'+(out>1?'s':'')+' left out');
+    if(up) fu.push(up+' moved up');
+  }
+  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()||fu.length>1),fu.filter(Boolean).join(' · '));
   autoOpenSections();
 }
 
