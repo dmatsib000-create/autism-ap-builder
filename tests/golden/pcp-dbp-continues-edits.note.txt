@@ -103,7 +103,7 @@ Plan:
   • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
   • All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.
   • If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.
-  • This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if anxiety is not improving with treatment, or is worsening.
+  • This clinic prescribes and adjusts this medication.
 
 ── Problem 3: Depressive Disorder (F32.9) ──
 
@@ -120,7 +120,7 @@ Plan:
   • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
   • All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.
   • If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.
-  • This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if depression is not improving with treatment, or is worsening.
+  • This clinic prescribes and adjusts this medication.
   • Shortened return-to-clinic interval: 4 to 6 weeks.
 
 ── Problem 4: OCD / Obsessive-Compulsive Disorder (F42.9) ──

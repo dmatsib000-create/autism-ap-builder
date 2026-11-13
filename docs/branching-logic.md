@@ -2044,13 +2044,14 @@ Edits are stored as row ids, not as text. That is what lets the list rebuild on 
 
 ### 13.5 What the plan changes elsewhere in the note
 
-Existing lines read `dbpFollowUp`, so the note cannot contradict the list. All are unchanged when no plan is chosen.
+Existing lines read `dbpFollowUp`, so the note cannot contradict the list. With no plan chosen every line keeps its plan-neutral wording.
 
 | Line | With a plan chosen |
 |---|---|
 | `RETURN TO CLINIC` | Plan `pcp` and no return expected (`pcpReturnExpected()` false): "No routine return visit is scheduled", with a pointer to the list when it is in the note. Otherwise the typed interval or the `{interval}` stop. A typed "as needed" or "prn" prints "Return to clinic as needed." (it used to print "Return to clinic in as needed.") |
 | Gait recheck (§7.10) | Plan `pcp`: "at the next well visit with primary care" in place of the `{primary care or this clinic}` stop |
 | Depression plan | Plan `pcp`: "Mood and safety recheck in 4 to 6 weeks with primary care." in place of "Shortened return-to-clinic interval: 4 to 6 weeks." |
+| Who continues ADHD, anxiety and depression medication (`rxOwner()`) | Plan `pcp`: the hand-back sentence ("primary care then continues the medication" / "once the dose is stable, primary care can continue it", with when to return). Plan `dbp` **or no plan**: "This clinic prescribes and adjusts this medication." Handing medication to primary care is a disposition, so nothing about it prints unless the clinician chose the hand-back. The OCD and sleep blocks carry no such sentence. A unit case fails if any problem block mentions primary care when the plan is not `pcp` |
 | Work primary care carries under a hand-back: sleep re-evaluation, GI, confirmed PFD, confirmed ARFID (`fuPcpVisit()`) | Plan `pcp`: "Primary care reassesses at the next visit" (sleep: "in 4 to 6 weeks with primary care"). Plan `dbp`: unchanged, because a DBP visit is coming |
 | Work that stays with this clinic: suspected ADHD re-evaluation, the feeding and ARFID evaluations, teacher materials, QbTest results (`fuDbpVisit()`) | Either plan: "at the DBP return visit" |
 
@@ -2058,7 +2059,7 @@ The two classes are the same split `pcpCtx().open` uses to decide what is still 
 
 **Medication wording (§6 problem blocks).** Changed in the same pass, on the council's recommendation (64 to 66%) and the attending's answers of 2026-11-13:
 
-- The note records what was prescribed; it prints no drug menu and **no dose**. Each medication block prints the behavioral plan, one sentence of reasoning, the fill-ins `RX_FILL` (agent, dose and schedule; titration; planned maximum; tried before and stopped), the dose source `RX_DOSE_SOURCE` (the 2022-2023 Florida Best Practice guideline, confirmed with the attending), class-level safety lines worded so they never imply the child takes a drug, and who continues the medication. A unit case fails if any milligram figure prints in a problem block.
+- The note records what was prescribed; it prints no drug menu and **no dose**. Each medication block prints the behavioral plan, one sentence of reasoning, the fill-ins `RX_FILL` (agent, dose and schedule; titration; planned maximum; tried before and stopped), the dose source `RX_DOSE_SOURCE` (the 2022-2023 Florida Best Practice guideline, confirmed with the attending), class-level safety lines worded so they never imply the child takes a drug, and who prescribes it (which follows the plan, see the table above). A unit case fails if any milligram figure prints in a problem block.
 - Reasoning sentences that describe this clinic's practice say "this clinic" and come from the attending: guanfacine ER or clonidine ER with emotional dysregulation beyond ADHD or a sleep problem; atomoxetine when anxiety co-occurs; sertraline or fluoxetine first for anxiety and depression, early move to duloxetine for depression that is not responding; mirtazapine only after an SSRI with an alpha-2 agonist has not been enough and medical causes are ruled out; sertraline for OCD with referral to the psychiatry OCD clinic and the psychology OCD therapy clinic.
 - Statements printed as done for every patient became fill-ins: `{Boxed warning discussed: yes / no}`, `{provided / not needed, screen negative}`.
 - One melatonin statement (`RX_MELATONIN`) in all three places it appears, with no milligrams: the guideline's ceiling differs for children and adolescents and the tool takes no age in years.

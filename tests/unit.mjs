@@ -833,6 +833,20 @@ const CASES = [
                 assert.ok(!/\d\s?(mg|mcg)\b/.test(m), 'a milligram figure printed with diagStatus='+dx+': '+(m.match(/.{40}\d\s?(mg|mcg)\b.{20}/)||[''])[0]);
                 assert.ok(m.split('Medication: {agent, dose and schedule started today, or reason deferred}').length-1>=4);
                 assert.ok(m.includes('Florida Best Practice Psychotherapeutic Medication Guidelines')); assert.ok(!/black box warning[^.]*counseled/i.test(m)); } } },
+  { name: 'note: a medication block hands the medication to primary care only under "No routine DBP follow-up"',
+    setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; S.sleep=true;
+              ['adhd_combined','anxiety','depression','ocd','sleep_disorder'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); },
+    check(a){ // Everything from the first problem block to the primary care list / Return to Clinic.
+              const blocks=()=>{ const m=a.generateNote().main; const i=m.indexOf('── Problem '); assert.ok(i>=0);
+                const ends=['── Recommendations for Primary Care ──','RETURN TO CLINIC'].map(t=>m.indexOf(t,i)).filter(j=>j>=0);
+                return m.slice(i,Math.min(...ends)); };
+              const owner='This clinic prescribes and adjusts this medication.';
+              for(const dx of ['confirmed','ruleOut']) for(const plan of ['','dbp']){ a.S.diagStatus=dx; a.S.dbpFollowUp=plan; const b=blocks();
+                assert.ok(!/primary care/i.test(b), 'plan "'+plan+'", '+dx+': a problem block mentions primary care: '+(b.match(/.{60}primary care.{40}/i)||[''])[0]);
+                assert.equal(b.split(owner).length-1, 3, 'ADHD, anxiety and depression each name this clinic as prescriber'); }
+              a.S.diagStatus='confirmed'; a.S.dbpFollowUp='pcp'; const b=blocks();
+              assert.ok(!b.includes(owner));
+              assert.ok(b.includes('primary care then continues the medication')); assert.equal(b.split('once the dose is stable, primary care can continue it').length-1, 2); } },
   { name: 'note: follow-up lines in the problem blocks follow the plan',
     setup(S){ S.diagStatus='confirmed'; S.ageGroup='schoolAge'; ['gi','adhd_suspected'].forEach(k=>{S.comorbid.add(k);S.comorbidInPlan.add(k);}); S.rtcInterval='as needed'; },
     check(a){ const m=()=>a.generateNote().main;

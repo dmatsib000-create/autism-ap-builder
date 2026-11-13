@@ -4216,7 +4216,7 @@ function generateNote() {
       L.push('  • Before starting: cardiac history and examination; ECG if risk factors.');
       L.push('  • At each visit: height, weight, pulse, blood pressure, appetite, sleep, and mood or irritability; parent and teacher rating scales (Vanderbilt or Conners) at each dose change.'+(S.diagStatus==='confirmed'?' Autistic children are less likely to report side effects themselves; a change in behavior is the signal.':''));
       L.push('  • If guanfacine or clonidine is used, it is tapered, never stopped abruptly. If atomoxetine is used, it carries a boxed warning for suicidal thinking.');
-      L.push('  • This clinic adjusts the dose until it is stable; primary care then continues the medication. Return to this clinic if symptoms remain impairing at the planned maximum, or if the medication is not tolerated.');
+      L.push('  • '+rxOwner('This clinic adjusts the dose until it is stable; primary care then continues the medication. Return to this clinic if symptoms remain impairing at the planned maximum, or if the medication is not tolerated.'));
     } else {
       L.push('  • Defer stimulant medication; diagnosis not yet confirmed; behavioral strategies in ABA first.');
       L.push('  • QBTest (objective attention and hyperactivity measure): indicated if school-age or older.');
@@ -4249,7 +4249,7 @@ function generateNote() {
     L.push('  • '+RX_DOSE_SOURCE);
     L.push('  • '+RX_BOXED);
     L.push('  • '+RX_ACTIVATION);
-    L.push('  • This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if anxiety is not improving with treatment, or is worsening.');
+    L.push('  • '+rxOwner('This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if anxiety is not improving with treatment, or is worsening.'));
     L.push('');
   }
 
@@ -4275,7 +4275,7 @@ function generateNote() {
     L.push('  • '+RX_DOSE_SOURCE);
     L.push('  • '+RX_BOXED);
     L.push('  • '+RX_ACTIVATION);
-    L.push('  • This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if depression is not improving with treatment, or is worsening.');
+    L.push('  • '+rxOwner('This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if depression is not improving with treatment, or is worsening.'));
     // Under a hand-back the 4-6 week recheck belongs to primary care (attending decision
     // 2026-11-12), so the note must not promise a clinic return the follow-up plan denies.
     L.push(S.dbpFollowUp==='pcp'?'  • Mood and safety recheck in 4 to 6 weeks with primary care.':'  • Shortened return-to-clinic interval: 4 to 6 weeks.');
@@ -4836,6 +4836,10 @@ const RX_MELATONIN='Melatonin as an adjunct to the behavioral plan, not a replac
 // chosen both return the wording the note always had.
 //   fuDbpVisit: work this clinic keeps; once a plan is chosen it names the DBP return visit.
 //   fuPcpVisit: work primary care carries under a hand-back.
+// Who continues a medication is a hand-back statement, so it prints only once the clinician
+// has chosen "No routine DBP follow-up". With DBP follow-up continuing, or no plan chosen,
+// the note says only that this clinic prescribes; nothing about primary care is implied.
+function rxOwner(handBack){ return S.dbpFollowUp==='pcp'?handBack:'This clinic prescribes and adjusts this medication.'; }
 function fuDbpVisit(dflt){ return S.dbpFollowUp?'at the DBP return visit':dflt; }
 function fuPcpVisit(dflt){ return S.dbpFollowUp==='pcp'?'Primary care reassesses at the next visit':dflt; }
 
