@@ -25,6 +25,7 @@ Centralized bibliography for `autism-ap-builder.html` and its companion docs.
 - [§8 Fetal alcohol spectrum disorders](#8-fetal-alcohol-spectrum-disorders)
 - [§9 Education law — IDEA and Florida ESE rules](#9-education-law--idea-and-florida-ese-rules)
 - [§10 Toe walking & gait](#10-toe-walking--gait)
+- [§11 Primary care hand-back](#11-primary-care-hand-back)
 
 ---
 
@@ -162,16 +163,57 @@ See §1 above. Cited additionally in the ABA letter evidence paragraph for milit
 
 ## 5. Comorbidity & medication
 
-### `[fl-bhc-2022]` — Florida Behavioral Health Center medication guidelines
+### `[fl-bhc-2022]` — Florida Best Practice Psychotherapeutic Medication Guidelines, 2022-2023
 
-Florida Behavioral Health Center (FL BHC). **Children & Adolescent Best Practice Psychotherapeutic Medication Guidelines.** 2022. (Florida organizational guideline. Full citation/URL **needs verification** — this is an organizational source, not a peer-reviewed publication.)
+University of South Florida, Florida Center for Behavioral Health Improvements and Solutions (Florida Medicaid Drug Therapy Management Program for Behavioral Health). **2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents.** Tampa, FL: University of South Florida; 2023. <https://floridabhcenter.org/child-guidelines/2022-2023-florida-best-practice-psychotherapeutic-medication-guidelines-for-children-and-adolescents/>
 
-- **Used for:** ADHD stimulant recommendations ([autism-ap-builder.html:3929](../autism-ap-builder.html#L3929)); anxiety SSRI/SNRI recommendations ([3970](../autism-ap-builder.html#L3970)); depression medication recommendations ([4001](../autism-ap-builder.html#L4001)); sleep pharmacotherapy ([4182](../autism-ap-builder.html#L4182)).
-- **Supports the claim:** Florida-jurisdiction medication guidance — locally relevant because the practice is at UF Behavior and Developmental Clinic. Distinct from national guidance; do not substitute AAP or AACAP citations here.
-- **Likely identity (2026-10-31 web search):** the *2022–2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents*, published by the University of South Florida's Florida Medicaid Drug Therapy Management Program (hosted at floridabhcenter.cbcs.usf.edu and listed on the Florida AHCA behavioral-health medication resources page). The 2022–2023 cycle was issued as separate condition guides (ADHD, major depression, anxiety, insomnia, and others) rather than one document. The USF site refused the connection, so no guide was opened and the "Level 1" wording the note uses for ADHD was not checked against the source. Not PubMed-indexed.
-- **Note:** this is the one citation in this file that appears in the chart note itself ("FL BHC 2022"), so it carries more weight than the comment-only entries above. "FL BHC" may also not be an abbreviation a reader can trace; consider whether the note should name the guideline more fully.
-- **Watch item:** a Florida Department of Health document titled *GUIDANCE: Avoidance of Psychotropic Pharmacotherapy in Children*, posted July 2026 on floridahealth.gov, surfaced in the same search. It could not be read (image-only PDF), so its status and content are unknown. Worth the maintainer reading, since it may bear on the medication lines this guideline supports.
-- **Verified:** **needs verification — open the 2022–2023 condition guides and confirm the wording the note relies on**
+- **Used for:** every medication block of the A&P note (`RX_DOSE_SOURCE`: "Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending"); the "Medication reasoning" sentences of the ADHD, anxiety, depression and OCD blocks for a child without confirmed autism; the OCD block's combination and 8 to 12 week statements; the sleep block's short-term-use, taper and not-recommended lines; `RX_MELATONIN`.
+- **Why this source:** the attending named it as the clinic's dose reference on 2026-11-13 ("Dose should be taken from the ... Florida Best Practice Psychotherapeutic Medication Guidelines ... but clear with attendings"). The note prints no dose from it; the clinician types the dose.
+- **Supports the claim (read in the 72-page PDF the attending supplied, 2026-11-13):**
+  - ADHD, ages 6 to 17. Level 1: "Psychostimulant monotherapy (methylphenidate class or amphetamine class ...). If first choice is ineffective, try monotherapy with another stimulant". Level 2: extended-release alpha-2 agonist with a stimulant or alone, "Atomoxetine or Viloxazine monotherapy". Level 0: "closely monitor height, weight and appetite ... periodically monitor pulse and blood pressure".
+  - Anxiety, ages 6 to 17. Level 2: "Initiate treatment with fluoxetine or sertraline monotherapy or in combination with CBT. Combination therapy with CBT has been shown to be more effective than medication alone. Review boxed warning with family and monitor for treatment emergent suicidality and behavioral activation".
+  - Major depression, ages 6 to 17. Level 1: active support for 6 weeks if mild. Level 2: "Fluoxetine or combination of CBT or IPT psychotherapy with fluoxetine"; "May consider use of escitalopram for age 12 years and above".
+  - OCD, ages 6 to 17. Level 1b: moderate to severe, "start with combination of behavioral therapy (CBT + ERP) and an FDA approved monotherapy with an SSRI such as sertraline (6+ years and older)". Treatment considerations: time to full effect "may be long (8-12 weeks)".
+  - Insomnia. Level 2: melatonin "administered from 30 to 60 minutes prior to the desired bedtime"; "Consider recommending the use of pharmaceutical grade melatonin". Table 11 gives different ceilings for children and adolescents, which is why the note prints no milligrams. Level 3: "Pharmacotherapy should only be considered for short-term use"; clonidine is tapered. Not recommended list includes amitriptyline, benzodiazepines, doxepin, first and second generation antipsychotics, and zolpidem.
+- **Not from this source:** the guideline does not address ADHD, anxiety or depression treatment in autistic children specifically. Sentences in the note that begin "this clinic" are the attending's stated practice, not the guideline's.
+- **Watch item:** a Florida Department of Health document titled *GUIDANCE: Avoidance of Psychotropic Pharmacotherapy in Children*, posted July 2026 on floridahealth.gov, surfaced in an earlier search. It could not be read (image-only PDF). Worth the maintainer reading, since it may bear on these lines. A newer edition of the guideline, when published, replaces this entry and the year printed in `RX_DOSE_SOURCE`.
+- **Verified:** 2026-11-13, full text (PDF supplied by the attending). The quoted passages above were read; the dose tables were not transcribed because no dose is printed.
+
+### `[rupp-2005]` — methylphenidate in autism with hyperactivity
+
+Research Units on Pediatric Psychopharmacology Autism Network. Randomized, controlled, crossover trial of methylphenidate in pervasive developmental disorders with hyperactivity. *Arch Gen Psychiatry.* 2005;62(11):1266-1274. [doi:10.1001/archpsyc.62.11.1266](https://doi.org/10.1001/archpsyc.62.11.1266). PMID 16275814.
+
+- **Used for:** the ADHD block's reasoning sentence with confirmed autism ("49% of 72 children in one trial"; "side effects stop treatment more often"); the `adhd` row of `PCP_DEFS` ("more stimulant side effects").
+- **Supports the claim:** Abstract: "Thirty-five (49%) of 72 enrolled subjects were classified as methylphenidate responders"; adverse effects were more frequent than in typically developing children with ADHD, and 13 of 72 (18%) stopped for them.
+- **Verified:** 2026-11-12, PubMed abstract.
+
+### `[king-2009]` and `[herscu-2020]` — SSRI trials in autism targeted repetitive behavior
+
+King BH, Hollander E, Sikich L, et al. Lack of efficacy of citalopram in children with autism spectrum disorders and high levels of repetitive behavior. *Arch Gen Psychiatry.* 2009;66(6):583-590. [doi:10.1001/archgenpsychiatry.2009.30](https://doi.org/10.1001/archgenpsychiatry.2009.30). PMID 19487623.
+
+Herscu P, Handen BL, Arnold LE, et al. The SOFIA study: negative multi-center study of low dose fluoxetine on repetitive behaviors in children and adolescents with autistic disorder. *J Autism Dev Disord.* 2020;50(9):3233-3244. [doi:10.1007/s10803-019-04120-y](https://doi.org/10.1007/s10803-019-04120-y). PMID 31267292.
+
+- **Used for:** the anxiety block's reasoning sentence with confirmed autism ("No SSRI has been tested against placebo for anxiety in autistic youth; the autism SSRI trials targeted repetitive behavior").
+- **Supports the claim:** both trials recruited for repetitive behavior, not anxiety. The sentence replaced an earlier one that said SSRIs "showed NO superiority over placebo" for anxiety, which these trials cannot show.
+- **Verified:** 2026-11-12. King 2009 full text; Herscu 2020 PubMed abstract.
+
+### `[ozonoff-2011]` and `[ozonoff-2024]` — sibling recurrence
+
+Ozonoff S, Young GS, Carter A, et al. Recurrence risk for autism spectrum disorders: a Baby Siblings Research Consortium study. *Pediatrics.* 2011;128(3):e488-e495. [doi:10.1542/peds.2010-2825](https://doi.org/10.1542/peds.2010-2825). PMID 21844053.
+
+Ozonoff S, Young GS, Bradshaw J, et al. Familial Recurrence of Autism: Updates From the Baby Siblings Research Consortium. *Pediatrics.* 2024;154(2). [doi:10.1542/peds.2023-065297](https://doi.org/10.1542/peds.2023-065297). PMID 39011552.
+
+- **Used for:** the note's Anticipatory Guidance sibling line ("About 1 in 5 younger siblings of an autistic child are later diagnosed with autism (Ozonoff 2011; Ozonoff 2024)"). These two are named in the chart note itself.
+- **Supports the claim:** 18.7% (2011) and 20.2%, 95% CI 16.6 to 24.3 (2024). Autism only; the earlier wording "ASD/developmental risk (~10–20%)" mixed outcomes.
+- **Verified:** 2026-11-12, full text of both (PMC). The 2024 article number is not shown in the PubMed record.
+
+### `[mcelhanon-2014]` — gastrointestinal symptoms in autism
+
+McElhanon BO, McCracken C, Karpen S, Sharp WG. Gastrointestinal symptoms in autism spectrum disorder: a meta-analysis. *Pediatrics.* 2014;133(5):872-883. [doi:10.1542/peds.2013-3995](https://doi.org/10.1542/peds.2013-3995). PMID 24777214.
+
+- **Used for:** the GI problem block's Assessment sentence ("more common in autistic children than in comparison children").
+- **Supports the claim:** odds ratio 4.42 (95% CI 1.90 to 10.28) against study controls; constipation, diarrhea and abdominal pain were each more common. The note used to say "4-5x more frequently", which restates an odds ratio as a frequency; no multiple is printed now.
+- **Verified:** 2026-11-12, PubMed abstract.
 
 ---
 
@@ -387,6 +429,97 @@ Was listed as: Mehler MF, Mehler MF. "Classification of mild and minor developme
 
 - **Why retired:** a PubMed search on 2026-10-31 found no such paper: nothing by any Mehler on developmental delay, and no 2016 *JAMA Pediatrics* article with "developmental delay" in the title. The only Mark F. Mehler in PubMed researches Huntington's disease and neural stem cells, and the doubled author line suggests the reference was generated rather than copied from a source.
 - **What changed:** the only inline consumer, the comment above `gddSevWord()` in autism-ap-builder.html, now states the severity adjective is a maintainer clinical-judgment call. No note or letter output ever showed this citation, and output is unchanged. The design choice stands; if a real source is found later, add it as a new entry.
+
+---
+
+## 11. Primary care hand-back
+
+Sources behind the Recommendations for Primary Care list (`PCP_DEFS` in `autism-ap-builder.html`; `docs/branching-logic.md` §13). None of these is printed in the note, the list, or either letter: they are cited from code comments and from §13.6. Every entry below was checked against its PubMed record in a Claude session on 2026-11-12. Guideline full texts could not be opened in that session (publisher sites were blocked), so each `Supports the claim` line says whether the claim rests on the abstract or on full text. `[hyman-2020]` (§1), `[noritz-2013]`, `[gelfer-2024]` (§10), `[idea-34cfr300]` (§9) and `[apa-dsm-5-tr-2022]` (§6) are reused by §13 and keep their own entries.
+
+### `[lipkin-2020]` — AAP clinical report on developmental surveillance and screening
+
+Lipkin PH, Macias MM; Council on Children With Disabilities, Section on Developmental and Behavioral Pediatrics. **Promoting optimal development: identifying infants and young children with developmental disorders through developmental surveillance and screening.** *Pediatrics.* 2020;145(1):e20193449. doi:10.1542/peds.2019-3449 (PMID 31843861)
+
+- **Used for:** docs/branching-logic.md §13.6; the `sibling` row of `PCP_DEFS` (autism screening at the 18- and 24-month visits).
+- **Supports the claim:** Abstract states that children with a diagnosed developmental disorder are identified as having special health care needs "with initiation of chronic condition management in the pediatric medical home", and gives general developmental screening at 9, 18 and 30 months with autism screening at 18 and 24 months. This is the basis for placing ongoing care with primary care. It does not say that subspecialty follow-up is unnecessary; no guideline found does.
+- **Verified:** bibliographic details and the quoted abstract wording confirmed against PubMed PMID 31843861 on 2026-11-12 (Claude session). The corporate-author string was not returned by PubMed and should be checked on the article page. Maintainer initials pending.
+
+### `[wolraich-2019]` — AAP clinical practice guideline for ADHD
+
+Wolraich ML, Hagan JF Jr, Allan C, et al; Subcommittee on Children and Adolescents With Attention-Deficit/Hyperactive Disorder. **Clinical practice guideline for the diagnosis, evaluation, and treatment of attention-deficit/hyperactivity disorder in children and adolescents.** *Pediatrics.* 2019;144(4):e20192528. doi:10.1542/peds.2019-2528 (PMID 31570648; PMC7067282)
+
+- **Used for:** docs/branching-logic.md §13.6; the `adhd` row of `PCP_DEFS` (primary care continues ADHD medication once the dose is stable and checks heart rate and blood pressure).
+- **Supports the claim:** Full text read (PMC). The guideline is written for the primary care clinician, treats ADHD as a chronic condition managed in the medical home, and encourages monitoring of heart rate and blood pressure; it gives no visit interval in the guideline text itself. Read with `[barbaresi-2020]`, which points the other way for a child who also has autism.
+- **Verified:** bibliographic details confirmed against PubMed PMID 31570648 on 2026-11-12 (Claude session); the points above were read in the PMC full text in that session. Maintainer initials pending.
+
+### `[barbaresi-2020]` — SDBP clinical practice guideline for complex ADHD
+
+Barbaresi WJ, Campbell L, Diekroger EA, et al. **Society for Developmental and Behavioral Pediatrics clinical practice guideline for the assessment and treatment of children and adolescents with complex attention-deficit/hyperactivity disorder.** *J Dev Behav Pediatr.* 2020;41 Suppl 2S:S35-S57. doi:10.1097/DBP.0000000000000770 (PMID 31996577)
+
+- **Used for:** docs/branching-logic.md §13.6; the `tAdhd` row of `PCP_DEFS` (re-refer when ADHD symptoms remain impairing despite treatment).
+- **Supports the claim:** Abstract defines ADHD with a coexisting condition (autism included) as complex ADHD that warrants specialist assessment, and names an inadequate response to treatment as a reason for that assessment. This is why the list sends treatment failure back to DBP. The guideline states no number of failed trials; "two failed medication trials" was searched for and is in no source.
+- **Verified:** bibliographic details confirmed against PubMed PMID 31996577 on 2026-11-12 (Claude session). Abstract only; the key action statement wording was not read. Maintainer initials pending.
+
+### `[williams-buckley-2020]` — AAN practice guideline on insomnia in autism
+
+Williams Buckley A, Hirtz D, Oskoui M, et al. **Practice guideline: Treatment for insomnia and disrupted sleep behavior in children and adolescents with autism spectrum disorder: report of the Guideline Development, Dissemination, and Implementation Subcommittee of the American Academy of Neurology.** *Neurology.* 2020;94(9):392-404. doi:10.1212/WNL.0000000000009033 (PMID 32051244; PMC7238942)
+
+- **Used for:** the note's sleep-disorder block with confirmed autism ("Melatonin is the only sleep medication the AAN autism sleep guideline (2020) recommends"); `RX_MELATONIN`; the `sleepRecheck`, `sleep` and `tSleep` rows of `PCP_DEFS` (behavioral sleep plan first, melatonin alongside it, come back if both fail); docs/branching-logic.md §13.6.
+- **Supports the claim (AAN Practice Guideline Summary for Clinicians, 3 pages, supplied by the attending and read 2026-11-13):** assess coexisting conditions and review medications that disrupt sleep; behavioral strategies "as a first-line treatment approach"; "offer melatonin ... if behavioral strategies have not been helpful"; "write a prescription for melatonin or recommend using a high-purity pharmaceutical grade"; "a low dose (one to three mg per day), 30 to 60 minutes before bedtime, and titrate to effect, not exceeding 10 mg per day"; counsel on adverse effects "and the lack of long-term safety data" (all Level B). Melatonin is the only medication it makes a recommendation for.
+- **Corrected 2026-11-13:** the note briefly said "No other sleep medication has been studied in autistic children (AAN 2020)". The summary does not say that, and the full guideline text was not read, so the sentence now states only what the summary shows.
+- **Dose discrepancy, decided by the attending 2026-11-13 (keep the Florida doses):** this guideline allows up to 10 mg per day in autistic children and adolescents; the Florida guideline's Table 11 caps children at 3 mg and adolescents at 10 mg, with a 0.5 to 1 mg start for children `[fl-bhc-2022]`. The note prints no milligrams and names the Florida guideline as the dose reference; the AAN ceiling is not printed. The 4 to 6 week reassessment is this clinic's practice, not a guideline number.
+- **Deliberately not used (attending, 2026-11-13):** the Level B recommendation to counsel families on melatonin's adverse effects and the lack of long-term safety data. The note does not print it; do not add it without asking.
+- **Verified:** bibliographic details against PubMed PMID 32051244 on 2026-11-12; clinician summary read in full 2026-11-13. The full *Neurology* article was not read.
+
+### `[aguinaldo-2021]` — ASQ validated in primary care and outpatient specialty clinics
+
+Aguinaldo LD, Sullivant S, Lanzillo EC, et al. **Validation of the ask suicide-screening questions (ASQ) with youth in outpatient specialty and primary care clinics.** *Gen Hosp Psychiatry.* 2021;68:52-58. doi:10.1016/j.genhosppsych.2020.11.006 (PMID 33310014; PMC7855604)
+
+- **Used for:** autism-ap-builder.html, comment on the `mood` row of `PCP_DEFS`; docs/branching-logic.md §13.6.
+- **Supports the claim:** In 515 youth aged 10 to 21, the ASQ had 100% sensitivity in both the outpatient specialty and the primary care samples (specificity 91.2% and 87.9%). Supports naming the ASQ as the suicide-risk screen a PCP can use at the mood and safety recheck. The sample was not an autism sample and did not include children under 10.
+- **Verified:** bibliographic details and figures confirmed against PubMed PMID 33310014 on 2026-11-12 (Claude session). PubMed lists the electronic publication date as November 2020; the volume year is 2021 and should be checked on the article page. Maintainer initials pending.
+
+### `[horowitz-2012]` — Original ASQ development study
+
+Horowitz LM, Bridge JA, Teach SJ, et al. **Ask Suicide-Screening Questions (ASQ): a brief instrument for the pediatric emergency department.** *Arch Pediatr Adolesc Med.* 2012;166(12):1170-1176. doi:10.1001/archpediatrics.2012.1276 (PMID 23027429; PMC6889955)
+
+- **Used for:** autism-ap-builder.html, comment on the `mood` row of `PCP_DEFS`; docs/branching-logic.md §13.6.
+- **Supports the claim:** Derivation of the four-question ASQ in 524 emergency department patients aged 10 to 21 (sensitivity 96.9%, specificity 87.6%). Cited as the origin of the instrument; `[aguinaldo-2021]` is the evidence for use outside the emergency department.
+- **Verified:** bibliographic details and figures confirmed against PubMed PMID 23027429 on 2026-11-12 (Claude session). Maintainer initials pending.
+
+### `[forrest-2000]` — What referring pediatricians value in a specialist's letter
+
+Forrest CB, Glade GB, Baker AE, Bocian A, von Schrader S, Starfield B. **Coordination of specialty referrals and physician satisfaction with referral care.** *Arch Pediatr Adolesc Med.* 2000;154(5):499-506. doi:10.1001/archpedi.154.5.499 (PMID 10807303)
+
+- **Used for:** docs/branching-logic.md §13.6 (why each action row names an owner and why the follow-up lines always print).
+- **Supports the claim:** Across 963 referrals from 122 pediatricians, a stated plan for co-managing the patient was the only letter element significantly related to the referring physician's overall satisfaction. Supports the list's shape. It measured physician satisfaction, not child outcomes.
+- **Verified:** bibliographic details confirmed against PubMed PMID 10807303 on 2026-11-12 (Claude session). Abstract only. Maintainer initials pending.
+
+### `[baum-2024]` — DBP workforce supply, 2020 to 2040
+
+Baum RA, Berman BD, Fussell JJ, et al. **Child health needs and the developmental-behavioral pediatrics workforce supply: 2020-2040.** *Pediatrics.* 2024;153(Suppl 2). doi:10.1542/peds.2023-063678H (PMID 38300001)
+
+- **Used for:** docs/branching-logic.md §13.6 (why the feature exists).
+- **Supports the claim:** About 1.0 DBP subspecialist per 100,000 US children in 2023, projected to stay at 0.8 to 1.0 through 2040. Supports the premise that follow-up visits compete with new evaluations for a fixed supply. No study was found that tests whether handing stable patients back to primary care improves access or is safe; §13.6 says so.
+- **Verified:** bibliographic details confirmed against PubMed PMID 38300001 on 2026-11-12 (Claude session). PubMed returned no page or e-locator; **needs verification** on the article page before quoting outside this repo. Maintainer initials pending.
+
+### `[aap-mh-toolkit-2e]` — AAP Mental Health Toolkit, 2nd edition (needs verification)
+
+American Academy of Pediatrics. **Addressing Mental Health Concerns in Pediatrics: A Practical Resource Toolkit for Clinicians, 2nd edition.**
+
+- **Used for:** docs/branching-logic.md §13.6. Named by the maintainer on 2026-11-12 as the source primary care can draw on for the mood and safety recheck, together with the NIMH ASQ toolkit.
+- **Supports the claim:** Not yet established. The maintainer's copy could not be read in the session that built the list (the folder was reachable but its files were not returned), so no wording in the `mood` row comes from it. The title above is from memory.
+- **Verified:** **needs verification**. Title, edition, year and publisher detail are unconfirmed; do not quote from this entry.
+
+### `[nimh-asq-toolkit]` — NIMH Ask Suicide-Screening Questions toolkit, outpatient pathway
+
+National Institute of Mental Health. **Ask Suicide-Screening Questions (ASQ) Toolkit: Youth ASQ Toolkit, Outpatient Primary Care and Specialty Clinics.** <https://www.nimh.nih.gov/research/research-conducted-at-nimh/asq-toolkit-materials/youth-asq-toolkit>
+
+- **Used for:** autism-ap-builder.html, the `mood` and `tSuicide` rows of `PCP_DEFS`; docs/branching-logic.md §13.6.
+- **Supports the claim (read 2026-11-13: the outpatient clinical pathway, the Brief Suicide Safety Assessment guide and worksheet, the information sheet, the nurse script and the parent flyer):** screening is for ages 10 and older (8 and 9 with behavioral health complaints); a non-acute positive screen is followed by the Brief Suicide Safety Assessment (BSSA) before the patient leaves; the BSSA worksheet's dispositions are emergency evaluation, further evaluation with a mental health referral "preferably within 72 hours", non-urgent mental health follow-up, or no further intervention; every positive screen gets a safety plan and counseling on storing or removing lethal means.
+- **Not from this source:** the local services named in `tSuicide` (UF Psychiatric Hospital (Vista), Meridian, SMA, Charlie Health, the Community Action Treatment team and its number, myflfamilies.com/catt). Those are the attending's list for this region (2026-11-13) and were not independently checked. The toolkit's accuracy in autistic youth, and any screen for a child under 10 or one who does not use speech, are not established in the sources read; the `mood` row says to ask the child and caregiver and names no tool for them.
+- **Also supports (toolkit materials page, <https://www.nimh.nih.gov/research/research-conducted-at-nimh/asq-toolkit-materials>, read 2026-11-12):** "designed to screen medical patients", "a free resource for use in medical settings"; "four brief suicide screening questions" ("four yes/no questions") that take "20 seconds to administer"; the BSSA is "conducted by a trained clinician" (social workers, nurse practitioners, physician assistants, physicians and others); the pathway figure labels the BSSA "10-15 minutes" (figure text, not body text); "Any patient that screens positive, regardless of disposition, should be given the Patient Resource List." Used for the plain-language `mood` and `tSuicide` rows.
+- **Verified:** 2026-11-13, the six outpatient documents listed above, downloaded from nimh.nih.gov; materials page 2026-11-12 (Claude session).
 
 ---
 

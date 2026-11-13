@@ -58,7 +58,7 @@ PEERS (Program for the Education and Enrichment of Relational Skills) or compara
       Current society guidance recommends that first-tier evaluation for unexplained neurodevelopmental disorders include exome or genome sequencing (ES/GS) together with chromosomal microarray (CMA), sequential or concurrent, with trio analysis when feasible.¹,² Fragile X (FMR1) testing and screening for treatable inborn errors of metabolism are recommended at the second tier in apparently nonsyndromic cases, or earlier if phenotype or family history is suggestive.¹
       Establishing a specific genetic etiology supports prognostication, surveillance for disorder-related complications, accurate recurrence risk for the family, eligibility for disease-specific services and clinical trials, and (for treatable inborn errors of metabolism) directed therapy.¹
       Per scope of practice, our clinic does not perform genetic consent, pretest counseling, or ordering of specialized genetic testing; these are coordinated by clinical genetics, including testing selection, dysmorphology examination, specimen collection, and order entry. Venipuncture for limited testing (Fragile X, CMA) is available at our clinic but is deferred on compassionate grounds, as it is poorly tolerated in children with autism and developmental delays; centralizing specimen collection through clinical genetics avoids repeated traumatic blood draws. Electronic referral placed via Epic.
-  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: anxiety, depression, OCD. Behavioral strategies should be maximized prior to and concurrent with any medication.
+  • Child/Adolescent Psychiatry: Referral for: OCD (psychiatry OCD clinic). Behavioral strategies should be maximized prior to and concurrent with any medication.
 
   References (genetics):
     1. Rodan LH, Stoler J, Chen E, Geleske T; Council on Genetics. Genetic evaluation of the child with intellectual disability or global developmental delay: clinical report. Pediatrics. 2025;156(1):e2025072219. doi:10.1542/peds.2025-072219
@@ -94,14 +94,13 @@ Plan:
   Treatment is indicated based on the functional impairment documented in the Assessment above.
   • ASD-adapted CBT first-line (psychotherapy): "Facing Your Fears" program or equivalent; must include visual supports, gradual exposure hierarchy tailored to sensory and communication profile, and use of special interests as motivators.
   • Environmental accommodations: predictable schedules, visual schedules, advance warning before transitions, designated calm-down space.
-  Pharmacotherapy for anxiety in ASD differs from standard care: multiple SSRI RCTs (citalopram, fluoxetine) in ASD youth showed NO superiority over placebo and high rates of behavioral activation syndrome (agitation, hyperactivity, or impulsivity). Non-SSRI agents have stronger ASD-specific evidence:
-  • Mirtazapine (preferred first-line if medication needed): start 3.75 mg at bedtime; increase by 3.75 mg weekly; maximum 45 mg/day. Only published RCT of a medication specifically for anxiety in ASD youth (47% "much improved" vs. 20% placebo). Additional benefit if sleep or appetite are concerns. Common adverse effects: drowsiness, weight gain, increased appetite.
-  • Buspirone (preferred first-line alternative): start 2.5 mg each morning; increase by 2.5 mg weekly to target 15 mg twice daily. Open-label data in ASD: 41–58% positive response. Minimal adverse effect profile. Allow 2–4 weeks for onset.
-  • Guanfacine ER (if co-occurring ADHD, sleep disruption, or irritability): start 1 mg; titrate to 4 mg/day maximum. Addresses multiple targets simultaneously.
-  • SSRIs (second-line, after above fail): use with caution in ASD; behavioral activation (increased energy, impulsiveness, hyperactivity, insomnia, stereotypy) common; start at lowest available dose; monitor closely for first 2-4 weeks; black box warning for suicidality counseled. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.
-  • Benzodiazepines: avoid chronic use; paradoxical activation risk in ASD; short-term bridge use only if needed during acute episodes.
   • IEP/504: anxiety-driven school avoidance, school refusal, and performance anxiety should be addressed in educational plan.
-  • Psychiatry co-management for medication management; via existing referral.
+  Medication reasoning: No SSRI has been tested against placebo for anxiety in autistic youth; the autism SSRI trials targeted repetitive behavior. When medication is needed, this clinic starts with sertraline or fluoxetine, and considers mirtazapine only after an SSRI together with an alpha-2 agonist has not been sufficient and medical causes have been ruled out.
+  • Medication: {agent, dose and schedule started today, or reason deferred}. Titration: {step and interval}. Planned maximum: {dose}. Tried before and stopped: {none / agent and reason}.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.
+  • If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.
+  • This clinic prescribes and adjusts this medication.
 
 ── Problem 3: Depressive Disorder (F32.9) ──
 
@@ -110,16 +109,16 @@ Assessment:
   Safety screening performed at this encounter: {negative / positive — if positive, describe safety plan and resources provided}.
 
 Plan:
-  • Safety plan and crisis resources provided: 988 Suicide & Crisis Lifeline (call or text 988); Crisis Text Line (text HOME to 741741).
+  • Safety plan and crisis resources (988 Suicide & Crisis Lifeline, call or text 988; Crisis Text Line, text HOME to 741741): {provided / not needed, screen negative}.
   Treatment is indicated based on the functional impairment documented in the Assessment above.
   • Psychotherapy first-line: Behavioral Activation therapy (BA) or modified CBT adapted for ASD; requires therapist with both depression and ASD training.
-  Pharmacotherapy for depression in ASD: no RCTs of depression treatment specifically in ASD exist. SSRIs (while first-line in neurotypical pediatric depression) have not shown consistent efficacy in ASD and carry high risk of behavioral activation syndrome (agitation, hyperactivity, or impulsivity). ASD-specific preferred agents:
-  • Duloxetine (SNRI; preferred first-line if comorbid anxiety or pain): start 20 mg daily; increase by 10 mg every 1-2 weeks; range 20-90 mg/day in 1-2 divided doses. Addresses co-occurring anxiety and depression simultaneously. Black box warning: suicidality; monitor closely.
-  • Mirtazapine (preferred if sleep disruption, appetite loss, or anxiety co-occurring): start 3.75 mg at bedtime; increase by 3.75 mg weekly; maximum 45 mg/day. Common adverse effects: drowsiness, weight gain.
-  • Bupropion (if ADHD symptoms co-occurring or SSRI/SNRI not tolerated): start 150 mg ER daily; may increase to 300 mg/day after ≥7 days (FDA adult label; pediatric practice typically extends to 7-14 days; typically reserved for school-age children and adolescents — off-label; exercise caution in children under 12). Does not cause weight gain or sexual dysfunction. Caution: lowers seizure threshold; avoid if epilepsy co-occurring; activating and may worsen anxiety.
-  • SSRIs (second-line, after above agents fail): fluoxetine has strongest neurotypical pediatric RCT evidence but monitor closely for behavioral activation syndrome (agitation, hyperactivity, disinhibition) in ASD at each dose change; black box warning for suicidality counseled. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.
-  • Psychiatry referral: strongly recommended for medication management and ongoing safety monitoring.
-  • Shortened return-to-clinic interval: 4–6 weeks.
+  Medication reasoning: No medication trial has tested the treatment of depression in autistic youth. When medication is needed, this clinic starts with sertraline or fluoxetine and moves early to duloxetine if the depression is not responding; mirtazapine is considered only after an SSRI together with an alpha-2 agonist has not been sufficient and medical causes have been ruled out.
+  • Medication: {agent, dose and schedule started today, or reason deferred}. Titration: {step and interval}. Planned maximum: {dose}. Tried before and stopped: {none / agent and reason}.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.
+  • If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.
+  • This clinic prescribes and adjusts this medication.
+  • Shortened return-to-clinic interval: 4 to 6 weeks.
 
 ── Problem 4: OCD / Obsessive-Compulsive Disorder (F42.9) ──
 
@@ -129,11 +128,12 @@ Assessment:
 Plan:
   Treatment is indicated based on the functional impairment documented in the Assessment above.
   • ERP (Exposure and Response Prevention) is the evidence-based psychotherapy for OCD; not generic CBT. Therapist must have specific ERP training and ASD experience.
-  • SSRI at OCD-range dosing. Note: OCD typically requires 2-3x the dose used for anxiety (e.g., sertraline target 150-200 mg for OCD vs. 50-100 mg for anxiety); do not assume an anxiety dose is sufficient.
-  • Minimum 8–12 week trial at therapeutic dose before concluding treatment failure.
-  • Clomipramine: option for refractory cases; ECG required before initiation.
-  • Combination ERP + SSRI is more effective than either alone for moderate-to-severe OCD.
-  • Psychiatry referral for medication management.
+  • Referrals: psychiatry OCD clinic (medication management) and psychology OCD therapy clinic (ERP).
+  Medication reasoning: When medication is needed, this clinic starts sertraline while the psychiatry OCD clinic referral is pending. ERP combined with an SSRI is recommended for moderate to severe OCD, and the full effect of medication can take 8 to 12 weeks (Florida Best Practice guideline).
+  • Medication: {agent, dose and schedule started today, or reason deferred}. Titration: {step and interval}. Planned maximum: {dose}. Tried before and stopped: {none / agent and reason}.
+  • Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.
+  • All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.
+  • If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.
 
 RETURN TO CLINIC
 Return to clinic in 3 months.

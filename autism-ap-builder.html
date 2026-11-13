@@ -672,6 +672,27 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 /* When reviewer's-eye is on, mute placeholder highlights */
 body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
 
+/* ── Primary care list workspace (PCP Recs tab) ──────────────────────────
+   Each row carries its own leave-out and move-up buttons. Reviewer view hides the
+   controls, the status strip and the left-out rows, leaving what a copy carries. */
+.pcp-doc .pcp-title{font-size:13pt;font-weight:700;margin:0 0 4px}
+.pcp-doc .pcp-group{font-weight:700;font-size:10.5pt;margin:16px 0 4px;color:var(--gray-700)}
+.pcp-doc .pcp-list{list-style:none;margin:0;padding:0}
+.pcp-row{display:flex;align-items:flex-start;gap:10px;padding:5px 6px;border-radius:var(--radius-sm);font-size:10.5pt;line-height:1.55}
+.pcp-row + .pcp-row{border-top:1px solid var(--border-subtle)}
+.pcp-row.is-omitted .pcp-text{color:var(--gray-500);text-decoration:line-through}
+.pcp-ctl{display:inline-flex;gap:4px;flex-shrink:0;min-width:62px;padding-top:1px}
+.pcp-text{flex:1;min-width:0}
+.pcp-btn{width:28px;height:26px;border-radius:var(--radius-sm);border:1px solid var(--border-control);background:var(--bg-card);color:var(--gray-600);cursor:pointer;font-size:var(--text-12);font-family:var(--font);line-height:1;padding:0}
+.pcp-btn.is-on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);font-weight:700}
+.pcp-btn:disabled{opacity:.45;cursor:not-allowed}
+@media (hover:hover){.pcp-btn:not(:disabled):hover{border-color:var(--accent)}}
+.pcp-tag{display:inline-block;min-width:60px;text-align:center;font-size:var(--text-10);font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-500);border:1px dashed var(--border-control);border-radius:var(--radius-sm);padding:4px 0;cursor:help}
+.pcp-status.pcp-off{background:var(--gray-100);border-left:4px solid var(--gray-300);padding:9px 13px;margin-bottom:12px;border-radius:0 4px 4px 0;font-size:var(--text-12);color:var(--gray-600)}
+.pcp-doc .pcp-hint{font-size:var(--text-11);color:var(--gray-500);margin:18px 0 0;border-top:1px dashed var(--border-subtle);padding-top:9px;line-height:1.5}
+body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-hint,body.reviewer-eye .pcp-row.is-omitted{display:none}
+@media (max-width:800px){.pcp-btn{width:40px;height:40px}.pcp-ctl{min-width:86px}.pcp-tag{min-width:84px;padding:10px 0}}
+
 /* ── Toast notifications (replaces alert) ────────────────────────────── */
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:var(--space-3);pointer-events:none;max-width:380px}
 .toast{background:var(--gray-900);color:white;padding:10px 14px;border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:12.5px;line-height:1.5;font-weight:500;pointer-events:auto;opacity:0;transform:translateY(-8px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);max-width:100%;display:flex;align-items:flex-start;gap:var(--space-3)}
@@ -1432,6 +1453,12 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row" style="margin-left:16px"><input type="checkbox" data-key="single" value="neurologyNowForSeizure"> Also refer to neurology now (without waiting for EEG result)</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
+        <div class="grp-sep">Psychiatry referral, by exception</div>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">This clinic manages medication for ADHD, anxiety and depression, so those diagnoses do not refer on their own. Tick a reason to add the referral; the note states it. OCD refers to the psychiatry OCD clinic automatically.</div>
+        <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="mania_psychosis"> Concern for mania or psychosis</label>
+        <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="treatment_failure"> Treatment has not worked</label>
+        <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="substance_use"> Substance use complicating treatment</label>
+        <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="safety"> Safety concern</label>
         <div class="grp-sep">Labs &amp; studies ordered</div>
         <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Write the reason, end it with a colon, then list the tests under it one per line (pasting from Epic works). Leave a blank line between groups. A test with no reason can sit on its own line. Prints in the plan as its own section, exactly as typed.</div>
         <textarea class="strengths-area" id="labsOrderedField" aria-label="Labs and studies ordered" rows="5" placeholder="Pica, screen for iron deficiency and lead exposure:&#10;CBC with differential&#10;Ferritin&#10;Lead level&#10;&#10;Vitamin D"></textarea>
@@ -1671,10 +1698,39 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <label class="cb-row"><input type="checkbox" data-key="ag" value="screen_time"> Screen time guidance</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="highlyMotivated"> Family is highly motivated for home learning resources</label>
       </div>
-      <hr class="divider" style="margin-top:10px">
-      <div class="field-group" style="margin-top:8px">
+    </div>
+  </div>
+
+  <!-- 10. Follow-up & Primary Care: the follow-up plan, the return interval, and the
+       clinician's own lines for the primary care list. The list itself (with its
+       leave-out and move-up controls) is the "PCP Recs" output tab. -->
+  <div class="section">
+    <div id="sh-followup" class="sec-head" role="heading" aria-level="2" onclick="toggleSec(this,event)"><button type="button" class="sec-label sec-btn"><span class="sec-folio">10</span><span class="sec-kicker">Handoff</span><span class="sec-title">Follow-up &amp; Primary Care</span></button><span class="sec-chevron" aria-hidden="true">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="field-group">
+        <span class="field-label" id="dbpFollowUpLabel">DBP follow-up plan</span>
+        <div class="radio-grid" role="group" aria-labelledby="dbpFollowUpLabel">
+          <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="pcp">No routine DBP follow-up</label>
+          <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="dbp">DBP follow-up continues</label>
+        </div>
+        <div class="field-hint" style="margin:5px 0 0;font-size:var(--text-11);color:var(--gray-500)">Choosing a plan finishes the primary care list and adds it to the note. With "No routine DBP follow-up", anything in the form that still needs this clinic (testing to finish, forms to review) is named as the one reason to return.</div>
+        <label class="cb-row" style="margin:8px 0 0"><input type="checkbox" id="rxStartedTodayCb"> Medication started or dose changed today</label>
+        <div class="field-hint" style="margin:2px 0 0 22px;font-size:var(--text-11);color:var(--gray-500)">For ADHD, anxiety, depression or OCD medication in the plan. This clinic adjusts the dose until it is stable, so the list keeps one return visit for that instead of handing the child back now.</div>
+      </div>
+      <div class="field-group">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
         <input type="text" id="rtcIntervalField" aria-label="Return to clinic interval" placeholder="e.g., 6 months, 1 year, as needed..." style="width:100%;font-size:var(--text-12);font-family:var(--font);border-radius:3px;padding:5px 8px;color:var(--gray-700)">
+      </div>
+      <div class="field-group">
+        <span class="field-label">Your own lines for primary care <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">One recommendation per line. They print after the generated actions, exactly as typed, and are not saved in a selections string.</div>
+        <textarea class="strengths-area" id="pcpExtraField" aria-label="Your own recommendations for primary care" rows="3" placeholder="PCP (next visit): recheck weight after the medication change"></textarea>
+        <span class="phi-hint">PHI-free zone: no names, MRNs, dates, or result values. Avoid curly braces { }, which Epic treats as fill-in stops.</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <label class="cb-row" style="margin:0"><input type="checkbox" id="pcpInNoteCb" checked> Add the list to the A&amp;P note</label>
+        <label class="cb-row" style="margin:0" title="The follow-up plan is normally discussed with the family at the visit. Tick this only when it was not; the list then says so and leaves a fill-in for how the family will be told."><input type="checkbox" id="pcpNotDiscussedCb"> Plan not yet discussed with the family</label>
+        <button class="btn btn-gray btn-sm" type="button" onclick="setPreviewMode('pcp')">Review the list</button>
       </div>
     </div>
   </div>
@@ -1807,6 +1863,7 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
         <button class="tab-btn is-on" id="tabNote" onclick="setPreviewMode('note')" aria-pressed="true">A&amp;P Note</button>
         <button class="tab-btn" id="tabABA" onclick="setPreviewMode('aba')" aria-pressed="false" style="display:none">&#9733; ABA Letter</button>
         <button class="tab-btn" id="tabIEP" onclick="setPreviewMode('iep')" aria-pressed="false" style="display:none">&#9733; IEP Letter</button>
+        <button class="tab-btn" id="tabPCP" onclick="setPreviewMode('pcp')" aria-pressed="false">PCP Recs</button>
       </div>
       <button class="rev-eye-btn" id="revEyeBtn" type="button" onclick="toggleReviewerEye()" aria-pressed="false" title="Toggle reviewer's-eye view (strip {placeholder} highlighting to preview what the payer or school will see)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1835,6 +1892,11 @@ body.reviewer-eye .iep-ph,body.reviewer-eye .aba-ph{background:transparent;color
     <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
+  <div class="note-sticky-bar" id="pcpStickyBar" style="display:none">
+    <button class="btn btn-gray btn-sm" id="pcpResetBtn" onclick="resetPcpEdits()" title="Put back every line you left out and return the list to its standard order.">Undo my edits</button>
+    <button class="btn btn-green btn-sm" id="copyPCPBtn" onclick="copyPCP('rich')">&#9733; Copy List (rich)</button>
+    <button class="btn btn-epic btn-sm" id="copyPCPEpicBtn" onclick="copyPCP('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
+  </div>
 </div>
 </div><!-- /main -->
 
@@ -1851,6 +1913,16 @@ function initialState(){ return {
   diagStatus:'', asdLevelSC:'', asdLevelRRB:'', asdLevelJustificationSC:'', asdLevelJustificationRRB:'',
   visitType:'',
   rtcInterval:'',
+  // Primary care list (see PCP_DEFS). dbpFollowUp: ''=not chosen | 'pcp'=no routine DBP
+  // follow-up | 'dbp'=DBP follow-up continues; the list reaches the note only once one is
+  // chosen and pcpInNote is on. pcpOmit / pcpFirst hold PCP_DEFS row ids the clinician left
+  // out or moved up (pcpFirst in click order). pcpExtra is typed, one line per row.
+  dbpFollowUp:'', pcpInNote:true, pcpNotDiscussed:false, pcpOmit:new Set(), pcpFirst:new Set(), pcpExtra:'',
+  // A medication was started or its dose changed at this visit. The note's medication blocks
+  // say this clinic adjusts the dose until stable, so that titration is open work (pcpCtx).
+  rxStartedToday:false,
+  // Why psychiatry is involved (see rulePsychiatry). Any entry turns the referral on.
+  psychReasons:new Set(),
   specifiers:new Set(),
   // PR-K + PR-L: COG_SPEC_EXCL keys (withID/withSuspectedID/withGDD/withSuspectedGDD/
   // withBIF/withoutID/withoutGDD) the clinician has manually toggled. Bridge respects
@@ -2409,10 +2481,16 @@ function ruleGenetics() {
 // referral can wait for more diagnostic context; a neurology referral for
 // regression should not.
 function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNeuroFindings||S.neurologyNowForSeizure||S.developmentalRegression||gaitFindings().needsNeuro}; }
+// Psychiatry by exception (attending, 2026-11-12 and 2026-11-13): this clinic prescribes
+// for ADHD, anxiety and depression itself, so those diagnoses no longer refer on their own.
+// Psychiatry comes in for a reason the clinician selects (S.psychReasons) and for OCD, which
+// goes to the psychiatry OCD clinic. WARY: the aggression/self-injury trigger is the
+// pre-existing rule, kept because the attending has not ruled on it either way.
+const PSYCH_REASON_LABELS={mania_psychosis:'concern for mania or psychosis',treatment_failure:'treatment that has not worked',
+  substance_use:'substance use complicating treatment',safety:'safety concern'};
 function rulePsychiatry() {
-  const med=hasConfirmedADHD()||S.comorbid.has('anxiety')||S.comorbid.has('depression')||S.comorbid.has('ocd');
   const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus();
-  return {include:med||sev};
+  return {include:S.psychReasons.size>0||S.comorbid.has('ocd')||sev};
 }
 // Fecal smearing contributes a GI trigger only when a medical cause is NOT ruled out
 // (suspected/unclear/unspecified) — once the clinician marks it ruled out, smearing stops
@@ -2897,6 +2975,11 @@ function evalPathSteps(){
   return {hasProfile,hasDx,dxTodayAllowed,profileDone,dxStatus,dxDone,dxOutcome:hasDx&&dxDone?S.evalDxOutcome:'',pendingTesting};
 }
 
+// A suspected ID/GDD specifier whose confirming evaluation is not already in hand, and the
+// wider test that also counts a screener-level borderline finding. Shared by the note's
+// workup section and the primary care list so the two cannot disagree about what is pending.
+function suspectedIDorGDDPending(){ return (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal'; }
+function cogEvalReferralPending(){ return suspectedIDorGDDPending()||bifIdRisk(); }
 function generateNote() {
   const pr=getPron();
   const L=[];
@@ -3079,11 +3162,11 @@ function generateNote() {
   // Diagnostic Workup — also fires when ID/GDD is suspected so the comprehensive evaluation
   // referral has somewhere to live (otherwise it'd be silently dropped when no ASD workup is
   // documented but the suspected-ID gating still demands a formal evaluation recommendation).
-  const hasSuspectedIDorGDD = (S.specifiers.has('withSuspectedID')||S.specifiers.has('withSuspectedGDD'))&&S.cogDataSource!=='priorExternal';
+  const hasSuspectedIDorGDD = suspectedIDorGDDPending();
   // Screener/clinical borderline routes to the SAME confirmatory-evaluation referral
   // (ID is not yet excluded), without asserting suspected ID. bifIdRisk() already
   // excludes priorExternal, so no extra source guard is needed here.
-  const hasCogEvalReferral = hasSuspectedIDorGDD || bifIdRisk();
+  const hasCogEvalReferral = cogEvalReferralPending();
   // Evaluation-path output survives a Confirmed diagnosis only when it documents SUPPORT for
   // the established diagnosis rather than an in-progress workup: the "fairly certain" CARS-2
   // pathways (certainYoung/certainOlder) always qualify, and — approved 2026-07-16, same
@@ -3131,7 +3214,7 @@ function generateNote() {
         L.push(tmReturned.length?'Materials still awaited from teacher / external informants:':'Materials requested from teacher / external informants:');
         tmAwaited.forEach(k=>{if(tmLabels[k])L.push('  • '+tmLabels[k]);});
         // Chase-the-family line only while something is actually outstanding.
-        L.push('Family to provide teacher contact information. Materials to be returned at or before the next visit.');
+        L.push('Family to provide teacher contact information. Materials to be returned at or before '+fuDbpVisit('the next visit').replace(/^at /,'')+'.');
       }
     }
     if(evalPathShows){
@@ -3810,7 +3893,7 @@ function generateNote() {
     L.push('  • Sleep hygiene: dark, cool, quiet environment; screen-free hour before bed');
     L.push('  • Stimulus control: bedroom associated with sleep only');
     L.push('  • Visual bedtime routine schedule recommended');
-      L.push('Low-dose melatonin (0.5–1 mg, 30–60 minutes before target bedtime) discussed as an adjunct to behavioral intervention. Dose and timing to be titrated to response. Behavioral strategies should be implemented concurrently and not replaced by melatonin.');
+    L.push(RX_MELATONIN);
     L.push('');
   }
 
@@ -3920,8 +4003,14 @@ function generateNote() {
       const neuroBody = clauses.length ? clauses.map(cap).join('. ') + '.' : 'Evaluation/management of neurological concern.';
       L.push('  • Pediatric Neurology: ' + neuroBody);
     }
-    if(hQ){L.push('  • QbTest (Quantified Behavior Test): FDA-cleared objective measurement of attention, impulsivity, and activity level to support ADHD evaluation given confounding variables and/or insufficient corroborating data. To be scheduled following insurance verification. Results reviewed at follow-up.');}
-    if(hP){const i=[];if(hasConfirmedADHD())i.push('ADHD');if(S.comorbid.has('anxiety'))i.push('anxiety');if(S.comorbid.has('depression'))i.push('depression');if(S.comorbid.has('ocd'))i.push('OCD');if(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib')||S.needsBehavior.has('property'))i.push('severe interfering behaviors');L.push('  • Child/Adolescent Psychiatry: Pharmacologic evaluation for: '+(i.join(', ')||'co-occurring concerns')+'. Behavioral strategies should be maximized prior to and concurrent with any medication.');}
+    if(hQ){L.push('  • QbTest (Quantified Behavior Test): FDA-cleared objective measurement of attention, impulsivity, and activity level to support ADHD evaluation given confounding variables and/or insufficient corroborating data. To be scheduled following insurance verification. Results reviewed '+fuDbpVisit('at follow-up')+'.');}
+    if(hP){
+      // States why psychiatry is involved; a tile forced on with no reason leaves a fill-in.
+      const i=Object.keys(PSYCH_REASON_LABELS).filter(k=>S.psychReasons.has(k)).map(k=>PSYCH_REASON_LABELS[k]);
+      if(S.comorbid.has('ocd'))i.push('OCD (psychiatry OCD clinic)');
+      if((S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus())i.push('severe interfering behaviors');
+      L.push('  • Child/Adolescent Psychiatry: Referral for: '+(i.join('; ')||'{reason for referral}')+'. Behavioral strategies should be maximized prior to and concurrent with any medication.');
+    }
     if(hGI){
       if(S.needsBehavior.has('pica')){
         L.push('  • Pediatric GI: Referral indicated given documented pica. Evaluation for foreign body ingestion risk, nutritional deficiencies (iron, zinc, lead exposure), and gastrointestinal sequelae of non-food ingestion. Coordinate with ABA team on pica reduction protocol; GI and behavioral interventions are complementary and should proceed concurrently.');
@@ -4086,9 +4175,9 @@ function generateNote() {
   if(S.ag.size){
     L.push(n+++'. ANTICIPATORY GUIDANCE');
     if(S.ag.has('caregiver_support')) L.push('  • Caregiver Support: Caregiver mental health and wellbeing are essential to patient outcomes. Resources: NAMI (National Alliance on Mental Illness) - Gainesville chapter offers support groups, the Family-to-Family education program, and crisis resources; nami.org or NAMI Helpline: 1-800-950-6264. UF CARD caregiver support groups: card.ufl.edu | (352) 273-0517. Autism Society of America: autism-society.org. Respite care resources through APD (Agency for Persons with Disabilities).');
-    if(S.ag.has('sibling')) L.push('  • Sibling Recurrence: Elevated ASD/developmental risk (~10–20%). All siblings should be monitored.');
+    if(S.ag.has('sibling')) L.push('  • Sibling Recurrence: About 1 in 5 younger siblings of an autistic child are later diagnosed with autism (Ozonoff 2011; Ozonoff 2024). All siblings should be monitored.');
     if(S.ag.has('sleep_hygiene')) L.push('  • Sleep Hygiene: Consistent schedule, screen-free hour before bed, dark/cool environment, visual bedtime routine.');
-    if(S.ag.has('nutrition')) L.push('  • Nutrition/Feeding: Many children with ASD have sensory-based food selectivity. Strategies: reduce mealtime pressure; offer familiar and novel foods together without requiring tasting; allow food exploration at the child\'s pace. Food chaining (systematic, therapist-guided expansion of food acceptance through a sensory hierarchy) is the primary evidence-based approach — families should implement food chaining only under guidance from an SLP or OT with feeding training, not independently. SLP/OT feeding referral is recommended when diet is restricted to fewer than 20 foods, when nutritional adequacy is in question, or when mealtime distress is affecting family functioning — early referral produces better outcomes than waiting for severity to escalate. Multivitamin recommended if diet is nutritionally restricted.');
+    if(S.ag.has('nutrition')) L.push('  • Nutrition/Feeding: Many children with ASD have sensory-based food selectivity. Strategies: reduce mealtime pressure; offer familiar and novel foods together without requiring tasting; allow food exploration at the child\'s pace. Food chaining (systematic, therapist-guided expansion of food acceptance through a sensory hierarchy) is the primary evidence-based approach — families should implement food chaining only under guidance from an SLP or OT with feeding training, not independently. SLP/OT feeding referral is recommended when the child accepts a narrow range of foods or refuses whole food groups, when nutritional adequacy or growth is in question, or when mealtime distress is affecting family functioning — early referral produces better outcomes than waiting for severity to escalate. Multivitamin recommended if diet is nutritionally restricted.');
     if(S.ag.has('advocacy')) L.push('  • Educational Rights/Advocacy: IDEA rights, Section 504, and special ed advocacy resources provided.');
     if(S.ag.has('transition')) L.push('  • Transition Planning: Begin by age 14–16. Domains: vocational, post-secondary education, independent living, healthcare transition, guardianship, SSI, ABLE accounts.');
     if(S.ag.has('puberty')) L.push('  • Puberty/Sexuality/Body Safety: Age-appropriate guidance on puberty, consent, body privacy, and online safety.');
@@ -4119,38 +4208,25 @@ function generateNote() {
     L.push('');L.push('Plan:');
     if(confirmed){
       L.push('  Treatment is indicated based on the functional impairment documented in the Assessment above.');
+      L.push('  • IEP/504 accommodations (extended time, preferential seating, chunked assignments) regardless of medication status.');
       if(S.diagStatus==='confirmed'){
-        L.push('  Medication approach in ASD+ADHD differs from standard ADHD care: only ~49% of ASD children respond to methylphenidate (vs. higher rates in non-autistic ADHD); adverse effect rates are higher. Non-stimulants, particularly guanfacine ER, have RCT support in ASD and may be preferred as first-line agents in many patients.');
-        L.push('  • Non-stimulants (consider first-line in ASD):');
-        L.push('    -Guanfacine ER: start 1 mg daily; increase by 1 mg/week to maximum 4 mg/day. Has RCT evidence in ASD (50% positive response; also benefits irritability, anxiety, sleep, tics). Additional benefit if sleep or anxiety co-occurring.');
-        L.push('    -Clonidine ER: start 0.1 mg at night; increase weekly by 0.1 mg to maximum 0.4 mg/day. More sedating than guanfacine; useful if sleep-onset is a target.');
-        L.push('    -Atomoxetine: start 0.5 mg/kg/day; titrate to 1.2–1.4 mg/kg/day (max 100 mg/day). Black box warning: suicidal ideation; monitor closely.');
-        L.push('  • Stimulants (if non-stimulant insufficient or not tolerated):');
-        L.push('    -Methylphenidate IR: start 2.5 mg AM; increase by 2.5 mg every 5–7 days. Maximum 35 mg/day (≤25 kg) or 60 mg/day (>25 kg).');
-        L.push('    -Amphetamine salts IR: start 2.5 mg; maximum 40 mg/day (or 60 mg/day if >50 kg). No RCTs in ASD; extrapolated from ADHD data.');
-        L.push('    -ER formulations preferred once effective IR dose established.');
-        L.push('  • Cardiac screening before initiation (history and exam; ECG if indicated).');
-        L.push('  • Monitor at each titration step: appetite, weight/growth, sleep onset, mood/irritability, and stereotypy. Note: ASD patients are less likely to self-report adverse effects; behavioral change is the signal.');
-        L.push('  • Vanderbilt or Conners Rating Scales (teacher and parent forms) at each titration visit to quantify response.');
-        L.push('  • IEP/504 accommodations (extended time, preferential seating, chunked assignments) regardless of medication status.');
-        L.push('  • Psychiatry co-management for medication management; via existing referral or new referral if not already placed.');
+        // 49% of 72: [rupp-2005]. The second sentence is this clinic's practice (attending,
+        // 2026-11-13), not a guideline ranking, and is worded as such.
+        L.push('  Medication reasoning: Stimulants remain the first choice for ADHD (AAP 2019). In autistic children the response to methylphenidate is lower (49% of 72 children in one trial) and side effects stop treatment more often. This clinic considers guanfacine ER or clonidine ER when emotional dysregulation goes beyond ADHD alone or sleep is a problem, and atomoxetine when anxiety co-occurs.');
       } else {
-        L.push('  • Stimulant monotherapy first-line (FL BHC Level 1): methylphenidate class or amphetamine class, IR or ER formulation; if first stimulant is insufficient or not tolerated, try monotherapy with another stimulant before escalating.');
-        L.push('  • Level 2 options if stimulant inadequate: extended-release alpha-2 agonist + stimulant combination; or alpha-2 agonist (guanfacine ER or clonidine ER) monotherapy; or atomoxetine or viloxazine monotherapy.');
-        L.push('    -Guanfacine ER: start 1 mg daily; increase by 1 mg/week to maximum 4 mg/day.');
-        L.push('    -Clonidine ER: start 0.1 mg at night; titrate weekly to maximum 0.4 mg/day.');
-        L.push('    -Atomoxetine: start 0.5 mg/kg/day; titrate to 1.2–1.4 mg/kg/day (max 100 mg/day). Black box warning: suicidal ideation; monitor closely.');
-        L.push('  • Cardiac screening before initiation (history and exam; ECG if indicated).');
-        L.push('  • Monitor: appetite, weight/growth, pulse, blood pressure at each titration step.');
-        L.push('  • Vanderbilt or Conners Rating Scales (teacher and parent forms) at each titration visit to quantify response.');
-        L.push('  • IEP/504 accommodations (extended time, preferential seating, chunked assignments) regardless of medication status.');
-        L.push('  • Psychiatry co-management for medication management; via existing referral or new referral if not already placed.');
+        L.push('  Medication reasoning: Stimulant monotherapy (methylphenidate or amphetamine class) is first; if the first stimulant is insufficient or not tolerated, the other class is tried next. An extended-release alpha-2 agonist, atomoxetine, or viloxazine follows (Florida Best Practice guideline, Levels 1 and 2).');
       }
+      L.push('  • '+RX_FILL);
+      L.push('  • '+RX_DOSE_SOURCE);
+      L.push('  • Before starting: cardiac history and examination; ECG if risk factors.');
+      L.push('  • At each visit: height, weight, pulse, blood pressure, appetite, sleep, and mood or irritability; parent and teacher rating scales (Vanderbilt or Conners) at each dose change.'+(S.diagStatus==='confirmed'?' Autistic children are less likely to report side effects themselves; a change in behavior is the signal.':''));
+      L.push('  • If guanfacine or clonidine is used, it is tapered, never stopped abruptly. If atomoxetine is used, it carries a boxed warning for suicidal thinking.');
+      L.push('  • '+rxOwner('This clinic adjusts the dose until it is stable; primary care then continues the medication. Return to this clinic if symptoms remain impairing at the planned maximum, or if the medication is not tolerated.'));
     } else {
       L.push('  • Defer stimulant medication; diagnosis not yet confirmed; behavioral strategies in ABA first.');
       L.push('  • QBTest (objective attention and hyperactivity measure): indicated if school-age or older.');
       L.push('  • Vanderbilt or Conners Rating Scales (teacher and parent forms) to quantify symptoms across settings.');
-      L.push('  • Re-evaluate ADHD status at next follow-up visit with rating scale data in hand.');
+      L.push('  • Re-evaluate ADHD status '+fuDbpVisit('at the next follow-up visit')+' with rating scale data in hand.');
       L.push('  • IEP/504 accommodations for attention may be warranted regardless of formal ADHD diagnosis.');
     }
     L.push('');
@@ -4165,27 +4241,20 @@ function generateNote() {
     if(S.diagStatus==='confirmed'){
       L.push('  • ASD-adapted CBT first-line (psychotherapy): "Facing Your Fears" program or equivalent; must include visual supports, gradual exposure hierarchy tailored to sensory and communication profile, and use of special interests as motivators.');
       L.push('  • Environmental accommodations: predictable schedules, visual schedules, advance warning before transitions, designated calm-down space.');
-      L.push('  Pharmacotherapy for anxiety in ASD differs from standard care: multiple SSRI RCTs (citalopram, fluoxetine) in ASD youth showed NO superiority over placebo and high rates of behavioral activation syndrome (agitation, hyperactivity, or impulsivity). Non-SSRI agents have stronger ASD-specific evidence:');
-      L.push('  • Mirtazapine (preferred first-line if medication needed): start 3.75 mg at bedtime; increase by 3.75 mg weekly; maximum 45 mg/day. Only published RCT of a medication specifically for anxiety in ASD youth (47% "much improved" vs. 20% placebo). Additional benefit if sleep or appetite are concerns. Common adverse effects: drowsiness, weight gain, increased appetite.');
-      L.push('  • Buspirone (preferred first-line alternative): start 2.5 mg each morning; increase by 2.5 mg weekly to target 15 mg twice daily. Open-label data in ASD: 41–58% positive response. Minimal adverse effect profile. Allow 2–4 weeks for onset.');
-      L.push('  • Guanfacine ER (if co-occurring ADHD, sleep disruption, or irritability): start 1 mg; titrate to 4 mg/day maximum. Addresses multiple targets simultaneously.');
-      L.push('  • SSRIs (second-line, after above fail): use with caution in ASD; behavioral activation (increased energy, impulsiveness, hyperactivity, insomnia, stereotypy) common; start at lowest available dose; monitor closely for first 2-4 weeks; black box warning for suicidality counseled. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.');
-      L.push('  • Benzodiazepines: avoid chronic use; paradoxical activation risk in ASD; short-term bridge use only if needed during acute episodes.');
       L.push('  • IEP/504: anxiety-driven school avoidance, school refusal, and performance anxiety should be addressed in educational plan.');
-      L.push('  • Psychiatry co-management for medication management; via existing referral.');
+      // Trial statement: [king-2009] [herscu-2020]. The order is this clinic's practice
+      // (attending, 2026-11-13) and matches the Florida guideline's first step.
+      L.push('  Medication reasoning: No SSRI has been tested against placebo for anxiety in autistic youth; the autism SSRI trials targeted repetitive behavior. When medication is needed, this clinic starts with sertraline or fluoxetine, and considers mirtazapine only after an SSRI together with an alpha-2 agonist has not been sufficient and medical causes have been ruled out.');
     } else {
       L.push('  • CBT first-line (psychotherapy): exposure-based CBT tailored to the anxiety subtype (GAD, separation anxiety, social anxiety, specific phobia); parent involvement essential.');
       L.push('  • Environmental accommodations: predictable schedules, advance warning before transitions, designated calm-down space; IEP/504 for anxiety-driven school avoidance or school refusal.');
-      L.push('  SSRI/SNRI first-line if medication needed (FL BHC 2022):');
-      L.push('  • Sertraline: child start 10–12.5 mg/day, max 100–150 mg/day; adolescent start 25 mg/day, max 150–200 mg/day.');
-      L.push('  • Fluoxetine: child start 2.5–5 mg/day, max 40 mg/day; adolescent start 5–10 mg/day, max 60–80 mg/day.');
-      L.push('  • Fluvoxamine: child start 12.5–25 mg/day, max 100–200 mg/day; adolescent start 25 mg/day, max 150–300 mg/day.');
-      L.push('  • Duloxetine (FDA-approved for GAD age ≥7 years): child start 20–30 mg/day, max 60 mg/day; adolescent start 30 mg/day, max 120 mg/day.');
-      L.push('  • Venlafaxine XR: start 37.5 mg/day; max 75–225 mg/day depending on weight.');
-      L.push('  • Titrate to lowest therapeutic dose; may increase after 1 month if well tolerated and significant symptoms remain. Allow 8–12 weeks for full effect. Black box warning for suicidality counseled.');
-      L.push('  • Benzodiazepines: avoid ongoing use; short-term bridge only with caution (disinhibition, mood lability risk; abuse potential).');
-      L.push('  • Psychiatry co-management for medication management; via existing referral.');
+      L.push('  Medication reasoning: For moderate to severe anxiety, or an inadequate response to CBT alone, fluoxetine or sertraline is started, alone or with CBT; the combination is more effective than medication alone (Florida Best Practice guideline, Level 2).');
     }
+    L.push('  • '+RX_FILL);
+    L.push('  • '+RX_DOSE_SOURCE);
+    L.push('  • '+RX_BOXED);
+    L.push('  • '+RX_ACTIVATION);
+    L.push('  • '+rxOwner('This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if anxiety is not improving with treatment, or is worsening.'));
     L.push('');
   }
 
@@ -4196,25 +4265,25 @@ function generateNote() {
     const dsSafe2=S.depressionSafety==='negative'?'negative.':S.depressionSafety==='positive'?'positive. {Describe safety plan and resources provided.}':'{negative / positive — if positive, describe safety plan and resources provided}.';
     L.push('  Safety screening performed at this encounter: '+dsSafe2);
     L.push('');L.push('Plan:');
-    L.push('  • Safety plan and crisis resources provided: 988 Suicide & Crisis Lifeline (call or text 988); Crisis Text Line (text HOME to 741741).');
+    // A fill-in, not "provided": the sentence used to print as done for every patient.
+    L.push('  • Safety plan and crisis resources (988 Suicide & Crisis Lifeline, call or text 988; Crisis Text Line, text HOME to 741741): {provided / not needed, screen negative}.');
     L.push('  Treatment is indicated based on the functional impairment documented in the Assessment above.');
     if(S.diagStatus==='confirmed'){
       L.push('  • Psychotherapy first-line: Behavioral Activation therapy (BA) or modified CBT adapted for ASD; requires therapist with both depression and ASD training.');
-      L.push('  Pharmacotherapy for depression in ASD: no RCTs of depression treatment specifically in ASD exist. SSRIs (while first-line in neurotypical pediatric depression) have not shown consistent efficacy in ASD and carry high risk of behavioral activation syndrome (agitation, hyperactivity, or impulsivity). ASD-specific preferred agents:');
-      L.push('  • Duloxetine (SNRI; preferred first-line if comorbid anxiety or pain): start 20 mg daily; increase by 10 mg every 1-2 weeks; range 20-90 mg/day in 1-2 divided doses. Addresses co-occurring anxiety and depression simultaneously. Black box warning: suicidality; monitor closely.');
-      L.push('  • Mirtazapine (preferred if sleep disruption, appetite loss, or anxiety co-occurring): start 3.75 mg at bedtime; increase by 3.75 mg weekly; maximum 45 mg/day. Common adverse effects: drowsiness, weight gain.');
-      L.push('  • Bupropion (if ADHD symptoms co-occurring or SSRI/SNRI not tolerated): start 150 mg ER daily; may increase to 300 mg/day after ≥7 days (FDA adult label; pediatric practice typically extends to 7-14 days; typically reserved for school-age children and adolescents — off-label; exercise caution in children under 12). Does not cause weight gain or sexual dysfunction. Caution: lowers seizure threshold; avoid if epilepsy co-occurring; activating and may worsen anxiety.');
-      L.push('  • SSRIs (second-line, after above agents fail): fluoxetine has strongest neurotypical pediatric RCT evidence but monitor closely for behavioral activation syndrome (agitation, hyperactivity, disinhibition) in ASD at each dose change; black box warning for suicidality counseled. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.');
+      // The order is this clinic's practice (attending, 2026-11-13).
+      L.push('  Medication reasoning: No medication trial has tested the treatment of depression in autistic youth. When medication is needed, this clinic starts with sertraline or fluoxetine and moves early to duloxetine if the depression is not responding; mirtazapine is considered only after an SSRI together with an alpha-2 agonist has not been sufficient and medical causes have been ruled out.');
     } else {
       L.push('  • Psychotherapy first-line: CBT or IPT for mild-to-moderate severity; parent involvement essential. Active support for 6 weeks if symptoms are mild before initiating medication.');
-      L.push('  Medication if moderate-to-severe or inadequate psychotherapy response (FL BHC 2022):');
-      L.push('  • Fluoxetine (first-line, FDA-approved for MDD age ≥8 years): child start 2.5–5 mg/day, max 40 mg/day; adolescent start 10–20 mg/day, max 60 mg/day. May divide doses ≥20 mg/day. Preferred combination: fluoxetine + CBT or IPT.');
-      L.push('  • Escitalopram (age 12+ only, FDA-approved): start 5–10 mg/day; max 20 mg/day. Titrate by 5 mg every 3–4 weeks.');
-      L.push('  • Second-line after fluoxetine/escitalopram failure: sertraline (child start 12.5 mg, max 100–150 mg; adolescent start 25 mg, max 150–200 mg); bupropion SR (age ≥11, start 100 mg, max 300–400 mg/day) or XL (age ≥12, start 150 mg, max 450 mg/day); venlafaxine XR (start 37.5 mg, max 75–225 mg by weight).');
-      L.push('  • Monitor for behavioral activation syndrome (agitation, hyperactivity, impulsivity) and suicidality (black box warning) at each dose change and during the first weeks of treatment. If behavioral activation occurs: hold the dose increase, return to the prior tolerated dose, and contact the prescribing provider within 24-48 hours.');
+      L.push('  Medication reasoning: For moderate to severe depression, or no response to active support, fluoxetine is first, preferably combined with CBT or interpersonal therapy; escitalopram is an option from age 12 (Florida Best Practice guideline, Level 2).');
     }
-    L.push('  • Psychiatry referral: strongly recommended for medication management and ongoing safety monitoring.');
-    L.push('  • Shortened return-to-clinic interval: 4–6 weeks.');
+    L.push('  • '+RX_FILL);
+    L.push('  • '+RX_DOSE_SOURCE);
+    L.push('  • '+RX_BOXED);
+    L.push('  • '+RX_ACTIVATION);
+    L.push('  • '+rxOwner('This clinic starts and adjusts the medication; once the dose is stable, primary care can continue it. Return to this clinic if depression is not improving with treatment, or is worsening.'));
+    // Under a hand-back the 4-6 week recheck belongs to primary care (attending decision
+    // 2026-11-12), so the note must not promise a clinic return the follow-up plan denies.
+    L.push(S.dbpFollowUp==='pcp'?'  • Mood and safety recheck in 4 to 6 weeks with primary care.':'  • Shortened return-to-clinic interval: 4 to 6 weeks.');
     L.push('');
   }
 
@@ -4225,11 +4294,14 @@ function generateNote() {
     L.push('');L.push('Plan:');
     L.push('  Treatment is indicated based on the functional impairment documented in the Assessment above.');
     L.push('  • ERP (Exposure and Response Prevention) is the evidence-based psychotherapy for OCD; not generic CBT. Therapist must have specific ERP training and ASD experience.');
-    L.push('  • SSRI at OCD-range dosing. Note: OCD typically requires 2-3x the dose used for anxiety (e.g., sertraline target 150-200 mg for OCD vs. 50-100 mg for anxiety); do not assume an anxiety dose is sufficient.');
-    L.push('  • Minimum 8–12 week trial at therapeutic dose before concluding treatment failure.');
-    L.push('  • Clomipramine: option for refractory cases; ECG required before initiation.');
-    L.push('  • Combination ERP + SSRI is more effective than either alone for moderate-to-severe OCD.');
-    L.push('  • Psychiatry referral for medication management.');
+    // Attending, 2026-11-13: this clinic starts sertraline and refers to both OCD clinics.
+    // Combination and time-to-effect statements were read in the Florida guideline.
+    L.push('  • Referrals: psychiatry OCD clinic (medication management) and psychology OCD therapy clinic (ERP).');
+    L.push('  Medication reasoning: When medication is needed, this clinic starts sertraline while the psychiatry OCD clinic referral is pending. ERP combined with an SSRI is recommended for moderate to severe OCD, and the full effect of medication can take 8 to 12 weeks (Florida Best Practice guideline).');
+    L.push('  • '+RX_FILL);
+    L.push('  • '+RX_DOSE_SOURCE);
+    L.push('  • '+RX_BOXED);
+    L.push('  • '+RX_ACTIVATION);
     L.push('');
   }
 
@@ -4338,8 +4410,9 @@ function generateNote() {
       else if(!gf.ptMeasure) L.push('  • Outpatient PT evaluation: {offered, family declined / offered, family undecided / not discussed today}');
       // The clinician's own Return to Clinic interval times the recheck; with none set (or
       // "as needed"), the recheck goes to primary care with a 12-month ceiling.
-      const rtc=(S.rtcInterval||'').trim();
-      const when=rtc&&!/as needed|prn/i.test(rtc)?'at the return visit (see Return to Clinic)':'at the next well visit with {primary care or this clinic}, no later than 12 months';
+      // Once the follow-up plan hands the child back, the recheck has one owner and the
+      // {primary care or this clinic} choice is no longer the clinician's to fill in.
+      const when=rtcVisitPlanned()?'at the return visit (see Return to Clinic)':'at the next well visit with '+(S.dbpFollowUp==='pcp'?'primary care':'{primary care or this clinic}')+', no later than 12 months';
       L.push('  • Recheck: ankle range (knee straight and bent) and gait '+when+(gf.notAssessed&&gf.heelsFlat?'; measure ankle range then, and refer to PT for measurement if it still cannot be measured':'')+'. Refer to PT if the ankle no longer reaches neutral with the knee straight, has lost range since the last documented examination, or pain, falls, or functional impact develops.');
     }
     if(gf.ptIndicated&&gf.toeWalk){
@@ -4456,22 +4529,15 @@ function generateNote() {
     L.push('    -Sleep environment: dark, cool, quiet; address sensory sensitivities (weighted blanket, white noise, etc.)');
     L.push('    -Screen-free period of at least 60 minutes before target bedtime');
     L.push('    -Stimulus control: bed used only for sleep, not play or screens');
-    if(S.diagStatus==='confirmed'){
-      L.push('  Pharmacotherapy for sleep in ASD (always adjunct to behavioral intervention):');
-      L.push('  • Melatonin (first-line pharmacological adjunct): start 1-3 mg approximately 30 minutes before target bedtime; increase every 5-7 days in 1-3 mg increments to maximum 10 mg. Timing is more important than dose. ASD children have lower endogenous melatonin secretion; >84% improvement rate across studies. Use third-party certified formulation (USP or NSF label); FDA does not regulate supplements. Chewable or liquid preferred for texture-sensitive children.');
-      L.push('  • Guanfacine ER (if co-occurring ADHD or anxiety): start 1 mg; titrate weekly to maximum 4 mg/day. Addresses sleep, hyperactivity, and anxiety simultaneously.');
-      L.push('  • Clonidine IR (if melatonin insufficient; more sedating): start 0.05 mg (half of 0.1 mg tablet) 30 minutes before bedtime; increase by 0.05 mg every 3–5 days; maximum 0.3 mg. ER: start 0.1 mg, titrate weekly to 0.3 mg/day.');
-      L.push('  • Trazodone (if above insufficient): start 25 mg at bedtime; increase weekly by 25 mg to 100-150 mg based on weight. No RCTs in ASD children but clinically used; rare risk of priapism; counsel families.');
-      L.push('  • Mirtazapine (if co-occurring anxiety or depression): start 3.75 mg at bedtime; titrate to maximum 45 mg/day. Benefits sleep onset and maintenance; weight gain common.');
-      L.push('  NOT recommended as sleep agents in ASD: benzodiazepines (paradoxical activation risk is elevated in ASD; chronic use contraindicated), zolpidem (no pediatric ASD evidence), amitriptyline/doxepin (anticholinergic burden, cardiac risk). Antipsychotics should not be initiated primarily for sleep without separate behavioral or psychiatric indications.');
-    } else {
-      L.push('  Pharmacotherapy for sleep (always adjunct to behavioral intervention; FL BHC 2022):');
-      L.push('  • Melatonin (Level 2; first-line adjunct): children start 0.5-1 mg nightly, maximum 3 mg; adolescents start 1-3 mg nightly, maximum 10 mg. Administer 30-60 minutes before target bedtime. Use pharmaceutical-grade formulation (USP or NSF certified; FDA does not regulate supplements).');
-      L.push('  • Clonidine (Level 3; not FDA-approved for insomnia; evidence in ADHD and neurodevelopmental disorders): start 0.05 mg at bedtime; titrate by 0.05 mg/week to maximum 0.3 mg nightly. Taper on discontinuation (0.05 mg every 3 days).');
-      L.push('  • Diphenhydramine (short-term/situational use only): children 12.5-50 mg nightly; adolescents 25-100 mg nightly. Caution: paradoxical excitation in some children; daytime somnolence; not for ongoing use.');
-      L.push('  NOT recommended: benzodiazepines, zolpidem, amitriptyline, doxepin, or antipsychotics as sleep aids; insufficient pediatric evidence and/or unacceptable risk:benefit ratio.');
-    }
-    L.push('  • Re-evaluate sleep in 4-6 weeks.');
+    L.push('  • '+RX_MELATONIN);
+    // Melatonin is the only medication the AAN autism sleep guideline makes a recommendation
+    // for [williams-buckley-2020] (clinician summary read 2026-11-13). Short-term use,
+    // the taper, and the not-recommended list were read in the Florida guideline (insomnia).
+    if(S.diagStatus==='confirmed') L.push('  • Melatonin is the only sleep medication the AAN autism sleep guideline (2020) recommends; further sleep medication is an attending decision. Started today: {none / drug, dose, timing}. If clonidine or guanfacine is started, it is tapered, never stopped abruptly.');
+    else L.push('  • Further sleep medication is an attending decision, for short-term use alongside the behavioral plan (Florida Best Practice guideline, Level 3). Started today: {none / drug, dose, timing}. If clonidine is started, it is tapered, never stopped abruptly.');
+    L.push('  • '+RX_DOSE_SOURCE);
+    L.push('  • Not recommended as sleep aids (Florida Best Practice guideline): benzodiazepines, zolpidem, amitriptyline, doxepin, and antipsychotic medication.');
+    L.push('  • Re-evaluate sleep in 4 to 6 weeks'+(S.dbpFollowUp==='pcp'?' with primary care':'')+'.');
     L.push('  • If ADHD is co-occurring: review stimulant timing; afternoon dose may be delaying sleep onset.');
     L.push('  • Polysomnography referral if sleep-disordered breathing (snoring, witnessed apneas, restless sleep) is suspected.');
     L.push('');
@@ -4495,14 +4561,14 @@ function generateNote() {
   if(S.comorbid.has('gi')&&cp('gi')){
     L.push('── Problem '+probN+++': Functional GI Disorder (K59.00) ──');L.push('');
     L.push('Assessment:');
-    L.push('  GI disorder confirmed (constipation, GERD, and/or functional abdominal pain). GI symptoms occur 4-5x more frequently in ASD than in the general population. In non-verbal or minimally verbal individuals, GI pain frequently manifests as behavioral dysregulation, self-injurious behavior, or sleep disruption rather than verbal complaint; all providers should maintain a high index of suspicion for a GI pain etiology when behavior escalates.');
+    L.push('  GI disorder confirmed (constipation, GERD, and/or functional abdominal pain). Gastrointestinal symptoms, particularly constipation, diarrhea and abdominal pain, are more common in autistic children than in comparison children. In non-verbal or minimally verbal individuals, GI pain frequently manifests as behavioral dysregulation, self-injurious behavior, or sleep disruption rather than verbal complaint; all providers should maintain a high index of suspicion for a GI pain etiology when behavior escalates.');
     L.push('');L.push('Plan:');
     L.push('  • Pediatric GI referral placed; see Medical Referrals in ASD plan above.');
     L.push('  • Dietary review: fiber intake, fluid intake, food variety, and selective eating patterns.');
     L.push('  • First-line for constipation: polyethylene glycol (MiraLAX); dosing per weight/age per GI or PCP guidance.');
     L.push('  • GERD: management per GI specialist recommendation.');
     L.push('  • All care providers (ABA team, school staff, teachers) alerted that behavioral escalations may have a GI-pain etiology and should trigger a medical evaluation rather than solely a behavioral intervention.');
-    L.push('  • Reassess at next follow-up.');
+    L.push('  • '+fuPcpVisit('Reassess at next follow-up')+'.');
     L.push('');
   }
 
@@ -4550,9 +4616,9 @@ function generateNote() {
     } else {
       L.push('  • Medical: GI co-management is documented separately. Coordinate feeding therapy plan with GI findings.');
     }
-    L.push('  • Growth monitoring: Weight, height, and BMI at every visit. Alert threshold: weight loss, downward crossing of growth percentiles, or BMI below the 5th percentile warrants urgent escalation of intervention.');
+    L.push('  • Growth monitoring: Weight, height, and BMI at every visit. Weight loss, or weight or BMI falling across percentile lines, prompts earlier review with medical and nutritional evaluation.');
     L.push('  • Caregiver guidance: Responsive feeding — structured mealtimes without pressure, positive reinforcement for approach behavior toward food, follow the child\'s lead. Avoid force-feeding; pressure feeding reinforces avoidance and disrupts the caregiver-child mealtime relationship. Food chaining and systematic desensitization to be conducted under therapist guidance, not independently at home.');
-    L.push('  • Reassess at next follow-up visit; sooner if growth failure or significant dietary restriction is identified.');
+    L.push('  • '+fuPcpVisit('Reassess at next follow-up visit')+'; sooner if growth failure or significant dietary restriction is identified.');
     L.push('');
   }
 
@@ -4565,7 +4631,7 @@ function generateNote() {
     L.push('  • Referral for interdisciplinary feeding evaluation: Refer to UF Pediatric GI/Feeding Clinic or regional pediatric interdisciplinary feeding program. Evaluation should include: SLP assessment of oral-motor function and swallowing safety (with instrumental evaluation if aspiration is suspected), OT assessment of sensory-motor feeding function and mealtime environment, dietitian assessment of nutritional adequacy and growth trajectory, and medical screening for organic contributors as indicated.');
     L.push('  • Interim caregiver guidance: Structured mealtimes without pressure; positive reinforcement for approach behavior toward food; follow the child\'s lead. Avoid force-feeding while formal evaluation is pending. Do not initiate food chaining or graduated exposure protocols independently before the interdisciplinary evaluation is completed.');
     L.push('  • Growth monitoring: Weight and height at next visit; flag for urgent referral if weight loss or growth failure is identified before formal evaluation is completed.');
-    L.push('  • Follow up on evaluation completion at next clinic visit.');
+    L.push('  • Follow up on evaluation completion '+fuDbpVisit('at next clinic visit')+'.');
     L.push('');
   }
 
@@ -4607,9 +4673,9 @@ function generateNote() {
       L.push('  • Medical evaluation: If organic GI pathology is contributing to food avoidance (dysphagia, GERD, eosinophilic esophagitis), GI evaluation is indicated before or concurrent with feeding therapy. GI referral {placed at this visit / discussed for future scheduling}.');
     }
     L.push('  • Nutrition/dietitian referral: Assess caloric adequacy, micronutrient status (iron, zinc, vitamin D, B12), and growth trajectory. Nutritional supplementation should be initiated as indicated; do not wait for dietary expansion before addressing documented deficiencies.');
-    L.push('  • Growth monitoring: Weight, height, and BMI at every visit. Alert threshold: weight loss, failure to maintain growth curve, or BMI below the 5th percentile warrants urgent escalation.');
+    L.push('  • Growth monitoring: Weight, height, and BMI at every visit. Weight loss, or weight or BMI falling across percentile lines, prompts earlier review with medical and nutritional evaluation.');
     L.push('  • Family guidance: Zero-pressure mealtimes; structured schedule; positive reinforcement for approach behavior toward food. Mealtimes should remain associated with neutral-to-positive experiences. Escalating conflict around food reinforces avoidance. Food chaining and exposure protocols are to be implemented under therapist guidance only — not independently at home before evaluation is completed.');
-    L.push('  • Reassess at next follow-up; sooner if weight loss or growth failure is identified.');
+    L.push('  • '+fuPcpVisit('Reassess at next follow-up')+'; sooner if weight loss or growth failure is identified.');
     L.push('');
   }
 
@@ -4626,11 +4692,21 @@ function generateNote() {
     L.push('  • Interim guidance: Structured, low-pressure mealtimes; positive reinforcement for food exploration; avoid pressure or forced exposure while evaluation is pending. Family should not implement food exposure hierarchies or food chaining protocols independently before formal evaluation is completed.');
     L.push('  • Nutritional monitoring: If dietary restriction is already severe, dietitian referral for caloric and micronutrient assessment should not await formal ARFID confirmation.');
     L.push('  • Growth monitoring: Weight and height at next visit; escalate urgently if growth failure is identified.');
-    L.push('  • Follow up on evaluation completion at next clinic visit.');
+    L.push('  • Follow up on evaluation completion '+fuDbpVisit('at next clinic visit')+'.');
+    L.push('');
+  }
+  // Primary care list: its own block after the last problem, directly above Return to
+  // Clinic, so the follow-up line and the return visit are read together.
+  if(pcpInNoteActive()){
+    L.push('── Recommendations for Primary Care ──');
+    pcpSectionLines().forEach(l=>L.push(l));
     L.push('');
   }
   L.push('RETURN TO CLINIC');
-  L.push(S.rtcInterval?`Return to clinic in ${S.rtcInterval}.`:'Return to clinic: {interval}');
+  // "No routine DBP follow-up" with nothing left open and no visit typed is a complete
+  // answer, so say it instead of leaving an {interval} stop for the clinician to delete.
+  if(S.dbpFollowUp==='pcp'&&!pcpReturnExpected(pcpCtx())) L.push('No routine return visit is scheduled'+(S.pcpInNote?' (see Recommendations for Primary Care for when and how to return)':'')+'.');
+  else L.push(!S.rtcInterval.trim()?'Return to clinic: {interval}':rtcVisitPlanned()?`Return to clinic in ${S.rtcInterval.trim()}.`:'Return to clinic as needed.');
   L.push('');
 
   L.push('────────────────────────────────────────────────────────');
@@ -4688,8 +4764,12 @@ function generateRichHTML(isPreview=false) {
   // Section color bars for plan numbered sections
   const sectionColors=['#2563eb','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#6b7280','#0f766e','#be185d'];
   let planSectionIdx=-1;
+  // The primary care list's group labels ("Actions:", "Re-refer to DBP if:") are its only
+  // structure, and the PCP reads the list in this pasted note; bold them as the tab does.
+  const pcpLabels=new Set(pcpInNoteActive()?pcpSections().map(s=>s.label):[]);
   lines.forEach(line=>{
-    if(line==='ASSESSMENT'||line==='PLAN'){
+    if(pcpLabels.has(line)){closeUL();html+=`<p style="font-weight:bold;margin:8px 0 3px">${e(line)}</p>`;}
+    else if(line==='ASSESSMENT'||line==='PLAN'){
       closeUL();
       const border='border-bottom:2px solid #374151';
       html+=`<p style="font-size:${isPreview?'13pt':'14pt'};font-weight:bold;${border};padding-bottom:3px;margin:18px 0 8px">${e(line)}</p>`;
@@ -4742,6 +4822,396 @@ function generateRichHTML(isPreview=false) {
   closeUL();
   html+='</div>';
   return html;
+}
+
+// ─── MEDICATION WORDING SHARED BY THE NOTE'S PROBLEM BLOCKS ──────────────────
+// keep docs/branching-logic.md §13.5 in sync
+// The note records what was prescribed; it prints no drug menu and no dose (council on the
+// text outputs, 2026-11-13). Every dose is typed by the clinician into a brace Epic will not
+// sign past, and the source for that dose is named once per block (attending, 2026-11-13).
+// These are one audience (the chart), so sharing them is not the cross-surface DRY the
+// audience rule forbids.
+const RX_FILL='Medication: {agent, dose and schedule started today, or reason deferred}. Titration: {step and interval}. Planned maximum: {dose}. Tried before and stopped: {none / agent and reason}.';
+const RX_DOSE_SOURCE='Doses follow the 2022-2023 Florida Best Practice Psychotherapeutic Medication Guidelines for Children and Adolescents and are confirmed with the attending.';
+const RX_BOXED='All antidepressants carry a boxed warning for suicidal thinking in youth. {Boxed warning discussed: yes / no}.';
+const RX_ACTIVATION='If activation occurs (new agitation, restlessness, or impulsivity), do not increase the dose; the family calls this clinic before the next dose.';
+// Timing and pharmaceutical-grade advice were read in the Florida guideline (insomnia,
+// Level 2) and in the AAN summary. No milligrams: the Florida table caps children at 3 mg
+// and adolescents at 10 mg, the AAN caps autistic children at 10 mg, and the attending's
+// rule is that the dose comes from the Florida guideline, so the clinician types it.
+const RX_MELATONIN='Melatonin as an adjunct to the behavioral plan, not a replacement: low starting dose, 30 to 60 minutes before the target bedtime, adjusted to response. Dose advised today: {dose, or melatonin not started}. Pharmaceutical-grade product advised.';
+// Follow-up lines in the problem blocks follow the plan, in the same two classes the
+// primary care list uses (pcpCtx().open = work that stays with this clinic). With no plan
+// chosen both return the wording the note always had.
+//   fuDbpVisit: work this clinic keeps; once a plan is chosen it names the DBP return visit.
+//   fuPcpVisit: work primary care carries under a hand-back.
+// Who continues a medication is a hand-back statement, so it prints only once the clinician
+// has chosen "No routine DBP follow-up". With DBP follow-up continuing, or no plan chosen,
+// the note says only that this clinic prescribes; nothing about primary care is implied.
+function rxOwner(handBack){ return S.dbpFollowUp==='pcp'?handBack:'This clinic prescribes and adjusts this medication.'; }
+function fuDbpVisit(dflt){ return S.dbpFollowUp?'at the DBP return visit':dflt; }
+function fuPcpVisit(dflt){ return S.dbpFollowUp==='pcp'?'Primary care reassesses at the next visit':dflt; }
+
+// ─── RECOMMENDATIONS FOR PRIMARY CARE ────────────────────────────────────────
+// keep docs/branching-logic.md §13 in sync
+// A fourth reader (the child's primary care clinician), so this wording is written for that
+// reader and is deliberately NOT shared with the note, ABA or IEP prose (CLAUDE.md audience
+// rule). The aim is a hand-back the PCP can act on, so that routine DBP return visits are
+// not needed and those slots stay open for new children.
+//
+// Every row comes from a selection: it prints only while its `on` test holds, and no row
+// restates a diagnosis. Row ids are saved in selections strings (pcpOmit, pcpFirst), so
+// renaming or removing one needs a SEL_VERSION bump like any other saved value.
+//   group  act    = one action, with its owner and (where one applies) a timeframe
+//          manage = a condition primary care can follow without routine DBP visits
+//          refer  = a change that should bring the child back to this clinic
+//          other  = a change that goes straight to another service (neurology, psychiatry,
+//                   crisis care), because sending it back here first would only add delay
+//   keep: for a row whose `on` test reads typed text, the part of that test that does NOT.
+//   Typed text is never restored, so pcpPruneEdits() judges such a row by `keep` and holds
+//   on to its saved edits instead of reporting them as lost after every restore.
+// Timeframes are limited to ones the note already states or that a guideline gives; where
+// neither exists the row names the visit ("next visit") and no number. Sources and what was
+// and was not verified: docs/branching-logic.md §13.6 and docs/references.md §11.
+const PCP_THERAPY_NAMES={aba:'ABA',slp:'speech-language therapy',ot:'occupational therapy',pt:'physical therapy',pcit:'parent-child interaction therapy (PCIT)',psychotherapy:'psychotherapy',socialSkills:'a social skills group'};
+const PCP_REFERRAL_NAMES={genetics:'clinical genetics',audiology:'audiology',neurology:'pediatric neurology',psychiatry:'child psychiatry',gi:'pediatric gastroenterology',sleep_ref:'a sleep study'};
+// The clinician's own Return to Clinic text names a visit unless it is blank or ONLY "as
+// needed" / "PRN". Anchored on purpose: "6 months, sooner PRN" names a 6-month visit, and an
+// unanchored match once rewrote it to "as needed" and dropped the visit from note and list.
+function rtcVisitPlanned(){ const rtc=(S.rtcInterval||'').trim(); return !!rtc&&!/^(?:as needed|p\.?r\.?n\.?)(?: only)?\.?$/i.test(rtc); }
+// PURE (reads S only). The facts the rows share, worked out once per build.
+function pcpCtx(){
+  const inPlan=(...ks)=>ks.some(k=>S.comorbid.has(k)&&S.comorbidInPlan.has(k));
+  // A therapy already under way (a status set under Adjust Referrals) needs no start check.
+  // Preschool social skills is "refer at a future visit" in the note, so nothing has started,
+  // and ABA cannot start before the diagnosis is confirmed (payers require it).
+  const therapies=Object.keys(PCP_THERAPY_NAMES).filter(k=>referralIncluded(k)&&!S.therapyStatus[k]
+    &&!(k==='socialSkills'&&S.ageGroup==='preschool')&&!(k==='aba'&&S.diagStatus!=='confirmed'));
+  const referrals=Object.keys(PCP_REFERRAL_NAMES).filter(k=>referralIncluded(k)).map(k=>PCP_REFERRAL_NAMES[k]);
+  if(S.prenatalAlcohol&&S.fasdFeatures) referrals.push('ophthalmology');
+  // What this clinic still has to finish. Each entry is something the note itself leaves
+  // with DBP, and any entry overrides the standing "no routine DBP follow-up" line.
+  const open=[];
+  if(S.diagStatus==='suspected'||S.diagStatus==='ruleOut') open.push('complete the autism diagnostic evaluation');
+  else if(S.diagStatus==='confirmed'&&(S.dxEvalPath==='certainYoung'||S.dxEvalPath==='certainOlder')&&evalPathSteps().pendingTesting) open.push('complete the standardized autism testing already scheduled');
+  if([...S.teacherMaterials].some(k=>!S.teacherMaterialsReturned.has(k))) open.push('review the rating forms requested from school');
+  if(inPlan('adhd_suspected')) open.push('complete the ADHD evaluation');
+  if(cogEvalReferralPending()) open.push('review the cognitive and adaptive testing once it is completed');
+  if(inPlan('pfd_suspected','arfid_suspected')) open.push('review the feeding evaluation');
+  if(referralIncluded('qbtest')&&!inPlan('adhd_suspected')) open.push('review the QbTest result');
+  // While DBP follow-up continues, the note's depression plan keeps its own shortened
+  // return, so the recheck stays here; under a hand-back it is the PCP's ("mood" row).
+  if(S.dbpFollowUp==='dbp'&&inPlan('depression')) open.push('recheck mood and safety');
+  // The medication blocks say this clinic adjusts the dose until it is stable (rxOwner), so a
+  // medication started or changed today keeps one return visit even under a hand-back
+  // (maintainer decision, 2026-11-12). Counted only while a medication block prints; a stable dose is
+  // still the PCP's (the "adhd" manage row).
+  const psychRx=hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')||inPlan('anxiety','depression','ocd');
+  if(S.rxStartedToday&&psychRx) open.push('adjust the medication started or changed today until the dose is stable');
+  // Not in this list on purpose (attending decisions, 2026-11-12): the sleep recheck, the
+  // mood and safety recheck after a depression plan, constipation, growth checks, and ADHD
+  // medication at a stable dose are handed to primary care.
+  const depression=inPlan('depression'), anxiety=inPlan('anxiety');
+  return {inPlan,therapies,referrals,open,gf:gaitFindings(),who:isTeenPlus()?'patient':'child',
+    // The diagnostic evaluation is never handed back unfinished (attending, 2026-11-13).
+    evalOpen:S.diagStatus==='suspected'||S.diagStatus==='ruleOut',
+    depression,anxiety,psychRef:referralIncluded('psychiatry'),
+    // The mood recheck names the PCP as owner, so it exists only once the hand-back is chosen.
+    moodRow:depression&&S.dbpFollowUp==='pcp',
+    psychRx,
+    genetics:referralIncluded('genetics'),
+    urgentNeuro:referralIncluded('neurology')&&S.developmentalRegression&&S.regressionTiming==='ongoing',
+    sleep:S.sleep||S.comorbid.has('sleep_disorder'),sleepInPlan:inPlan('sleep_disorder'),
+    feedingDx:inPlan('pfd_chronic','pfd_acute','arfid'),feedingSuspected:inPlan('pfd_suspected','arfid_suspected'),
+    adhdRx:hasConfirmedADHD()&&inPlan('adhd_combined','adhd_inattentive','adhd_hyperactive')};
+}
+const PCP_GROUPS=[
+  ['act',()=>'Actions:'],
+  ['manage',()=>S.dbpFollowUp==='dbp'?'Primary care manages between DBP visits:':'Primary care manages:'],
+  // While a return visit is still expected these are reasons to call sooner, not to re-refer.
+  ['refer',c=>pcpReturnExpected(c)?'Contact DBP before the return visit if:':'Re-refer to DBP if:'],
+  // Not every line here is a referral (same-day evaluation, crisis care), hence the heading.
+  ['other',()=>'Urgent, or for another service:'],
+];
+function pcpReturnExpected(c){ return S.dbpFollowUp==='dbp'||(S.dbpFollowUp==='pcp'&&(rtcVisitPlanned()||c.open.length>0)); }
+// This clinic places every referral itself; some plans still want it sent from the PCP
+// (attending, 2026-11-13).
+const PCP_RESEND=' We placed every referral. Some insurance plans want the referral to come from primary care; if so, please re-send it.';
+const PCP_DEFS=[
+  {id:'therapyStart',group:'act',owner:'PCP',when:'next visit',
+    on:c=>c.therapies.length>0,
+    text:c=>'Ask whether '+andList(c.therapies.map(k=>PCP_THERAPY_NAMES[k]))+' '+(c.therapies.length>1?'have':'has')+' started. If not, ask where the family is on '+(c.therapies.length>1?'each waitlist':'the waitlist')+'. The insurance case manager can find in-network providers, and families often have to call a waitlist more than once.'+(c.referrals.length?'':PCP_RESEND)},
+  {id:'referrals',group:'act',owner:'PCP',when:'next visit',
+    on:c=>c.referrals.length>0,
+    text:c=>'Check that '+(c.referrals.length>1?'these referrals are':'this referral is')+' scheduled or done: '+andList(c.referrals)+'.'+PCP_RESEND
+      +(c.genetics?' You do not need to order genetic testing: clinical genetics orders it and follows up the results.':'')
+      +(c.urgentNeuro?' The neurology referral is urgent because skills are being lost now.':'')},
+  {id:'earlySteps',group:'act',owner:'PCP and family',when:'now',
+    on:()=>referralIncluded('earlySteps'),
+    text:()=>'Check that the Florida Early Steps (Part C) referral was sent. Early Steps has to find the child eligible before the third birthday, so it cannot wait.'},
+  {id:'fdlrs',group:'act',owner:'Family',when:'now',
+    on:()=>referralIncluded('fdlrs'),
+    text:()=>'Call FDLRS Child Find to ask for a preschool evaluation and IEP planning through the school district.'},
+  {id:'schoolEval',group:'act',owner:'Family',when:'now',
+    on:()=>isPartBAge()&&(S.schoolDoc==='iep_needed'||(S.schoolDoc==='neither'&&!['privateNoIEP','privateWithIEP'].includes(S.schoolPlacement))),
+    text:()=>'Ask the school district in writing for a special education evaluation.'+(S.schoolDoc==='iep_needed'?' Once the family signs consent, the district has 60 days to evaluate.':'')},
+  // The two rechecks that carry a clock are actions, so the PCP finds them where tasks are
+  // looked for. The sleep clock comes from the note's own sleep-disorder plan, so a sleep
+  // concern that is not a problem in the plan stays under "manage" with no clock.
+  {id:'sleepRecheck',group:'act',owner:'PCP',when:'in 4 to 6 weeks',
+    on:c=>c.sleepInPlan,
+    text:()=>'Ask how sleep is going. Keep the behavioral sleep plan going, with melatonin at the dose in our plan.'+(referralIncluded('sleep_ref')?'':' If snoring, pauses in breathing, or restless sleep appear, order a sleep study.')},
+  // The screen is the NIMH ASQ, validated in primary care and outpatient specialty clinics
+  // from age 10 [aguinaldo-2021] [horowitz-2012]. What follows a positive screen is the NIMH
+  // outpatient pathway [nimh-asq-toolkit]; the triage itself is stated once, in tSuicide.
+  {id:'mood',group:'act',owner:'PCP',when:'in 4 to 6 weeks, sooner if mood worsens',
+    on:c=>c.moodRow,
+    text:c=>'Recheck mood and safety with the ASQ (Ask Suicide-Screening Questions). NIMH made this screen for medical clinics; the free NIMH ASQ toolkit (search "NIMH ASQ toolkit") has the questions, a script, and a worksheet for each step.'
+      +'\n1. For a patient 10 or older, ask the 4 yes/no questions, ideally with the parent out of the room. It takes about 20 seconds.'
+      +'\n2. If every answer is no, the screen is negative. Still act on your own concern or the caregiver\'s; a negative screen does not outweigh it.'
+      +'\n3. If any answer is yes, do the Brief Suicide Safety Assessment (BSSA) before the patient leaves. It takes about 10 to 15 minutes, and the toolkit worksheet walks you through it. Then follow "If suicidal thoughts come up" under "Urgent, or for another service".'
+      +'\nFor a younger child, or one who does not use speech to answer, ask about safety in plain, concrete words, in the way the child communicates, and ask the caregiver what has changed.'
+      +(c.psychRef?'\nDo this recheck even if the psychiatry visit has not happened yet.':'')},
+  // id kept from when this was a re-referral trigger (ids are saved values). "Repeated" for
+  // a child already tested, "completed" where delay is only suspected and may never have been.
+  {id:'tGdd',group:'act',owner:'PCP',when:'at school entry',
+    on:()=>S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD'),
+    text:()=>'Global developmental delay is a provisional diagnosis, so it needs retesting. Check that the school has '+(S.specifiers.has('withGDD')?'repeated':'completed')+' cognitive and adaptive testing; if not, re-refer to DBP.'},
+  // Printed only where the note itself sends the recheck to primary care: no return visit
+  // typed, and DBP follow-up not continuing (the note then leaves the owner as a fill-in).
+  {id:'gaitRecheck',group:'act',owner:'PCP',when:'next well visit, no later than 12 months',
+    keep:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp',
+    on:c=>c.gf.observeOnly&&S.dbpFollowUp!=='dbp'&&!rtcVisitPlanned(),
+    text:()=>'Check how far the ankle bends up, with the knee straight and with it bent, and watch the child walk. Refer to physical therapy if the ankle no longer reaches neutral with the knee straight, or if pain, falls, or trouble with daily activities develop.'},
+  {id:'eeg',group:'act',owner:'DBP',
+    on:()=>referralIncluded('eeg'),
+    text:()=>'We will review the EEG ordered at this visit and refer to pediatric neurology if it is abnormal. Nothing is needed from you.'},
+  {id:'labs',group:'act',owner:'DBP',
+    keep:()=>true,
+    on:()=>!!S.labsOrdered.trim(),
+    text:()=>'We will review the labs and studies ordered at this visit and act on the results. Nothing is needed from you.'},
+  {id:'sibling',group:'act',owner:'PCP',when:'well visits',
+    on:()=>S.ag.has('sibling'),
+    text:()=>'Autism is more likely in younger siblings. Screen them for autism at the 18- and 24-month visits, and refer early for any concern.'},
+  {id:'transition',group:'act',owner:'PCP',when:()=>isTeenPlus()?'now':'starting in early adolescence',
+    on:()=>S.ag.has('transition'),
+    text:()=>'Start planning the move to adult health care with the family: adult doctors, support for decision-making, and benefits.'},
+  {id:'safety',group:'act',owner:'PCP',when:'well visits',
+    on:()=>S.safety.has('elopement_counsel')||S.safety.has('water_counsel'),
+    text:()=>'Ask the family how their '+andList([S.safety.has('elopement_counsel')&&'wandering',S.safety.has('water_counsel')&&'water-safety'].filter(Boolean))+' precautions are working.'},
+
+  {id:'sleep',group:'manage',
+    on:c=>c.sleep&&!c.sleepInPlan,
+    text:()=>'Sleep: Keep the behavioral sleep plan going. Low-dose melatonin can be added alongside it.'},
+  {id:'gi',group:'manage',
+    on:c=>c.inPlan('gi'),
+    text:()=>'GI symptoms: Treat constipation with polyethylene glycol dosed by weight. In this child, a change in behavior or sleep may be the only sign of abdominal pain.'},
+  {id:'growth',group:'manage',
+    on:c=>c.feedingDx||c.feedingSuspected,
+    text:c=>c.feedingDx
+      ?'Feeding and growth: Check weight, height, and BMI at every visit. Contact the feeding team or GI if weight drops, or if weight or BMI falls across percentile lines.'
+      :'Feeding and growth: While the feeding evaluation is pending, check weight and height at the next visit. If growth falters, escalate urgently.'},
+  // This clinic adjusts the dose until it is stable (attending, 2026-11-13). The tool cannot
+  // know whether that has happened, so the start of primary care prescribing is a fill-in.
+  {id:'adhd',group:'manage',
+    on:c=>c.adhdRx,
+    text:()=>'ADHD medication: We adjust the dose until it is stable. You take over prescribing from {now, or the date DBP confirms a stable dose}. At each medication visit, check height, weight, blood pressure, heart rate, sleep, appetite, and mood or irritability.'
+      +(S.diagStatus==='confirmed'?' Children with autism get more stimulant side effects than children with ADHD alone, so make any later dose change slowly.':'')},
+
+  {id:'tNewConcern',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'A new developmental, learning, attention, or mood concern needs a diagnostic evaluation.'},
+  {id:'tBehavior',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'Self-injury, aggression, or unsafe behavior continues despite current supports, or you are considering medication for behavior.'},
+  {id:'tDocs',group:'refer',
+    on:()=>S.diagStatus==='confirmed',
+    text:()=>'School, insurance, disability services, or the move to adult care needs updated diagnostic testing or documentation.'},
+  {id:'tSleep',group:'refer',
+    on:c=>c.sleep,
+    text:()=>'Sleep problems continue after the behavioral plan and a melatonin trial.'},
+  {id:'tAdhd',group:'refer',
+    on:c=>c.adhdRx,
+    text:()=>'ADHD symptoms still get in the way despite treatment.'},
+  // Not improving in primary care comes back here, not to psychiatry (attending, 2026-11-13).
+  {id:'tMood',group:'refer',
+    on:c=>c.depression||c.anxiety,
+    text:c=>(c.depression&&c.anxiety?'Depression or anxiety':c.depression?'Depression':'Anxiety')+' is not improving with treatment, or is worsening.'},
+
+  // First in the group, and shown for every child with a medication-treated problem in
+  // the plan, not only depression: atomoxetine and every antidepressant carry the boxed
+  // warning. lock: it cannot be left out while the mood recheck that points to it prints.
+  // Dispositions follow the NIMH BSSA worksheet [nimh-asq-toolkit]; the local services are
+  // the attending's list (2026-11-13) and are this region's, not a national standard.
+  {id:'tSuicide',group:'other',
+    lock:c=>c.moodRow&&!S.pcpOmit.has('mood'),
+    on:c=>c.psychRx,
+    text:()=>'If suicidal thoughts come up:'
+      +'\n- Intent, a plan, or an attempt: arrange an emergency evaluation the same day.'
+      +'\n- Thoughts without intent or a plan: do the BSSA at that visit. Make a written safety plan with the patient and family, and ask the family to lock up firearms and medications.'
+      +'\n- If the BSSA calls for a mental health evaluation within 72 hours, options in our area are: voluntary psychiatric evaluation at UF Psychiatric Hospital (Vista), Meridian, or SMA in other counties; Charlie Health (telehealth intensive outpatient therapy and psychiatry, usually a quick intake, age 11 and older); or a Community Action Treatment (CAT) team, for a child at high risk of hospitalization who does not meet criteria for involuntary admission (352-505-3534; myflfamilies.com/catt).'
+      +'\n- Give every patient who screens positive the toolkit\'s patient resource list. The family can call or text 988 at any time.'},
+  // This clinic brings psychiatry in only for these (attending, 2026-11-12); a poor
+  // response to treatment comes back to DBP first (tAdhd, tMood, tNewConcern).
+  {id:'tPsych',group:'other',
+    on:c=>c.psychRx,
+    text:c=>'New mania or psychosis: arrange a mental health evaluation the same day (the emergency department if none is available)'+(c.adhdRx?', and hold any stimulant until then':'')+'. Substance use that complicates treatment: '+(c.psychRef?'tell child psychiatry promptly.':'refer to child psychiatry.')},
+  // Loss of skills goes to neurology, not back here (attending decision 2026-11-12; the
+  // guideline sources name neurology as the destination too).
+  {id:'tRegress',group:'other',
+    on:()=>!!S.diagStatus,
+    text:c=>(S.developmentalRegression?'More language, social, or motor skills are lost: ':'The '+c.who+' loses language, social, or motor skills they already had: ')
+      +(referralIncluded('neurology')?'tell pediatric neurology promptly.':'refer to pediatric neurology.')},
+  {id:'tCatatonia',group:'other',
+    on:()=>S.comorbid.has('catatonia_history'),
+    text:()=>'New slowing, freezing, posturing, or loss of speech (possible catatonia): contact psychiatry the same day.'},
+];
+// The follow-up lines are the rows that cannot be left out: the list must always say
+// whether this clinic expects to see the child again, and how to come back. It is a mix on purpose. The standing
+// wording ("No routine DBP follow-up is planned") is what the clinician chose, and any
+// selection that leaves work with this clinic (c.open) or a typed return interval overrides
+// it with exactly what the return is for, so the standing line can never hide open work.
+const PCP_CLINIC_PHONE='(352) 265-8250';
+function pcpFollowUpLines(c,hasRefer){
+  const rtc=(S.rtcInterval||'').trim(), planned=rtcVisitPlanned();
+  const what=c.open.length?' to '+andList(c.open):'';
+  const fam='the '+c.who+' and family';
+  // How to come back once routine visits stop. The two-year rule is this clinic's
+  // scheduling policy (attending, 2026-11-12). "No routine follow-up" is not a discharge:
+  // the child stays a patient and returns as needed (attending, 2026-11-13).
+  const route='How to come back: within 2 years of the last visit, the family or your office can call us directly at '+PCP_CLINIC_PHONE+'. No new referral is needed. After 2 years, or if the '+c.who+' was dismissed from our clinic, please send a new referral.';
+  // The plan is discussed with the family at the visit; only the exception is recorded
+  // (attending, 2026-11-13), so no "discussed" attestation prints for every patient.
+  const told=S.pcpNotDiscussed?['This follow-up plan was not discussed with the family at the visit: {how and when the family will be told}.']:[];
+  if(S.dbpFollowUp==='pcp'){
+    const remains='This is not a discharge: the '+c.who+' remains in our care and can return as needed.';
+    if(!pcpReturnExpected(c)) return ['No routine DBP visits are planned; you can follow the '+c.who+' with the plan below. '+remains+' We are glad to see '+fam+' again '+(hasRefer?'for any reason listed under "Re-refer to DBP if".':'whenever the need arises.')+' Thank you for caring for this '+c.who+'.',route,...told];
+    // An unfinished diagnostic evaluation stays here, and the plan after it is not promised
+    // before a diagnosis exists.
+    if(c.evalOpen) return ['We will see the '+c.who+' again '+(planned?'in '+rtc:'in {interval}')+what+'. We will send the follow-up plan in that visit\'s note.',...told];
+    return ['We will see the '+c.who+' for one more visit'+(planned?' in '+rtc:'')+(what||' {purpose of the return visit}')+'. After that visit, no routine DBP visits are planned. '+remains,route,...told];
+  }
+  if(S.dbpFollowUp==='dbp')
+    return ['We will keep seeing the '+c.who+', next '+(planned?'in '+rtc:rtc||'{interval}')+what+'. Between our visits, you manage the items in this list. Thank you for sharing this '+c.who+'\'s care.'];
+  return ['{DBP follow-up plan: no routine DBP follow-up, or a return visit and its purpose}'];
+}
+// One per typed line, as typed; a pasted bullet mark is dropped so it does not print twice.
+function pcpExtraLines(){
+  return String(S.pcpExtra||'').split(/\r?\n/).map(l=>l.trim().replace(/^[•*·-](\s+|$)/,'')).filter(Boolean);
+}
+// PURE (reads S only). Every row the selections produce, with the clinician's edits applied:
+// rows moved up come first within their group in the order they were clicked, the rest keep
+// table order, and left-out rows stay in the list (flagged) so the workspace can show them.
+function pcpBuild(){
+  const c=pcpCtx(), first=[...S.pcpFirst];
+  const rank=id=>{const i=first.indexOf(id);return i<0?first.length:i;};
+  const groups={};
+  PCP_GROUPS.forEach(([key,label])=>{
+    const rows=PCP_DEFS.filter(d=>d.group===key&&d.on(c)).map((d,i)=>{const locked=!!(d.lock&&d.lock(c));return {id:d.id,i,locked,
+      omitted:!locked&&S.pcpOmit.has(d.id),first:S.pcpFirst.has(d.id),
+      text:(d.owner?d.owner+(d.when?' ('+(typeof d.when==='function'?d.when(c):d.when)+')':'')+': ':'')+d.text(c)};});
+    rows.sort((a,b)=>(rank(a.id)-rank(b.id))||(a.i-b.i));
+    groups[key]={label:label(c),rows};
+  });
+  pcpExtraLines().forEach(t=>groups.act.rows.push({typed:true,text:t}));
+  const kept=k=>groups[k].rows.filter(r=>!r.omitted);
+  const any=PCP_GROUPS.some(([k])=>groups[k].rows.length>0);
+  return {c,groups,kept,empty:!any&&!S.dbpFollowUp,followUp:pcpFollowUpLines(c,kept('refer').length>0)};
+}
+// What every copy and the note carry: kept rows only, in print order.
+function pcpSections(){
+  const b=pcpBuild(), out=[];
+  const add=(label,items)=>{if(items.length)out.push({label,items});};
+  // Follow-up first: whether this clinic is still following is what the PCP looks for first.
+  add('DBP follow-up:',b.followUp);
+  add(b.groups.act.label,b.kept('act').map(r=>r.text));
+  add(b.groups.manage.label,b.kept('manage').map(r=>r.text));
+  add(b.groups.refer.label,b.kept('refer').map(r=>r.text));
+  add(b.groups.other.label,b.kept('other').map(r=>r.text));
+  return out;
+}
+function pcpSectionLines(){
+  const L=[];
+  // A row's later lines (numbered steps, sub-points) print as 6-space continuations, which the
+  // rich note keeps inside the bullet; see generateRichHTML.
+  pcpSections().forEach(s=>{L.push('');L.push(s.label);s.items.forEach(t=>{const [h,...rest]=t.split('\n');L.push('  • '+h);rest.forEach(r=>L.push('      '+r));});});
+  return L;
+}
+// The list is part of the note once a follow-up plan is chosen (and the clinician has not
+// switched it off). Until then the note is unchanged and the list lives on its own tab.
+function pcpInNoteActive(){ return !!S.dbpFollowUp&&S.pcpInNote; }
+// Plain text of the standalone list: what "Copy for Epic" pastes from the PCP Recs tab.
+function generatePCPPlain(){
+  if(pcpBuild().empty) return '';
+  return ['RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)',...pcpSectionLines()].join('\n');
+}
+// A row may carry steps on later lines (a newline in its text); each prints as its own indented line.
+function pcpLinesHtml(t,fmt){ const [h,...rest]=String(t).split('\n'); return fmt(h)+rest.map(r=>'<span style="display:block;padding-left:1.1em;margin-top:2px">'+fmt(r)+'</span>').join(''); }
+// isPreview=true: the workspace (every row, with its leave-out and move-up controls).
+// isPreview=false: clipboard HTML for Word (kept rows only, inline styles, no controls).
+function generatePCPHTML(isPreview){
+  const b=pcpBuild(), e=escapeHtml;
+  if(!isPreview){
+    if(b.empty) return '';
+    return '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.6;color:#1f2937;max-width:820px">'
+      +'<p style="font-weight:bold;font-size:12pt;margin:0 0 6px">Recommendations for Primary Care from Developmental-Behavioral Pediatrics (DBP)</p>'
+      +pcpSections().map(s=>'<p style="font-weight:bold;margin:10px 0 3px">'+e(s.label)+'</p><ul style="margin:3px 0 3px 18px;padding:0">'
+        +s.items.map(t=>'<li style="margin-bottom:3px">'+pcpLinesHtml(t,e)+'</li>').join('')+'</ul>').join('')
+      +'</div>';
+  }
+  if(b.empty) return '<div class="note-empty">Nothing selected so far produces a recommendation for primary care.<br><br><small>Choose a DBP follow-up plan in section 10, or keep filling in the form.</small></div>';
+  const ph=t=>pcpLinesHtml(t,x=>phSpan(e(x),'aba-ph'));
+  const row=r=>{
+    if(r.typed) return '<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="You typed this line in section 10. Edit it there.">typed</span></span><span class="pcp-text">'+ph(r.text)+'</span></li>';
+    return '<li class="pcp-row'+(r.omitted?' is-omitted':'')+'"><span class="pcp-ctl">'
+      // Lit only when left out: an included line is the default and stays quiet, so the
+      // eye goes to the clinician's edits (same rule as the move-up button and the form's chips).
+      +'<button type="button" class="pcp-btn'+(r.omitted?' is-on':'')+'" data-pcp="omit:'+r.id+'" aria-pressed="'+r.omitted+'" aria-label="Leave this line out" aria-describedby="pcpt-'+r.id+'" title="'+(r.locked?'Stays in the list while the mood and safety recheck is in it.':r.omitted?'Left out. Click to put it back.':'Included. Click to leave it out.')+'" onclick="togglePcpOmit(\''+r.id+'\')"'+(r.locked?' disabled':'')+'>'+(r.omitted?'+':'✓')+'</button>'
+      +'<button type="button" class="pcp-btn'+(r.first?' is-on':'')+'" data-pcp="first:'+r.id+'" aria-pressed="'+r.first+'" aria-label="Move this line to the top of its group" aria-describedby="pcpt-'+r.id+'" title="'+(r.first?'Moved to the top. Click to return it to its usual place.':'Move to the top of this group.')+'" onclick="togglePcpFirst(\''+r.id+'\')"'+(r.omitted?' disabled':'')+'>↑</button>'
+      +'</span><span class="pcp-text" id="pcpt-'+r.id+'">'+ph(r.text)+'</span></li>';
+  };
+  const group=(label,rows)=>rows.length?'<p class="pcp-group">'+e(label)+'</p><ul class="pcp-list">'+rows.join('')+'</ul>':'';
+  let h='<div class="note-doc pcp-doc">';
+  if(!S.dbpFollowUp) h+='<div class="note-err pcp-status"><strong>Follow-up plan not chosen.</strong> Pick one in section 10 (Follow-up &amp; Primary Care). Until you do, this list is not added to the A&amp;P note, and a copy carries a {placeholder} where the follow-up line goes.</div>';
+  else if(S.pcpInNote) h+='<div class="note-ok pcp-status"><strong>In the A&amp;P note</strong>, just above Return to Clinic. It updates as you edit here.</div>';
+  else h+='<div class="pcp-status pcp-off">Not in the A&amp;P note (switched off in section 10). Copy it from this tab.</div>';
+  h+='<p class="pcp-title">Recommendations for Primary Care from Developmental-Behavioral Pediatrics (DBP)</p>';
+  h+=group('DBP follow-up:',b.followUp.map(t=>'<li class="pcp-row"><span class="pcp-ctl"><span class="pcp-tag" title="This line always prints. It follows the follow-up plan, the return interval, and anything in the form that this clinic still has to finish.">always</span></span><span class="pcp-text">'+ph(t)+'</span></li>'));
+  h+=group(b.groups.act.label,b.groups.act.rows.map(row));
+  h+=group(b.groups.manage.label,b.groups.manage.rows.map(row));
+  h+=group(b.groups.refer.label,b.groups.refer.rows.map(row));
+  h+=group(b.groups.other.label,b.groups.other.rows.map(row));
+  h+='<p class="pcp-hint">✓ keeps or leaves out a line. ↑ moves it to the top of its group; click several in the order you want them. These choices are saved with your selections. Lines marked "always" cannot be left out, and lines marked "typed" are edited in section 10. Wording changes are made in Epic after pasting, so they are never lost when the list rebuilds.</p>';
+  return h+'</div>';
+}
+async function copyPCP(format){
+  const btn=document.getElementById(format==='rich'?'copyPCPBtn':'copyPCPEpicBtn');
+  const plain=generatePCPPlain();
+  if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
+  if(format==='rich'&&await writeClipboardRich(()=>generatePCPHTML(false),plain)){flashBtn('✓ Rich text copied!',btn);return;}
+  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+}
+// The workspace is redrawn on every render, which would drop keyboard focus from the
+// button just pressed; put it back on the same control.
+function pcpRerender(key){ render(); document.querySelector('[data-pcp="'+key+'"]')?.focus(); }
+function togglePcpOmit(id){
+  if(S.pcpOmit.has(id)) S.pcpOmit.delete(id); else{S.pcpOmit.add(id);S.pcpFirst.delete(id);}
+  pcpRerender('omit:'+id);
+}
+function togglePcpFirst(id){
+  if(S.pcpFirst.has(id)) S.pcpFirst.delete(id); else S.pcpFirst.add(id);
+  pcpRerender('first:'+id);
+}
+function resetPcpEdits(){ S.pcpOmit.clear();S.pcpFirst.clear();render(); }
+// Touches S only. An edit belongs to a row; when a changed selection removes the row, the
+// edit goes with it, so nothing sits hidden in S to ride along in the next export and
+// reappear later (the same rule the form's sub-options follow). A row with a `keep` test is
+// judged by it (see PCP_DEFS). Runs at the top of render() and from selPruneOrphans(), so a
+// restored string is held to it too.
+function pcpPruneEdits(){
+  const c=pcpCtx(), live=new Set(PCP_DEFS.filter(d=>(d.keep||d.on)(c)).map(d=>d.id));
+  [S.pcpOmit,S.pcpFirst].forEach(set=>[...set].forEach(id=>{if(!live.has(id))set.delete(id);}));
+  [...S.pcpFirst].forEach(id=>{if(S.pcpOmit.has(id))S.pcpFirst.delete(id);});
 }
 
 // ─── ABA LETTER OF MEDICAL NECESSITY ─────────────────────────────────────────
@@ -5941,13 +6411,18 @@ async function copyIEPLetter(format){
 }
 
 function setPreviewMode(mode){
+  // A different document opens at its top; the scroll position of the one just left means
+  // nothing in this one, and each tab's first lines (status strip, letter heading) matter most.
+  const pv=document.getElementById('notePreview');
+  if(pv&&mode!==S.previewMode) pv.scrollTop=0;
   S.previewMode=mode;
-  [['tabNote','note'],['tabABA','aba'],['tabIEP','iep']].forEach(([id,m])=>{
+  [['tabNote','note'],['tabABA','aba'],['tabIEP','iep'],['tabPCP','pcp']].forEach(([id,m])=>{
     const t=document.getElementById(id);t.classList.toggle('is-on',mode===m);t.setAttribute('aria-pressed',String(mode===m));
   });
   document.getElementById('noteStickyBar').style.display=mode==='note'?'':'none';
   document.getElementById('abaStickyBar').style.display=mode==='aba'?'':'none';
   document.getElementById('iepStickyBar').style.display=mode==='iep'?'':'none';
+  document.getElementById('pcpStickyBar').style.display=mode==='pcp'?'':'none';
   render();
 }
 
@@ -6146,6 +6621,7 @@ function render(){
   // toggles the .inactive class on each row based on current activity.
   syncTherapyStatusFromActivity();
   updateTherapyStatusEnablement();
+  pcpPruneEdits();
   updatePriorTestOutcomeRequired();
   updateEvChips();
   updateGaitExamVisibility();
@@ -6180,6 +6656,13 @@ function render(){
   // IEP letter preview
   if(S.previewMode==='iep'){
     pre.innerHTML=generateIEPLetterHTML();
+    updateSectionHeaders();
+    return;
+  }
+
+  // Primary care list: the workspace view (leave-out and move-up controls on each line)
+  if(S.previewMode==='pcp'){
+    pre.innerHTML=generatePCPHTML(true);
     updateSectionHeaders();
     return;
   }
@@ -6858,6 +7341,9 @@ function clearAll(opts){
   document.getElementById('levelGroup').style.display='none';
   document.getElementById('showDSMTable').checked=true;
   document.getElementById('showDSMLines').checked=false;
+  document.getElementById('pcpInNoteCb').checked=true;
+  document.getElementById('pcpNotDiscussedCb').checked=false;
+  document.getElementById('rxStartedTodayCb').checked=false;
   document.getElementById('levelJustificationSCField').value='';
   document.getElementById('levelJustificationRRBField').value='';
   document.getElementById('rtcIntervalField').value='';
@@ -6921,19 +7407,21 @@ const SEL_FIELDS={
   strangerDanger:'flag', safety:'many', ag:'many', showDSMTable:'flag', showDSMLines:'flag',
   insuranceType:'one', abaHours:'one', abaSetting:'many', abaTargets:'many',
   overrides:'map',
+  dbpFollowUp:'one', pcpInNote:'flag', pcpNotDiscussed:'flag', rxStartedToday:'flag', pcpOmit:'many', pcpFirst:'many',
+  psychReasons:'many',
 };
 // Typed by the clinician, so PHI-capable: never exported, and restore cannot write them
 // because decodeSelections only ever emits SEL_FIELDS keys. priorTestingDate is a typed
 // year, left out on purpose (it narrows re-identification when joined to the categories).
 const SEL_TYPED=['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval',
-  'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments'];
+  'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments','pcpExtra'];
 const SEL_VIEW=['previewMode']; // which output tab is showing; not part of the case
 // 'one' fields set by a menu instead of a radio group: field -> select id.
 const SEL_MENUS={paeQuantity:'paeDrinksSel',paeFrequency:'paeFrequencySel',paeTiming:'paeTimingSel',
   evalProfileStatus:'evalProfileStatusSel',evalDxStatus:'evalDxStatusSel',evalDxOutcome:'evalDxOutcomeSel',ados2Module:'ados2ModuleSel'};
 // Flags whose checkbox is wired by id (the rest are data-key="single" / criteriaC-E).
 const SEL_ID_FLAGS={unevenCog:'unevenCogCb',adaptiveStandardized:'adaptiveStandardizedCb',
-  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines'};
+  traumaIncludeInIEP:'traumaIncludeInIEP',showDSMTable:'showDSMTable',showDSMLines:'showDSMLines',pcpInNote:'pcpInNoteCb',pcpNotDiscussed:'pcpNotDiscussedCb',rxStartedToday:'rxStartedTodayCb'};
 // Sub-rows a parent checkbox reveals from its change handler. Restore fires no handlers,
 // so paintFormFromState recomputes them from S. A new reveal-on-check row needs an entry
 // here (invariants lane checks every hidden-by-default "...Row" id is accounted for).
@@ -6970,12 +7458,12 @@ const SEL_TEMPLATE=new Set(['visitType','ageGroup','langLevel','langModifiers',
   'needsComm','needsAdaptive','needsBehavior','needsSocial','needsSensory','needsMotor',
   'emotionalReg','academic','strangerDanger','teacherMaterials',
   'safety','ag','showDSMTable','showDSMLines',
-  'insuranceType','abaHours','abaSetting','overrides']);
+  'insuranceType','abaHours','abaSetting','overrides','pcpInNote']);
 const SEL_SCOPE_TEMPLATE='scope=template';
 // Categories that are sensitive beyond ordinary clinical detail; a Full string holding
 // any of them gets a named notice in the panel. label -> the fields that carry it.
 const SEL_SENSITIVE={
-  'mental-health and other diagnoses':['comorbid','comorbidInPlan','depressionSafety','traumaIncludeInIEP','specifiers'],
+  'mental-health and other diagnoses':['comorbid','comorbidInPlan','depressionSafety','traumaIncludeInIEP','specifiers','psychReasons','rxStartedToday'],
   'prenatal alcohol exposure':['prenatalAlcohol','fasdFeatures','paeEvidence','fasdDomains','paeQuantity','paeFrequency','paeTiming'],
   'family and social circumstances':['socialWork','socialWorkReasons'],
   'genetic and neurological findings':['dysmorphism','congenitalAnomalies','developmentalRegression','regressionTiming','seizureConcern','focalNeuroFindings'],
@@ -7019,6 +7507,7 @@ function selPruneOrphans(){
   if(!st.hasProfile) S.evalProfileStatus='';
   if(!st.hasDx||(S.evalDxStatus==='today'&&!st.dxTodayAllowed)) S.evalDxStatus='';
   if(!S.evalDxStatus) S.evalDxOutcome='';
+  pcpPruneEdits();
 }
 
 // PURE (reads S only). level is 'template' or 'full'. Only values that differ from a
@@ -7063,6 +7552,7 @@ function selAllowed(){
   a.specifiersManuallySet=COG_SPEC_EXCL.slice();
   a.schoolSvcManualOff=a.schoolSvc;
   a.comorbidInPlan=[...document.querySelectorAll('.plan-pill[data-cv]')].map(p=>p.dataset.cv);
+  a.pcpOmit=a.pcpFirst=PCP_DEFS.map(d=>d.id); // rows of the primary care list; its controls are drawn by render()
   a.therapyStatus={};
   Object.keys(S.therapyStatus).forEach(k=>{a.therapyStatus[k]=vals('input[type=radio][name="therapyStatus_'+k+'"]');});
   a.priorTestingOutcome={};
@@ -7239,7 +7729,7 @@ function setSelLevel(level){
   const hint=document.getElementById('selLevelHint');
   const sens=level==='full'?selSensitiveIn(str):[];
   hint.textContent=level==='template'
-    ?'Template: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, DSM table display, insurance category, ABA hours and settings, and referral overrides. Leaves out the diagnosis, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
+    ?'Template: visit type, age band, language level and features, functional needs, teacher materials requested, safety and guidance topics, DSM table display, insurance category, ABA hours and settings, referral overrides, and whether the primary care list is added to the note. Leaves out the diagnosis, the follow-up plan, cognitive profile, medical history, comorbid conditions and test results; school services and ABA targets are rebuilt from the needs on restore.'
     :'Full: every selection in the form.';
   if(sens.length){
     // The category names carry the emphasis; red stays reserved for the standing caution
@@ -7452,6 +7942,17 @@ function updateSectionHeaders(){
   const sf=S.safety.size;setSH('sh-safety',sig.safety.content,sf>0?sf+' item'+(sf>1?'s':''):'');
   // 9 AG
   const ag=S.ag.size;setSH('sh-ag',ag>0,ag>0?ag+' item'+(ag>1?'s':''):'');
+  // Edits made on the PCP Recs tab also change the note, so the heading counts them where
+  // the Note tab's reader can see them. Built rows, not the saved sets: a locked row ignores
+  // its saved leave-out.
+  const fu=[S.dbpFollowUp==='pcp'?'No routine DBP follow-up':S.dbpFollowUp==='dbp'?'DBP follow-up continues':''];
+  if(S.pcpOmit.size||S.pcpFirst.size){
+    const rows=Object.values(pcpBuild().groups).flatMap(g=>g.rows);
+    const out=rows.filter(r=>r.omitted).length, up=rows.filter(r=>r.first&&!r.omitted).length;
+    if(out) fu.push(out+' line'+(out>1?'s':'')+' left out');
+    if(up) fu.push(up+' moved up');
+  }
+  setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()||S.rxStartedToday||fu.length>1),fu.filter(Boolean).join(' · '));
   autoOpenSections();
 }
 
@@ -7817,7 +8318,7 @@ function updateAgeBasedVisibility(){
   // renumber is display-only. Iterating the canonical id list (not a DOM query) keeps the
   // unnumbered utility sections (ABA parameters, Adjust Referrals) out of the count.
   let folioN=1;
-  ['sh-profile','sh-dxWorkup','sh-dsm5','sh-needs','sh-medflags','sh-comorbid','sh-school','sh-safety','sh-ag'].forEach(id=>{
+  ['sh-profile','sh-dxWorkup','sh-dsm5','sh-needs','sh-medflags','sh-comorbid','sh-school','sh-safety','sh-ag','sh-followup'].forEach(id=>{
     const h=document.getElementById(id);if(!h)return;
     const w=h.closest('.section');
     const f=h.querySelector('.sec-folio');
@@ -8576,6 +9077,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('labsOrderedField').addEventListener('input',function(){S.labsOrdered=this.value;render();});
   document.getElementById('showDSMTable').addEventListener('change',function(){S.showDSMTable=this.checked;render();});
   document.getElementById('showDSMLines').addEventListener('change',function(){S.showDSMLines=this.checked;render();});
+  document.getElementById('pcpInNoteCb').addEventListener('change',function(){S.pcpInNote=this.checked;render();});
+  document.getElementById('pcpNotDiscussedCb').addEventListener('change',function(){S.pcpNotDiscussed=this.checked;render();});
+  document.getElementById('rxStartedTodayCb').addEventListener('change',function(){S.rxStartedToday=this.checked;render();});
+  document.getElementById('pcpExtraField').addEventListener('input',function(){S.pcpExtra=this.value;render();});
   document.querySelectorAll('.plan-pill[data-cv]').forEach(pill=>{
     pill.addEventListener('click',()=>toggleComorbidPlan(pill.dataset.cv));
     // The pill's own text ("Include plan" / "Note only") never names the condition, so its

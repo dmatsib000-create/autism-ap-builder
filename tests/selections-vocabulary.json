@@ -913,6 +913,100 @@
      "no"
     ]
    }
+  },
+  "dbpFollowUp": {
+   "type": "one",
+   "values": [
+    "pcp",
+    "dbp"
+   ]
+  },
+  "pcpInNote": {
+   "type": "flag",
+   "values": []
+  },
+  "pcpNotDiscussed": {
+   "type": "flag",
+   "values": []
+  },
+  "rxStartedToday": {
+   "type": "flag",
+   "values": []
+  },
+  "pcpOmit": {
+   "type": "many",
+   "values": [
+    "therapyStart",
+    "referrals",
+    "earlySteps",
+    "fdlrs",
+    "schoolEval",
+    "sleepRecheck",
+    "mood",
+    "tGdd",
+    "gaitRecheck",
+    "eeg",
+    "labs",
+    "sibling",
+    "transition",
+    "safety",
+    "sleep",
+    "gi",
+    "growth",
+    "adhd",
+    "tNewConcern",
+    "tBehavior",
+    "tDocs",
+    "tSleep",
+    "tAdhd",
+    "tMood",
+    "tSuicide",
+    "tPsych",
+    "tRegress",
+    "tCatatonia"
+   ]
+  },
+  "pcpFirst": {
+   "type": "many",
+   "values": [
+    "therapyStart",
+    "referrals",
+    "earlySteps",
+    "fdlrs",
+    "schoolEval",
+    "sleepRecheck",
+    "mood",
+    "tGdd",
+    "gaitRecheck",
+    "eeg",
+    "labs",
+    "sibling",
+    "transition",
+    "safety",
+    "sleep",
+    "gi",
+    "growth",
+    "adhd",
+    "tNewConcern",
+    "tBehavior",
+    "tDocs",
+    "tSleep",
+    "tAdhd",
+    "tMood",
+    "tSuicide",
+    "tPsych",
+    "tRegress",
+    "tCatatonia"
+   ]
+  },
+  "psychReasons": {
+   "type": "many",
+   "values": [
+    "mania_psychosis",
+    "treatment_failure",
+    "substance_use",
+    "safety"
+   ]
   }
  }
 }
