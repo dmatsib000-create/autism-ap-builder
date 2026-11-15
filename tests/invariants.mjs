@@ -230,6 +230,12 @@ check('ABA targets (TARGET_RATIONALE keys are real targets)',
   subset('TARGET_RATIONALE', targetRationaleKeys, 'checkboxes', abaCheckboxKeys));
 check('ABA targets (sync add() targets a real checkbox)',
   subset('sync add()', abaSyncAddKeys, 'checkboxes', abaCheckboxKeys));
+// ABA_TARGET_SUPPORT names the targets the sync may take back when their support goes;
+// a key with no checkbox would be a take-back rule that can never fire (a stale rename).
+const abaSupportKeys = flatObjectKeys(balancedAfter('const ABA_TARGET_SUPPORT='));
+check('ABA targets (ABA_TARGET_SUPPORT keys are real targets)',
+  abaSupportKeys.length ? subset('ABA_TARGET_SUPPORT', abaSupportKeys, 'checkboxes', abaCheckboxKeys)
+    : 'ABA_TARGET_SUPPORT parsed to no keys (was its shape changed?)');
 
 // ── D2. Prior-testing instruments: label table = checkboxes; adaptive subset is real ──
 // PRIOR_TEST_LABELS is the one instrument-name table every surface reads, and

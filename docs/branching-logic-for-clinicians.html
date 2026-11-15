@@ -631,16 +631,20 @@ flowchart TD
 
       <p>If you mark the diagnosis status as <em>confirmed</em> but the criteria don't all check out, the tool displays a warning banner at the top of the form: something like <em>"⚠ DSM-5 criteria incomplete — A: 2/3 · B: 1/4 · C/D/E: missing C."</em> The banner is intentionally prominent but it does <em>not</em> block you. The tool will still generate a confirmed-ASD A&amp;P note and ABA letter if you proceed — on the assumption that you may have a clinically valid reason to document an exception (re-evaluation, follow-up after prior diagnosis, etc.). The warning's job is to make sure the omission is deliberate, not accidental.</p>
 
+      <p>The note itself never claims criteria you have not checked. With confirmed autism and incomplete criteria, the summary says the diagnosis is confirmed and adds one fill-in that names the gaps, for example <em>{DSM-5 criteria incomplete in this note (Criterion A 2 of 3; Criterion E not confirmed): state the basis for the diagnosis or the evaluation it rests on}</em>. Epic stops on it with F2, so you type the basis (or the evaluation the diagnosis rests on) before signing. At a <em>follow-up</em> visit with no criteria checked, it instead says autism was diagnosed previously, with a fill-in for the year and setting, and that criteria were not re-documented at this visit. When an intellectual disability or developmental delay specifier is set and Criterion E's evidence box is empty, the sentence that says the autism findings exceed what ID or GDD alone would explain ends with a fill-in asking for that basis.</p>
+
+      <p>Under each criterion, a small amber note on the form (never in the note) says <em>Ticked, no evidence entered</em> or <em>Evidence entered, not ticked</em>. After "Check all criteria" every row shows the first one until you type or click in evidence.</p>
+
       <p>If your diagnosis status is <em>suspected</em> or <em>ruling out</em>, no warning fires — partial criteria are expected at that stage.</p>
 
       <h2>One auto-cascade worth knowing about</h2>
 
-      <p>Checking Criterion <strong>B2</strong> (insistence on sameness) automatically marks "rigidity" as a behavioral need behind the scenes, which in turn adds "transitions" as an ABA target. This is the only criterion that auto-cascades into the needs and targets sections — chosen because B2 and rigidity are operationally the same thing. Unchecking B2 reverses both. If you ever wonder why "transitions" suddenly appeared in your ABA target list, this is usually why.</p>
+      <p>Checking Criterion <strong>B2</strong> (insistence on sameness) automatically marks "rigidity" as a behavioral need behind the scenes, which in turn adds "transitions" as an ABA target. This is the only criterion that auto-cascades into the needs section — chosen because B2 and rigidity are operationally the same thing. (Criterion B1, repetitive movements or speech, likewise adds the "reduce interfering repetitive behaviors" target.) Unchecking B2 removes rigidity, and also unchecks "transitions" if the tool added it. A "transitions" target you checked yourself stays checked; the note then describes it without claiming B2 is documented. If you ever wonder why "transitions" suddenly appeared in your ABA target list, this is usually why.</p>
 
       <details class="vignette"><summary>Example: see this in action</summary>
         <p>You are documenting a 5-year-old with clear social-communication deficits across the board, intense restricted interests, and notable sensory hyper-reactivity, but no observed motor stereotypies or insistence on sameness.</p>
         <p>You check a1, a2, a3 (Criterion A complete), b3 and b4 (two of four Criterion B items — meets the minimum), and C, D, E. The badge in the header turns green: <em>✓ DSM-5 criteria complete.</em></p>
-        <p>Now you change your mind and uncheck b3. Criterion B drops to 1 out of 4 (just b4 remains), below the threshold. The badge turns yellow and a banner appears: <em>"⚠ DSM-5 criteria incomplete — A: 3/3 · B: 1/4 · C/D/E: met."</em> If you leave the diagnosis status set to <em>confirmed</em>, the warning persists but the letters still generate. If you change diagnosis status to <em>suspected</em>, the warning disappears.</p>
+        <p>Now you change your mind and uncheck b3. Criterion B drops to 1 out of 4 (just b4 remains), below the threshold. The badge turns yellow and a banner appears: <em>"⚠ DSM-5 criteria incomplete — A: 3/3 · B: 1/4 · C/D/E: met."</em> If you leave the diagnosis status set to <em>confirmed</em>, the warning persists and the letters still generate, and the note's summary carries a fill-in naming the gap (Criterion B 1 of 4) instead of claiming full criteria. If you change diagnosis status to <em>suspected</em>, the warning disappears.</p>
       </details>
 
       <p class="tech-link">For the technical detail, see <a href="branching-logic.md#4-dsm-5-criteria-mapping">§4 in the technical reference</a>.</p>
@@ -959,7 +963,7 @@ flowchart LR
 
       <p>The tool's "auto-populate ABA targets" feature watches your needs and clinical flag selections and adds matching targets automatically. For example, checking "elopement" under behavior needs auto-adds "reduce_elopement" to the target list; checking "expressive communication" auto-adds "functional_comm"; checking "menstrual care" under adaptive needs auto-adds "menstrual_care."</p>
 
-      <p><strong>This auto-population is one-directional — it only adds.</strong> If you uncheck a target manually, the tool will not re-add it the next time you open the form. This is intentional: it protects your manual curation from being overwritten by surprise re-population. The only exception is rigidity, which is tied to Criterion B2 (see Section <a href="#s4">4</a>) and resets if you uncheck B2.</p>
+      <p><strong>This auto-population is one-directional — it only adds.</strong> If you uncheck a target manually, the tool will not re-add it the next time you open the form. This is intentional: it protects your manual curation from being overwritten by surprise re-population. There is one narrow exception, for the two targets that come from DSM-5 criteria. If the tool added "reduce interfering repetitive behaviors" (from B1) or "transitions" (from B2), and you then uncheck that criterion (for example after "Check all criteria"), the tool unchecks the target too. It does this only for targets it added itself; a target you checked by hand is never removed. Disruptive vocalizations also support the repetitive-behaviors target, so it stays while that box is checked. Rigidity, which is tied to Criterion B2 (see Section <a href="#s4">4</a>), always resets if you uncheck B2.</p>
 
       <p>Practical consequence: if you've manually removed a target you don't think applies, it stays removed. If you want it back, re-check it manually.</p>
 
@@ -1094,7 +1098,7 @@ flowchart LR
 
       <h2>Auto-populated ABA targets that no longer apply</h2>
 
-      <p>The ABA target auto-populator adds targets when you check needs, but it only adds — it never removes. If you check a need, then later uncheck it (or the underlying clinical picture changes), the ABA target stays in the list until you manually uncheck it. This is intentional protection against surprise loss of manually-curated targets, but it means a stale target can linger.</p>
+      <p>The ABA target auto-populator adds targets when you check needs, but it almost never removes them. If you check a need, then later uncheck it (or the underlying clinical picture changes), the ABA target stays in the list until you manually uncheck it. This is intentional protection against surprise loss of manually-curated targets, but it means a stale target can linger. The one exception is a target the tool added from Criterion B1 or B2: unchecking that criterion unchecks the target too (see Section <a href="#s4">4</a>).</p>
 
       <p><strong>What to watch for:</strong> before sending an ABA letter, scan the target list. Anything that no longer reflects current clinical priorities should be manually unchecked.</p>
 

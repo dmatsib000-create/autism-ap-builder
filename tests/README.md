@@ -45,8 +45,13 @@ for headings and emphasis. Presence may not.
   runs and can be asserted. It also tests pure text helpers whose output reaches
   the note but that only run from a click handler: `appendEvidence`, which joins a
   DSM-5 evidence chip's text onto a criterion's evidence (so a source heading or
-  a typed sentence never ends up as "Parent report:; …" or "….; …"). These lanes
-  share `makeApp()` and the real, unmodified shipped script.
+  a typed sentence never ends up as "Parent report:; …" or "….; …"). It also drives
+  the ABA target sync's narrow take-back (`ABA_TARGET_SUPPORT` with
+  `S.abaTargetsAuto`: only a B1/B2 target the sync added itself is unticked when its
+  criterion goes; a hand-ticked one survives) and the Confirmed summary's
+  incomplete-criteria branches (`criteriaGaps`, the follow-up wording, the single
+  fill-in, the Criterion E stop). These lanes share `makeApp()` and the real,
+  unmodified shipped script.
   The unit lane also covers **export / restore selections** (`encodeSelections`,
   `decodeSelections`, both pure): every `initialState()` key must be classified as
   saved (`SEL_FIELDS`), typed (`SEL_TYPED`) or view (`SEL_VIEW`); typed text never

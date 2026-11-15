@@ -1976,6 +1976,7 @@ function initialState(){ return {
   strangerDanger:false,
   safety:new Set(), ag:new Set(), showDSMTable:true, showDSMLines:false,
   insuranceType:'', abaHours:'', abaSetting:new Set(), abaTargets:new Set(),
+  abaTargetsAuto:new Set(), // abaTargets the sync added itself (see ABA_TARGET_SUPPORT); never exported
   previewMode:'note',
   overrides:{aba:'auto',pcit:'auto',psychotherapy:'auto',socialSkills:'auto',
     slp:'auto',ot:'auto',pt:'auto',genetics:'auto',neurology:'auto',
@@ -2541,6 +2542,25 @@ function validateCriteria() {
   const a=S.criteriaA.size, b=S.criteriaB.size, cde=S.criteriaC&&S.criteriaD&&S.criteriaE;
   return {aCount:a, bCount:b, cde, complete:a===3&&b>=2&&cde};
 }
+// The unmet parts of the gate, in DSM order; empty exactly when validateCriteria().complete.
+// The Confirmed summary names these in its fill-in rather than asserting full criteria.
+function criteriaGaps() {
+  const v=validateCriteria(), g=[];
+  if(v.aCount<3) g.push(`Criterion A ${v.aCount} of 3`);
+  if(v.bCount<2) g.push(`Criterion B ${v.bCount} of 4`);
+  [['C',S.criteriaC],['D',S.criteriaD],['E',S.criteriaE]].forEach(([k,on])=>{ if(!on) g.push(`Criterion ${k} not confirmed`); });
+  return g;
+}
+const CRITERIA_EV_KEYS=['a1','a2','a3','b1','b2','b3','b4','c','d','e'];
+// On-screen hint for one criterion's evidence box (never printed, never ticks anything).
+// Typed or chip evidence counts as a positive finding: negative findings are rarely written there.
+function evidenceHint(k) {
+  const on=k==='c'?S.criteriaC:k==='d'?S.criteriaD:k==='e'?S.criteriaE:(S.criteriaA.has(k)||S.criteriaB.has(k));
+  const has=!!(S.ev[k]||'').trim();
+  if(on&&!has) return 'Ticked, no evidence entered';
+  if(!on&&has) return 'Evidence entered, not ticked';
+  return '';
+}
 
 // ─── LABEL MAPS ──────────────────────────────────────────────────────────────
 const AGE_LABELS={toddler:'toddler (12–35 months)',preschool:'preschool-aged child (3–5 years)',schoolAge:'school-aged child (6–11 years)',adolescent:'adolescent (12–17 years)',youngAdult:'young adult (18+ years)'};
@@ -2851,30 +2871,46 @@ function generateClinicalSummary(){
   let body='';
 
   if(S.diagStatus==='confirmed'){
-    const aCnt=S.criteriaA.size;
-    const bCnt=S.criteriaB.size;
-    const aStr=aCnt===3?'all three Criterion A domains':`${aCnt} of three Criterion A domains`;
-    const bStr=bCnt===4?'all four Criterion B domains':`${bCnt} of four Criterion B domains`;
-    const needsD=[];
-    if(S.needsComm.size) needsD.push('communication');
-    if(S.needsBehavior.size) needsD.push('behavior');
-    if(S.needsAdaptive.size) needsD.push('adaptive skills');
-    if(S.needsSocial.size) needsD.push('social development');
-    if(S.needsSensory.size) needsD.push('sensory processing');
-    if(hasCoreMotor()||gaitFindings().ptIndicated) needsD.push('motor development');
-
-    body=`${subj} ${v3('demonstrates')} a persistent pattern of deficits in social communication and social interaction across ${aStr}, and restricted and repetitive patterns of behavior and interests across ${bStr}, as documented in the DSM-5 criteria table.`;
-    body+=` These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment`;
-    if(needsD.length){
-      const nd=[...needsD];
-      const ndStr=nd.length===1?nd[0]:nd.slice(0,-1).join(', ')+', and '+nd[nd.length-1];
-      body+=` across multiple functional domains, including ${ndStr}`;
-    }
-    const hasIDorGDD=S.specifiers.has('withID')||S.specifiers.has('withSuspectedID')||S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD');
-    if(hasIDorGDD){
-      body+=`. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; ASD is established as a distinct co-occurring diagnosis, as the social communication deficits and restricted/repetitive behaviors documented exceed what would be expected from intellectual disability or global developmental delay alone.`;
+    // Incomplete criteria never print "meets full DSM-5 criteria". A follow-up with nothing
+    // ticked cites the earlier diagnosis; any other gap gets ONE brace stop naming it, so the
+    // contradiction cannot be signed. The FASD line ("criteria documented above") is
+    // council-ratified and untouched: it becomes true once the stop is answered.
+    const gaps=criteriaGaps();
+    const noneTicked=!S.criteriaA.size&&!S.criteriaB.size&&!S.criteriaC&&!S.criteriaD&&!S.criteriaE;
+    if(S.visitType==='followup'&&noneTicked){
+      body='Autism spectrum disorder was diagnosed previously ({year and setting of diagnosis, e.g. this clinic or outside psychological evaluation}); DSM-5 criteria were not re-documented at this visit.';
+    } else if(gaps.length){
+      body=`The diagnosis of autism spectrum disorder is confirmed. {DSM-5 criteria incomplete in this note (${gaps.join('; ')}): state the basis for the diagnosis or the evaluation it rests on}`;
     } else {
-      body+=`. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone.`;
+      const aStr='all three Criterion A domains';
+      const bCnt=S.criteriaB.size;
+      const bStr=bCnt===4?'all four Criterion B domains':`${bCnt} of four Criterion B domains`;
+      const needsD=[];
+      if(S.needsComm.size) needsD.push('communication');
+      if(S.needsBehavior.size) needsD.push('behavior');
+      if(S.needsAdaptive.size) needsD.push('adaptive skills');
+      if(S.needsSocial.size) needsD.push('social development');
+      if(S.needsSensory.size) needsD.push('sensory processing');
+      if(hasCoreMotor()||gaitFindings().ptIndicated) needsD.push('motor development');
+
+      // Point only at criteria that actually print (the table is rich copy; the lines are opt-in).
+      const ptr=S.showDSMTable?', as documented in the DSM-5 criteria table':(S.showDSMLines?', as documented in the DSM-5 criteria below':'');
+      body=`${subj} ${v3('demonstrates')} a persistent pattern of deficits in social communication and social interaction across ${aStr}, and restricted and repetitive patterns of behavior and interests across ${bStr}${ptr}.`;
+      body+=` These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment`;
+      if(needsD.length){
+        const nd=[...needsD];
+        const ndStr=nd.length===1?nd[0]:nd.slice(0,-1).join(', ')+', and '+nd[nd.length-1];
+        body+=` across multiple functional domains, including ${ndStr}`;
+      }
+      const hasIDorGDD=S.specifiers.has('withID')||S.specifiers.has('withSuspectedID')||S.specifiers.has('withGDD')||S.specifiers.has('withSuspectedGDD');
+      if(hasIDorGDD){
+        // Criterion E against ID/GDD is a differential judgment: with no E evidence the claim
+        // needs its basis typed in. Complete criteria imply E is ticked.
+        const eStop=(S.ev.e||'').trim()?'':' ({basis for Criterion E: how social communication falls below what is expected for developmental level})';
+        body+=`. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; ASD is established as a distinct co-occurring diagnosis, as the social communication deficits and restricted/repetitive behaviors documented exceed what would be expected from intellectual disability or global developmental delay alone${eStop}.`;
+      } else {
+        body+=`. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone.`;
+      }
     }
     // Prior testing citation
     if(S.priorTesting.size>0){
@@ -3582,7 +3618,9 @@ function generateNote() {
     }
     // ABA Treatment Targets block — built from checked abaTargets using TARGET_RATIONALE lookup
     if(S.abaTargets.size>0){
-      const targetLines=[...S.abaTargets].filter(k=>TARGET_RATIONALE[k]).map(k=>`  • ${TARGET_RATIONALE[k]}`);
+      // A transitions target ticked by hand without B2 must not claim B2 is documented.
+      const TRANSITIONS_NO_B2='Transition tolerance and behavioral flexibility: transition supports are essential for school participation and daily functioning across environments.';
+      const targetLines=[...S.abaTargets].filter(k=>TARGET_RATIONALE[k]).map(k=>`  • ${k==='transitions'&&!S.criteriaB.has('b2')?TRANSITIONS_NO_B2:TARGET_RATIONALE[k]}`);
       if(targetLines.length){
         L.push('ABA Treatment Targets (final target list and prioritization to be determined by the treating BCBA following Functional Behavior Assessment):');
         targetLines.forEach(tl=>L.push(tl));
@@ -6608,6 +6646,25 @@ function updateEvChips(){
   });
   syncAllRoving();
 }
+// One amber line under each DSM-5 evidence box (evidenceHint). Form only: it is never in
+// #notePreview, so no copy or print path can carry it. Created lazily beside its textarea.
+function updateEvHints(){
+  CRITERIA_EV_KEYS.forEach(k=>{
+    const ta=document.getElementById('ev_'+k);
+    if(!ta||!ta.parentNode) return;
+    let h=document.getElementById('evhint_'+k);
+    if(!h){
+      h=document.createElement('div');
+      h.id='evhint_'+k;
+      h.className='lab-warn';
+      h.style.margin='3px 0 0';
+      ta.parentNode.appendChild(h);
+    }
+    const msg=evidenceHint(k);
+    h.textContent=msg;
+    h.hidden=!msg;
+  });
+}
 
 // Set while applyPreset() drives many controls in a row: each .click() fires a change
 // handler that calls render(), so a preset would otherwise re-render 10-25 times.
@@ -6624,6 +6681,7 @@ function render(){
   pcpPruneEdits();
   updatePriorTestOutcomeRequired();
   updateEvChips();
+  updateEvHints();
   updateGaitExamVisibility();
   updateLabWarnings();
   const v=validateCriteria();
@@ -7052,12 +7110,16 @@ function dsmCheckAll(){
   ['b1','b2','b3','b4'].forEach(v=>{S.criteriaB.add(v);const cb=document.querySelector(`input[data-key="criteriaB"][value="${v}"]`);if(cb)cb.checked=true;});
   S.criteriaC=true;S.criteriaD=true;S.criteriaE=true;
   ['C','D','E'].forEach(k=>{const cb=document.querySelector(`input[data-key="criteria${k}"]`);if(cb)cb.checked=true;});
+  // Same syncs a checkbox change runs, so B1/B2 targets appear now, not on the next click.
+  syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();
   render();
 }
 function dsmClearAll(){
   S.criteriaA.clear();S.criteriaB.clear();
   S.criteriaC=false;S.criteriaD=false;S.criteriaE=false;
   document.querySelectorAll('input[data-key="criteriaA"],input[data-key="criteriaB"],input[data-key="criteriaC"],input[data-key="criteriaD"],input[data-key="criteriaE"]').forEach(cb=>cb.checked=false);
+  // Takes back the B1/B2 targets the sync added (ABA_TARGET_SUPPORT); hand-ticked ones stay.
+  syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();
   render();
 }
 function toggleMod(key){
@@ -7078,6 +7140,8 @@ function toggleMod(key){
   const modEl=document.getElementById('mod_'+key);
   modEl.classList.toggle('is-on',S.langModifiers.has(key));
   modEl.setAttribute('aria-pressed',String(S.langModifiers.has(key)));
+  // The echolalic chip ticks B1, so the ABA targets follow at once.
+  syncABATargetsFromNeeds();syncSchoolSvcFromNeeds();
   render();
 }
 
@@ -7415,7 +7479,10 @@ const SEL_FIELDS={
 // year, left out on purpose (it narrows re-identification when joined to the categories).
 const SEL_TYPED=['unevenCogDesc','strengths','asdLevelJustificationSC','asdLevelJustificationRRB','rtcInterval',
   'ev','behavFreq','labsOrdered','paeDetail','teacherMaterialOther','priorTestingDate','iepInstruments','pcpExtra'];
-const SEL_VIEW=['previewMode']; // which output tab is showing; not part of the case
+// Not part of the case: which output tab is showing, and which ABA targets the sync added
+// itself (no control to restore it to; a Full restore leaves it empty, so every restored
+// target counts as hand-ticked and is never taken back; a Template restore re-runs the sync).
+const SEL_VIEW=['previewMode','abaTargetsAuto'];
 // 'one' fields set by a menu instead of a radio group: field -> select id.
 const SEL_MENUS={paeQuantity:'paeDrinksSel',paeFrequency:'paeFrequencySel',paeTiming:'paeTimingSel',
   evalProfileStatus:'evalProfileStatusSel',evalDxStatus:'evalDxStatusSel',evalDxOutcome:'evalDxOutcomeSel',ados2Module:'ados2ModuleSel'};
@@ -8345,18 +8412,32 @@ function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
 const phSpan=(s,cls)=>s.replace(/\{([^}]+)\}/g,(_,t)=>`<span class="${cls}">{${escapeHtml(t)}}</span>`);
 
 // ─── SYNC HELPERS ────────────────────────────────────────────────────────────
-// All sync functions are add-only — they never uncheck boxes the clinician manually set.
+// Sync functions never uncheck a box the clinician set. The ABA sync's one narrow
+// exception is below (ABA_TARGET_SUPPORT); everything else they do is add-only.
 // schoolSvcManualOff tracks services the clinician explicitly unchecked so they are not re-added.
 
-// Needs checkboxes → pre-populate ABA targets (add-only; manual unchecks are preserved)
-// keep docs/branching-logic.md §9.2 in sync (add-only by design; rigidity tied to B2 is the one exception)
+// ABA targets the sync may also take back, with each one's support. Clinicians bulk-tick B
+// with "Check all" and then untick what does not apply; a left-behind target would make the
+// note cite an unticked criterion. When support goes, the sync unticks the target ONLY if it
+// added it itself (S.abaTargetsAuto); a hand-ticked target is never touched. The add rules
+// read the same predicates, so adding and taking back cannot disagree.
+const ABA_TARGET_SUPPORT={
+  reduce_stereotypy:()=>S.criteriaB.has('b1')||S.needsBehavior.has('vocalDisruption'),
+  transitions:()=>S.criteriaB.has('b2'),
+};
+
+// Needs checkboxes → pre-populate ABA targets (add-only apart from ABA_TARGET_SUPPORT above)
+// keep docs/branching-logic.md §9.2 in sync (rigidity tied to B2, and the ABA_TARGET_SUPPORT take-back)
 function syncABATargetsFromNeeds(){
   // rigidity is derived from B2 (not directly checkable); reset before re-evaluating
   // (intentional exception to add-only: rigidity has no standalone checkbox)
   if(!S.criteriaB.has('b2')) S.needsBehavior.delete('rigidity');
+  // Marks a target as the sync's own only when it was absent; one already present
+  // (hand-ticked, preset, restored) stays the clinician's.
   const add=(t)=>{
     if(S.abaTargets.has(t)) return;
     S.abaTargets.add(t);
+    S.abaTargetsAuto.add(t);
     const cb=document.querySelector(`input[data-key="abaTargets"][value="${t}"]`);
     if(cb) cb.checked=true;
   };
@@ -8381,7 +8462,7 @@ function syncABATargetsFromNeeds(){
   // interfering behavior (aggression, elopement, SIB, noncompliance…) wrongly add a stereotypy-reduction
   // target. NOTE: vocalDisruption's function (stereotypy vs communicative/attention-maintained) is an FBA
   // determination — this presumes the interfering-repetitive framing and may be re-scoped after FBA.
-  if(S.criteriaB.has('b1')||S.needsBehavior.has('vocalDisruption')) add('reduce_stereotypy');
+  if(ABA_TARGET_SUPPORT.reduce_stereotypy()) add('reduce_stereotypy');
   // Pica — specific high-risk behavior requiring dedicated ABA target
   if(S.needsBehavior.has('pica')) add('reduce_pica');
   // Fecal smearing (scatolia) — function-based hygiene/toileting target; medical cause excluded first.
@@ -8389,7 +8470,7 @@ function syncABATargetsFromNeeds(){
   if(S.needsBehavior.has('boundaryViol')) add('boundary_skills');
   // Transitions + rigidity — fire when b2 (insistence on sameness) checked
   // B2 IS rigidity; also populate needsBehavior so IEP letter, accommodation, and counseling triggers activate
-  if(S.criteriaB.has('b2')){
+  if(ABA_TARGET_SUPPORT.transitions()){
     add('transitions');
     S.needsBehavior.add('rigidity');
   }
@@ -8397,6 +8478,15 @@ function syncABATargetsFromNeeds(){
   if(S.emotionalReg) add('self_reg');
   // Confirmed severe/moderate ID — self-help skills are a core ABA target
   if(S.cogProfile==='id_severe'||S.cogProfile==='id_moderate') add('self_help');
+  // Take back the sync's own targets whose support is gone; after every add rule, so a target
+  // is never added and taken back in the same pass.
+  Object.keys(ABA_TARGET_SUPPORT).forEach(t=>{
+    if(!S.abaTargetsAuto.has(t)||ABA_TARGET_SUPPORT[t]()) return;
+    S.abaTargets.delete(t);
+    S.abaTargetsAuto.delete(t);
+    const cb=document.querySelector(`input[data-key="abaTargets"][value="${t}"]`);
+    if(cb) cb.checked=false;
+  });
 }
 
 // langLevel selection → pre-populate Communication functional needs (add-only)
@@ -8771,6 +8861,8 @@ document.addEventListener('DOMContentLoaded',()=>{
         // pointing at a scalar field silently does nothing rather than crashing or coercing.
         const set = S[k];
         if(set instanceof Set) inp.checked ? set.add(v) : set.delete(v);
+        // A target the clinician ticks or unticks is theirs: the sync may no longer take it back.
+        if(k==='abaTargets') S.abaTargetsAuto.delete(v);
         // PR-K + PR-L: pin / release manual toggles of COG_SPEC_EXCL keys.
         //   - User checks a COG_SPEC_EXCL key   → add to manual-pin Set (PR-K)
         //   - User unchecks a COG_SPEC_EXCL key that WAS pinned → remove from Set AND

@@ -217,6 +217,92 @@ const CASES = [
     check(a){ a.syncABATargetsFromNeeds();
               assert.equal(a.S.abaTargets.has('reduce_stereotypy'), true, 'disruptive vocalizations should add reduce_stereotypy'); } },
 
+  // ── Narrow take-back (maintainer decision 2026-11-14): when B1/B2 support goes, the sync
+  // unticks ONLY targets it added itself (S.abaTargetsAuto); hand-ticked ones are never touched.
+  { name: 'Take-back: B1/B2 targets the sync added go when B1/B2 are unticked (Check all, then untick)',
+    setup(S){ S.criteriaB.add('b1'); S.criteriaB.add('b2'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              for (const t of ['reduce_stereotypy','transitions']) {
+                assert.equal(a.S.abaTargets.has(t), true, `${t} should be added`);
+                assert.equal(a.S.abaTargetsAuto.has(t), true, `${t} should be marked as the sync's own`);
+              }
+              a.S.criteriaB.clear(); a.syncABATargetsFromNeeds();
+              for (const t of ['reduce_stereotypy','transitions']) {
+                assert.equal(a.S.abaTargets.has(t), false, `${t} should be taken back`);
+                assert.equal(a.S.abaTargetsAuto.has(t), false, `${t} should leave the sync's own set`);
+              } } },
+  { name: 'Take-back: a hand-ticked transitions target with no B2 survives the sync',
+    setup(S){ S.abaTargets.add('transitions'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('transitions'), true, 'hand-ticked transitions must stay');
+              assert.equal(a.S.abaTargetsAuto.has('transitions'), false, 'a target present before the sync is never the sync\'s own'); } },
+  { name: 'Take-back: reduce_stereotypy stays while disruptive vocalizations still support it',
+    // Added from B1, then B1 goes but vocalDisruption arrives: the OR in its support holds.
+    setup(S){ S.criteriaB.add('b1'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              a.S.criteriaB.delete('b1'); a.S.needsBehavior.add('vocalDisruption'); a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('reduce_stereotypy'), true, 'vocalDisruption still supports the target'); } },
+  { name: 'Take-back: a sync-added target the clinician then claims is not taken back',
+    // The checkbox handler deletes the key from abaTargetsAuto on any manual tick/untick;
+    // this case reproduces that effect (the handler itself is browser-only).
+    setup(S){ S.criteriaB.add('b2'); },
+    check(a){ a.syncABATargetsFromNeeds();
+              a.S.abaTargetsAuto.delete('transitions');
+              a.S.criteriaB.delete('b2'); a.syncABATargetsFromNeeds();
+              assert.equal(a.S.abaTargets.has('transitions'), true, 'a claimed target must stay'); } },
+
+  // ── Confirmed summary: incomplete criteria never print "meets full DSM-5 criteria" ──
+  { name: 'criteriaGaps: names each unmet part in DSM order',
+    setup(S){ S.criteriaA.add('a1'); S.criteriaA.add('a2'); S.criteriaB.add('b1'); S.criteriaC=true; S.criteriaD=true; },
+    check(a){ assert.deepEqual(a.criteriaGaps(), ['Criterion A 2 of 3','Criterion B 1 of 4','Criterion E not confirmed']); } },
+  { name: 'criteriaGaps: empty when the gate is met (B needs only 2 of 4)',
+    setup(S){ ['a1','a2','a3'].forEach(k=>S.criteriaA.add(k)); S.criteriaB.add('b1'); S.criteriaB.add('b3'); S.criteriaC=S.criteriaD=S.criteriaE=true; },
+    check(a){ assert.deepEqual(a.criteriaGaps(), []); } },
+  { name: 'evidenceHint: ticked-blank, evidence-unticked, both, neither',
+    setup(S){ S.criteriaA.add('a1'); S.ev.a2='Parent report: no joint attention'; S.criteriaA.add('a3'); S.ev.a3='Observed: no orienting'; },
+    check(a){ assert.equal(a.evidenceHint('a1'), 'Ticked, no evidence entered');
+              assert.equal(a.evidenceHint('a2'), 'Evidence entered, not ticked');
+              assert.equal(a.evidenceHint('a3'), '');
+              assert.equal(a.evidenceHint('e'), ''); } },
+  { name: 'Summary: incomplete criteria at an initial visit get one gap fill-in, no full-criteria claim',
+    setup(S){ S.diagStatus='confirmed'; S.visitType='initial'; S.criteriaA.add('a1'); S.criteriaA.add('a2'); },
+    check(a){ const t=a.generateClinicalSummary();
+              assert.ok(t.includes('The diagnosis of autism spectrum disorder is confirmed. {DSM-5 criteria incomplete in this note (Criterion A 2 of 3; Criterion B 0 of 4; Criterion C not confirmed; Criterion D not confirmed; Criterion E not confirmed): state the basis for the diagnosis or the evaluation it rests on}'), t);
+              assert.ok(!/meets full DSM-5|Criterion A domains|criteria table/.test(t), 'no unsupported claim: '+t);
+              assert.equal((t.match(/\{/g)||[]).length, 1, 'exactly one fill-in'); } },
+  { name: 'Summary: follow-up with nothing ticked cites the earlier diagnosis',
+    setup(S){ S.diagStatus='confirmed'; S.visitType='followup'; },
+    check(a){ const t=a.generateClinicalSummary();
+              assert.ok(t.includes('Autism spectrum disorder was diagnosed previously ({year and setting of diagnosis, e.g. this clinic or outside psychological evaluation}); DSM-5 criteria were not re-documented at this visit.'), t);
+              assert.ok(!/meets full DSM-5|0 of three/.test(t), t); } },
+  { name: 'Summary: follow-up with some criteria ticked gets the gap fill-in',
+    setup(S){ S.diagStatus='confirmed'; S.visitType='followup'; S.criteriaA.add('a1'); },
+    check(a){ const t=a.generateClinicalSummary();
+              assert.ok(t.includes('{DSM-5 criteria incomplete in this note (Criterion A 1 of 3;'), t);
+              assert.ok(!t.includes('diagnosed previously'), t); } },
+  { name: 'Summary: complete criteria with no table or lines printing cite no table',
+    setup(S){ S.diagStatus='confirmed'; ['a1','a2','a3'].forEach(k=>S.criteriaA.add(k)); S.criteriaB.add('b1'); S.criteriaB.add('b2');
+              S.criteriaC=S.criteriaD=S.criteriaE=true; S.showDSMTable=false; S.showDSMLines=false; },
+    check(a){ const t=a.generateClinicalSummary();
+              assert.ok(t.includes('meets full DSM-5 criteria'), t);
+              assert.ok(!t.includes('as documented in the DSM-5'), t); } },
+  { name: 'Summary: complete criteria with an ID specifier and empty E evidence carry one E fill-in',
+    setup(S){ S.diagStatus='confirmed'; ['a1','a2','a3'].forEach(k=>S.criteriaA.add(k)); S.criteriaB.add('b1'); S.criteriaB.add('b2');
+              S.criteriaC=S.criteriaD=S.criteriaE=true; S.specifiers.add('withSuspectedID'); },
+    check(a){ let t=a.generateClinicalSummary();
+              assert.equal((t.match(/\{basis for Criterion E: how social communication falls below what is expected for developmental level\}/g)||[]).length, 1, t);
+              assert.equal((t.match(/\{/g)||[]).length, 1, 'never two stops');
+              a.S.ev.e='Social communication well below nonverbal developmental level on ADOS-2';
+              t=a.generateClinicalSummary();
+              assert.ok(!t.includes('{'), 'E evidence typed: no stop: '+t); } },
+  { name: 'Summary: new Confirmed wording has no em dash and no square-bracket fill-in',
+    setup(){},
+    check(a){ const S=a.S; S.diagStatus='confirmed';
+              for (const vt of ['', 'initial', 'reeval', 'followup']) {
+                S.visitType=vt; const t=a.generateClinicalSummary();
+                assert.ok(!/—|\[/.test(t), `visitType '${vt}': `+t);
+              } } },
+
   // ── syncSchoolSvcFromNeeds(): academic -> psychoed wiring (Unit 5, DOM wrapper) ──
   // A flagged academic concern routes to the 'psychoed' school service (the IDEA
   // psychoeducational-evaluation request) for preschool and up, deduped via the Set with

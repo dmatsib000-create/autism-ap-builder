@@ -6,7 +6,7 @@ ICD-10-CM: F84.0
 
 ── Clinical Summary ──
 
-The patient is a school-aged boy who is using fluent, age-appropriate language. He demonstrates a persistent pattern of deficits in social communication and social interaction across all three Criterion A domains, and restricted and repetitive patterns of behavior and interests across 2 of four Criterion B domains, as documented in the DSM-5 criteria table. These features are present across multiple settings, have been evident since the early developmental period, and cause clinically significant functional impairment across multiple functional domains, including adaptive skills. This presentation meets full DSM-5 criteria for Autism Spectrum Disorder; the clinical findings are not better explained by intellectual disability or global developmental delay alone. Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
+The patient is a school-aged boy who is using fluent, age-appropriate language. The diagnosis of autism spectrum disorder is confirmed. {DSM-5 criteria incomplete in this note (Criterion C not confirmed; Criterion D not confirmed; Criterion E not confirmed): state the basis for the diagnosis or the evaluation it rests on} Diagnosis and implications were reviewed with the family at today's visit; questions were addressed.
 
 ── DSM-5 Diagnostic Criteria ──
 

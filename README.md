@@ -281,7 +281,7 @@ Quick decoder for the acronyms and short forms used in the rest of this document
 - **FDLRS** — Florida Diagnostic and Learning Resources System (preschool early-intervention network for children not yet in public school)
 
 **Tool-internal conventions**
-- **Add-only** — auto-population helpers add checks but never remove them; the clinician's manual unchecks persist across re-renders
+- **Add-only** — auto-population helpers add checks and do not remove them, with one narrow exception: an ABA target the tool added from DSM-5 criterion B1 or B2 is unchecked again when that criterion is unchecked. A target you checked yourself is never removed, and your manual unchecks persist across re-renders
 - **The bridge** — the cognitive-profile → DSM-5 specifier auto-link (see the [technical reference](docs/branching-logic.md) §11.7 and the clinician guide)
 - **Override pill** — the three-state Auto/Include/Exclude toggle in the Adjust Referrals section that overrides a referral rule
 - **`{placeholder}` field** — brace-wrapped text in letter output that the clinician fills in after copying (e.g., `{Student Name}`); Epic treats each one as an F2 cursor stop and will not let the note be signed while one remains
