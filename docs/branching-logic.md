@@ -341,7 +341,7 @@ The markup carries the same state (`class="sec-head collapsed"` on the head, `cl
 
 **Clear All** calls `resetSections()` before its final render (`setPreviewMode('note')`, see §5.4): the edge memory is emptied and the four defaults re-collapse; since `S` is already blank, that render sees no rising edge. Sections outside the table keep whatever state the clinician left them in.
 
-**Toolbar.** The "Expand all" / "Collapse all" button (`#secToggleAllBtn`, `toggleAllSections()`) acts on every on-screen section head; a display-gated section (the ABA parameters block) is skipped so it cannot make the label read "Expand all" while everything visible is open. The label is re-synced by `syncSecToggleAll()` after any open/close.
+**Toolbar.** The "Expand all" / "Collapse all" button (`#secToggleAllBtn`, `toggleAllSections()`) sits at the right of the Quick start bar, at the top of the form, and acts on every on-screen section head; a display-gated section (the ABA parameters block) is skipped so it cannot make the label read "Expand all" while everything visible is open. The label is re-synced by `syncSecToggleAll()` after any open/close.
 
 Adding a fifth collapsed section is one `SEC_TABLE` row plus the two markup classes on its head and body; adding a relevance trigger is one more clause in that row's `relevant`. Both are unit-tested in `tests/unit.mjs` ("sections:" and "secAutoOpenKeys:" cases).
 
