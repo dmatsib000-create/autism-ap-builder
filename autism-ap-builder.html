@@ -285,6 +285,8 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .btn-theme{display:inline-flex;align-items:center;gap:6px}
 .theme-swatch{width:11px;height:11px;border-radius:var(--radius-pill);background:var(--accent);border:1px solid rgba(255,255,255,.55);flex-shrink:0}
 .header-actions{display:flex;gap:var(--space-2);align-items:center}
+/* Clear All (and the confirm that replaces it) sits apart from Export / Restore so a reach for one never lands on the other. */
+.header-clear,.header-actions .confirm-inline{margin-left:var(--space-9)}
 .btn{padding:6px 13px;border-radius:var(--radius);border:none;cursor:pointer;font-size:var(--text-12);font-weight:500;transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur-fast) var(--ease);font-family:var(--font);letter-spacing:.005em}
 @media (hover:hover){.btn:hover{box-shadow:var(--shadow-sm)}.btn:active{transform:translateY(.5px)}}
 .btn-white{background:var(--bg-card);color:var(--accent-hover)}
@@ -629,6 +631,8 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .vt-unset .dx-banner-label-vt{color:var(--amber)!important}
 /* ── Sticky note actions bar ────────── */
 .note-sticky-bar{padding:7px 14px;border-top:1px solid var(--gray-200);display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;background:white;flex-shrink:0}
+/* Print prints whatever tab is showing; pinned left so the copy buttons keep their place at the right. */
+.note-sticky-bar .bar-print{margin-right:auto}
 /* ── Contextual dx-active highlight ─── */
 .dx-active{border-color:var(--amber)!important;box-shadow:0 0 0 2px var(--amber-light)!important}
 .dx-active .sec-head{background:var(--dx-head-bg)!important}
@@ -748,6 +752,8 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
   body:not(.mob-output) .right-panel{display:none}
   body.mob-output .left-panel{display:none}
   .note-preview{overflow:visible;height:auto;padding:10px}
+  /* The page scrolls as one column here, so keep the copy bar in reach at the screen's foot. */
+  .note-sticky-bar{position:sticky;bottom:0;z-index:30;box-shadow:0 -2px 6px rgba(15,15,25,.08)}
   #mobile-nav{display:flex}
   .app-header{flex-wrap:wrap;padding:8px 12px}
   .app-header h1{font-size:var(--text-13)}
@@ -804,12 +810,16 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
   .iep-ph,.aba-ph{background:transparent;color:inherit;font-style:normal;padding:0}
   a{color:black;text-decoration:underline}
   .preview-tabs{display:none}
+  /* PCP Recs prints as the list is copied: no edit buttons, hints, or left-out lines. */
+  .pcp-ctl,.pcp-status,.pcp-hint,.pcp-row.is-omitted{display:none!important}
   @page{margin:.75in}
 }
 /* Quick-start preset bar — in-visit archetype scaffolding (prototype).
    Sits above the diagnosis banner as the "start here" affordance. */
 .preset-bar{margin:0 0 12px;padding:10px 12px;border:1px solid var(--gray-300,#d1d5db);border-radius:var(--radius);background:var(--gray-50,#f9fafb)}
-.preset-bar-label{font-size:var(--text-11);font-weight:600;color:var(--gray-700,#374151);margin-bottom:7px}
+.preset-bar-head{display:flex;align-items:flex-start;gap:var(--space-3);margin-bottom:7px}
+.preset-bar-head #secToggleAllBtn{margin-left:auto;flex-shrink:0}
+.preset-bar-label{font-size:var(--text-11);font-weight:600;color:var(--gray-700,#374151)}
 .preset-bar-label span{font-weight:400;color:var(--gray-500,#6b7280)}
 .preset-bar-btns{display:flex;flex-wrap:wrap;gap:var(--space-2,6px)}
 /* Self-contained light-background styling — NOT .btn-outline, which is white-on-dark
@@ -838,15 +848,8 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
   <div class="header-actions">
     <button class="btn btn-outline btn-theme" id="themeBtn" onclick="cycleTheme()" title="Switch color theme"><span class="theme-swatch" aria-hidden="true"></span><span id="themeLabel" aria-live="polite">Theme: Current</span></button>
     <div class="header-sep"></div>
-    <button class="btn btn-outline" id="secToggleAllBtn" type="button" onclick="toggleAllSections()" aria-label="Expand all sections" title="Open or close every form section">Expand all</button>
-    <div class="header-sep"></div>
-    <button class="btn btn-outline" onclick="window.print()">Print</button>
-    <button class="btn btn-outline" onclick="copyNote('plain','all',this)">Copy Plain</button>
-    <button class="btn btn-white" id="copyRichBtn" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
-    <div class="header-sep"></div>
     <button class="btn btn-outline" type="button" onclick="openSelDialog()" title="Copy your selections as a short string, or rebuild the form from one">Export / Restore</button>
-    <div class="header-sep"></div>
-    <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+    <button class="btn btn-danger header-clear" type="button" onclick="clearAll()">Clear All</button>
   </div>
 </header>
 
@@ -891,7 +894,10 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
        needs) and deliberately leave the diagnostic determination — DSM-5 criteria and
        both severity levels (asdLevelSC/asdLevelRRB) — UNSET for the clinician to affirm. -->
   <div class="preset-bar" id="presetBar">
-    <div class="preset-bar-label">Quick start <span>&mdash; one click scaffolds a common case; diagnosis &amp; severity stay blank for you to set.</span></div>
+    <div class="preset-bar-head">
+      <div class="preset-bar-label">Quick start <span>&mdash; one click scaffolds a common case; diagnosis &amp; severity stay blank for you to set.</span></div>
+      <button class="btn btn-gray btn-sm" id="secToggleAllBtn" type="button" onclick="toggleAllSections()" aria-label="Expand all sections" title="Open or close every form section">Expand all</button>
+    </div>
     <div class="preset-bar-btns">
       <button class="btn preset-btn" type="button" onclick="applyPreset('p1')">Toddler eval — workup pending</button>
       <button class="btn preset-btn" type="button" onclick="applyPreset('p2')">Preschool — emerging language</button>
@@ -1876,12 +1882,14 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
     <small>No PHI collected or stored. All output requires clinician review.</small></div>
   </div>
   <div class="note-sticky-bar" id="noteStickyBar">
+    <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the note as shown">Print</button>
     <button class="btn btn-gray btn-sm" onclick="copyNote('plain','assessment',this)">Assessment (plain)</button>
     <button class="btn btn-gray btn-sm" onclick="copyNote('plain','plan',this)">Plan (plain)</button>
     <button class="btn btn-gray btn-sm" onclick="copyNote('plain','all',this)">All (plain)</button>
     <button class="btn btn-green btn-sm" id="copyRichBtnSticky" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
+    <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the letter as shown">Print</button>
     <span id="abaLevelWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
     <span id="abaThinWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--red-dark);background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
     <span id="abaCatatoniaWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
@@ -1889,10 +1897,12 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
     <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
   <div class="note-sticky-bar" id="iepStickyBar" style="display:none">
+    <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the letter as shown">Print</button>
     <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')">&#9733; Copy Letter (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
   </div>
   <div class="note-sticky-bar" id="pcpStickyBar" style="display:none">
+    <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the list as shown">Print</button>
     <button class="btn btn-gray btn-sm" id="pcpResetBtn" onclick="resetPcpEdits()" title="Put back every line you left out and return the list to its standard order.">Undo my edits</button>
     <button class="btn btn-green btn-sm" id="copyPCPBtn" onclick="copyPCP('rich')">&#9733; Copy List (rich)</button>
     <button class="btn btn-epic btn-sm" id="copyPCPEpicBtn" onclick="copyPCP('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>

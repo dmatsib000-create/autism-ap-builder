@@ -61,7 +61,7 @@ The eight above produce a clinically defensible note. These six additions are wh
 
 ### Copy the note into Epic
 
-The A&P Note tab has three buttons in the top toolbar: **Print**, **Copy Plain**, and **★ Copy Rich Text**. For Maya's note, click **Copy Rich Text** → switch to Epic → paste into the note composer; formatting (bold, bullets, section structure) is preserved.
+Every output tab has its own copy bar along the bottom of the preview (on a phone it stays pinned to the bottom of the screen), with a **Print** button at its left that prints the tab you are looking at. On the A&P Note tab the bar offers **Assessment (plain)**, **Plan (plain)**, **All (plain)**, and **★ Copy Rich Text**. For Maya's note, click **Copy Rich Text** → switch to Epic → paste into the note composer; formatting (bold, bullets, section structure) is preserved.
 
 The ABA Letter and IEP Letter tabs each have their own per-tab toolbar with a second option: **Copy for Epic (plain)**. This copies the letter as plain text with every `{placeholder}` field left exactly as written. Epic treats the braces as cursor stops, so once pasted into the Epic note composer you can press F2 to hop to each placeholder, read its hint, and fill or delete it. Use this for the letter tabs; use Rich Text for the A&P note.
 
