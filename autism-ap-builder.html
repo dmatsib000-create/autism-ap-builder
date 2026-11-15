@@ -6663,6 +6663,8 @@ function updateEvHints(){
     const msg=evidenceHint(k);
     h.textContent=msg;
     h.hidden=!msg;
+    // Screen readers read a description even from a hidden element, so link it only while shown.
+    if(msg) ta.setAttribute('aria-describedby',h.id); else ta.removeAttribute('aria-describedby');
   });
 }
 
