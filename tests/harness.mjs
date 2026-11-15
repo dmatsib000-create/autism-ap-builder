@@ -56,6 +56,9 @@ const EXPORTS = [
   // S.abaTargets directly. Covers the behavior->target mapping the golden lane can't
   // reach (golden fixtures set S.abaTargets directly and never invoke the sync).
   'syncABATargetsFromNeeds',
+  // Pure criteria readers behind the Confirmed summary's fill-in and the form's evidence hints.
+  'criteriaGaps',
+  'evidenceHint',
   // Add-only school-service sync, same shape as syncABATargetsFromNeeds: DOM-driven,
   // mutates S.schoolSvc via a guarded add() whose querySelector/cb.checked/badge steps
   // are best-effort under the null DOM. The unit lane drives it to lock the Unit 5

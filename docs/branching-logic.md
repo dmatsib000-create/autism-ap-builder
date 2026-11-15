@@ -91,7 +91,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 |---|---|---|---|
 | `ageGroup` | string | `'toddler' \| 'preschool' \| 'schoolAge' \| 'adolescent' \| 'youngAdult'` | §2 (age-group routing) |
 | `pronouns` | string | `'he' \| 'she' \| 'they' \| ''` | §8 (pronoun resolution) |
-| `visitType` | string | varies | Note framing, RTC interval |
+| `visitType` | string | varies | Note opening sentence; Confirmed summary wording when no criteria are ticked (§4.3.1). It does not set the return-to-clinic interval, which is typed. |
 | `rtcInterval` | string | varies | Plan section |
 | `dbpFollowUp` | string | [§13.3](#133-follow-up-lines-a-standing-line-that-selections-override) |
 | `diagStatus` | string | `'confirmed' \| 'suspected' \| 'ruleOut'` | §4, §5 (tab gates), §9 (ABA gate) |
@@ -182,6 +182,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | Property | Drives |
 |---|---|
 | `abaTargets` (Set) | §9 — populated by `syncABATargetsFromNeeds()` |
+| `abaTargetsAuto` (Set) | §9.2 — the `abaTargets` the sync added itself (gates the B1/B2 take-back); in `SEL_VIEW`, never exported |
 | `abaSetting` (Set) | §9 — letter "settings" paragraph |
 | `abaHours` | string — letter dosing line |
 
@@ -247,6 +248,7 @@ For Ctrl-F navigation when you remember a property name but not its category:
 | `abaHours` | string | [§1.2](#12-the-s-object--property-reference), [§9.6](#96-settings-and-hours) |
 | `abaSetting` | Set | [§9.6](#96-settings-and-hours) |
 | `abaTargets` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds) |
+| `abaTargetsAuto` | Set | [§9.2](#92-aba-target-population--syncabatargetsfromneeds) |
 | `academic` | boolean | [§9.2](#92-aba-target-population--syncabatargetsfromneeds), [§10.15](#1015-psychoeducational-evaluation-auto-recommendation) |
 | `adaptiveStandardized` | boolean | [§1.2](#12-the-s-object--property-reference) |
 | `adaptProfile` | string | [§1.2](#12-the-s-object--property-reference) |
@@ -350,7 +352,7 @@ The header button **Export / Restore** opens a panel (`#selDialog`) with two hal
 
 **Format.** `APB<version>;key=value;key=a,b;key=k:v,k:v`, values URI-encoded (the only value that needs it today is the ADOS-2 module, `Module%203`). Keys are `S` property names. Only values that differ from `initialState()` are written, so an empty form exports as `APB1`. Sets keep their click order, because some generators list items in that order.
 
-**What is saved is declared in one table.** `SEL_FIELDS` maps each saved `S` property to a type: `one` (single choice), `flag` (boolean), `many` (Set), `map` (object of single choices: `therapyStatus`, `priorTestingOutcome`, `overrides`). `SEL_TYPED` lists the typed fields, which are never exported: `unevenCogDesc`, `strengths`, both level justifications, `rtcInterval`, `pcpExtra`, `ev.*`, `behavFreq.*`, `labsOrdered`, `paeDetail`, `teacherMaterialOther`, `iepInstruments`, and `priorTestingDate` (a typed year, left out by decision 2026-11-12). `SEL_VIEW` holds `previewMode`. Text that a chip writes into a typed field (strength chips, evidence chips, the echolalia auto-fill of B1 evidence) is typed text for this purpose and is not exported. The unit lane fails if an `initialState()` key is in none of the three lists, so a new `S` property cannot ship unclassified.
+**What is saved is declared in one table.** `SEL_FIELDS` maps each saved `S` property to a type: `one` (single choice), `flag` (boolean), `many` (Set), `map` (object of single choices: `therapyStatus`, `priorTestingOutcome`, `overrides`). `SEL_TYPED` lists the typed fields, which are never exported: `unevenCogDesc`, `strengths`, both level justifications, `rtcInterval`, `pcpExtra`, `ev.*`, `behavFreq.*`, `labsOrdered`, `paeDetail`, `teacherMaterialOther`, `iepInstruments`, and `priorTestingDate` (a typed year, left out by decision 2026-11-12). `SEL_VIEW` holds `previewMode` and `abaTargetsAuto` (which targets the ABA sync added itself; it has no control, so a Full restore leaves it empty and every restored target counts as hand-ticked). Text that a chip writes into a typed field (strength chips, evidence chips, the echolalia auto-fill of B1 evidence) is typed text for this purpose and is not exported. The unit lane fails if an `initialState()` key is in none of the three lists, so a new `S` property cannot ship unclassified.
 
 **Two export levels.** `SEL_TEMPLATE` lists the fields exported at the default **Template** level: visit type, age band, language level and modifiers, the six needs Sets plus `emotionalReg` / `academic` / `strangerDanger`, requested teacher materials, safety and anticipatory-guidance topics, the two DSM display toggles, insurance category, ABA hours and settings, referral overrides, and `pcpInNote` (whether the primary care list is added to the note, a display preference like the DSM toggles). Everything else is exported only at **Full**: the follow-up plan and the primary care list edits (`dbpFollowUp`, `pcpOmit`, `pcpFirst`: a disposition and edits made for one child, and an edit's row id shows which condition produced the row), the diagnostic determination (status, levels, criteria), pronouns, cognitive and adaptive profile, specifiers, medical flags, exposure history, comorbid conditions and their sub-options, prior testing and work-up results, therapy status, social work, school placement and documentation. A field absent from `SEL_TEMPLATE` is Full-only, so a new field defaults to the narrower export. Template drops the derived `rigidity` need, since it depends on criterion B2, which Template omits. For the same reason `schoolSvc`, `schoolSvcManualOff` and `abaTargets` are Full-only: the add-only syncs fill them from omitted fields as well (`sped` from an ID profile, `counseling` from a comorbid diagnosis, `transitions` from B2), so exporting them would disclose what Template leaves out. A Template string carries the marker `scope=template`, and restoring one runs `syncABATargetsFromNeeds()` and `syncSchoolSvcFromNeeds()` to rebuild both from the restored needs; services or targets that were hand-picked beyond what the needs imply are not carried by a Template. The panel always reopens at Template.
 
@@ -549,21 +551,39 @@ The warning is non-blocking — the clinician can still proceed (the tool serves
 
 A second banner of the same kind, **⚠ Coding Warning**, fires when the `withID` specifier is checked but no ID severity tier is selected in Cognitive Profile. The note itself still codes `F79` (unspecified severity) and reads correctly as signed; the prompt to pick a severity lives only on screen. It used to be a bracketed "documentation note" inside the note text, which the placeholder rule forbids (brackets paste verbatim into Epic and can be signed into the chart). The IEP letter keeps its own brace-placeholder prompt for the same gap (`idDocPrompt`, §10), because that letter is the one the school reads.
 
+#### 4.3.1 What the Confirmed clinical summary prints (council 2026-11-13/14)
+
+The banner above is on-screen only. The note's own summary (`generateClinicalSummary()`, `diagStatus === 'confirmed'`) never asserts criteria that are not ticked. `criteriaGaps()` returns the unmet parts of the gate in DSM order (`Criterion A n of 3`, `Criterion B n of 4` when fewer than 2, `Criterion C/D/E not confirmed`); it is empty exactly when `validateCriteria().complete`.
+
+| Criteria state | Visit type | Summary prints |
+|---|---|---|
+| complete | any | The existing sentence: counts, C/D/E, functional domains, "meets full DSM-5 criteria". Its pointer reads "as documented in the DSM-5 criteria table" when `showDSMTable`, "...criteria below" when only `showDSMLines`, and nothing when neither prints. |
+| none ticked | `followup` | "Autism spectrum disorder was diagnosed previously ({year and setting of diagnosis, e.g. this clinic or outside psychological evaluation}); DSM-5 criteria were not re-documented at this visit." |
+| any other gap | any (including a partial follow-up and a blank visit type) | "The diagnosis of autism spectrum disorder is confirmed. {DSM-5 criteria incomplete in this note (*gaps*): state the basis for the diagnosis or the evaluation it rests on}" |
+
+One brace stop replaces the count, the C/D/E claim and "meets full DSM-5 criteria", so the contradiction cannot be signed (Epic's F2 stops on it). The FASD paragraph's "established based on the DSM-5 criteria documented above" (§7.9) is council-ratified and unchanged; it is true once the stop is answered. The remaining case (follow-up, FASD flags, nothing ticked) is on the FASD council's deferred list.
+
+**Criterion E fill-in.** When the criteria are complete and an ID/GDD specifier is set (`withID`, `withSuspectedID`, `withGDD`, `withSuspectedGDD`), the summary asserts the deficits "exceed what would be expected from intellectual disability or global developmental delay alone". If `S.ev.e` is blank, that sentence ends with `({basis for Criterion E: how social communication falls below what is expected for developmental level})` (attending sign-off 2026-11-14). It fires only on complete criteria, so a sentence never carries two stops.
+
+**Evidence hints (form only).** Under each criterion's evidence box, `updateEvHints()` (from `render()`) shows `evidenceHint(k)` in the amber `.lab-warn` style: "Ticked, no evidence entered" or "Evidence entered, not ticked". The hints never print and never tick anything; any diagnosis status. Typed or chip evidence is read as a positive finding, because clinicians rarely write negative findings there.
+
+**Check all / Clear all criteria.** "Check all criteria" (`dsmCheckAll`) ticks A1-A3, B1-B4, C, D and E and enters no evidence (the hints then show on every row until evidence is typed). Both it and "Clear all criteria" run the ABA and school syncs, so the B1/B2 targets appear, and sync-added ones are taken back, at once (§9.2).
+
 ### 4.4 Side effects of specific criteria
 
 A few criteria toggle other state when set, beyond their own membership:
 
 | Trigger | Auto-side-effect | Line | Rationale |
 |---|---|---|---|
-| Echolalic modifier chip clicked | `criteriaB.add('b1')`; pre-fills `ev.b1` with "Scripted/echolalic speech" | 4090–4098 | Echolalia is the textbook B1 finding; reduce data-entry burden |
+| Echolalic modifier chip clicked | `criteriaB.add('b1')`; pre-fills `ev.b1` with "Scripted/echolalic speech"; runs the ABA/school syncs (so `reduce_stereotypy` follows at once) | 4090–4098 | Echolalia is the textbook B1 finding; reduce data-entry burden |
 | `criteriaB.has('b2')` becomes true | `needsBehavior.add('rigidity')`; via §9 cascade adds `'transitions'` ABA target | 4567, 4566 | B2 (insistence on sameness) is operationally the same as the "rigidity" needs category |
-| `criteriaB.has('b2')` becomes false | `needsBehavior.delete('rigidity')` | 4538 | Reverses the above. This is the one **exception** to `syncABATargetsFromNeeds()`'s add-only design (§9) — rigidity is derived, not manually entered |
+| `criteriaB.has('b2')` becomes false | `needsBehavior.delete('rigidity')`; the `'transitions'` target is taken back only if the sync added it (`ABA_TARGET_SUPPORT`, §9.2) | 4538 | Reverses the above. Rigidity is derived, not manually entered, so it always follows B2; a hand-ticked transitions target stays |
 
 ### 4.5 Confirmed vs suspected diagnosis paths
 
 | `S.diagStatus` | Output behavior |
 |---|---|
-| `'confirmed'` | Note states diagnosis affirmatively. ABA tab eligible. CARD rule fires. |
+| `'confirmed'` | Note states diagnosis affirmatively (with a fill-in when criteria are incomplete, §4.3.1). ABA tab eligible. CARD rule fires. |
 | `'suspected'` | Note uses differential language ("Concerns consistent with ASD; differential includes..."). ABA tab hidden. Early Steps and FDLRS still fire. |
 | `'ruleOut'` | Note documents the evaluation process and negative finding. Most therapy rules don't fire. |
 
@@ -966,6 +986,7 @@ Two independent flags in the Medical & Referral Flags section, under the **"Pren
 3. **Differential prose (R6, council-ratified 2026-07-16, amended same day):**
    - **Not confirmed** → parallel-tracks paragraph: FASD is in the differential, evaluated in parallel; conditions can co-occur; neither evaluation replaces the other. No comparative pattern claims.
    - **Confirmed** → anchor: diagnosis established per the DSM-5 criteria documented above; [adaptive subject] warrants/warrant additional evaluation for possible co-occurring FASD; separate diagnostic question, does not alter the autism diagnosis or its services. The subject phrase AND verb adapt to which flag(s) fired ("exposure … warrants" is singular; "findings … warrant" is plural).
+   - **Anchor and incomplete criteria (2026-11-14, wording unchanged):** "documented above" is true once the clinical summary's criteria fill-in is answered (§4.3.1); with incomplete criteria the summary no longer claims full criteria above it. Follow-up + FASD flags + no criteria ticked (the summary then cites the earlier diagnosis) is referred to this council's deferred list.
    - **Confirmed + criteria gate** → the evidentiary sentence ("Notably, the documented presentation includes deficits in nonverbal communicative behaviors and restricted, repetitive behaviors beyond the sensory domain…") prints **only when `criteriaA` has `a2` AND `criteriaB` has at least one of `b1`/`b2`/`b3`**. The sentence asserts only what the note itself documents; when the gate fails (in practice: a documentation gap, since any complete B set includes a non-sensory criterion), it stays silent rather than handing a reviewer the weak spot of a thinly documented presentation. This is the **single ratified exception** to the no-criteria-aware-differential-prose rule; anything beyond it is deferred.
 
 **Referral wiring.**
@@ -1156,19 +1177,28 @@ The letter does not render for suspected or rule-out evaluations, regardless of 
 
 ### 9.2 ABA target population — `syncABATargetsFromNeeds()`
 
-`syncABATargetsFromNeeds()` (called on every state change at lines 4685, 4687) is the engine that populates `S.abaTargets` from the rest of state.
+`syncABATargetsFromNeeds()` is the engine that populates `S.abaTargets` from the rest of state. It runs from every checkbox and radio change handler, from a Template restore (`applySelectionState` with `rederive`), and from the three criteria shortcuts that change B without a checkbox event: "Check all criteria" (`dsmCheckAll`), "Clear all criteria" (`dsmClearAll`), and the echolalic language chip (`toggleMod`, which ticks B1). Before 2026-11-14 those three did not run it, so their targets appeared or lingered until the next ordinary click.
 
-**Add-only design.** Each candidate target is checked against the current `abaTargets` Set; if already present, the function skips it. If absent and the trigger condition holds, it adds. **There is no removal logic** — once a target is in the Set (either by sync or by the clinician manually checking it), it stays until the clinician manually unchecks. This is intentional and documented inline (`autism-ap-builder.html:4537`).
+**Add-only design, with one narrow take-back.** Each candidate target is checked against the current `abaTargets` Set; if already present, the function skips it. If absent and the trigger condition holds, it adds, and records the key in `S.abaTargetsAuto` (the targets the sync added itself). Otherwise the sync removes nothing: a target the clinician ticked, a preset ticked, or a Full restore brought back stays until the clinician unticks it.
 
-**Why add-only?** When a clinician curates the target list (perhaps removing a target the sync added because it doesn't apply to this patient's specific situation), reopening a needs checkbox that originally triggered the target should *not* silently resurrect it. The clinician's curation reflects judgment the sync function cannot replicate. The trade-off: a clinician who *wants* to reset has to manually uncheck each unwanted target.
+**Why add-only?** When a clinician curates the target list (perhaps removing a target the sync added because it doesn't apply to this patient's specific situation), reopening a needs checkbox that originally triggered the target should *not* silently resurrect it. The clinician's curation reflects judgment the sync function cannot replicate. The trade-off: a clinician who *wants* to reset has to manually uncheck each unwanted target. (Known gap, left as is: unticking a sync-added target while its trigger is still ticked is undone at once, because the change handler re-runs the sync; there is no ABA equivalent of `schoolSvcManualOff`.)
 
-**The one exception — rigidity** (`autism-ap-builder.html:4538`):
+**The take-back (`ABA_TARGET_SUPPORT`, maintainer decision 2026-11-14).** Two targets are added from DSM-5 B criteria, which clinicians commonly tick in bulk with "Check all criteria" and then untick where they do not apply. Without a take-back, an unticked B1 or B2 left its target behind, and the note's target rationale then claimed support the criteria table contradicted. `ABA_TARGET_SUPPORT` names each such target with its support:
+
+| Target | Supported while |
+|---|---|
+| `reduce_stereotypy` | `criteriaB.has('b1') \|\| needsBehavior.has('vocalDisruption')` |
+| `transitions` | `criteriaB.has('b2')` |
+
+After all the add rules, the sync unticks a target in this table **only if** it is in `S.abaTargetsAuto` **and** its support is gone. The add rules for these two targets read the same predicates, so adding and taking back cannot disagree. A clinician's own tick or untick of a target checkbox removes it from `S.abaTargetsAuto` (the change handler's Set branch), so a target the clinician has touched is never taken back. `S.abaTargetsAuto` is in `SEL_VIEW`, not `SEL_FIELDS`: it has no control and is never exported. After a Full restore it is empty, so every restored target counts as hand-ticked (the safe direction); a Template restore re-runs the sync and rebuilds it. `clearAll()` resets it through `initialState()`. The invariants lane checks that every `ABA_TARGET_SUPPORT` key is a real target checkbox.
+
+**Rigidity** (the derived need, not a target):
 
 ```javascript
 if (!S.criteriaB.has('b2')) S.needsBehavior.delete('rigidity');
 ```
 
-If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehavior` (which in turn removes the `'transitions'` ABA target). The exception exists because rigidity is *derived* from B2 rather than manually entered — the clinician toggled B2, not the rigidity needs box.
+If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehavior`. Rigidity is *derived* from B2 rather than manually entered (it has no checkbox), so it always follows B2. The `transitions` target follows B2 only through the take-back above: when the sync added it, and never when the clinician ticked it.
 
 **Target population table** (`autism-ap-builder.html:5952–5985`):
 
@@ -1189,7 +1219,7 @@ If `criteriaB.has('b2')` becomes false, `'rigidity'` is removed from `needsBehav
 | `reduce_pica` | `needsBehavior.has('pica')` |
 | `reduce_smearing` | `needsBehavior.has('smearing')` — function-based hygiene/toileting target. Unlike `reduce_pica`, **not** a Behavior of Danger: the medical contributor (constipation with overflow incontinence / encopresis) is excluded or treated first via the GI referral, and the rationale uses no emergency / no-safe-frequency framing. |
 | `boundary_skills` | `needsBehavior.has('boundaryViol')` |
-| `transitions` | `criteriaB.has('b2')` (and `'rigidity'` added to needsBehavior). **Remove direction:** if `b2` becomes false, `'rigidity'` is deleted from `needsBehavior` (the one exception to add-only — see [§4.4](#44-side-effects-of-specific-criteria)), but `'transitions'` itself **stays** in `abaTargets` — the add-only contract still applies to the target. Clinician must manually uncheck if they want it gone. |
+| `transitions` | `criteriaB.has('b2')` (and `'rigidity'` added to needsBehavior). **Remove direction:** if `b2` becomes false, `'rigidity'` is deleted from `needsBehavior` (see [§4.4](#44-side-effects-of-specific-criteria)), and `'transitions'` is taken back only if the sync added it (`ABA_TARGET_SUPPORT`, above). A hand-ticked transitions target stays; the note's rationale for it then drops the "insistence on sameness documented (DSM-5 Criterion B2)" clause, so it never cites an unticked criterion. |
 | `self_reg` | `S.behavFreq.emotionalReg === true` |
 | `self_help` | Either path adds it once (Set semantics — no duplication): `needsAdaptive.has('toileting' \| 'dressing' \| 'feeding_adl')` **OR** `cogProfile === 'id_severe' \| 'id_moderate'` |
 
@@ -1777,9 +1807,9 @@ To enumerate `// WARY:` comments at any time: `grep -n "WARY:" autism-ap-builder
 
 Detailed in [§8.4](#84-wary-silent-fallback-risk-in-v3). Summary: verbs missing from `V3_MAP` produce ungrammatical output for `pronouns: 'they'` patients with no UI signal — only a `console.warn` clinicians never see.
 
-### 11.2 `syncABATargetsFromNeeds()` add-only contract (`autism-ap-builder.html:4537`)
+### 11.2 `syncABATargetsFromNeeds()` add-only contract
 
-Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). Add-only by design, with the one documented exception for rigidity-via-B2. CLAUDE.md reinforces: *"Do not add removal logic."* The fragility: a maintainer who sees a target re-added on every render might "fix" the perceived bug by adding removal, breaking clinician curation. The inline comment exists to head off that change.
+Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). Add-only by design, with two narrow exceptions: rigidity always follows B2, and `ABA_TARGET_SUPPORT` takes back a B1/B2 target only when the sync added it itself and its support is gone (maintainer decision 2026-11-14). CLAUDE.md reinforces: no removal logic beyond that table. The fragility: a maintainer who sees a target re-added on every render might "fix" the perceived bug by adding broader removal, breaking clinician curation; or might widen `ABA_TARGET_SUPPORT` to a target the clinician commonly ticks by hand. Any removal must stay gated on `S.abaTargetsAuto`, so a target the clinician touched is never taken back. The inline comments exist to head off both changes.
 
 ### 11.3 Safety-flag asymmetry (§7.7 open question 2)
 
