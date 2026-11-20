@@ -3703,7 +3703,7 @@ function generateNote() {
       pushSocialTargets();
     } else {
       L.push('Structured autism-specific social skills group. Options in the Gainesville area:');
-      L.push('  - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 273-0517) for current group availability and enrollment.');
+      L.push('  - UF CARD Social Skills Groups (ages 6+): Evidence-based ASD-specific social skills training. Contact UF CARD (card.ufl.edu | (352) 265-2230) for current group availability and enrollment.');
       L.push('  - Social Thinking (Speech4Kids): Structured social cognition curriculum appropriate for school-age children with ASD. Contact Speech4Kids: (352) 240-3155 | speech4kidsgainesville.com');
       L.push('  - PEERS for Kids: Manualized, evidence-based social skills training program for school-age children.');
       pushSocialTargets();
@@ -4151,7 +4151,7 @@ function generateNote() {
   const showResources=hCARD||anyTherapyInPlan||under6||behaviorconcern||over5ABA||S.prenatalAlcohol||S.fasdFeatures;
   if(showResources){
     L.push(n+++'. FAMILY RESOURCES & NEXT STEPS');
-    if(hCARD){L.push('  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 273-0517');}
+    if(hCARD){L.push('  • CARD (Center for Autism and Related Disabilities, University of Florida): Family provided with information about UF CARD, which offers free support, education, and community resources for individuals with autism and their families - including caregiver support groups, assistance locating therapy services, caregiver training, and community navigation. Website: card.ufl.edu | Phone: (352) 265-2230');}
     // Family self-referral, not a medical referral — hence Family Resources, not Medical
     // Referrals. Tone per the ratified referral rule: name the resource, defer the process.
     if(S.prenatalAlcohol||S.fasdFeatures){L.push('  • The Florida Center for Early Childhood (FASD Clinic): Family encouraged to self-refer to The Florida Center\'s FASD Clinic, the only FASD-specific diagnostic clinic in Florida; telehealth evaluation is available statewide. Website: thefloridacenter.org');}
@@ -4223,7 +4223,7 @@ function generateNote() {
   // AG
   if(S.ag.size){
     L.push(n+++'. ANTICIPATORY GUIDANCE');
-    if(S.ag.has('caregiver_support')) L.push('  • Caregiver Support: Caregiver mental health and wellbeing are essential to patient outcomes. Resources: NAMI (National Alliance on Mental Illness) - Gainesville chapter offers support groups, the Family-to-Family education program, and crisis resources; nami.org or NAMI Helpline: 1-800-950-6264. UF CARD caregiver support groups: card.ufl.edu | (352) 273-0517. Autism Society of America: autism-society.org. Respite care resources through APD (Agency for Persons with Disabilities).');
+    if(S.ag.has('caregiver_support')) L.push('  • Caregiver Support: Caregiver mental health and wellbeing are essential to patient outcomes. Resources: NAMI (National Alliance on Mental Illness) - Gainesville chapter offers support groups, the Family-to-Family education program, and crisis resources; nami.org or NAMI Helpline: 1-800-950-6264. UF CARD caregiver support groups: card.ufl.edu | (352) 265-2230. Autism Society of America: autism-society.org. Respite care resources through APD (Agency for Persons with Disabilities).');
     if(S.ag.has('sibling')) L.push('  • Sibling Recurrence: About 1 in 5 younger siblings of an autistic child are later diagnosed with autism (Ozonoff 2011; Ozonoff 2024). All siblings should be monitored.');
     if(S.ag.has('sleep_hygiene')) L.push('  • Sleep Hygiene: Consistent schedule, screen-free hour before bed, dark/cool environment, visual bedtime routine.');
     if(S.ag.has('nutrition')) L.push('  • Nutrition/Feeding: Many children with ASD have sensory-based food selectivity. Strategies: reduce mealtime pressure; offer familiar and novel foods together without requiring tasting; allow food exploration at the child\'s pace. Food chaining (systematic, therapist-guided expansion of food acceptance through a sensory hierarchy) is the primary evidence-based approach — families should implement food chaining only under guidance from an SLP or OT with feeding training, not independently. SLP/OT feeding referral is recommended when the child accepts a narrow range of foods or refuses whole food groups, when nutritional adequacy or growth is in question, or when mealtime distress is affecting family functioning — early referral produces better outcomes than waiting for severity to escalate. Multivitamin recommended if diet is nutritionally restricted.');
