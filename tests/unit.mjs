@@ -940,6 +940,14 @@ const CASES = [
               assert.ok(!m().includes('Psychiatry co-management'));
               a.S.psychReasons.add('treatment_failure'); a.S.psychReasons.add('mania_psychosis');
               assert.ok(m().includes('Child/Adolescent Psychiatry: Referral for: concern for mania or psychosis; treatment that has not worked.'));
+              // Aggression or self-injury does not refer on its own at any age (attending, 2026-11-20);
+              // only the stated medication failure does.
+              a.S.psychReasons.clear(); a.S.needsBehavior.add('aggression'); a.S.needsBehavior.add('sib');
+              for(const age of ['schoolAge','adolescent']){ a.S.ageGroup=age; assert.ok(!m().includes('Child/Adolescent Psychiatry'), 'aggression/self-injury alone referred at '+age); }
+              a.S.ageGroup='schoolAge'; a.S.psychReasons.add('behavior_rx_failure');
+              assert.ok(m().includes('Referral for: aggression or self-injury not controlled after an alpha-2 agonist and two first-line antipsychotics.'));
+              assert.ok(!m().includes('severe interfering behaviors'));
+              a.S.needsBehavior.clear();
               a.S.psychReasons.clear(); a.S.comorbid.add('ocd'); a.S.comorbidInPlan.add('ocd');
               assert.ok(m().includes('Referral for: OCD (psychiatry OCD clinic).'));
               assert.ok(m().includes('psychiatry OCD clinic (medication management) and psychology OCD therapy clinic (ERP)'));

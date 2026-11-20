@@ -1460,9 +1460,10 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
         <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
         <div class="grp-sep">Psychiatry referral, by exception</div>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">This clinic manages medication for ADHD, anxiety and depression, so those diagnoses do not refer on their own. Tick a reason to add the referral; the note states it. OCD refers to the psychiatry OCD clinic automatically.</div>
+        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">This clinic manages medication for ADHD, anxiety and depression, so those diagnoses do not refer on their own, and neither does aggression or self-injury. Tick a reason to add the referral; the note states it. OCD refers to the psychiatry OCD clinic automatically.</div>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="mania_psychosis"> Concern for mania or psychosis</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="treatment_failure"> Treatment has not worked</label>
+        <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="behavior_rx_failure"> Aggression or self-injury after an alpha-2 agonist and two first-line antipsychotics have failed</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="substance_use"> Substance use complicating treatment</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="safety"> Safety concern</label>
         <div class="grp-sep">Labs &amp; studies ordered</div>
@@ -2495,14 +2496,15 @@ function ruleNeurology() { return {include:S.comorbid.has('epilepsy')||S.focalNe
 // Psychiatry by exception (attending, 2026-11-12 and 2026-11-13): this clinic prescribes
 // for ADHD, anxiety and depression itself, so those diagnoses no longer refer on their own.
 // Psychiatry comes in for a reason the clinician selects (S.psychReasons) and for OCD, which
-// goes to the psychiatry OCD clinic. WARY: the aggression/self-injury trigger is the
-// pre-existing rule, kept because the attending has not ruled on it either way.
+// goes to the psychiatry OCD clinic. Aggression or self-injury does not refer on its own
+// either (attending, 2026-11-20): this clinic treats it, and psychiatry comes in only after
+// an alpha-2 agonist and two first-line antipsychotics have failed, which the clinician
+// states by ticking behavior_rx_failure. The earlier automatic trigger (aggression or
+// self-injury from school age) was removed on that decision.
 const PSYCH_REASON_LABELS={mania_psychosis:'concern for mania or psychosis',treatment_failure:'treatment that has not worked',
+  behavior_rx_failure:'aggression or self-injury not controlled after an alpha-2 agonist and two first-line antipsychotics',
   substance_use:'substance use complicating treatment',safety:'safety concern'};
-function rulePsychiatry() {
-  const sev=(S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus();
-  return {include:S.psychReasons.size>0||S.comorbid.has('ocd')||sev};
-}
+function rulePsychiatry() { return {include:S.psychReasons.size>0||S.comorbid.has('ocd')}; }
 // Fecal smearing contributes a GI trigger only when a medical cause is NOT ruled out
 // (suspected/unclear/unspecified) — once the clinician marks it ruled out, smearing stops
 // driving the referral (re-referring an excluded cause is contradictory). Routes through the
@@ -4056,7 +4058,6 @@ function generateNote() {
       // States why psychiatry is involved; a tile forced on with no reason leaves a fill-in.
       const i=Object.keys(PSYCH_REASON_LABELS).filter(k=>S.psychReasons.has(k)).map(k=>PSYCH_REASON_LABELS[k]);
       if(S.comorbid.has('ocd'))i.push('OCD (psychiatry OCD clinic)');
-      if((S.needsBehavior.has('aggression')||S.needsBehavior.has('sib'))&&isSchoolAgePlus())i.push('severe interfering behaviors');
       L.push('  • Child/Adolescent Psychiatry: Referral for: '+(i.join('; ')||'{reason for referral}')+'. Behavioral strategies should be maximized prior to and concurrent with any medication.');
     }
     if(hGI){

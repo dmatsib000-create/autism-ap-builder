@@ -200,7 +200,7 @@ The two letter generators each have a `*Plain()` sibling (`generateABALetterPlai
 | `pcpInNote` | boolean, default `true` — whether the list is inserted into the A&P note once a plan is chosen |
 | `pcpNotDiscussed` | boolean, default `false` — the follow-up plan was not discussed with the family at the visit; adds one line with a fill-in to the list's follow-up lines under plan `pcp` (§13.3) |
 | `rxStartedToday` | boolean, default `false` — a medication was started or its dose changed at this visit; while a medication block prints it is open work, so a hand-back keeps one return visit (§13.3) |
-| `psychReasons` | Set — why psychiatry is involved: `mania_psychosis`, `treatment_failure`, `substance_use`, `safety`. Any entry turns the psychiatry referral on (§7.2 rule 10); labels in `PSYCH_REASON_LABELS` |
+| `psychReasons` | Set — why psychiatry is involved: `mania_psychosis`, `treatment_failure`, `behavior_rx_failure`, `substance_use`, `safety`. Any entry turns the psychiatry referral on (§7.2 rule 10); labels in `PSYCH_REASON_LABELS` |
 | `pcpOmit` | Set of `PCP_DEFS` row ids the clinician left out |
 | `pcpFirst` | Set of `PCP_DEFS` row ids moved to the top of their group, in click order |
 | `pcpExtra` | string, typed — the clinician's own lines, one per row, printed after the generated actions |
@@ -839,7 +839,7 @@ Callers do not pair keys and rules by hand. `referralIncluded(key)` looks the ru
 | 7 | `rulePT` | 1389 | Gross motor, hypotonia, or motor-coordination needs OR DCD comorbid OR `gaitFindings().ptIndicated` (§7.10) | `pt` |
 | 8 | `ruleGenetics` | 1390 | Confirmed ASD, OR (diagStatus set AND (regression OR confirmed dysmorphism OR congenital anomaly OR either FASD flag §7.9)) | `genetics` |
 | 9 | `ruleNeurology` | 1409 | Epilepsy OR focal neuro findings OR seizure concern OR developmental regression OR a gait red flag (§7.10) | `neurology` |
-| 10 | `rulePsychiatry` | — | By exception: any `psychReasons` entry (section 5: concern for mania or psychosis, treatment has not worked, substance use complicating treatment, safety concern), OR OCD (psychiatry OCD clinic), OR (aggression or self-injury AND age school+). ADHD, anxiety and depression do not refer on their own (attending, 2026-11-12 and 2026-11-13). The note's referral bullet states the reason; a tile forced on with no reason prints a `{reason for referral}` stop | `psychiatry` |
+| 10 | `rulePsychiatry` | — | By exception: any `psychReasons` entry (section 5: concern for mania or psychosis; treatment has not worked; aggression or self-injury after an alpha-2 agonist and two first-line antipsychotics have failed; substance use complicating treatment; safety concern), OR OCD (psychiatry OCD clinic). ADHD, anxiety and depression do not refer on their own (attending, 2026-11-12 and 2026-11-13), and neither does aggression or self-injury at any age (attending, 2026-11-20; the old "aggression or self-injury AND age school+" trigger was removed). The note's referral bullet states the reason; a tile forced on with no reason prints a `{reason for referral}` stop | `psychiatry` |
 | 11 | `ruleGI` | 1415 | GI comorbid OR feeding OR PFD OR ARFID OR pica OR fecal smearing (only when its medical cause is **not** marked ruled-out via `S.smearWorkup`) | `gi` |
 | 12 | `ruleSleepRef` | 1416 | `S.sleepStudy === true` | `sleep_ref` |
 | 13 | `ruleAudiology` | 1417 | Hearing screen fail, OR (toddler/preschool AND speech concern), OR either FASD flag (§7.9 — rationale adapts; always a single bullet) | `audiology` |
@@ -956,7 +956,7 @@ Combined-level lookup picks Level 2 narrative (line 3091). Domain filter (line 3
 
 These are inconsistencies or vague thresholds surfaced during the source scan. They aren't bugs, but a future reader changing this code should know about them:
 
-1. **`rulePsychiatry` "severe behavior" is undefined in code** (line 1410). The condition reads `psychReasons.size || OCD || (severeBehavior && ageSchoolPlus)` but "severe" isn't a state field — it's inferred from the size or specific contents of `needsBehavior` / `safety`. Worth a future audit pass to make the threshold explicit.
+1. **Resolved 2026-11-20: `rulePsychiatry` "severe behavior".** The rule used to include `(aggression or self-injury) && ageSchoolPlus`, with "severe" never defined. The attending removed that trigger: psychiatry is brought in for behavior only after an alpha-2 agonist and two first-line antipsychotics have failed, which the clinician states with the `behavior_rx_failure` reason. The rule is now `psychReasons.size || OCD`.
 
 2. **Safety-flag asymmetry between `ruleABA` and `_abaContent`.** `ruleABA` checks `S.safety.size > 0` (line 1356), but the urgency-clause safety flags inside `_abaContent` (lines 3120–3125) are computed from a *different* set of conditions (`hasSIB`, `hasElope`, etc., which combine `needsBehavior` membership with specific `safety` keys). The two lists overlap but aren't identical. A patient could trip `ruleABA` for "safety needs" while the letter's urgency clause stays silent, or vice versa. Probably fine clinically (the letter still mentions safety in the domain list), but worth verifying with a council pass before any refactor.
 
@@ -1815,11 +1815,9 @@ Documented in [§9.2](#92-aba-target-population--syncabatargetsfromneeds). Add-o
 
 `ruleABA`'s safety trigger and `_abaContent`'s urgency-clause flags are computed from different state combinations. Both produce reasonable output, but they could disagree — a patient could trip the ABA rule's safety needs while the letter's urgency clause stays silent, or vice versa. Worth a council pass before any refactor of safety handling.
 
-### 11.4 `rulePsychiatry` "severe behavior" undefined (§7.7 open question 1)
+### 11.4 `rulePsychiatry` "severe behavior" (resolved 2026-11-20)
 
-The condition includes "severe behavior + age school+" but "severe" is inferred from `needsBehavior` / `safety` rather than a flagged threshold. Future audit needed to make it explicit.
-
-**Open since 2026-11-13.** The rule became "psychiatry by exception" (§7.2 rule 10). The attending named four reasons for psychiatry (mania, psychosis, treatment failure, complicating substance use) and OCD; aggression or self-injury was not among them and was not ruled out either. The trigger is kept as it was and marked `WARY:` in the source. Ask the attending before removing or keeping it for good.
+No longer fragile. The undefined "severe behavior + age school+" trigger was removed on the attending's decision of 2026-11-20: aggression or self-injury refers to psychiatry only after an alpha-2 agonist and two first-line antipsychotics have failed, selected as the `behavior_rx_failure` reason in section 5 (§7.2 rule 10). A unit case checks that aggression or self-injury alone adds no referral at any age. The section number is kept so older cross-references still resolve.
 
 ### 11.5 Reasons-array string contract (§7.7 open question 3)
 
