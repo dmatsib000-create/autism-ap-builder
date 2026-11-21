@@ -1004,6 +1004,7 @@
    "values": [
     "mania_psychosis",
     "treatment_failure",
+    "behavior_rx_failure",
     "substance_use",
     "safety"
    ]

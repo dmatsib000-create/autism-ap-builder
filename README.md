@@ -187,7 +187,7 @@ If licensing is sorted, the technical setup for a self-hosted GitHub Pages copy:
 2. **Enable GitHub Pages.** In your forked repo, go to **Settings → Pages** (left sidebar). Under "Build and deployment," set Source to **Deploy from a branch**, Branch to **main**, folder to **/ (root)**. Click Save.
 3. **Wait for the build.** GitHub Pages typically deploys in about a minute. Refresh the Pages settings page until you see "Your site is live at https://YOUR-USERNAME.github.io/autism-ap-builder/".
 4. **Visit your copy** at `https://YOUR-USERNAME.github.io/autism-ap-builder/autism-ap-builder.html`. It's now yours to customize.
-5. **Customize UF-specific references.** Open `autism-ap-builder.html` in any text editor and search for `card.ufl.edu`, `(352) 273-0517`, and `UF Behavior and Development Clinic`. Replace each with your institution's equivalents. Commit and push; the live copy updates automatically on next deploy.
+5. **Customize UF-specific references.** Open `autism-ap-builder.html` in any text editor and search for `card.ufl.edu`, `(352) 265-2230`, and `UF Behavior and Development Clinic`. Replace each with your institution's equivalents. Commit and push; the live copy updates automatically on next deploy.
 
 ### Reporting bugs or requesting features
 
