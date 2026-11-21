@@ -200,7 +200,6 @@
 [data-theme="slate"] .chip.is-on::after,
 [data-theme="slate"] .r-opt.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
 [data-theme="slate"] .tab-btn.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent)}
-/* Slate: selected-chip glyph becomes an em-dash, ONLY where a mark already exists */
 /* Slate: square the toggle (track + knob) */
 [data-theme="slate"] .tog-sl{border-radius:2px}
 [data-theme="slate"] .tog-sl::after{border-radius:1px}
@@ -542,11 +541,11 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
    cancel .left-panel's padding so the bar spans the column and sticks flush to its top. */
 .sec-index{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:2px;margin:-10px -10px 10px;padding:6px 8px 5px;background:var(--surface);border-bottom:1px solid var(--border-default)}
 .sec-index:empty{display:none}
-.si-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border:1px solid transparent;border-radius:var(--radius);background:none;font:inherit;font-size:var(--text-12);color:var(--gray-600);cursor:pointer;line-height:1.3}
+.si-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 4px;border:1px solid transparent;border-radius:var(--radius);background:none;font:inherit;font-size:var(--text-12);color:var(--gray-600);cursor:pointer;line-height:1.3}
 @media (hover:hover){.si-btn:hover{background:var(--gray-100);color:var(--gray-800)}}
 .si-btn .si-dot{width:6px;height:6px;border-radius:50%;background:var(--gray-300);flex-shrink:0}
 .si-btn.si-has .si-dot{background:var(--green)}
-[data-theme="slate"] .si-btn{padding:3px 4px;letter-spacing:-.01em} /* Libre Franklin runs wide; keeps the list to two lines */
+[data-theme="slate"] .si-btn{letter-spacing:-.01em} /* Libre Franklin runs wide; keeps the list to two lines */
 .si-btn.si-here{border-color:var(--border-default);background:var(--bg-card);color:var(--gray-900);font-weight:600}
 /* ── Evidence chips ─────────────────── */
 .ev-source-strip{display:flex;gap:3px;margin-bottom:4px}
@@ -6719,7 +6718,8 @@ if(typeof document!=='undefined'&&document.addEventListener){
 const PV_BLOCK='p,li,h1,h2,h3,h4,h5,h6,td,th,div';
 function pvLeafBlocks(pre){
   if(!pre||typeof pre.querySelectorAll!=='function')return [];
-  const doc=pre.querySelector('.note-doc,.aba-doc')||pre;
+  // No document sheet (the empty-form message): nothing to compare or mark.
+  const doc=pre.querySelector('.note-doc,.aba-doc');if(!doc)return [];
   // One pass: every block that holds another block is dropped, leaving the innermost ones.
   const all=[...doc.querySelectorAll(PV_BLOCK)],outer=new Set();
   all.forEach(el=>{const p=el.parentElement&&el.parentElement.closest(PV_BLOCK);if(p&&doc.contains(p))outer.add(p);});
@@ -6733,23 +6733,38 @@ function pvSchedule(){
   if(pvQueued)return;
   if(onNextFrame(()=>{pvQueued=false;pvFollow(document.getElementById('notePreview'));})!==null)pvQueued=true;
 }
+// PURE: indexes of the blocks in cur that the previous render did not have. Repeated
+// texts are counted, so a second identical line still shows as new.
+function pvChangedIndexes(prev,cur){
+  const left=new Map();prev.forEach(t=>left.set(t,(left.get(t)||0)+1));
+  const out=[];
+  cur.forEach((t,i)=>{const n=left.get(t)||0;if(n)left.set(t,n-1);else out.push(i);});
+  return out;
+}
+// PURE: which changed block the view goes to (-1: none). Changed blocks group into runs of
+// neighbours; the view goes to the start of the longest run (a new plan section), not the
+// first one-line change (its summary mention near the top). When more than 40% of the blocks
+// changed (diagnosis status, age group), it goes to the first change instead.
+function pvPickTarget(changed,total){
+  if(!changed.length)return -1;
+  if(changed.length>total*0.4)return changed[0];
+  let best=changed[0],bestLen=0,start=changed[0],len=0;
+  changed.forEach((i,k)=>{
+    if(k&&i===changed[k-1]+1)len++;else{start=i;len=1;}
+    if(len>bestLen){bestLen=len;best=start;}
+  });
+  return best;
+}
 function pvFollow(pre){
   const cur=pvLeafBlocks(pre),texts=cur.map(el=>el.textContent.trim());
   const prev=pvPrevTexts,sameDoc=prev&&prev.length&&pvPrevMode===S.previewMode;
   pvPrevTexts=texts;pvPrevMode=S.previewMode;
   if(!sameDoc)return; // first paint, an emptied form, or a tab switch: nothing to compare
-  const left=new Map();prev.forEach(t=>left.set(t,(left.get(t)||0)+1));
-  // Changed blocks grouped into runs of neighbours; the view goes to the longest run (a new
-  // plan section), not the first one-line change (its summary mention near the top).
-  const runs=[];let last=-2;
-  cur.forEach((el,i)=>{const n=left.get(texts[i])||0;if(n){left.set(texts[i],n-1);return;}
-    el.classList.add('pv-changed');
-    if(i===last+1)runs[runs.length-1].push(el);else runs.push([el]);last=i;});
-  if(!runs.length||pvLastKind==='type')return;
-  // A click that rewrites most of the note (diagnosis status, age group) goes to its first change instead.
-  const total=runs.reduce((n,r)=>n+r.length,0);
-  const run=total>cur.length*0.4?runs[0]:runs.reduce((a,b)=>b.length>a.length?b:a);
-  const pr=pre.getBoundingClientRect(),tr=run[0].getBoundingClientRect();
+  const changed=pvChangedIndexes(prev,texts);
+  changed.forEach(i=>cur[i].classList.add('pv-changed'));
+  const target=pvPickTarget(changed,cur.length);
+  if(target<0||pvLastKind==='type')return;
+  const pr=pre.getBoundingClientRect(),tr=cur[target].getBoundingClientRect();
   if(tr.top>=pr.top+8&&tr.bottom<=pr.bottom-8)return; // already in view
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   pre.scrollTo({top:pre.scrollTop+(tr.top-pr.top)-pre.clientHeight/4,behavior:reduce?'auto':'smooth'});
@@ -7401,7 +7416,7 @@ function applySecDefaults(){
 }
 // Clear All only: a fresh form gets the default layout back, and the emptied edge
 // memory means the render that follows sees no rising edge and opens nothing.
-function resetSections(){secPrev={};applySecDefaults();}
+function resetSections(){secPrev={};siPinned=null;applySecDefaults();}
 // Heads of sections that are actually on screen (a display-gated section like the
 // ABA parameters block is skipped, so a hidden section can't make the toolbar
 // button read "Expand all" while everything visible is open).
@@ -7413,11 +7428,14 @@ function allSecHeads(){
 // (allSecHeads, so age-hidden sections drop out), named by the section's short kicker,
 // with a dot that mirrors the header's has-content dot. A jump opens the section,
 // scrolls it under the bar, and moves focus to its header button.
-const SI_EXTRA_LABELS={abaParamsSection:'ABA letter'};
+// Short forms of the visible section titles (not the Slate kickers, which differ: Handoff,
+// Comorbidity), so a name in the list matches the heading it jumps to.
+const SI_LABELS={'sh-profile':'Profile','sh-dxWorkup':'Workup','sh-dsm5':'Criteria','sh-needs':'Needs','sh-medflags':'Medical flags','sh-comorbid':'Comorbid','sh-school':'School','sh-safety':'Safety','sh-ag':'Guidance','sh-followup':'Follow-up','sh-overrides':'Adjust referrals'};
 function siLabel(h){
-  const k=h.querySelector('.sec-kicker');if(k)return k.textContent.trim();
+  if(SI_LABELS[h.id])return SI_LABELS[h.id];
   const sec=h.closest('.section');
-  return (sec&&SI_EXTRA_LABELS[sec.id])||(h.id==='sh-overrides'?'Overrides':h.textContent.replace(/[▼★⚙]/g,'').trim().split(/\s+/).slice(0,2).join(' '));
+  if(sec&&sec.id==='abaParamsSection')return 'ABA letter';
+  return h.textContent.trim().split(/\s+/).slice(0,2).join(' ');
 }
 // The section last jumped to stays marked until a hand scroll: the final sections are too
 // short to reach the top of the column, so position alone would mark the one above.
@@ -7443,7 +7461,7 @@ function renderSecIndex(){
     heads.forEach(h=>{
       const b=document.createElement('button');
       b.type='button';b.className='si-btn';
-      b.innerHTML='<span class="si-dot" aria-hidden="true"></span>'+escapeHtml(siLabel(h));
+      b.innerHTML='<span class="si-dot" aria-hidden="true"></span>'+escapeHtml(siLabel(h))+'<span class="sr-only si-sr"></span>';
       b.addEventListener('click',()=>siJump(h));
       b._head=h;idx.appendChild(b);
     });
@@ -7452,6 +7470,7 @@ function renderSecIndex(){
     const has=!!b._head.querySelector('.sec-dot.dot-has');
     b.classList.toggle('si-has',has);
     b.title=has?'Has entries':'Nothing entered yet';
+    const sr=b.querySelector('.si-sr');if(sr)sr.textContent=has?', has entries':''; // the dot alone is color only
   });
   siSpy();
 }
@@ -7476,12 +7495,19 @@ if(typeof document!=='undefined'&&document.addEventListener){
   ['wheel','touchmove'].forEach(t=>document.addEventListener(t,unpin,{capture:true,passive:true}));
   document.addEventListener('mousedown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('left-panel'))siPinned=null;},true);
   document.addEventListener('keydown',e=>{if(/^(PageUp|PageDown|Home|End)$/.test(e.key))unpin(e);},true);
+  // Tabbing into another section moves the form too: the mark follows focus, not the jump.
+  document.addEventListener('focusin',e=>{
+    if(!siPinned||!e.target||!e.target.closest||e.target.closest('.sec-index'))return;
+    const sec=e.target.closest('.section');
+    if(sec&&sec!==siPinned.closest('.section')){siPinned=null;siSpy();}
+  },true);
   document.addEventListener('scroll',e=>{
     if(!e.target||!e.target.classList||!e.target.classList.contains('left-panel')||siTick)return;
     siTick=true;requestAnimationFrame(()=>{siTick=false;siSpy();});
   },true);
 }
 function toggleAllSections(){
+  siPinned=null;
   const heads=allSecHeads(),anyClosed=heads.some(h=>h.classList.contains('collapsed'));
   heads.forEach(h=>setSecOpen(h,anyClosed));
   syncSecToggleAll();
