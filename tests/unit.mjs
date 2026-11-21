@@ -566,6 +566,21 @@ const CASES = [
     check(a){ assert.equal(a.sectionRelevance().overrides.content, false);
               a.S.overrides.pt='no';
               assert.equal(a.sectionRelevance().overrides.content, true); } },
+  // ── Preview follow (pvChangedIndexes / pvPickTarget): display-only, but a wrong pick sends
+  // the clinician to the wrong place in the note after every click ──
+  { name: 'preview follow: only new or extra-copy blocks count as changed',
+    setup(){},
+    check(a){ assert.deepEqual(a.pvChangedIndexes(['A','B','C'],['A','B','C']), [], 'nothing changed');
+              assert.deepEqual(a.pvChangedIndexes(['A','C'],['A','B','C']), [1], 'one inserted block');
+              assert.deepEqual(a.pvChangedIndexes(['A','X'],['A','X','X']), [2], 'a second identical line is new');
+              assert.deepEqual(a.pvChangedIndexes(['A','B'],['B']), [], 'a removal alone marks nothing'); } },
+  { name: 'preview follow: the view goes to the longest run, or the first change when most changed',
+    setup(){},
+    check(a){ assert.equal(a.pvPickTarget([], 50), -1, 'no change: no scroll');
+              assert.equal(a.pvPickTarget([3, 20,21,22,23,24, 30], 50), 20, 'sleep plan beats its one-line summary mention');
+              assert.equal(a.pvPickTarget([5,6, 9,10], 50), 5, 'tie: the earlier run');
+              assert.equal(a.pvPickTarget([2, 10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], 50), 2, 'over 40% changed: the first change');
+              assert.equal(a.pvPickTarget([4], 10), 4, 'single change'); } },
   { name: 'secAutoOpenKeys: opens on a rising edge, never on steady or falling',
     setup(){},
     check(a){ const off={content:false,relevant:false}, c={content:true,relevant:false}, r={content:false,relevant:true};

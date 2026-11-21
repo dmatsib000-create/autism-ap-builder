@@ -200,7 +200,6 @@
 [data-theme="slate"] .chip.is-on::after,
 [data-theme="slate"] .r-opt.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
 [data-theme="slate"] .tab-btn.is-on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent)}
-/* Slate: selected-chip glyph becomes an em-dash, ONLY where a mark already exists */
 /* Slate: square the toggle (track + knob) */
 [data-theme="slate"] .tog-sl{border-radius:2px}
 [data-theme="slate"] .tog-sl::after{border-radius:1px}
@@ -306,8 +305,6 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){.btn-gray:hover{background:var(--gray-300)}}
 .btn-green{background:var(--btn-green);color:white}
 @media (hover:hover){.btn-green:hover{background:var(--btn-green-hover)}}
-.btn-epic{background:#6d28d9;color:white;border-color:#6d28d9}
-@media (hover:hover){.btn-epic:hover{background:#5b21b6}}
 .btn-sm{padding:3px 9px;font-size:var(--text-11)}
 .main{display:grid;grid-template-columns:445px 1fr;flex:1;overflow:hidden}
 .left-panel{background:var(--surface);border-right:1px solid var(--gray-200);overflow-y:auto;padding:10px}
@@ -315,11 +312,19 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 .rp-header{padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:white;flex-shrink:0;flex-wrap:wrap;gap:var(--space-2);box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .rp-header h2{font-size:var(--text-13);font-weight:600;color:var(--gray-700)}
 .note-preview{flex:1;overflow-y:auto;padding:16px 20px}
+/* Preview follow (pvFollow): what the last change altered glows, then fades. With reduced
+   motion the fade is skipped and the mark stays until the next change, still showing what
+   changed. Never printed; the copies are built from the generators, not this DOM. */
+.pv-changed{border-radius:3px;animation:pvGlow 1.8s var(--ease) both}
+@keyframes pvGlow{0%,40%{background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}100%{background:transparent;box-shadow:0 0 0 3px transparent}}
+@media (prefers-reduced-motion: reduce){.pv-changed{animation:none!important;background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}}
+@media print{.pv-changed{animation:none!important;background:none!important;box-shadow:none!important}}
 .note-empty{text-align:center;color:var(--gray-400);padding:60px 20px;font-size:var(--text-13);line-height:1.8}
 .section{margin-bottom:10px;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-sm);transition:box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
 .section:focus-within{box-shadow:var(--shadow-md);border-color:var(--border-strong)}
 .sec-head{background:linear-gradient(180deg,var(--gray-50) 0%,#f1f2f5 100%);border-bottom:1px solid var(--border-subtle);padding:9px 12px;font-weight:700;font-size:var(--text-11);color:var(--gray-700);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;min-height:38px;transition:background var(--dur) var(--ease)}
 @media (hover:hover){.sec-head:hover{background:linear-gradient(180deg,var(--gray-100) 0%,#eaebee 100%)}}
+.sec-head > .sec-btn{flex:1;text-align:left}
 .sec-head > span:last-child{font-size:var(--text-10);color:var(--gray-500);transition:transform var(--dur) var(--ease);display:inline-block;line-height:1}
 .sec-head.collapsed > span:last-child{transform:rotate(-90deg)}
 .sec-body{padding:11px}
@@ -409,7 +414,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    "rule of the road" without being alarming. Placed once per free-text cluster,
    not under every field, to avoid visual noise. Inline <code> styles a small
    bracketed-placeholder hint like [NAME] so clinicians have a visible alternative. */
-.phi-hint{font-size:var(--text-10-5);color:#7f1d1d;font-style:italic;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
+.phi-hint{font-size:var(--text-11-5);color:#7f1d1d;line-height:1.45;letter-spacing:.01em;margin:4px 0 8px;display:block}
 .lab-warn{background:var(--amber-light);color:var(--amber-dark);border-left:3px solid var(--amber);border-radius:var(--radius-sm);padding:3px 8px;font-size:var(--text-11);line-height:1.4;margin:0 0 4px}
 .phi-hint::before{content:"🔒 ";font-style:normal;opacity:.75;margin-right:1px}
 .phi-hint code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;font-size:var(--text-10);background:rgba(127,29,29,.07);padding:0 4px;border-radius:2px;border:1px solid rgba(127,29,29,.16);color:#7f1d1d;letter-spacing:0}
@@ -440,7 +445,7 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
 @media (hover:hover){.r-opt:hover{border-color:var(--accent);background:var(--accent-soft)}}
 /* Hint text inside a chip (age ranges). Muted grey at rest; the chip's hover/selected tint drops
    muted grey under 4.5:1, so there the hint takes the chip's own text color. */
-.r-opt small{font-size:var(--text-10);color:var(--gray-500)}
+.r-opt small{font-size:var(--text-11);color:var(--gray-500)}
 .r-opt.is-on small{color:inherit}
 @media (hover:hover){.r-opt:hover small{color:inherit}}
 .r-opt.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:500;box-shadow:inset 0 0 0 1px var(--accent)}
@@ -477,7 +482,9 @@ body{font-family:var(--font);font-size:var(--text-13);color:var(--gray-800);back
    original hover did not recolor text). Responsive touch sizing is below. */
 .mod-chip{padding:4px 10px;border-color:var(--border-strong);color:inherit;font-size:var(--text-11-5);font-weight:500}
 @media (hover:hover){.mod-chip:hover{color:inherit}}
-.mod-chip.is-on::before{content:'✓ '}
+/* One chosen look across every button-style choice (radio-style .r-opt and every .chip):
+   pale fill, outline, and a check mark. The mark is the cue that does not rely on color. */
+.chip.is-on::before,.r-opt.is-on::before{content:'✓';font-weight:700;margin-right:1px}
 .lang-qual-card{position:relative;display:block;margin-top:8px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none}
 .lang-qual-card:hover{border-color:#86efac;background:#dcfce7}
 .lang-qual-card:has(input:checked){border-color:#16a34a;background:#dcfce7}
@@ -522,20 +529,31 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .expander-btn{background:none;border:none;cursor:pointer;font-size:var(--text-12);font-weight:600;color:var(--gray-700);padding:2px 0;text-align:left;width:100%;display:flex;align-items:center;gap:var(--space-1);font-family:var(--font)}
 .expander-btn:hover{color:var(--blue)}
 .expander-count{font-size:var(--text-10);font-weight:500;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue);border-radius:999px;padding:1px 7px;margin-left:2px}
-.pronoun-hint{font-size:var(--text-10-5);color:var(--gray-400);margin-top:3px;font-style:italic}
+.field-hint{font-size:var(--text-11-5);color:var(--gray-600);line-height:1.45}
+.pronoun-hint{font-size:var(--text-11-5);color:var(--gray-500);margin-top:3px}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
 /* ── Section completion indicators ── */
 .sec-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gray-200);vertical-align:middle;margin-right:5px;flex-shrink:0;transition:background .25s}
 .sec-dot.dot-has{background:var(--green)}
+/* Section index: sticky jump list at the top of the form column. Negative side/top margins
+   cancel .left-panel's padding so the bar spans the column and sticks flush to its top. */
+.sec-index{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:2px;margin:-10px -10px 10px;padding:6px 8px 5px;background:var(--surface);border-bottom:1px solid var(--border-default)}
+.sec-index:empty{display:none}
+.si-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 4px;border:1px solid transparent;border-radius:var(--radius);background:none;font:inherit;font-size:var(--text-12);color:var(--gray-600);cursor:pointer;line-height:1.3}
+@media (hover:hover){.si-btn:hover{background:var(--gray-100);color:var(--gray-800)}}
+.si-btn .si-dot{width:6px;height:6px;border-radius:50%;background:var(--gray-300);flex-shrink:0}
+.si-btn.si-has .si-dot{background:var(--green)}
+[data-theme="slate"] .si-btn{letter-spacing:-.01em} /* Libre Franklin runs wide; keeps the list to two lines */
+.si-btn.si-here{border-color:var(--border-default);background:var(--bg-card);color:var(--gray-900);font-weight:600}
 /* ── Evidence chips ─────────────────── */
 .ev-source-strip{display:flex;gap:3px;margin-bottom:4px}
-.ev-src-chip{padding:2px 9px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:var(--text-10);font-weight:500;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.ev-src-chip{padding:3px 9px;border-radius:var(--radius-sm);border:1px solid var(--accent);cursor:pointer;font-size:var(--text-12);font-weight:500;background:var(--accent-soft);color:var(--accent-hover);transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
 @media (hover:hover){.ev-src-chip:hover{background:var(--accent);color:white}}
 .ev-src-chip:active{opacity:.75}
 .ev-obs-strip{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
-.ev-obs-chip{padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-10);background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
+.ev-obs-chip{padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-default);cursor:pointer;font-size:var(--text-12);background:var(--gray-50);color:var(--gray-600);transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);user-select:none}
 @media (hover:hover){.ev-obs-chip:hover{background:var(--green-light);border-color:var(--green);color:var(--green-dark)}}
 .ev-obs-chip:active{opacity:.7}
 .sec-sum{font-size:var(--text-10);color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic;vertical-align:middle;max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -641,8 +659,7 @@ input:checked+.tog-sl::after{transform:translateX(14px)}
 .dx-banner-label{font-size:var(--text-10);font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
 .dx-banner .radio-grid{gap:var(--space-1)}
 .dx-banner .r-opt{font-size:var(--text-12);font-weight:500}
-.dx-banner .r-opt.is-on{background:var(--blue);color:white;border-color:var(--blue-dark)}
-.dx-banner-none{font-size:var(--text-11);color:var(--gray-400);font-style:italic;margin-top:4px}
+.dx-banner-none{font-size:var(--text-11-5);color:var(--gray-500);margin-top:4px}
 /* ── Output preview tabs — pill-style on desktop ───────────────── */
 .preview-tabs{display:inline-flex;gap:2px;padding:3px;background:var(--gray-100);border:1px solid var(--border-subtle);border-radius:var(--radius-pill)}
 .tab-btn{position:relative;padding:5px 14px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--gray-600);cursor:pointer;font-size:var(--text-11);font-weight:600;font-family:var(--font);transition:background var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);letter-spacing:.01em}
@@ -755,6 +772,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
   /* The page scrolls as one column here, so keep the copy bar in reach at the screen's foot. */
   .note-sticky-bar{position:sticky;bottom:0;z-index:30;box-shadow:0 -2px 6px rgba(15,15,25,.08)}
   #mobile-nav{display:flex}
+  .sec-index{display:none} /* mobile has its own sticky section heads */
   .app-header{flex-wrap:wrap;padding:8px 12px}
   .app-header h1{font-size:var(--text-13)}
   .header-badge{font-size:7px;padding:1px 5px}
@@ -887,6 +905,8 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
 
 <div class="main" role="main">
 <div class="left-panel" role="region" aria-label="Input form">
+  <!-- Section index: built and kept current by renderSecIndex() (called from updateSectionHeaders) -->
+  <nav class="sec-index" id="secIndex" aria-label="Jump to a form section"></nav>
 
   <!-- Quick-start archetype presets (in-visit scaffolding, PROTOTYPE). Each button
        drives the real form controls via applyPreset() so all branching/bridges fire
@@ -1154,7 +1174,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
       <div id="dxWorkupConfirmedNotice" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--green-light);border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--green-dark)">Diagnosis confirmed. Use this section only to document prior testing reviewed or additional workup still pending. Leave blank if not applicable.</div>
       <div id="evalProfileDoneHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Cognitive/developmental testing is complete — update <strong>Cognitive Profile</strong> and its data source in Patient Profile.</div>
       <div id="evalDxSupportHint" style="display:none;margin-bottom:10px;padding:6px 10px;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:var(--text-11);color:var(--amber-dark)">Completed testing supports the clinical diagnosis — consider whether <strong>Diagnosis Status</strong> should move to Confirmed.</div>
-      <p style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
+      <p id="dxWorkupUseHint" style="font-size:var(--text-11);color:var(--gray-600);margin-bottom:10px">Use when ASD is suspected / under evaluation. Selections generate a diagnostic plan section.</p>
 
       <div class="field-group">
         <span class="field-label">Teacher / External Informant Materials to Request</span>
@@ -1393,7 +1413,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
               <label class="r-opt"><input type="radio" name="smearWorkup" data-bind="smearWorkup" value="ruled_out"> Ruled out</label>
               <label class="r-opt"><input type="radio" name="smearWorkup" data-bind="smearWorkup" value="unclear"> Unclear</label>
             </div>
-            <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">Optional. "Ruled out" removes the GI referral from the plan; "Suspected" or "Unclear" adds a bowel-workup (GI) referral and leads the plan with medical evaluation.</div>
+            <div class="field-hint" style="margin:2px 0 6px;">Optional. "Ruled out" removes the GI referral from the plan; "Suspected" or "Unclear" adds a bowel-workup (GI) referral and leads the plan with medical evaluation.</div>
           </div>
           <label id="boundaryViolRow" class="cb-row"><input type="checkbox" data-key="needsBehavior" value="boundaryViol"> Boundary violations / impaired personal space (inappropriate touching, physical intrusiveness toward peers or adults)</label>
         </div>
@@ -1440,7 +1460,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
           <label class="cb-row"><input type="checkbox" data-key="single" value="emotionalReg"> Emotional regulation difficulties</label>
           <div class="beh-freq-row" data-for="emotionalReg" style="display:none"><input class="beh-freq-inp" data-freqkey="emotionalReg" type="text" aria-label="Emotional regulation difficulties: frequency or description" placeholder="Frequency/description (optional) — e.g., 2–3 episodes/day, triggered by transitions or demands"></div>
           <label class="cb-row"><input type="checkbox" data-key="single" value="academic"> Academic / learning difficulties</label>
-          <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">For school-age children this is primarily a school / IDEA matter: to act on it, also flag "Psychoeducational evaluation recommended" (School &amp; Educational Supports) and, if a specific learning disorder is suspected, the SLD items in Comorbid Conditions.</div>
+          <div class="field-hint" style="margin:2px 0 6px;">For school-age children this is primarily a school / IDEA matter: to act on it, also flag "Psychoeducational evaluation recommended" (School &amp; Educational Supports) and, if a specific learning disorder is suspected, the SLD items in Comorbid Conditions.</div>
         </div>
       </div>
     </div>
@@ -1460,13 +1480,13 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
         <label class="cb-row"><input type="checkbox" data-key="single" value="sleepStudy"> Suspicion for sleep-disordered breathing / OSA → diagnostic sleep study</label>
         <label class="cb-row"><input type="checkbox" data-key="single" value="focalNeuroFindings"> Focal neurological findings → neurology referral</label>
         <div class="grp-sep">Psychiatry referral, by exception</div>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">This clinic manages medication for ADHD, anxiety and depression, so those diagnoses do not refer on their own. Tick a reason to add the referral; the note states it. OCD refers to the psychiatry OCD clinic automatically.</div>
+        <div class="field-hint" style="margin:2px 0 4px;">This clinic manages medication for ADHD, anxiety and depression, so those diagnoses do not refer on their own. Tick a reason to add the referral; the note states it. OCD refers to the psychiatry OCD clinic automatically.</div>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="mania_psychosis"> Concern for mania or psychosis</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="treatment_failure"> Treatment has not worked</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="substance_use"> Substance use complicating treatment</label>
         <label class="cb-row"><input type="checkbox" data-key="psychReasons" value="safety"> Safety concern</label>
         <div class="grp-sep">Labs &amp; studies ordered</div>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Write the reason, end it with a colon, then list the tests under it one per line (pasting from Epic works). Leave a blank line between groups. A test with no reason can sit on its own line. Prints in the plan as its own section, exactly as typed.</div>
+        <div class="field-hint" style="margin:2px 0 4px;">Write the reason, end it with a colon, then list the tests under it one per line (pasting from Epic works). Leave a blank line between groups. A test with no reason can sit on its own line. Prints in the plan as its own section, exactly as typed.</div>
         <textarea class="strengths-area" id="labsOrderedField" aria-label="Labs and studies ordered" rows="5" placeholder="Pica, screen for iron deficiency and lead exposure:&#10;CBC with differential&#10;Ferritin&#10;Lead level&#10;&#10;Vitamin D"></textarea>
         <span class="phi-hint">PHI-free zone: no names, MRNs, dates, or result values. Avoid curly braces { }, which Epic treats as fill-in stops.</span>
         <div id="labsWarnings" role="status" aria-live="polite"></div>
@@ -1474,7 +1494,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
              updateGaitExamVisibility() hides it and clears S.gaitExam otherwise. -->
         <div id="gaitExamRow" style="display:none">
           <div class="grp-sep">Gait exam</div>
-          <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Contracture, pain, or falls → PT. Any red flag (asymmetry, upper or lower motor neuron signs, later onset, concerning history) → neurology. Weakness signs, or low tone with toe walking → CK. None of these → observe and recheck.</div>
+          <div class="field-hint" style="margin:2px 0 4px;">Contracture, pain, or falls → PT. Any red flag (asymmetry, upper or lower motor neuron signs, later onset, concerning history) → neurology. Weakness signs, or low tone with toe walking → CK. None of these → observe and recheck.</div>
           <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="contracture"> Cannot dorsiflex ankle to neutral (heel-cord contracture)</label>
           <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="impact"> Pain, frequent falls, or fatigue limiting activity</label>
           <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="asymmetric"> Unilateral or asymmetric toe walking or gait</label>
@@ -1487,7 +1507,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
           <label class="cb-row"><input type="checkbox" data-key="gaitExam" value="familyPT"> Family requests PT after counseling (outpatient only; no school PT)</label>
         </div>
         <div class="grp-sep">Genetics-relevant exam findings</div>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
+        <div class="field-hint" style="margin:2px 0 4px;">Each flag triggers a referral in the plan: regression → genetics + neurology; confirmed dysmorphology or anomalies → genetics. Suspected dysmorphology alone does not trigger — pair with another flag or confirmed diagnosis.</div>
         <div class="radio-grid" style="margin:4px 0">
           <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value=""> No concern</label>
           <label class="r-opt"><input type="radio" name="dysmorphism" data-bind="dysmorphism" value="suspected"> Suspected dysmorphology</label>
@@ -1502,11 +1522,11 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
             <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="distant"> Distant, currently stable (≥1 year ago)</label>
             <label class="r-opt"><input type="radio" name="regressionTiming" data-bind="regressionTiming" value="unsure"> Timing unclear from records</label>
           </div>
-          <div class="field-hint" style="margin:0 0 4px;font-size:var(--text-11);color:var(--gray-500)">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
+          <div class="field-hint" style="margin:0 0 4px;">Active regression triggers expedited workup language; distant stable regression triggers routine-pace language. Timing affects prose only — the referral still fires.</div>
         </div>
         <div class="grp-sep">Prenatal exposures</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="prenatalAlcohol"> Clinically significant prenatal alcohol exposure documented</label>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">NIAAA threshold for clinically significant exposure: 6+ drinks/week for 2+ weeks during pregnancy, or 3+ drinks per occasion on 2+ occasions — or any ONE of the other evidence categories below (social/legal problems, documented intoxication, positive biomarker, positive screen).</div>
+        <div class="field-hint" style="margin:2px 0 4px;">NIAAA threshold for clinically significant exposure: 6+ drinks/week for 2+ weeks during pregnancy, or 3+ drinks per occasion on 2+ occasions — or any ONE of the other evidence categories below (social/legal problems, documented intoxication, positive biomarker, positive screen).</div>
         <div id="paeEvidenceRow" class="sub-options" style="display:none">
           <span class="sub-label">Evidence (NIAAA consensus categories — check all that apply)</span>
           <label class="cb-row"><input type="checkbox" data-key="paeEvidence" value="quantityFrequency"> Quantified maternal drinking documented</label>
@@ -1533,7 +1553,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
           <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="brain"> Deficient brain growth (microcephaly), structural brain anomaly, or recurrent nonfebrile seizures</label>
           <label class="cb-row"><input type="checkbox" data-key="fasdDomains" value="neurobehavioral"> Neurobehavioral impairment (cognition, executive function, learning, memory, mood/behavioral regulation, attention, impulse control)</label>
         </div>
-        <div class="field-hint" style="margin:2px 0 6px;font-size:var(--text-11);color:var(--gray-500)">Flagging guide (never note language): at the group level, FASD-related social difficulty tends to spare nonverbal communication (eye contact, gestures, facial expression — DSM-5 A2) and restricted/repetitive behaviors outside the sensory domain. Prominent A2 deficits or strong non-sensory RRBs favor ASD — alone or co-occurring with FASD — rather than FASD alone. Can be flagged with or without documented alcohol exposure.</div>
+        <div class="field-hint" style="margin:2px 0 6px;">Flagging guide (never note language): at the group level, FASD-related social difficulty tends to spare nonverbal communication (eye contact, gestures, facial expression — DSM-5 A2) and restricted/repetitive behaviors outside the sensory domain. Prominent A2 deficits or strong non-sensory RRBs favor ASD — alone or co-occurring with FASD — rather than FASD alone. Can be flagged with or without documented alcohol exposure.</div>
         <div class="grp-sep">Support Services</div>
         <label class="cb-row"><input type="checkbox" data-key="single" value="socialWork"> Social work referral (family support, APD/Medicaid waiver navigation, caregiver needs)</label>
         <div id="socialWorkReasonsRow" class="sub-options" style="display:none">
@@ -1719,9 +1739,9 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
           <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="pcp">No routine DBP follow-up</label>
           <label class="r-opt"><input type="radio" name="dbpFollowUp" data-bind="dbpFollowUp" value="dbp">DBP follow-up continues</label>
         </div>
-        <div class="field-hint" style="margin:5px 0 0;font-size:var(--text-11);color:var(--gray-500)">Choosing a plan finishes the primary care list and adds it to the note. With "No routine DBP follow-up", anything in the form that still needs this clinic (testing to finish, forms to review) is named as the one reason to return.</div>
+        <div class="field-hint" style="margin:5px 0 0;">Choosing a plan finishes the primary care list and adds it to the note. With "No routine DBP follow-up", anything in the form that still needs this clinic (testing to finish, forms to review) is named as the one reason to return.</div>
         <label class="cb-row" style="margin:8px 0 0"><input type="checkbox" id="rxStartedTodayCb"> Medication started or dose changed today</label>
-        <div class="field-hint" style="margin:2px 0 0 22px;font-size:var(--text-11);color:var(--gray-500)">For ADHD, anxiety, depression or OCD medication in the plan. This clinic adjusts the dose until it is stable, so the list keeps one return visit for that instead of handing the child back now.</div>
+        <div class="field-hint" style="margin:2px 0 0 22px;">For ADHD, anxiety, depression or OCD medication in the plan. This clinic adjusts the dose until it is stable, so the list keeps one return visit for that instead of handing the child back now.</div>
       </div>
       <div class="field-group">
         <span class="field-label">Return to Clinic <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
@@ -1729,7 +1749,7 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
       </div>
       <div class="field-group">
         <span class="field-label">Your own lines for primary care <span style="font-weight:400;color:var(--gray-400);text-transform:none;letter-spacing:0">(optional)</span></span>
-        <div class="field-hint" style="margin:2px 0 4px;font-size:var(--text-11);color:var(--gray-500)">One recommendation per line. They print after the generated actions, exactly as typed, and are not saved in a selections string.</div>
+        <div class="field-hint" style="margin:2px 0 4px;">One recommendation per line. They print after the generated actions, exactly as typed, and are not saved in a selections string.</div>
         <textarea class="strengths-area" id="pcpExtraField" aria-label="Your own recommendations for primary care" rows="3" placeholder="PCP (next visit): recheck weight after the medication change"></textarea>
         <span class="phi-hint">PHI-free zone: no names, MRNs, dates, or result values. Avoid curly braces { }, which Epic treats as fill-in stops.</span>
       </div>
@@ -1885,27 +1905,27 @@ body.reviewer-eye .pcp-ctl,body.reviewer-eye .pcp-status,body.reviewer-eye .pcp-
     <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the note as shown">Print</button>
     <button class="btn btn-gray btn-sm" onclick="copyNote('plain','assessment',this)">Assessment (plain)</button>
     <button class="btn btn-gray btn-sm" onclick="copyNote('plain','plan',this)">Plan (plain)</button>
-    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','all',this)">All (plain)</button>
-    <button class="btn btn-green btn-sm" id="copyRichBtnSticky" onclick="copyNote('rich','all',this)">&#9733; Copy Rich Text</button>
+    <button class="btn btn-gray btn-sm" onclick="copyNote('plain','all',this)" title="Plain text with no formatting. Every {placeholder} stays as written, so Epic still stops on it with F2.">Copy plain text</button>
+    <button class="btn btn-green btn-sm" id="copyRichBtnSticky" onclick="copyNote('rich','all',this)" title="Formatted copy (headings, bold, tables) for pasting into Word, or straight into Epic.">&#9733; Copy formatted</button>
   </div>
   <div class="note-sticky-bar" id="abaStickyBar" style="display:none">
     <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the letter as shown">Print</button>
     <span id="abaLevelWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--amber-dark);background:var(--amber-light);border:1px solid var(--amber);border-radius:4px;padding:2px 8px">⚠ ASD level not set — letter will say "(level not specified)"</span>
     <span id="abaThinWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:var(--red-dark);background:var(--red-light);border:1px solid var(--red);border-radius:4px;padding:2px 8px" title="Thin ABA justification: fewer than 2 treatment targets and no safety flags. Insurance is likely to deny. Verify ABA is the appropriate intervention before sending.">⚠ Thin ABA justification — fewer than 2 targets, no safety flags. Insurance likely to deny.</span>
     <span id="abaCatatoniaWarn" style="display:none;font-size:var(--text-11);font-weight:600;color:#7c2d12;background:#fed7aa;border:1px solid #c2410c;border-radius:4px;padding:2px 8px" title="Catatonia features documented. ABA intensity should be reduced and contingency demands minimized during the active episode; behavioral pressure can worsen catatonia. Coordinate with psychiatry before sending this letter.">⚠ Catatonia features active — reduce ABA intensity and contingency demands; coordinate with psychiatry</span>
-    <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')">&#9733; Copy Letter (rich)</button>
-    <button class="btn btn-epic btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
+    <button class="btn btn-gray btn-sm" id="copyABAEpicBtn" onclick="copyABALetter('epic')" title="Plain text with no formatting. Every {placeholder} stays as written, so Epic still stops on it with F2.">Copy plain text</button>
+    <button class="btn btn-green btn-sm" id="copyABABtn" onclick="copyABALetter('rich')" title="Formatted copy (headings, bold, tables) for pasting into Word, or straight into Epic.">&#9733; Copy formatted</button>
   </div>
   <div class="note-sticky-bar" id="iepStickyBar" style="display:none">
     <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the letter as shown">Print</button>
-    <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')">&#9733; Copy Letter (rich)</button>
-    <button class="btn btn-epic btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
+    <button class="btn btn-gray btn-sm" id="copyIEPEpicBtn" onclick="copyIEPLetter('epic')" title="Plain text with no formatting. Every {placeholder} stays as written, so Epic still stops on it with F2.">Copy plain text</button>
+    <button class="btn btn-green btn-sm" id="copyIEPBtn" onclick="copyIEPLetter('rich')" title="Formatted copy (headings, bold, tables) for pasting into Word, or straight into Epic.">&#9733; Copy formatted</button>
   </div>
   <div class="note-sticky-bar" id="pcpStickyBar" style="display:none">
     <button class="btn btn-gray btn-sm bar-print" type="button" onclick="window.print()" title="Print the list as shown">Print</button>
     <button class="btn btn-gray btn-sm" id="pcpResetBtn" onclick="resetPcpEdits()" title="Put back every line you left out and return the list to its standard order.">Undo my edits</button>
-    <button class="btn btn-green btn-sm" id="copyPCPBtn" onclick="copyPCP('rich')">&#9733; Copy List (rich)</button>
-    <button class="btn btn-epic btn-sm" id="copyPCPEpicBtn" onclick="copyPCP('epic')" title="Plain text for the Epic note composer. Every {placeholder} stays as written; Epic treats the braces as F2 cursor stops.">Copy for Epic (plain)</button>
+    <button class="btn btn-gray btn-sm" id="copyPCPEpicBtn" onclick="copyPCP('epic')" title="Plain text with no formatting. Every {placeholder} stays as written, so Epic still stops on it with F2.">Copy plain text</button>
+    <button class="btn btn-green btn-sm" id="copyPCPBtn" onclick="copyPCP('rich')" title="Formatted copy (headings, bold, tables) for pasting into Word, or straight into Epic.">&#9733; Copy formatted</button>
   </div>
 </div>
 </div><!-- /main -->
@@ -4161,10 +4181,10 @@ function generateNote() {
       L.push(step('Call your insurance company and ask to be assigned a case manager.'));
       L.push(step('Request a list of all recommended providers.'));
       if(referralIncluded('aba')){const pendingTesting=evalPathSteps().pendingTesting;
-        if(pendingTesting){L.push(step('[ABA] Once testing results are available, sign up for at least 4 ABA waitlists simultaneously'));L.push('       - no matter how long the lists appear.');}
-        else{L.push(step('[ABA] Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.'));}}
+        if(pendingTesting){L.push(step('Once testing results are available, sign up for at least 4 ABA waitlists simultaneously'));L.push('       - no matter how long the lists appear.');}
+        else{L.push(step('Sign up for at least 4 ABA waitlists simultaneously - no matter how long the lists appear.'));}}
       L.push(step('Use Google Maps to search for nearby providers and call to confirm insurance.'));
-      if(S.diagStatus==='confirmed'){L.push(step('[Autism diagnosis] Your local CARD center is also a resource for locating therapy services.'));L.push('       Please reach out for assistance.');}
+      if(S.diagStatus==='confirmed'){L.push(step('Some services require a formal autism diagnosis. Now that the diagnosis is confirmed, your local'));L.push('       CARD center can help you find them and locate therapy services. Please reach out for assistance.');}
       L.push(step('Follow up with providers every 3 weeks until a spot is secured;'));
       L.push('       consider appearing in person if phone calls go unanswered.');
       L.push(step('When a spot is obtained, notify other waitlists so another child may benefit.'));
@@ -5188,7 +5208,7 @@ function pcpSectionLines(){
 // The list is part of the note once a follow-up plan is chosen (and the clinician has not
 // switched it off). Until then the note is unchanged and the list lives on its own tab.
 function pcpInNoteActive(){ return !!S.dbpFollowUp&&S.pcpInNote; }
-// Plain text of the standalone list: what "Copy for Epic" pastes from the PCP Recs tab.
+// Plain text of the standalone list: what "Copy plain text" pastes from the PCP Recs tab.
 function generatePCPPlain(){
   if(pcpBuild().empty) return '';
   return ['RECOMMENDATIONS FOR PRIMARY CARE from Developmental-Behavioral Pediatrics (DBP)',...pcpSectionLines()].join('\n');
@@ -5236,8 +5256,8 @@ async function copyPCP(format){
   const btn=document.getElementById(format==='rich'?'copyPCPBtn':'copyPCPEpicBtn');
   const plain=generatePCPPlain();
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
-  if(format==='rich'&&await writeClipboardRich(()=>generatePCPHTML(false),plain)){flashBtn('✓ Rich text copied!',btn);return;}
-  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+  if(format==='rich'&&await writeClipboardRich(()=>generatePCPHTML(false),plain)){flashBtn('✓ Copied, formatted',btn);return;}
+  flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',btn);
 }
 // The workspace is redrawn on every render, which would drop keyboard focus from the
 // button just pressed; put it back on the same control.
@@ -5513,9 +5533,9 @@ function generateABALetterPlain(){
 async function copyABALetter(format){
   if(!abaLetterEligible()){toast('ABA Letter requires a confirmed ASD diagnosis with the ABA referral included.','warn');return;}
   const plain=generateABALetterPlain();
-  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABAEpicBtn'));return;}
-  if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Letter copied!',document.getElementById('copyABABtn'));return;}
-  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyABABtn'));
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',document.getElementById('copyABAEpicBtn'));return;}
+  if(format==='rich'&&await writeClipboardRich(()=>generateABALetter(false),plain)){flashBtn('✓ Copied, formatted',document.getElementById('copyABABtn'));return;}
+  flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',document.getElementById('copyABABtn'));
 }
 
 // ─── IEP / 504 LETTER ────────────────────────────────────────────────────────
@@ -6357,7 +6377,7 @@ function generateIEPLetterPlain(){
 async function copyIEPLetter(format){
   if(!iepLetterEligible()){toast('IEP Letter requires a school documentation status and an age group other than toddler.','warn');return;}
   const plain=generateIEPLetterPlain();
-  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPEpicBtn'));return;}
+  if(format==='epic'){flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',document.getElementById('copyIEPEpicBtn'));return;}
   if(format==='rich'&&await writeClipboardRich(()=>{
     // The Word-paste renderer is built inline here (third IEP surface; see tests/invariants.mjs).
       const c=_iepLetterContent();
@@ -6454,8 +6474,8 @@ async function copyIEPLetter(format){
       h+=`<p style="margin-top:10px;font-size:9pt;color:#6b7280;border-top:1px dashed #d1d5db;padding-top:8px">Enclosure: Copy of UF Behavior and Development Clinic evaluation note dated {Date of Evaluation}</p>`;
       h+=`</div>`;
       return h;
-  },plain)){flashBtn('✓ Letter copied!',document.getElementById('copyIEPBtn'));return;}
-  flashCopied(await writeClipboardText(plain),'✓ Copied!',document.getElementById('copyIEPBtn'));
+  },plain)){flashBtn('✓ Copied, formatted',document.getElementById('copyIEPBtn'));return;}
+  flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',document.getElementById('copyIEPBtn'));
 }
 
 function setPreviewMode(mode){
@@ -6681,6 +6701,75 @@ function updateEvHints(){
 // Set while applyPreset() drives many controls in a row: each .click() fires a change
 // handler that calls render(), so a preset would otherwise re-render 10-25 times.
 let renderSuspended=false;
+
+// ─── PREVIEW FOLLOW ──────────────────────────────────────────────────────────
+// After each change, mark the paragraphs of the preview that changed and, if the first one
+// is off screen, scroll it into view, so a click in section 5 shows its effect without a hunt
+// through the note. Display-only: it compares the rendered text of the preview with the text
+// of the last render and never reads or writes S. Typed text only marks (no scroll), so the
+// note does not jump mid-sentence. The status banners above the sheet are left out on
+// purpose: they change on nearly every criteria click and would pull the view to the top.
+let pvLastKind='click', pvPrevMode='', pvPrevTexts=null;
+if(typeof document!=='undefined'&&document.addEventListener){
+  const typed=t=>t&&(t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&/^(text|number|search)$/.test(t.type)));
+  document.addEventListener('input',e=>{pvLastKind=typed(e.target)?'type':'click';},true);
+  document.addEventListener('click',()=>{pvLastKind='click';},true);
+}
+const PV_BLOCK='p,li,h1,h2,h3,h4,h5,h6,td,th,div';
+function pvLeafBlocks(pre){
+  if(!pre||typeof pre.querySelectorAll!=='function')return [];
+  // No document sheet (the empty-form message): nothing to compare or mark.
+  const doc=pre.querySelector('.note-doc,.aba-doc');if(!doc)return [];
+  // One pass: every block that holds another block is dropped, leaving the innermost ones.
+  const all=[...doc.querySelectorAll(PV_BLOCK)],outer=new Set();
+  all.forEach(el=>{const p=el.parentElement&&el.parentElement.closest(PV_BLOCK);if(p&&doc.contains(p))outer.add(p);});
+  return all.filter(el=>!outer.has(el)&&el.textContent.trim());
+}
+// render() can run many times in one burst (a preset, a restore, typing); the comparison
+// and the section index need the screen only once per frame, so both wait for the next one.
+let pvQueued=false,siQueued=false;
+const onNextFrame=fn=>(typeof requestAnimationFrame==='function')?requestAnimationFrame(fn):null;
+function pvSchedule(){
+  if(pvQueued)return;
+  if(onNextFrame(()=>{pvQueued=false;pvFollow(document.getElementById('notePreview'));})!==null)pvQueued=true;
+}
+// PURE: indexes of the blocks in cur that the previous render did not have. Repeated
+// texts are counted, so a second identical line still shows as new.
+function pvChangedIndexes(prev,cur){
+  const left=new Map();prev.forEach(t=>left.set(t,(left.get(t)||0)+1));
+  const out=[];
+  cur.forEach((t,i)=>{const n=left.get(t)||0;if(n)left.set(t,n-1);else out.push(i);});
+  return out;
+}
+// PURE: which changed block the view goes to (-1: none). Changed blocks group into runs of
+// neighbours; the view goes to the start of the longest run (a new plan section), not the
+// first one-line change (its summary mention near the top). When more than 40% of the blocks
+// changed (diagnosis status, age group), it goes to the first change instead.
+function pvPickTarget(changed,total){
+  if(!changed.length)return -1;
+  if(changed.length>total*0.4)return changed[0];
+  let best=changed[0],bestLen=0,start=changed[0],len=0;
+  changed.forEach((i,k)=>{
+    if(k&&i===changed[k-1]+1)len++;else{start=i;len=1;}
+    if(len>bestLen){bestLen=len;best=start;}
+  });
+  return best;
+}
+function pvFollow(pre){
+  const cur=pvLeafBlocks(pre),texts=cur.map(el=>el.textContent.trim());
+  const prev=pvPrevTexts,sameDoc=prev&&prev.length&&pvPrevMode===S.previewMode;
+  pvPrevTexts=texts;pvPrevMode=S.previewMode;
+  if(!sameDoc)return; // first paint, an emptied form, or a tab switch: nothing to compare
+  const changed=pvChangedIndexes(prev,texts);
+  changed.forEach(i=>cur[i].classList.add('pv-changed'));
+  const target=pvPickTarget(changed,cur.length);
+  if(target<0||pvLastKind==='type')return;
+  const pr=pre.getBoundingClientRect(),tr=cur[target].getBoundingClientRect();
+  if(tr.top>=pr.top+8&&tr.bottom<=pr.bottom-8)return; // already in view
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  pre.scrollTo({top:pre.scrollTop+(tr.top-pr.top)-pre.clientHeight/4,behavior:reduce?'auto':'smooth'});
+}
+
 function render(){
   if(renderSuspended) return;
   // Adjust-Referrals coupling — both run unconditionally at the top so the various
@@ -6719,6 +6808,7 @@ function render(){
   // ABA letter preview
   if(S.previewMode==='aba'){
     pre.innerHTML=generateABALetter(true);
+    pvSchedule();
     updateSectionHeaders();
     return;
   }
@@ -6726,6 +6816,7 @@ function render(){
   // IEP letter preview
   if(S.previewMode==='iep'){
     pre.innerHTML=generateIEPLetterHTML();
+    pvSchedule();
     updateSectionHeaders();
     return;
   }
@@ -6733,6 +6824,7 @@ function render(){
   // Primary care list: the workspace view (leave-out and move-up controls on each line)
   if(S.previewMode==='pcp'){
     pre.innerHTML=generatePCPHTML(true);
+    pvSchedule();
     updateSectionHeaders();
     return;
   }
@@ -6761,6 +6853,7 @@ function render(){
   html+=generateRichHTML(true);
   }
   pre.innerHTML=html;
+  pvSchedule();
   const dxSec=document.getElementById('dxWorkupSection');
   if(dxSec) dxSec.classList.toggle('dx-active',S.diagStatus==='suspected');
   updateCriteriaBadge(v);
@@ -7221,8 +7314,8 @@ async function copyNote(format,part,btn){
   const note=generateNote();
   let plain = part==='assessment'?note.assessment:part==='plan'?note.plan:note.main;
   if(!plain.trim()){toast('Nothing to copy yet.','warn');return;}
-  if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Rich text copied!',btn);return;}
-  flashCopied(await writeClipboardText(plain),format==='rich'?'✓ Copied as plain text':'✓ Copied!',btn);
+  if(format==='rich'&&await writeClipboardRich(generateRichHTML,plain)){flashBtn('✓ Copied, formatted',btn);return;}
+  flashCopied(await writeClipboardText(plain),'✓ Copied as plain text',btn);
 }
 // Speak a short status to screen readers. Needed for flashBtn: it only swaps the button's
 // text, which assistive tech doesn't reliably read out. Cleared first so the same message
@@ -7323,14 +7416,98 @@ function applySecDefaults(){
 }
 // Clear All only: a fresh form gets the default layout back, and the emptied edge
 // memory means the render that follows sees no rising edge and opens nothing.
-function resetSections(){secPrev={};applySecDefaults();}
+function resetSections(){secPrev={};siPinned=null;applySecDefaults();}
 // Heads of sections that are actually on screen (a display-gated section like the
 // ABA parameters block is skipped, so a hidden section can't make the toolbar
 // button read "Expand all" while everything visible is open).
 function allSecHeads(){
   return [...document.querySelectorAll('.sec-head')].filter(h=>h.nextElementSibling?.classList.contains('sec-body')&&h.closest('.section')?.style.display!=='none');
 }
+// ─── SECTION INDEX ───────────────────────────────────────────────────────────
+// The sticky jump list over the form. Display-only: one button per visible section
+// (allSecHeads, so age-hidden sections drop out), named by the section's short kicker,
+// with a dot that mirrors the header's has-content dot. A jump opens the section,
+// scrolls it under the bar, and moves focus to its header button.
+// Short forms of the visible section titles (not the Slate kickers, which differ: Handoff,
+// Comorbidity), so a name in the list matches the heading it jumps to.
+const SI_LABELS={'sh-profile':'Profile','sh-dxWorkup':'Workup','sh-dsm5':'Criteria','sh-needs':'Needs','sh-medflags':'Medical flags','sh-comorbid':'Comorbid','sh-school':'School','sh-safety':'Safety','sh-ag':'Guidance','sh-followup':'Follow-up','sh-overrides':'Adjust referrals'};
+function siLabel(h){
+  if(SI_LABELS[h.id])return SI_LABELS[h.id];
+  const sec=h.closest('.section');
+  if(sec&&sec.id==='abaParamsSection')return 'ABA letter';
+  return h.textContent.trim().split(/\s+/).slice(0,2).join(' ');
+}
+// The section last jumped to stays marked until a hand scroll: the final sections are too
+// short to reach the top of the column, so position alone would mark the one above.
+let siPinned=null;
+function siJump(h){
+  const panel=document.querySelector('.left-panel'),idx=document.getElementById('secIndex');
+  if(!panel||!h)return;
+  if(h.classList.contains('collapsed')){setSecOpen(h,true);syncSecToggleAll();}
+  const sec=h.closest('.section')||h;
+  const top=panel.scrollTop+sec.getBoundingClientRect().top-panel.getBoundingClientRect().top-(idx?idx.offsetHeight:0)-6;
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  siPinned=h;
+  panel.scrollTo({top,behavior:reduce?'auto':'smooth'});
+  h.querySelector('.sec-btn')?.focus({preventScroll:true});
+  siSpy();
+}
+function renderSecIndex(){
+  const idx=document.getElementById('secIndex');if(!idx||typeof idx.querySelectorAll!=='function')return;
+  const heads=allSecHeads();
+  const key=heads.map(h=>siLabel(h)).join('|');
+  if(idx.dataset.key!==key){ // rebuild only when the set of visible sections changes
+    idx.dataset.key=key;idx.innerHTML='';
+    heads.forEach(h=>{
+      const b=document.createElement('button');
+      b.type='button';b.className='si-btn';
+      b.innerHTML='<span class="si-dot" aria-hidden="true"></span>'+escapeHtml(siLabel(h))+'<span class="sr-only si-sr"></span>';
+      b.addEventListener('click',()=>siJump(h));
+      b._head=h;idx.appendChild(b);
+    });
+  }
+  idx.querySelectorAll('.si-btn').forEach(b=>{
+    const has=!!b._head.querySelector('.sec-dot.dot-has');
+    b.classList.toggle('si-has',has);
+    b.title=has?'Has entries':'Nothing entered yet';
+    const sr=b.querySelector('.si-sr');if(sr)sr.textContent=has?', has entries':''; // the dot alone is color only
+  });
+  siSpy();
+}
+// Marks the section currently at the top of the form column.
+function siSpy(){
+  const panel=document.querySelector('.left-panel'),idx=document.getElementById('secIndex');
+  if(!panel||!idx||typeof idx.querySelectorAll!=='function')return;
+  const line=panel.getBoundingClientRect().top+idx.offsetHeight+24;
+  let here=null;
+  if(siPinned)here=[...idx.querySelectorAll('.si-btn')].find(b=>b._head===siPinned)||null;
+  if(!here)idx.querySelectorAll('.si-btn').forEach(b=>{if((b._head.closest('.section')||b._head).getBoundingClientRect().top<=line)here=b;});
+  idx.querySelectorAll('.si-btn').forEach(b=>{
+    b.classList.toggle('si-here',b===here);
+    if(b===here)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');
+  });
+}
+if(typeof document!=='undefined'&&document.addEventListener){
+  let siTick=false;
+  const unpin=e=>{if(e.target&&e.target.closest&&e.target.closest('.left-panel'))siPinned=null;};
+  // Hand scrolling only: wheel, touch drag, the scrollbar itself, or a paging key. A click on a
+  // control inside the jumped-to section keeps the mark.
+  ['wheel','touchmove'].forEach(t=>document.addEventListener(t,unpin,{capture:true,passive:true}));
+  document.addEventListener('mousedown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('left-panel'))siPinned=null;},true);
+  document.addEventListener('keydown',e=>{if(/^(PageUp|PageDown|Home|End)$/.test(e.key))unpin(e);},true);
+  // Tabbing into another section moves the form too: the mark follows focus, not the jump.
+  document.addEventListener('focusin',e=>{
+    if(!siPinned||!e.target||!e.target.closest||e.target.closest('.sec-index'))return;
+    const sec=e.target.closest('.section');
+    if(sec&&sec!==siPinned.closest('.section')){siPinned=null;siSpy();}
+  },true);
+  document.addEventListener('scroll',e=>{
+    if(!e.target||!e.target.classList||!e.target.classList.contains('left-panel')||siTick)return;
+    siTick=true;requestAnimationFrame(()=>{siTick=false;siSpy();});
+  },true);
+}
 function toggleAllSections(){
+  siPinned=null;
   const heads=allSecHeads(),anyClosed=heads.some(h=>h.classList.contains('collapsed'));
   heads.forEach(h=>setSecOpen(h,anyClosed));
   syncSecToggleAll();
@@ -7976,6 +8153,9 @@ function updateSectionHeaders(){
   // Section 2 confirmed-visit notice
   const dxNotice=document.getElementById('dxWorkupConfirmedNotice');
   if(dxNotice) dxNotice.style.display=S.diagStatus==='confirmed'?'':'none';
+  // The general "use when suspected" line would contradict that notice, so it steps aside.
+  const dxUse=document.getElementById('dxWorkupUseHint');
+  if(dxUse) dxUse.style.display=S.diagStatus==='confirmed'?'none':'';
   // ABA level warning
   const abaWarn=document.getElementById('abaLevelWarn');
   if(abaWarn) abaWarn.style.display=(S.diagStatus==='confirmed'&&!S.asdLevelSC&&!S.asdLevelRRB)?'':'none';
@@ -8033,6 +8213,7 @@ function updateSectionHeaders(){
   }
   setSH('sh-followup',!!(S.dbpFollowUp||S.rtcInterval||S.pcpExtra.trim()||S.rxStartedToday||fu.length>1),fu.filter(Boolean).join(' · '));
   autoOpenSections();
+  if(!siQueued&&onNextFrame(()=>{siQueued=false;renderSecIndex();})!==null)siQueued=true;
 }
 
 // ─── COG PROFILE → SPECIFIER BRIDGE ─────────────────────────────────────────
