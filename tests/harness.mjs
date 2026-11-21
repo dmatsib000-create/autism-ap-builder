@@ -58,6 +58,10 @@ const EXPORTS = [
   'syncABATargetsFromNeeds',
   // Pure criteria readers behind the Confirmed summary's fill-in and the form's evidence hints.
   'criteriaGaps',
+  // Pure deciders behind the preview follow (which blocks changed, and which one the view
+  // goes to). The DOM wrapper pvFollow reads the screen; these two read only their arguments.
+  'pvChangedIndexes',
+  'pvPickTarget',
   'evidenceHint',
   // Add-only school-service sync, same shape as syncABATargetsFromNeeds: DOM-driven,
   // mutates S.schoolSvc via a guarded add() whose querySelector/cb.checked/badge steps
