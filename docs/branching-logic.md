@@ -81,6 +81,8 @@ flowchart TD
 
 The two letter generators each have a `*Plain()` sibling (`generateABALetterPlain()`, `generateIEPLetterPlain()`) that produces a copy-friendly plain-text version from the same content object — so when modifying letter content, edit the `_*Content()` builder and both renderings update.
 
+**Preview follow (display only).** Every `render()` path calls `pvFollow(pre)` right after it fills `#notePreview`. It compares the text of the preview's leaf blocks (paragraphs, list items, table cells) inside `.note-doc` / `.aba-doc` with the previous render's, marks each changed block with `.pv-changed` (a short glow; with reduced motion the mark stays until the next change), and, if the change is off screen, scrolls the preview to it. The scroll target is the longest run of neighbouring changed blocks (so ticking Sleep difficulties shows the new sleep plan, not its one-line mention in the summary); when more than 40% of the blocks changed (diagnosis status, age group) it is the first change instead. Typed text marks without scrolling. The status banners above the sheet are outside `.note-doc` and never steer the view. It reads no `S` and changes no output; the copies come from the generators, not this DOM.
+
 ### 1.2 The `S` object — property reference
 
 `S` is created once as `const S = initialState()` and never reassigned. `initialState()` is the only place the state shape is declared: `clearAll()` resets every field from a fresh `initialState()`, so the Clear All reset list can never drift from the properties below. Properties fall into a few categories:
@@ -342,6 +344,8 @@ The markup carries the same state (`class="sec-head collapsed"` on the head, `cl
 **Clear All** calls `resetSections()` before its final render (`setPreviewMode('note')`, see §5.4): the edge memory is emptied and the four defaults re-collapse; since `S` is already blank, that render sees no rising edge. Sections outside the table keep whatever state the clinician left them in.
 
 **Toolbar.** The "Expand all" / "Collapse all" button (`#secToggleAllBtn`, `toggleAllSections()`) sits at the right of the Quick start bar, at the top of the form, and acts on every on-screen section head; a display-gated section (the ABA parameters block) is skipped so it cannot make the label read "Expand all" while everything visible is open. The label is re-synced by `syncSecToggleAll()` after any open/close.
+
+**Section index.** A sticky jump list (`#secIndex`, `renderSecIndex()`, called at the end of `updateSectionHeaders()`) sits at the top of the form column on screens wider than 768px; phones keep their sticky section heads instead. It lists the sections `allSecHeads()` returns (so age-hidden sections drop out), named by each head's `.sec-kicker` (ABA letter and Overrides for the two unnumbered sections), with a dot that mirrors the head's has-content dot. A jump opens the section through `setSecOpen()`, scrolls it under the bar, and moves focus to its header button. The section at the top of the column is marked `.si-here`; the one just jumped to keeps the mark until a hand scroll, because the last sections are too short to reach the top.
 
 Adding a fifth collapsed section is one `SEC_TABLE` row plus the two markup classes on its head and body; adding a relevance trigger is one more clause in that row's `relevant`. Both are unit-tested in `tests/unit.mjs` ("sections:" and "secAutoOpenKeys:" cases).
 

@@ -61,9 +61,9 @@ The eight above produce a clinically defensible note. These six additions are wh
 
 ### Copy the note into Epic
 
-Every output tab has its own copy bar along the bottom of the preview (on a phone it stays pinned to the bottom of the screen), with a **Print** button at its left that prints the tab you are looking at. On the A&P Note tab the bar offers **Assessment (plain)**, **Plan (plain)**, **All (plain)**, and **★ Copy Rich Text**. For Maya's note, click **Copy Rich Text** → switch to Epic → paste into the note composer; formatting (bold, bullets, section structure) is preserved.
+Every output tab has its own copy bar along the bottom of the preview (on a phone it stays pinned to the bottom of the screen), with a **Print** button at its left that prints the tab you are looking at. Every tab ends the bar with the same two buttons in the same places: **Copy plain text** and, at the far right, **★ Copy formatted**. The A&P Note tab adds **Assessment (plain)** and **Plan (plain)** for copying one half. For Maya's note, click **Copy formatted** → paste into Word or straight into the Epic note composer; formatting (bold, bullets, tables, section structure) is preserved.
 
-The ABA Letter and IEP Letter tabs each have their own per-tab toolbar with a second option: **Copy for Epic (plain)**. This copies the letter as plain text with every `{placeholder}` field left exactly as written. Epic treats the braces as cursor stops, so once pasted into the Epic note composer you can press F2 to hop to each placeholder, read its hint, and fill or delete it. Use this for the letter tabs; use Rich Text for the A&P note.
+Both copies leave every `{placeholder}` field exactly as written. Epic treats the braces as cursor stops, so once pasted you can press F2 to hop to each placeholder, read its hint, and fill or delete it. Use **Copy plain text** when you want the words without formatting.
 
 ### If you see ⚠ Incomplete
 
@@ -159,7 +159,7 @@ A few boundaries to know before you rely on the output. Read this section before
 
 - **Doesn't save your inputs between sessions.** The form is stateless by design (no PHI is stored or transmitted). Closing the browser tab discards everything. Copy your outputs into Epic *before* closing the tab. To carry your clicked selections (never typed text) to another session, see [Export / Restore](#save-your-selections-and-reuse-them-export--restore).
 
-- **Doesn't integrate with Epic or any other EMR.** Copy-paste is manual. The Copy for Epic (plain) button produces text whose `{placeholder}` fields act as F2 cursor stops in Epic, but the paste itself is a manual step.
+- **Doesn't integrate with Epic or any other EMR.** Copy-paste is manual. Both copy buttons keep every `{placeholder}` field, which acts as an F2 cursor stop in Epic, but the paste itself is a manual step.
 
 - **Doesn't cover every neurodevelopmental presentation.** Focused on autism evaluations with common comorbidities (ADHD, anxiety, depression, OCD, trauma, language disorder, SLDs, sleep, GI, PFD/ARFID, epilepsy, ID/GDD, catatonia). Less common comorbidities (Fragile X, Rett, Tourette's, etc.) are not yet in the checkbox lists — note them manually in the relevant free-text fields.
 
