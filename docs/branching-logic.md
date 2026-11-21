@@ -495,7 +495,7 @@ The "take the higher" rule is intentional and clinically conservative: a patient
 
 | Use site | Line | Reads |
 |---|---|---|
-| `asdLevel23()` helper (ABA trigger) | 1255 | `asdLevelSC >= '2' \|\| asdLevelRRB >= '2'` — fires `ruleABA`, `rulePCIT`, `rulePsychiatry` |
+| `asdLevel23()` helper (ABA trigger) | 1255 | `asdLevelSC >= '2' \|\| asdLevelRRB >= '2'` — a reason in `ruleABA`, and the note's ABA rationale when no specifier reason applies. It does not drive `rulePsychiatry`, which reads no severity (§7.2 rule 10) |
 | A&P note severity paragraph | various | Both domain levels + justification text are printed separately |
 
 ### 3.5 LEVEL_LABELS and LEVEL_DESC

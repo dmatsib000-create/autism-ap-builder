@@ -958,7 +958,7 @@ const CASES = [
               // Aggression or self-injury does not refer on its own at any age (attending, 2026-11-20);
               // only the stated medication failure does.
               a.S.psychReasons.clear(); a.S.needsBehavior.add('aggression'); a.S.needsBehavior.add('sib');
-              for(const age of ['schoolAge','adolescent']){ a.S.ageGroup=age; assert.ok(!m().includes('Child/Adolescent Psychiatry'), 'aggression/self-injury alone referred at '+age); }
+              for(const age of ['schoolAge','adolescent','youngAdult']){ a.S.ageGroup=age; assert.ok(!m().includes('Child/Adolescent Psychiatry'), 'aggression/self-injury alone referred at '+age); }
               a.S.ageGroup='schoolAge'; a.S.psychReasons.add('behavior_rx_failure');
               assert.ok(m().includes('Referral for: aggression or self-injury not controlled after an alpha-2 agonist and two first-line antipsychotics.'));
               assert.ok(!m().includes('severe interfering behaviors'));
